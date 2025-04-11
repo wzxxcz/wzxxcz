@@ -17,7 +17,7 @@
       "name": "秋天的微风🍀❤️-天天开心❤️"
     },
     {
-      "url": "https://ys.mohuajz.eu.org/付豪/付豪影视.json",
+      "url": "https://ys.mohuajz.eu.org/付豪影视/付豪影视.json",
       "name": "秋天的微风🍀❤️-付豪影视❤️"
     },
     {
