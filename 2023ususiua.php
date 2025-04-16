@@ -8,9 +8,25 @@
       "url": "http://my.djian.top/dfgeg/dhsvj/raw/branch/maing/moyu.json",
       "name": "💕幸福年年❤️-摸鱼儿💓"
     },
+{
+      "url": "https://ys.mohuajz.eu.org/开心软件/api.json",
+      "name": "💕幸福年年❤️-开心软件💓"
+    },
     {
-      "url": "https://12703.kstore.space/%E5%B0%91%E5%84%BF%E9%A2%91%E9%81%93/0319.json",
-      "name": "💕幸福年年❤️-少儿频道💓"
+      "url": "https://ys.mohuajz.eu.org/付豪影视/api.json",
+      "name": "💕幸福年年❤️-付豪影视💓"
+    },
+    {
+      "url": "https://gitee.com/yiwu369/6758/raw/master/青龙/1.json",
+      "name": "💕幸福年年❤️-青龙🐉💓"
+    },
+    {
+      "url": "https://cnb.cool/fish2018/pg/-/git/raw/master/jsm.json",
+      "name": "💕幸福年年❤️-pg💓"
+    },
+    {
+      "url": "https://cccimg.com/down.php/7d1f30263b3f2bf3deda2d7faeef4844.zhen6",
+      "name": "💕幸福年年❤️-真六💓"
     },
     {
       "url": "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1742265799997/总统影院学堂16.1.1.json",
