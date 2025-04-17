@@ -9,6 +9,10 @@
       "name": "💕幸福年年❤️-摸鱼儿💓"
     },
     {
+      "url": "https://ys.mohuajz.eu.org/江楠楠/江楠楠.json",
+      "name": "💕幸福年年❤️-江楠楠影视💓"
+    },
+    {
       "url": "https://ys.mohuajz.eu.org/tvboxqq/戏曲音乐/api.json",
       "name": "💕幸福年年❤️-戏曲音乐💓"
     },
