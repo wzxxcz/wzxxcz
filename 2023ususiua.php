@@ -1,7 +1,7 @@
 {
   "urls": [
-  {
-      "url": "https://d.kstore.dev/download/12703/2025.json",
+    {
+      "url": "http://my.djian.top/yutih2025/uuyug2025/raw/branch/maing/api.json",
       "name": "幸福年年❤️❤️仓库-主用接口"
     },
     {
@@ -24,7 +24,7 @@
       "url": "http://110.40.74.165:666/yunfensi/yunfensi4k.json",
       "name": "💕幸福年年❤️-奇迹云💓"
     },
-{
+    {
       "url": "https://ys.mohuajz.eu.org/开心软件/api.json",
       "name": "💕幸福年年❤️-开心软件💓"
     },
@@ -92,10 +92,10 @@
       "url": "https://hb.xyyh.online/tvbox",
       "name": "幸福年年❤️❤️影视-🐯小 虎 斑"
     },
-  {
+    {
       "name": "🎁🥮幸福年年❤️❤️仓库/瓜子影视",
       "url": "https://git.acwing.com/iduoduo/orange/-/raw/main/config.bin "
-    },  
+    },
     {
       "name": "🎁🥮幸福年年❤️❤️仓库/白云智教",
       "url": "https://gitee.com/ltby1/blue-sky-education/raw/master/蓝天白云智教.json"
