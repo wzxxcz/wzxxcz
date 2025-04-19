@@ -680,12 +680,11 @@
     "logo": "https://s1.imagehub.cc/images/2025/01/15/e8b21391c58ed454c13ade26c003e857.gif",
     "lives": [
         {
-      "name": "十六万歌曲(四网通用)",
-      "type": 0,
-      "url": "https://ys.mohuajz.eu.org/十六万.txt",
-      "playerType": 1
-    }
-  ],
+            "name": "十六首（仅新版影视仓┃ok影视）",
+            "type": 0,
+            "url": "https://ys.mohuajz.eu.org/十六万.txt",
+            "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}"
+        },
         {
             "name": "星火直播",
             "type": 0,
