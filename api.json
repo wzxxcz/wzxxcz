@@ -1,4 +1,4 @@
-//关注微信公众号：奇奇乐分享，发送“本地包”，获取本地包更新链接与图文教程。
+//资源全部免费，仅供测试交流，请勿内置传播与转卖；关注微信公众号：奇奇乐分享，发送“本地包”获取教程与更多资源！
 
 {
     "spider": "./spider.jar",
@@ -6,7 +6,7 @@
     "sites": [
         {
             "key": "豆",
-            "name": "【冬日暖阳-蓝色影视】",
+            "name": "【神秘的哥哥们】",
             "type": 3,
             "api": "csp_DouDouGuard",
             "indexs": 1,
@@ -117,6 +117,17 @@
             "changeable": 1
         },
         {
+            "key": "文采",
+            "name": "💮文采┃秒播",
+            "type": 3,
+            "api": "csp_JpysGuard",
+            "timeout": 10,
+            "playerType": 2,
+            "searchable": 1,
+            "quickSearch": 1,
+            "changeable": 1
+        },
+        {
             "key": "神车",
             "name": "🐻小熊┃秒播",
             "type": 3,
@@ -151,6 +162,17 @@
             "quickSearch": 1,
             "changeable": 1,
             "ext": "https://www.zxzjhd.com/"
+        },
+        {
+            "key": "厂长",
+            "name": "📔厂长┃不卡",
+            "type": 3,
+            "api": "csp_NewCzGuard",
+            "timeout": 10,
+            "playerType": 2,
+            "searchable": 1,
+            "quickSearch": 1,
+            "changeable": 1
         },
         {
             "key": "溢彩",
@@ -208,17 +230,6 @@
             "ext": "rfOb1uAWbkRHp7hdxprG9un3+SLP183q3ik3cJDiAwlFdF8L6SIvrvc9LrpTyIg76T7QJZdEkWNj43wiSaA0TJyQpu2IF2jsSLWFx7WkAmG40hFxJ1tI+Jf+EVG8DtoDRcNi+TtVGULnWrSz3EWnVcxR3EJhXnrwYWe1kJtNW5txuHAO"
         },
         {
-            "key": "火星",
-            "name": "🌞星空┃多线",
-            "type": 3,
-            "api": "csp_AppSxGuard",
-            "timeout": 10,
-            "searchable": 1,
-            "quickSearch": 1,
-            "changeable": 1,
-            "ext": "rfOb1uAWbkRHp7hdxprGv+T3+2qcnI67lW1iKsuzUE0beEMA/nE2s7EhOq5X1M8s5yK9aPYa5Fgv9l9CG+gdBtq3uqM="
-        },
-        {
             "key": "热播",
             "name": "📺热播┃多线",
             "type": 3,
@@ -241,29 +252,6 @@
             "quickSearch": 1,
             "changeable": 1,
             "ext": "uqGL1bNENExT9fFAy5mE5qU="
-        },
-        {
-            "key": "文采",
-            "name": "💮文采┃秒播",
-            "type": 3,
-            "api": "csp_JpysGuard",
-            "timeout": 10,
-            "playerType": 2,
-            "searchable": 1,
-            "quickSearch": 1,
-            "changeable": 1
-        },
-        {
-            "key": "厂长",
-            "name": "📔厂长┃不卡",
-            "type": 3,
-            "api": "csp_NewCzGuard",
-            "timeout": 10,
-            "playerType": 2,
-            "searchable": 1,
-            "quickSearch": 1,
-            "changeable": 1,
-            "ext": "https://www.czzyvideo.com/"
         },
         {
             "key": "奥特",
@@ -669,15 +657,6 @@
             "ext": {
                 "json": "https://im.feelec.com.cn/res/file.html?id=2c9a91099293dce401946513bd90128b"
             }
-        },
-        {
-            "key": "wx",
-            "name": "公众号：神秘的哥哥们",
-            "type": 3,
-            "api": "csp_XPathGuard",
-            "searchable": 1,
-            "quickSearch": 0,
-            "changeable": 0
         },
         {
             "key": "fan",
