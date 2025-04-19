@@ -686,6 +686,24 @@
             "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}"
         },
         {
+            "name": "星火直播",
+            "type": 0,
+            "url": "./lives/星火代理源.txt",
+            "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}"
+        },
+        {
+            "name": "咪咕代理直播",
+            "type": 0,
+            "url": "./lives/咪咕直播.txt",
+            "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}"
+        },
+        {
+            "name": "咪咕直播二",
+            "type": 0,
+            "url": "./lives/咪咕直播2(电信 移动 联通).txt",
+            "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}"
+        },
+        {
             "name": "V4聚合（卡顿请按左┃右键换线）",
             "type": 0,
             "url": "./lives/V4聚合（卡顿请按左┃右键换线）.txt",
