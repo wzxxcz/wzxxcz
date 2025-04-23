@@ -4,6 +4,10 @@
       "url": "http://my.djian.top/yutih2025/uuyug2025/raw/branch/maing/api.json",
       "name": "幸福年年❤️❤️仓库-主用接口"
     },
+   {
+      "url": "https://12523.kstore.space/hx.json",
+      "name": "💕幸福年年❤️-4K接口💓"
+    }, 
     {
       "url": "http://my.djian.top/dfgeg/dhsvj/raw/branch/maing/moyu.json",
       "name": "💕幸福年年❤️-摸鱼儿💓"
@@ -87,10 +91,6 @@
     {
       "name": "🎁🥮幸福年年❤️❤️仓库/海宇影视",
       "url": "https://pan.xccld.icu/f/YQptY/kanhai海宇影视.json"
-    },
-    {
-      "url": "https://hb.xyyh.online/tvbox",
-      "name": "幸福年年❤️❤️影视-🐯小 虎 斑"
     },
     {
       "name": "🎁🥮幸福年年❤️❤️仓库/瓜子影视",
