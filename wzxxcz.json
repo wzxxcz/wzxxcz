@@ -50,16 +50,6 @@
                 "ratio": 1.597
             }
         },
-	{
-	  "key":"热播影视",
-	  "name":"💡热播影视",
-	  "type":3,
-	  "api":"csp_AppRJ",
-	  "searchable":1,
-	  "quickSearch":1,
-	  "filterable":0,
-	  "ext":{"url":"http://v.rbotv.cn"}
-	},
         {
             "key": "天天影视",
             "name": "💡天天影视",
@@ -74,7 +64,7 @@
         },
          {
              "key": "文才py",
-             "name": "文才｜影视",
+             "name": "💡文才影视",
              "type": 3,
              "api": "./py/文才影视.py",
              "searchable": 1,
@@ -83,7 +73,7 @@
              "ext": {"site":"https://www.hkybqufgh.com,https://www.sizhengxt.com,https://0996zp.com,https://9zhoukj.com/,https://www.sizhengxt.com,https://www.tjrongze.com,https://www.jiabaide.cn,https://cqzuoer.com"}},
         {
             "key": "浪酷影视",
-            "name": "浪酷｜影视",
+            "name": "💡浪酷影视",
             "type": 3,
             "api": "csp_AppRJ",
             "searchable": 1,
@@ -92,23 +82,6 @@
             "ext": {
                 "url": "http://v.lkuys.cn"
             }
-        },
-        {
-            "key": "菲儿影视",
-            "name": "菲菲｜影视",
-            "type": 3,
-            "api": "csp_AppFerr",
-            "ext": "sHR2rlsfjI4L3t4RXQMkn/M3t4AXAKTrZj3tfhm1t/gMT3dOrHqIzUNqLUEOIDMvllTbX6e1hMhB2mfpOaCmHNOL1yBB3SmxNyqXlai90EIpdnwOOgCR9Z+YwCTj6ySjzJ2VBiH3eXeOGcavcNeVRA=="
-        },
-        {
-            "key": "影探影视",
-            "name": "影探｜影视",
-            "type": 3,
-            "api": "csp_AppYsV2",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "http://csjt.lyyytv.cn/api.php/app/"
         },
         {
             "key": "金牌影视",
