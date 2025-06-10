@@ -593,8 +593,18 @@
             "ext": "w7TClcONw6LDrsKYwoXCosKcwpvCrcKcw6HDrsKnwqDCo2rCqMKiw7HDsMOxYcKewpvClMOvw5fCqMOmw59VXFLCpMOiw6PCnMKzwpzCjuWGtemEmOaPleWRnMKf5Yem5L6Q5ZGxbeW+oeintui1tOa8ieetjMOXwpvDtw=="
         },
         {
+            "key": "八号影视",
+            "name": "🍊八号影视",
+            "type": 3,
+            "api": "csp_XYQHiker",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./XYQHiker/八号影视.json"
+        },
+        {
             "key": "盒子影视",
-            "name": "盒子｜影视",
+            "name": "🍊盒子影视",
             "type": 3,
             "api": "csp_XYQHiker",
             "searchable": 1,
@@ -603,28 +613,8 @@
             "ext": "./XYQHiker/盒子影视.json"
         },
         {
-            "key": "看看影视",
-            "name": "看看｜影视",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/看看影视.json"
-        },
-        {
-            "key": "骚火影院",
-            "name": "骚火｜影视",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/骚火影视.json"
-        },
-        {
             "key": "电影牛",
-            "name": "电影牛｜影视",
+            "name": "🐂电影牛影视",
             "type": 3,
             "api": "csp_XYQHiker",
             "searchable": 1,
@@ -633,29 +623,8 @@
             "ext": "./XYQHiker/电影牛.json"
         },
         {
-            "key": "剧圈圈",
-            "name": "剧圈圈｜影视",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/剧圈圈.js"
-        },
-        {
-            "key": "看了么",
-            "name": "看了么｜影视",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/看了么.js"
-        },
-        {
-            "key": "茶杯狐",
-            "name": "茶杯狐｜影视",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/茶杯狐.js"
-        },
-        {
             "key": "1905",
-            "name": "1905｜影视",
+            "name": "🍊1905影视",
             "type": 3,
             "api": "csp_Web1905",
             "searchable": 1,
@@ -664,7 +633,7 @@
         },
         {
             "key": "红牛资源",
-            "name": "红牛｜采集",
+            "name": "🐂红牛采集",
             "type": 1,
             "api": "https://www.hongniuzy2.com/api.php/provide/vod/",
             "searchable": 1,
