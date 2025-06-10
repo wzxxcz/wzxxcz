@@ -528,154 +528,69 @@
         },
         {
             "key": "秀儿影视",
-            "name": "秀儿｜影视",
+            "name": "🍊秀儿影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/秀儿影视.json"
         },
         {
-            "key": "奇迹影视",
-            "name": "奇迹｜影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/奇迹影视.json"
-        },
-        {
-            "key": "可可影视",
-            "name": "可可｜影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/可可影视.json"
-        },
-        {
             "key": "海纳影视",
-            "name": "海纳｜影视",
+            "name":"🧿海纳影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/海纳影视.json"
         },
         {
             "key": "面包影视",
-            "name": "面包｜影视",
+            "name": "🍞面包蓝光",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/面包影视.json"
         },
         {
             "key": "永乐影视",
-            "name": "永乐｜影视",
+            "name":"🧿永乐影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/永乐影视.json"
         },
         {
             "key": "雪糕影视",
-            "name": "雪糕｜影视",
+            "name":"🍨雪糕影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/雪糕影视.json"
         },
         {
             "key": "流光影视",
-            "name": "流光｜影视",
+            "name": "⏳️️流光影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/流光影视.json"
         },
         {
-            "key": "星辰影视",
-            "name": "星辰｜影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/星辰影视.json"
-        },
-        {
-            "key": "巴蜀影视",
-            "name": "巴蜀｜影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/巴蜀影视.json"
-        },
-        {
             "key": "泥巴影视",
-            "name": "泥巴｜影视",
+            "name": "🍊泥巴影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/泥巴影视.json"
         },
         {
             "key": "随客影视",
-            "name": "随客｜影视",
+            "name": "🍊随客影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": "./XBPQ/随客影视.json"
         },
         {
-            "key": "一起影视",
-            "name": "一起｜影视",
-            "type": 3,
-            "api": "csp_AppFree4K",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 0,
-            "ext": "w7TCmsONw6LDrsKYwoXCosKcwqDCrcKawqDDosKnwqTCoMKjwrPCosKpw5rDqsKjwpPCncKjwqfDmcOsw57Dn8KbwpRewqbDosOjwqHCpcKaWnvClcKpwqDCrcKawqDDnMKYZWNkwrHDl8Ogw5vCqsKWY8KTYsKxwqbCocKlwppaecKmV8KzwpPCocKuw6BoZGRpw53Dl8Krwq3CrWRjYmHCsMKawqbCmcKhdcKRwp7Cm8OHw5TDsMKgwrRTV+ecpOaTncKgwp/CmsKgw4rClMKiwqPClcOOw6XDpsKgwrRTV8KYwqTDrcOjw63Cs8KpYsKRwqDCoMOvwqTCqMOfw6zCmMKVwpjClMKnw6nDo8OpwqnCncKjwp/CnsKnw6PDosOpwrnCqMKiwpxtwqDCn8KawqDCvsKUwp59wqXDjsOlw6bCoMK0U1fCmMKkw63Do8OtwrPCqWLClMKdXsOvw5zDnsOzwqjClMKjwpnCkcKow5fDp8Okw69ib8KRwpPCtsOXw6fCn8OuwqLCm8KVwp7CtsOEw4PDhcK8dnh6dsOMwr/DkcOPw4B4e8KCVsOuw6XDpsK2wqFfUFfClMOew5bDrMOyw6rCp3vClcKpwqDCrcKawqDDscKowqnCmWbCr8KpwqHDtg=="
-        },
-        {
             "key": "耐看影视",
-            "name": "耐看｜影视",
+            "name": "🍊耐看影视",
             "type": 3,
             "api": "csp_WebNK",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "ext": "w7TClcONw6LDrsKYwoXCosKcwpvCrcKcw6HDrsKnwqDCo2rCqMKiw7HDsMOxYcKewpvClMOvw5fCqMOmw59VXFLCpMOiw6PCnMKzwpzCjuWGtemEmOaPleWRnMKf5Yem5L6Q5ZGxbeW+oeintui1tOa8ieetjMOXwpvDtw=="
-        },
-        {
-            "key": "真心影视",
-            "name": "真心｜影视",
-            "type": 3,
-            "api": "csp_WebGZ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "思古影视",
-            "name": "思古｜影视",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/思古影视.js"
-        },
-        {
-            "key": "追剧影视",
-            "name": "追剧｜影视",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/追剧视频.js"
-        },
-        {
-            "key": "魔力高清",
-            "name": "魔力｜影视",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/魔力高清.js"
-        },
-        {
-            "key": "碟调影视",
-            "name": "碟调｜影视",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/碟调影视.js"
-        },
-        {
-            "key": "八号影视",
-            "name": "八号｜影视",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/八号影视.json"
         },
         {
             "key": "盒子影视",
