@@ -5,36 +5,23 @@
     "sites": [
         {
             "key": "豆瓣",
-            "name": "豆瓣｜推荐",
+            "name": "🍊小橙子影视欢迎您！",
             "type": 3,
             "api": "csp_Douban",
             "searchable": 0
         },
         {
             "key": "预告",
-            "name": "新片｜预告",
+            "name": "🍊新片预告",
             "type": 3,
             "api": "csp_DouBan",
             "searchable": 0
         },
         {
             "key": "本地",
-            "name": "本地｜视频",
+            "name": "🍊本地视频",
             "type": 3,
             "api": "csp_LocalFile"
-        },
-         {
-            "key": "AList",
-            "name": "小雅｜合集",
-            "type": 3,
-            "api": "csp_Alist",
-            "searchable": 1,
-            "filterable": 1,
-            "changeable": 0,
-            "style": {
-                "type": "list"
-            },
-            "ext": "./json/alist.json"
         },
         {
             "key": "急救教学",
@@ -52,7 +39,7 @@
         },
         {
             "key": "配置中心",
-            "name": "配置｜中心",
+            "name": "🍊配置中心",
             "type": 3,
             "api": "csp_Config",
             "searchable": 0,
