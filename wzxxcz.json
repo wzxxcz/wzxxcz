@@ -41,7 +41,6 @@
           "name": "🍊其他配置",
           "type": 3,
           "api": "csp_Config",
-          "jar": "https://xcz.iptv365.org/xczsvip.jar",	
           "searchable": 0,
           "changeable": 0,
           "indexs": 0,
