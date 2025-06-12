@@ -37,19 +37,6 @@
             }
         },
 	{
-          "key": "配置中心1",
-          "name": "🍊其他配置",
-          "type": 3,
-          "api": "csp_Config",
-          "searchable": 0,
-          "changeable": 0,
-          "indexs": 0,
-          "style": {
-                    "type": "rect",
-                    "ratio": 1.597
-           }
-        },	  
-	{
           "key": "hipy_js_好趣网",
           "name": "🍊小橙子电视",
           "type": 3,
@@ -111,6 +98,95 @@
           "searchable": 0,
           "quickSearch": 0,
           "changeable": 0
+        },
+	{
+          "key": "DJ呦呦音乐网",
+          "name": "🎵DJ呦呦",
+          "type": 3,
+          "api": "csp_XYQHiker",
+          "jar": "https://xcz.iptv365.org/spider.jar",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/DJyyyyw.json"
+        },
+	{
+          "key": "hipy_js_种子音乐[听]",
+          "name": "🎵种子音乐",
+          "type": 3,
+          "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
+          "jar": "https://xcz.iptv365.org/spider.jar",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "order_num": 0,
+          "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/种子音乐[听].js"
+        },
+	{
+          "key": "hipy_js_蜻蜓FM",
+          "name": "🦟蜻蜓FM",
+          "type": 3,
+          "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "order_num": 0,
+          "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/蜻蜓FM.js"
+        },
+	{
+          "key": "央视大全",
+          "name": "🍊央视大全",
+          "type": 3,
+          "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "order_num": 0,
+          "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视大全.js"
+        },
+	{
+          "key": "央视经济",
+          "name": "🍊央视经济",
+          "type": 3,
+          "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "order_num": 0,
+          "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视经济.js"
+        },
+        {
+          "key": "央视新闻",
+          "name": "🍊央视新闻",
+          "type": 3,
+          "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "order_num": 0,
+          "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视新闻.js"
+        },
+        {
+         "key": "央视少儿",
+         "name": "🍊央视少儿",
+         "type": 3,
+         "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xczmy/refs/heads/maing/drpy_libs/drpy2.min.js",
+         "searchable": 1,
+         "quickSearch": 1,
+         "filterable": 1,
+         "order_num": 0,
+         "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xczmy/refs/heads/maing/js/央视少儿.js"
+        },	  
+        {
+          "key": "央视综合",
+          "name": "🍊央视综合",
+          "type": 3,
+          "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "order_num": 0,
+          "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视综合.js"
         },
         {
             "key": "急救教学",
