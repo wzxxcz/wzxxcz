@@ -189,15 +189,47 @@
           "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视综合.js"
         },
 	{
-  "key": "alllive",
-  "name": "📽️一直播直播",
-  "type": 3,
-  "api": "csp_AllliveGuard",
-  "playerType": 2,
-  "searchable": 0,
-  "quickSearch": 0,
-  "changeable": 0
-},
+          "key": "alllive",
+          "name": "📽️一直播直播",
+          "type": 3,
+          "api": "csp_AllliveGuard",
+          "playerType": 2,
+          "searchable": 0,
+          "quickSearch": 0,
+          "changeable": 0
+        },
+	{
+            "key": "玩偶哥哥",
+            "name": "🐲小橙子智能4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./json/wogg.json"
+        },
+	{
+            "key": "欧哥",
+            "name":"🐲小橙子4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": "./json/og.json"
+        },
+	{
+            "key": "闪电",
+            "name": "⚡️闪电4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": "./json/sd.json"
+        },
         {
             "key": "急救教学",
             "name": "🍊急救教学",
@@ -252,16 +284,6 @@
             "api": "csp_SP360"
         },
         {
-            "key": "玩偶哥哥",
-            "name": "🐲小橙子智能4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./json/wogg.json"
-        },
-        {
             "key": "木偶",
             "name": "🍁木偶资源4K弹幕",
             "type": 3,
@@ -303,17 +325,6 @@
             "filterable": 1,
             "changeable": 1,
             "ext": "./json/yyds.json"
-        },
-        {
-            "key": "欧哥",
-            "name":"🐲小橙子4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/og.json"
         },
         {
             "key": "二小",
@@ -358,17 +369,6 @@
             "filterable": 1,
             "changeable": 1,
             "ext": "./json/hb.json"
-        },
-        {
-            "key": "闪电",
-            "name": "⚡️闪电4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/sd.json"
         },
         {
             "key": "下饭",
