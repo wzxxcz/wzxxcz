@@ -961,22 +961,8 @@
       ]
     },
     {
-      "key": "豪华采集",
-      "name": "豪华｜采集",
-      "type": 1,
-      "api": "https://hhzyapi.com/api.php/provide/vod/",
-      "quickSearch": 1,
-      "searchable": 1,
-      "changeable": 1,
-      "categories": [
-        "国产动漫",
-        "日韩动漫",
-        "国产剧"
-      ]
-    },
-    {
       "key": "牛牛资源采集",
-      "name": "牛牛｜采集",
+      "name": "🐂牛牛采集",
       "type": 1,
       "api": "https://api.niuniuzy.me/api.php/provide/vod/",
       "quickSearch": 1,
@@ -990,7 +976,7 @@
     },
     {
       "key": "天涯资源网",
-      "name": "天涯｜采集",
+      "name": "💡天涯采集",
       "type": 1,
       "api": "https://tyyszyapi.com/api.php/provide/vod/",
       "quickSearch": 1,
@@ -1004,7 +990,7 @@
     },
     {
       "key": "闪电资源网",
-      "name": "闪电｜采集",
+      "name": "⚡️闪电采集",
       "type": 1,
       "api": "https://sdzyapi.com/api.php/provide/vod/",
       "quickSearch": 1,
@@ -1018,7 +1004,7 @@
     },
     {
       "key": "无尽资源网",
-      "name": "无尽｜采集",
+      "name": "💡无尽采集",
       "type": 1,
       "api": "https://api.wujinapi.net/api.php/provide/vod/",
       "quickSearch": 1,
@@ -1032,7 +1018,7 @@
     },
     {
       "key": "天翼资源网",
-      "name": "天翼｜采集",
+      "name": "💡天翼采集",
       "type": 1,
       "api": "https://www.911ysw.top/tianyi.php/provide/vod/",
       "playUrl": "",
@@ -1044,225 +1030,45 @@
         "国产剧"
       ]
     },
-            {
-            "key": "嗷呜动漫",
-            "name": "嗷呜｜动漫",
-            "type": 3,
-            "api": "./py/嗷呜动漫.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },    
-        {
-            "key": "MiFunP动漫",
-            "name": "MiFunP｜动漫",
-            "type": 3,
-            "api": "./py/MiFunP.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
-        {
-            "key": "CliCli动漫",
-            "name": "CliCli｜动漫",
-            "type": 3,
-            "api": "./py/CliCli动漫.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
-        {
-            "key": "哆啦新番社",
-            "name": "哆啦｜新番社",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "style": {
-                "type": "list"
-            },
-            "ext": "./XBPQ/哆啦新番社.json"
-        },
-        {
-            "key": "56动漫",
-            "name": "56｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/56动漫.js"
-        },
-        {
-            "key": "NT动漫",
-            "name": "NT｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/NT动漫.js"
-        },
-        {
-            "key": "Anime1",
-            "name": "Anime1｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/Anime1.js"
-        },
-        {
-            "key": "曼波动漫",
-            "name": "曼波｜动漫",
-            "type": 3,
-            "api": "csp_Xdai",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "ext": "jaHR0cHM6Ly9hcHAub21vZnVuMS50b3AvYXBpLnBocHw2NmRjMzA5Y2JlZWNhNDU0fDY2ZGMzMDljYmVlY2E0NTR8MTAw"
-        },
-        {
-            "key": "稀饭动漫",
-            "name": "稀饭｜动漫",
-            "type": 3,
-            "api": "csp_Xdai",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "ext": "jaHR0cHM6Ly94ZmFwcC0xMzA1MzkwMDY1LmNvcy5hcC1ndWFuZ3pob3UubXlxY2xvdWQuY29tL2dldGFwcC50eHR8MXlaMlNwbjlrcm56VktvQ3wxeVoyU3BuOWtybnpWS29DfDEwMA=="
-        },
-        {
-            "key": "咕咕动漫",
-            "name": "咕咕｜动漫",
-            "type": 3,
-            "api": "csp_Xdai",
-            "playerType": 1,
-            "ext": "jaHR0cHM6Ly93d3cuZ3VndTMuY29tfG5LZlo4S1g2SlROV1J6VER8bktmWjhLWDZKVE5XUnpURHw0MDE="
-        },
-        {
-            "key": "动画片",
-            "name": "动画片｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/动画片大全.js"
-        },
-        {
-            "key": "路漫漫",
-            "name": "路漫漫｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/路漫漫.js"
-        },
-        {
-            "key": "动漫岛",
-            "name": "动漫岛｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/动漫岛.js"
-        },
-        {
-            "key": "去看吧",
-            "name": "去看吧｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/去看吧.js"
-        },
-        {
-            "key": "爱弹幕",
-            "name": "爱弹幕｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/爱弹幕.js"
-        },
-        {
-            "key": "异世界",
-            "name": "异世界｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/异世界.js"
-        },
-        {
-            "key": "好看动漫",
-            "name": "好看｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/好看动漫.js"
-        },
-        {
-            "key": "奇米动漫",
-            "name": "奇米｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/奇米动漫.js"
-        },
-        {
-            "key": "花子动漫",
-            "name": "花子｜动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/花子动漫.js"
-        },
-        {
-            "key": "蜻蜓FM",
-            "name": "蜻蜓｜FM",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/蜻蜓FM.js"
-        },
-{
-      "key": "csp_Kugou",
-      "name": "酷狗｜听歌",
+    {
+      "key": "曼波动漫",
+      "name": "🍼曼波动漫",
       "type": 3,
-      "api": "csp_Kugou",
-      "jar": "https://4708.kstore.space/jar/Yoursmile.jar",
-      "playerType": 2,
-      "ext": {
-        "classes": [
-          {
-            "type_name": "酷狗",
-            "type_id": "kugou"
-          }
-        ]
-      }
-    },
-{
-            "key": "酷奇MV",
-            "name": "酷奇｜听歌",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/酷奇MV.js"
-        },
-        {
-            "key": "播客",
-            "name": "播客｜听歌",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/播客.js"
-        },
-        {
-            "key": "呦呦DJ",
-            "name": "呦呦｜听歌",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/呦呦DJ.js"
-        },
-        {
-            "key": "清风DJ",
-            "name": "清风｜听歌",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/清风DJ.js"
-        },
-        {
-            "key": "爱车MV",
-            "name": "爱车｜听歌",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/爱车MV.js"
-        },
-        {
+      "api": "csp_Xdai",
+      "searchable": 1,
+      "quickSearch": 0,
+      "filterable": 0,
+      "ext": "jaHR0cHM6Ly9hcHAub21vZnVuMS50b3AvYXBpLnBocHw2NmRjMzA5Y2JlZWNhNDU0fDY2ZGMzMDljYmVlY2E0NTR8MTAw"
+     },
+     {
+       "key": "稀饭动漫",
+       "name": "🤣稀饭动漫",
+       "type": 3,
+       "api": "csp_Xdai",
+       "searchable": 1,
+       "quickSearch": 0,
+       "filterable": 0,
+       "ext": "jaHR0cHM6Ly94ZmFwcC0xMzA1MzkwMDY1LmNvcy5hcC1ndWFuZ3pob3UubXlxY2xvdWQuY29tL2dldGFwcC50eHR8MXlaMlNwbjlrcm56VktvQ3wxeVoyU3BuOWtybnpWS29DfDEwMA=="
+     },
+     {
+       "key": "csp_Kugou",
+       "name": "🎤酷狗音乐",
+       "type": 3,
+       "api": "csp_Kugou",
+       "jar": "https://4708.kstore.space/jar/Yoursmile.jar",
+       "playerType": 2,
+       "ext": {
+                "classes": [
+                {
+                  "type_name": "酷狗",
+                  "type_id": "kugou"
+                }
+                  ]
+               }
+     },
+     {
             "key": "哔哩哔哩相声",
-            "name": "相声｜哔哩",
+            "name": "🍊相声哔哩",
             "type": 3,
             "api": "csp_Bili",
             "searchable": 0,
@@ -1276,7 +1082,7 @@
                 "type": "rect",
                 "ratio": 1.597
             }
-        },
+      },
         {
             "key": "哔哩哔哩小品",
             "name": "小品｜哔哩",
