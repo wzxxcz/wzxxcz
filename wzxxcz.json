@@ -12,16 +12,92 @@
         },
         {
             "key": "预告",
-            "name": "🍊新片预告",
+            "name": "🍊小橙子新片预告",
             "type": 3,
             "api": "csp_DouBan",
             "searchable": 0
         },
         {
             "key": "本地",
-            "name": "🍊本地视频",
+            "name": "🍊我的本地",
             "type": 3,
             "api": "csp_LocalFile"
+        },
+	{
+            "key": "配置中心",
+            "name": "🍊配置中心",
+            "type": 3,
+            "api": "csp_Config",
+            "searchable": 0,
+            "changeable": 0,
+            "indexs": 0,
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            }
+        },
+	{
+          "key": "hipy_js_好趣网",
+          "name": "🍊小橙子电视",
+          "type": 3,
+          "api": "https://gitee.com/wzbdyr/hqds/raw/master/lib/drpy_libs/drpy2.min.js",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "order_num": 87,
+          "ext": "https://gitee.com/wzbdyr/hqds/raw/master/zbjs/好趣网.js"
+        },
+        {
+          "key": "lf_live10_min",
+          "name": "📺︎可欣电视",
+          "type": 3,
+          "searchable": 0,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "api": "https://gitee.com/wzbdyr/xcz/raw/master/js/lf_live10_min-output.js",
+          "ext": "https://gitee.com/wzbdyr/xcz/raw/master/lib/lf_live.json"
+        },
+        {
+          "key": "直播转点播",
+          "name": "📺电视直播",
+          "type": 3,
+          "api": "https://gitee.com/wzbdyr/xcz/raw/master/lib/live.js",
+          "searchable": 0,
+          "quickSearch": 1,
+          "filterable": 0,
+          "ext": "https://gitee.com/wzbdyr/xcz/raw/master/lib/live.json"
+        },
+        {
+          "key": "csp_Kugou",
+          "name": "🎤酷狗音乐",
+          "type": 3,
+          "api": "csp_Kugou",
+          "jar": "https://4708.kstore.space/jar/Yoursmile.jar",
+          "playerType": 2,
+          "ext": {
+                "classes": [
+                {
+                  "type_name": "酷狗",
+                  "type_id": "kugou"
+                }
+                  ]
+               }
+        },
+	{
+          "key": "酷奇",
+          "name": "🎤酷奇MV",
+          "type": 3,
+          "api": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/drpy2.min.js",
+          "ext": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/酷奇MV.js",
+          "style": {
+             "type": "rect",
+             "ratio": 1.597
+           },
+          "timeout": 10,
+          "searchable": 0,
+          "quickSearch": 0,
+          "changeable": 0
         },
         {
             "key": "急救教学",
@@ -36,19 +112,6 @@
                 "ratio": 3.8
             },
             "gridview": "0-0-4.1"
-        },
-        {
-            "key": "配置中心",
-            "name": "🍊配置中心",
-            "type": 3,
-            "api": "csp_Config",
-            "searchable": 0,
-            "changeable": 0,
-            "indexs": 0,
-            "style": {
-                "type": "rect",
-                "ratio": 1.597
-            }
         },
         {
             "key": "天天影视",
@@ -1049,22 +1112,6 @@
        "quickSearch": 0,
        "filterable": 0,
        "ext": "jaHR0cHM6Ly94ZmFwcC0xMzA1MzkwMDY1LmNvcy5hcC1ndWFuZ3pob3UubXlxY2xvdWQuY29tL2dldGFwcC50eHR8MXlaMlNwbjlrcm56VktvQ3wxeVoyU3BuOWtybnpWS29DfDEwMA=="
-     },
-     {
-       "key": "csp_Kugou",
-       "name": "🎤酷狗音乐",
-       "type": 3,
-       "api": "csp_Kugou",
-       "jar": "https://4708.kstore.space/jar/Yoursmile.jar",
-       "playerType": 2,
-       "ext": {
-                "classes": [
-                {
-                  "type_name": "酷狗",
-                  "type_id": "kugou"
-                }
-                  ]
-               }
      },
      {
             "key": "哔哩哔哩相声",
