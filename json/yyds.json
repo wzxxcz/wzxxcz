@@ -1,11 +1,9 @@
 {
-    "SiteUrl": "https://duoduo.banye.tech:7086",
+    "SiteUrl": "https://tv.yydsys.top",
     "Domains": [
-        "https://tv.yydsys.top",
-        "https://tv.yydsys.cc",
-        "https://tv.214521.xyz"
+        "https://tv.yydsys.cc"
     ],
-    "SiteWord": "yyds",
+    "SiteWord": "多多",
     "SiteName": "多多",
     "Classes": [
         {
@@ -23,10 +21,6 @@
         {
             "type_name": "动漫",
             "type_id": "4"
-        },
-        {
-            "type_name": "综艺",
-            "type_id": "20"
         },
         {
             "type_name": "短剧",
