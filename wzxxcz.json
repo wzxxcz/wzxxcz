@@ -274,6 +274,39 @@
             "changeable": 1,
             "ext": "./json/yyds.json"
         },
+	{
+            "key": "百家",
+            "name": "🍊百家4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": "./json/bj.json"
+        },
+	{
+            "key": "大玩",
+            "name": "🍊大玩4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": "./json/dawo.json"
+        },
+	{
+            "key": "奥秘",
+            "name": "🍊奥秘4K",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": "./json/奥秘.json"
+        },
         {
             "key": "急救教学",
             "name": "🍊急救教学",
@@ -348,17 +381,6 @@
             "filterable": 1,
             "changeable": 1,
             "ext": "./json/ex.json"
-        },
-        {
-            "key": "百家",
-            "name": "🍊百家4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/bj.json"
         },
         {
             "key": "大玩",
