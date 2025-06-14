@@ -307,6 +307,27 @@
             "changeable": 1,
             "ext": "./json/奥秘.json"
         },
+	{
+            "key": "至臻",
+            "name": "🏆️至臻4K4K",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": "./json/zz.json"
+        },
+	{
+            "key": "团长",
+            "name": "🍊团长4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebTz",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1
+        },
         {
             "key": "急救教学",
             "name": "🍊急救教学",
@@ -387,17 +408,6 @@
             "api": "csp_SP360"
         },
         {
-            "key": "至臻",
-            "name": "🏆️至臻4K4K",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/zz.json"
-        },
-        {
             "key": "二小",
             "name": "🐂二小4K弹幕",
             "type": 3,
@@ -418,16 +428,6 @@
             "filterable": 1,
             "changeable": 1,
             "ext": "./json/dawo.json"
-        },
-        {
-            "key": "团长",
-            "name": "🍊团长4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebTz",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1
         },
         {
             "key": "雷鲸",
