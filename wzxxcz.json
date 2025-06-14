@@ -230,6 +230,17 @@
             "ext": "./json/hb.json"
         },
 	{
+            "key": "二小",
+            "name": "🐂二小4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 0,
+            "ext": "./json/ex.json"
+        },
+	{
             "key": "蜡笔",
             "name": "👠蜡笔在线",
             "type": 3,
@@ -270,7 +281,7 @@
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "changeable": 1,
+            "changeable": 0,
             "ext": "./json/bj.json"
         },
 	{
@@ -395,17 +406,6 @@
             "name": "💡三六零视频",
             "type": 3,
             "api": "csp_SP360"
-        },
-        {
-            "key": "二小",
-            "name": "🐂二小4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 0,
-            "ext": "./json/ex.json"
         },
         {
             "key": "大玩",
