@@ -629,7 +629,107 @@
                    "分类": "电影$1#剧集$2#动画$41#",
                    "简介": "🍊小橙子为您介绍剧情👉+text-muted col-pd\">&&</div>"
                  }
-        },	  
+        },
+	{
+            "key": "海纳影视",
+            "name":"🧿海纳影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": "./XBPQ/海纳影视.json"
+        },
+	{
+            "key": "面包影视",
+            "name": "🍞面包蓝光",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": "./XBPQ/面包影视.json"
+        },
+	{
+          "key": "木耳",
+          "name": "🍊木耳秒播",
+          "type": 1,
+          "api": "https://json02.heimuer.xyz/api.php/provide/vod",
+          "searchable": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "timeout": 20,
+          "categories": [
+        "剧情片",
+        "动作片",
+        "冒险片",
+        "喜剧片",
+        "奇幻片",
+        "恐怖片",
+        "悬疑片",
+        "惊悚片",
+        "灾难片",
+        "爱情片",
+        "犯罪片",
+        "科幻片",
+        "歌舞片",
+        "战争片",
+        "经典片",
+        "动画电影",
+        "网络电影",
+        "其他片",
+        "国产剧",
+        "港剧",
+        "韩剧",
+        "日剧",
+        "泰剧",
+        "台剧",
+        "欧美剧",
+        "新马剧",
+        "其他剧",
+        "国产综艺",
+        "港台综艺",
+        "韩国综艺",
+        "日本综艺",
+        "欧美综艺",
+        "新马泰综艺",
+        "其他综艺",
+        "古装短剧",
+        "虐恋短剧",
+        "逆袭短剧",
+        "神豪短剧",
+        "重生短剧",
+        "复仇短剧",
+        "穿越短剧",
+        "甜宠短剧",
+        "强者短剧",
+        "欧美动漫",
+        "日本动漫",
+        "韩国动漫",
+        "国产动漫",
+        "港台动漫"
+          ],
+          "header": {
+          "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+           }
+        },
+	{
+          "key": "蜗牛影院",
+          "name": "🐌蜗牛影院",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+	        "数组": "video-item&&</li",
+	        "标题": "title=\"&&\"",
+	        "图片":"data-background=\"&&\"",
+	        "链接": "href=\"&&\"",
+	        "播放数组": "class=\"row ewave-playlist&&</ul>",
+                "播放列表": "<a&&a>",
+                "播放链接": "href=\"&&\"",
+                "播放标题": ">&&</",
+                "线路数组": "class=\"swiper-slide ewave-tab&&li>",
+                "线路标题": ">&&</",
+                "分类url": "https://www.lan-sun.com/vodshow/{cateId}-{area}---{lang}----{catePg}---.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+<p&&</p >"
+          }
+        },  
         {
             "key": "急救教学",
             "name": "🍊急救教学",
@@ -953,20 +1053,6 @@
             "ext": "./XBPQ/秀儿影视.json"
         },
         {
-            "key": "海纳影视",
-            "name":"🧿海纳影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/海纳影视.json"
-        },
-        {
-            "key": "面包影视",
-            "name": "🍞面包蓝光",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/面包影视.json"
-        },
-        {
             "key": "永乐影视",
             "name":"🧿永乐影视",
             "type": 3,
@@ -1282,20 +1368,6 @@
             "playerType": 1,
             "searchable": 1,
             "changeable": 1
-        },
-        {
-            "key": "黑木耳采集",
-            "name": "💡黑木耳采集",
-            "type": 1,
-            "api": "https://json.heimuer.xyz/api.php/provide/vod/",
-            "quickSearch": 1,
-            "searchable": 1,
-            "changeable": 1,
-            "categories": [
-            "国产动漫",
-            "日本动漫",
-            "国产剧"
-            ]
         },
     {
       "key": "四个圈采集",
