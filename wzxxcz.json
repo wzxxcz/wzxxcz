@@ -320,6 +320,19 @@
           "ext": "./json/海绵.json"
         },
 	{
+            "key": "盘库",
+            "name": "🍊盘库4K",
+            "type": 3,
+            "api": "csp_PanWebKuBa",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
+            "searchable": 1,
+            "filterable": 0,
+            "changeable": 0,
+            "ext": {
+                "url": "https://panku8.com,https://yipanso.com"
+            }
+        },
+	{
             "key": "蜡笔",
             "name": "👠蜡笔在线",
             "type": 3,
@@ -493,18 +506,6 @@
             },
             "ext": {
                 "url": "https://www.qupanshe.com"
-            }
-        },
-        {
-            "key": "盘库",
-            "name": "🍊盘库4K",
-            "type": 3,
-            "api": "csp_PanWebKuBa",
-            "searchable": 1,
-            "filterable": 0,
-            "changeable": 0,
-            "ext": {
-                "url": "https://panku8.com,https://yipanso.com"
             }
         },
         {
