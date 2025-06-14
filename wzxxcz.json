@@ -294,15 +294,15 @@
             "ext": "./json/奥秘.json"
         },
 	{
-            "key": "至臻",
-            "name": "🏆️至臻4K4K",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 0,
-            "ext": "./json/zz.json"
+           "key": "至臻",
+           "name": "🏆️至臻4K4K",
+           "type": 3,
+           "api": "csp_PanWebShare",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "changeable": 0,
+           "ext": "./json/zz.json"
         },
 	{
             "key": "团长",
