@@ -1,5 +1,9 @@
 {
     "SiteUrl": "https://www.kuafuzy.com",
+    "Domains": [
+        "https://www.kuafuzy.cc/",
+        "https://www.kfzy.cc/"
+    ],
     "Classes": [
         {
             "type_name": "电影",
