@@ -274,6 +274,51 @@
             "ext": "./json/奥秘.json"
         },
 	{
+            "key": "聚搜",
+            "name": "🍊聚搜4K",
+            "type": 3,
+            "api": "csp_PanWebSearch",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+	    "changeable": 0,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            },
+            "ext": "./json/aliyunpansearch.json"
+        },
+	{
+            "key": "雷鲸",
+            "name": "🍊雷鲸4K",
+            "type": 3,
+            "api": "csp_PanWebShareCloudLJ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            },
+            "ext": "./json/lj.json"
+        },
+	{
+          "key": "海绵",
+          "name": "🍊海绵4K",
+          "type": 3,
+          "api": "csp_PanWebShareCloudHM",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 0,
+          "style": {
+                     "type": "list",
+                     "ratio": 1.433
+                   },
+          "ext": "./json/海绵.json"
+        },
+	{
             "key": "蜡笔",
             "name": "👠蜡笔在线",
             "type": 3,
@@ -419,21 +464,6 @@
             "ext": "./json/dawo.json"
         },
         {
-            "key": "雷鲸",
-            "name": "🍊雷鲸4K",
-            "type": 3,
-            "api": "csp_PanWebShareCloudLJ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/lj.json"
-        },
-        {
             "key": "夸父",
             "name": "🍊夸父4K",
             "type": 3,
@@ -463,21 +493,6 @@
             "ext": {
                 "url": "https://www.qupanshe.com"
             }
-        },
-        {
-            "key": "聚搜",
-            "name": "🍊聚搜4K",
-            "type": 3,
-            "api": "csp_PanWebSearch",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-	    "changeable": 0,
-            "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/aliyunpansearch.json"
         },
         {
             "key": "盘库",
