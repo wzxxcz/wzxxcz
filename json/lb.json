@@ -1,12 +1,14 @@
 {
-    "SiteUrl": "https://labi.banye.tech:7086",
+    "SiteUrl": "https://feimaoai.site",
     "Domains": [
+        "https://feimao666.fun",
+        "http://feimao888.fun",
         "http://feimaoai.site",
         "http://www.labi88.sbs",
-        "https://feimao666.fun",
-        "http://feimao888.fun"
+        "http://fmao.site",
+        "https://fmao.shop"
     ],
-    "SiteWord": "labi",
+    "SiteWord": "蜡笔",
     "SiteName": "蜡笔",
     "Classes": [
         {
@@ -18,20 +20,12 @@
             "type_id": "2"
         },
         {
-            "type_name": "4K",
-            "type_id": "24"
-        },
-        {
             "type_name": "综艺",
             "type_id": "4"
         },
         {
             "type_name": "动漫",
             "type_id": "3"
-        },
-        {
-            "type_name": "短剧",
-            "type_id": "5"
         }
     ],
     "Filters": {
