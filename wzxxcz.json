@@ -519,6 +519,117 @@
             "filterable": 1,
             "changeable": 1
         },
+	{
+            "key": "荐片",
+            "name": "🍊荐片磁力",
+            "api": "csp_Jianpian",
+            "type": 3,
+            "playerType": 1,
+            "ext": "http://api2.rinhome.com"
+        },
+	{
+            "key": "修罗影视",
+            "name": "🍊修罗磁力",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./XBPQ/修罗影视.json"
+        },
+        {
+            "key": "七味",
+            "name": "🍊七味磁力",
+            "type": 3,
+            "api": "csp_QnMp4",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
+            "key": "80S",
+            "name": "🍊80S磁力",
+            "type": 3,
+            "api": "csp_BLSGod",
+            "playerType": 1,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+	{
+            "key": "New6v",
+            "name": "🍊New6V磁力",
+            "type": 3,
+            "api": "csp_New6v",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "https://www.xb6v.com"
+        },
+	{
+            "key": "迅雷吧",
+            "name": "🍊迅雷吧磁力",
+            "type": 3,
+            "api": "csp_Xunlei8",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
+            "key": "狐狸君",
+            "name": "🍊狐狸君磁力",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "changeable": 1,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./XBPQ/狐狸君.json"
+        },
+	{
+            "key": "美剧天堂",
+            "name": "🍊美剧天堂磁力",
+            "type": 3,
+            "api": "csp_MeijuTT",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
+            "key": "电影天堂",
+            "name": "🍊电影天堂磁力",
+            "type": 3,
+            "api": "csp_DyGod",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+	{
+          "key": "饺子影院",
+          "name": "🥟饺子影院",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "ext": {
+                   "请求头": "User-Agent$MOBILE_UA",
+                   "编码": "UTF-8",
+	           "数组": "class=\"myui-vodlist__box\"&&</a",
+	           "标题": "title=\"&&\"",
+	           "副标题": "<span class=\"pic-text text-right\">&&</span>",
+	           "图片":"data-original=\"&&\"",
+	           "链接": "href=\"&&\"",
+	           "线路数组": "#playlist&&</a>",
+	           "线路标题": "tab\">&&</a",
+	           "播放数组": "<ul class=\"myui-content__list&&</ul>",
+                   "播放列表": "<li&&</li>",
+                   "播放标题": ">&&</a>",
+                   "播放链接": "href=\"&&\"",
+	           "跳转播放链接": "var player_*\"url\":\"&&\"",
+	           "搜索url":"https://www.jiaozi.me/search.php?page={pg}&searchkey={wd}&searchtype=",
+                   "分类url": "https://www.jiaozi.me/search.php?page={catePg}&searchtype=5&tid={cateId}",
+                   "分类": "电影$1#剧集$2#动画$41#",
+                   "简介": "🍊小橙子为您介绍剧情👉+text-muted col-pd\">&&</div>"
+                 }
+        },	  
         {
             "key": "急救教学",
             "name": "🍊急救教学",
@@ -1954,157 +2065,6 @@
                 "type": "rect",
                 "ratio": 1.597
             }
-        },
-        {
-            "key": "荐片",
-            "name": "荐片｜磁力",
-            "api": "csp_Jianpian",
-            "type": 3,
-            "playerType": 1,
-            "ext": "http://api2.rinhome.com"
-        },
-        {
-            "key": "修罗影视",
-            "name": "修罗｜磁力",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XBPQ/修罗影视.json"
-        },
-        {
-            "key": "七味",
-            "name": "七味｜磁力",
-            "type": 3,
-            "api": "csp_QnMp4",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "80S",
-            "name": "80S｜磁力",
-            "type": 3,
-            "api": "csp_BLSGod",
-            "playerType": 1,
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "New6v",
-            "name": "New6V｜磁力",
-            "type": 3,
-            "api": "csp_New6v",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "https://www.xb6v.com"
-        },
-        {
-            "key": "SeedHub",
-            "name": "SeedHub｜磁力",
-            "type": 3,
-            "api": "csp_SeedHub",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "美剧迷",
-            "name": "美剧迷｜磁力",
-            "type": 3,
-            "api": "csp_MeijuMi",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "迅雷吧",
-            "name": "迅雷吧｜磁力",
-            "type": 3,
-            "api": "csp_Xunlei8",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "电影港",
-            "name": "电影港｜磁力",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/电影港.json"
-        },
-        {
-            "key": "狐狸君",
-            "name": "狐狸君｜磁力",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "changeable": 1,
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XBPQ/狐狸君.json"
-        },
-        {
-            "key": "布谷TV",
-            "name": "布谷TV｜磁力",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XBPQ/布谷TV.json"
-        },
-        {
-            "key": "BT天堂",
-            "name": "BT天堂｜磁力",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/BT天堂.json"
-        },
-        {
-            "key": "Mp4电影",
-            "name": "Mp4电影｜磁力",
-            "type": 3,
-            "api": "csp_Mp4Mov",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "酷吧电影",
-            "name": "酷吧电影｜磁力",
-            "type": 3,
-            "api": "csp_KubaCL",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "美剧天堂",
-            "name": "美剧天堂｜磁力",
-            "type": 3,
-            "api": "csp_MeijuTT",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "电影天堂",
-            "name": "电影天堂｜磁力",
-            "type": 3,
-            "api": "csp_DyGod",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
         },
         {
             "key": "阿里云盘",
