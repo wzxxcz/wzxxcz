@@ -2108,7 +2108,7 @@
         },
         {
             "key": "阿里云盘",
-            "name": "阿里｜云盘",
+            "name": "🍊阿里云盘",
             "type": 3,
             "api": "csp_PanAli",
             "searchable": 0,
@@ -2122,7 +2122,7 @@
         },
         {
             "key": "夸克云盘",
-            "name": "夸克｜云盘",
+            "name": "🍊夸克云盘",
             "type": 3,
             "api": "csp_PanQuark",
             "searchable": 0,
@@ -2136,7 +2136,7 @@
         },
         {
             "key": "UC",
-            "name": "UC｜云盘",
+            "name": "🍊UC云盘",
             "type": 3,
             "api": "csp_PanUc",
             "searchable": 0,
@@ -2150,7 +2150,7 @@
         },
         {
             "key": "百度云盘",
-            "name": "百度｜云盘",
+            "name": "🍊百度云盘",
             "type": 3,
             "api": "csp_PanBaiDu",
             "searchable": 0,
@@ -2160,41 +2160,7 @@
                 "type": "list",
                 "ratio": 1.433
             }
-        },
-        {
-            "key": "短剧合集",
-            "name": "短剧｜云盘",
-            "type": 3,
-            "api": "./js/quark.min.js",
-            "ext": "./js/短剧合集.js",
-            "style": {
-                "type": "list"
-            }
-        },
-        {
-            "key": "短剧大全",
-            "name": "短剧｜夸克",
-            "type": 3,
-            "api": "./js/quark.min.js",
-            "ext": "./js/短剧大全.js",
-            "style": {
-                "type": "list"
-            }
-        },
-        {
-       "key": "幸福｜拾光",
-       "name": "幸福｜拾光",
-       "type": 3,
-       "api": "csp_XBPQ",
-       "ext": {
-       "请求头": "User-Agent$MOBILE_UA",
-       "编码": "UTF-8",
-       "分类": "电影$chfilm#电视剧$chtvs#综艺$chvariety#动漫$chcg#",  
-       "分类url": "https://www.cgong.com/{cateId}/{class}_{area}_{year}_gold_{catePg}.html",
-       "简介": "喜欢热闹还是喜欢安静
-       " 
-      }
-    }
+        }
     ],
     "parses": [
         {
