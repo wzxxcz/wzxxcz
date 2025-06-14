@@ -350,6 +350,21 @@
                  }
         },
 	{
+            "key": "夸父",
+            "name": "🍊夸父4K",
+            "type": 3,
+            "api": "csp_PanWebShareCloudKF",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            },
+            "ext": "./json/kf.json"
+        },
+	{
             "key": "蜡笔",
             "name": "👠蜡笔在线",
             "type": 3,
@@ -493,21 +508,6 @@
             "filterable": 1,
             "changeable": 1,
             "ext": "./json/dawo.json"
-        },
-        {
-            "key": "夸父",
-            "name": "🍊夸父4K",
-            "type": 3,
-            "api": "csp_PanWebShareCloudKF",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/kf.json"
         },
         {
             "key": "星芽短剧",
