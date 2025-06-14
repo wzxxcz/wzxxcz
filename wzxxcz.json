@@ -211,11 +211,12 @@
             "name": "🍛下饭4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/xf.json"
+            "changeable": 0,
+            "ext": "./json/下饭.json"
         },
 	{
             "key": "虎斑",
@@ -225,7 +226,7 @@
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "changeable": 1,
+            "changeable": 0,
             "ext": "./json/hb.json"
         },
 	{
