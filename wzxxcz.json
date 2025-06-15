@@ -2231,11 +2231,11 @@
           "ext": {
                    "请求头": "User-Agent$MOBILE_UA",
                    "编码": "UTF-8",
-	           "数组": "li class=\"fed-list-item fed-padding fed-col-xs4 fed-col-sm3 fed-col-md2\"&&</li",
+	           "数组":"/sjvoddetail/&&</a>",
 	           "标题": "<a class=\"fed-list-title fed-font-xiv fed-text-center fed-text-sm-left fed-visible fed-part-eone\">&&</a>",
 	           "副标题": "<span class=\"fed-list-remarks fed-font-xii fed-text-white fed-text-center\">&&</span>",
 	           "图片":"data-original=\"&&\"",
-	           "链接": "href=\"&&\"",
+	           "链接":"/sjvoddetail/+&&\"",
 	           "线路数组": "fed-part-eon&&/a>",
 		   "线路标题": "javascript:;\">&&<",
 	           "播放数组": "my-find-frist-play&&</li>", 
