@@ -2199,29 +2199,28 @@
                  }
         },
 	{
-          "key": "新视觉影院",
-          "name": "🍊新视觉影院",
+          "key": "蚂蚁影视",
+          "name": "🍊蚂蚁影视",
           "type": 3,
           "api": "csp_XBPQ",
           "ext": {
                    "请求头": "User-Agent$MOBILE_UA",
                    "编码": "UTF-8",
-	           "数组":"<li class=\"col-lg-6  col-md-6 col-sm-4 col-xs-3&&</li>",
+	           "数组": "class=\"video-pic\"&&</a",
 	           "标题": "title=\"&&\"",
-	           "副标题": "<span class=\"pic-text text-right\">&&</span>",
+	           "副标题": "<span class=\"note text-bg-r\">&&</span>",
 	           "图片":"data-original=\"&&\"",
 	           "链接": "href=\"&&\"",
 	           "线路数组": "data-toggle&&</li>",
-	           "线路标题": "tab\">&&<a",
-	           "播放数组": "myui-content__list&&</ul>",
+	           "线路标题": "tab\">&&</a",
+	           "播放数组": "clearfix fade active in&&</ul>",
                    "播放列表": "<a&&/a>",
                    "播放标题": ">&&<",
                    "播放链接": "href=\"&&\"",
 	           "跳转播放链接": "var player_*\"url\":\"&&\"",
-	           "搜索url":"https://www.xingshiys.com/search.php?page={pg}&searchword={wd}&searchtype=",
-                   "分类url": "https://www.xingshiys.com/{cateId}/index{catePg}.html",
-                   "分类": "电影$dianying#剧集$tv#动漫$anime#综艺$zongyi#短剧$dtv#",
-                   "简介": "🍊小橙子为您介绍剧情👉+tab-content myui-panel_bd\">&&</div>"
+                   "分类url": "https://www.xmyxjx.com/vodshow/{cateId}--------{catePg}---.html",
+                   "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
+                   "简介": "🍊小橙子为您介绍剧情👉+vod-content\">&&</div>"
                  }
         },
 	{
