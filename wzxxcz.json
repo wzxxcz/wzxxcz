@@ -2336,7 +2336,7 @@
                    "请求头": "User-Agent$MOBILE_UA",
                    "编码": "UTF-8",
                    "分类url": "https://www.jiabaide.cn/vod/show/id/{cateId}/type/{class}/area/{area}/year/{year}/page/{catePg}",
-                   "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
+                   "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
                  }
         },
 	{
