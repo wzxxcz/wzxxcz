@@ -2236,7 +2236,7 @@
 	           "副标题": "<div class=\"module-item-text\">&&</div>", 
 	           "图片":"data-src=\"&&\"",
 	           "链接": "href=\"&&\"",
-	           "线路数组": "play-source-tab&&/div>",
+	           "线路数组": "<div&&/div>",
 		   "线路标题": "play-source-tab=\"&&\"",
 	           "播放数组": "id=\"source&&</div>", 
                    "播放列表": "<a&&/a>",
