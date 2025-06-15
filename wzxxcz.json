@@ -2328,6 +2328,13 @@
                  }
         },
 	{
+           "key": "金牌影院",
+           "name": "🥇金牌影院",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": "https://xcz.iptv365.org/XBPQ/金牌影院.json"
+        },
+	{
               "key": "急救教学",
               "name": "🍊急救教学",
               "type": 3,
