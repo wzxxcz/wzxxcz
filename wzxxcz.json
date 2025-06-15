@@ -2236,7 +2236,7 @@
 	           "副标题": "<span class=\"fed-list-remarks fed-font-xii fed-text-white fed-text-center\">&&</span>",
 	           "图片":"data-original=\"&&\"",
 	           "链接": "href=\"&&\"",
-	           "线路数组": "fed-part-eon&&/a>",
+	           "线路数组": "fed-col-sm2&&/li>",
 		   "线路标题": "javascript:;\">&&<",
 	           "播放数组": "my-find-frist-play&&</li>", 
                    "播放列表": "<a&&/a>",
