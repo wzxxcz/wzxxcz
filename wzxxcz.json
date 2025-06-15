@@ -2211,7 +2211,7 @@
 	           "副标题": "<span class=\"note text-bg-r\">&&</span>",
 	           "图片":"data-original=\"&&\"",
 	           "链接": "href=\"&&\"",
-	           "线路数组": "data-toggle&&</li>",
+	           "线路数组": "data-toggle&&</a>",
 	           "线路标题": "tab\">&&</a",
 	           "播放数组": "clearfix fade active in&&</ul>",
                    "播放列表": "<a&&/a>",
