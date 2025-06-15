@@ -2206,7 +2206,7 @@
           "ext": {
                    "请求头": "User-Agent$MOBILE_UA",
                    "编码": "UTF-8",
-	           "数组":"<div class=\"myui-vodlist__box&&</div>",
+	           "数组":"<li class=\"col-lg-6  col-md-6 col-sm-4 col-xs-3&&</li>",
 	           "标题": "title=\"&&\"",
 	           "副标题": "<span class=\"pic-text text-right\">&&</span>",
 	           "图片":"data-original=\"&&\"",
