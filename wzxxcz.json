@@ -2237,7 +2237,7 @@
 	           "图片":"data-src=\"&&\"",
 	           "链接": "href=\"&&\"",
 	           "线路数组": "play-source-tab&&/div>",
-		   "线路标题": "data-source=\"&&\"",
+		   "线路标题": "play-source-tab=\"&&\"",
 	           "播放数组": "id=\"source&&</div>", 
                    "播放列表": "<a&&/a>",
                    "播放标题": ">&&<",
@@ -2246,7 +2246,7 @@
 		   "搜索url":"https://silidm.com/search/{wd}----------{pg}---.html",
                    "分类url": "https://silidm.com/show/{cateId}--------{catePg}---{year}.html",
                    "分类": "电影$dy#剧集$juji#动漫$dongman#综艺$zongyi#",
-                   "简介": "🍊小橙子为您介绍剧情👉+video-info-itemtitle\">&&</div>"
+                   "简介": "🍊小橙子为您介绍剧情👉+剧情：&&</p" 
                  }
         },
 	{
