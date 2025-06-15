@@ -2328,19 +2328,6 @@
                  }
         },
 	{
-          "key": "金牌影院",
-          "name": "🥇金牌影院",
-          "type": 3,
-          "api": "csp_XBPQ",
-          "ext": {
-                   "请求头": "User-Agent$MOBILE_UA",
-                   "编码": "UTF-8",
-                   "分类url": "https://www.jiabaide.cn/vod/show/id/{cateId}/type/{class}/area/{area}/year/{year}/page/{catePg}",
-                   "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
-		   "简介": "🍊小橙子为您介绍剧情👉+shrink-text\">&&</div>"
-                 }
-        },
-	{
               "key": "急救教学",
               "name": "🍊急救教学",
               "type": 3,
