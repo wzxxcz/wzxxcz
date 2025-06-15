@@ -2211,7 +2211,7 @@
 	           "副标题": "<span class=\"note text-bg-r\">&&</span>",
 	           "图片":"data-original=\"&&\"",
 	           "链接": "href=\"&&\"",
-	           "线路数组": "data-toggle&&/a>",
+	           "线路数组": "#con_playlist&&/a>",
 	           "线路标题": "tab\">&&<",
 	           "播放数组": "id=\"con_playlist&&</ul>", 
                    "播放列表": "<a&&/a>",
