@@ -1748,33 +1748,35 @@
         },
 	{
             "key": "聚搜",
-            "name": "🍊聚搜4K",
+            "name": "🍊聚搜4K弹幕",
             "type": 3,
             "api": "csp_PanWebSearch",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-	    "changeable": 0,
+            "changeable": 0,
             "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/aliyunpansearch.json"
+                        "type": "list",
+                        "ratio": 1.433
+                     },
+           "ext": "./lib/聚搜.json"
         },
 	{
             "key": "雷鲸",
-            "name": "🍊雷鲸4K",
+            "name": "🍊雷鲸4K弹幕",
             "type": 3,
             "api": "csp_PanWebShareCloudLJ",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "changeable": 1,
+            "changeable": 0,
             "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/lj.json"
+                       "type": "list",
+                       "ratio": 1.433
+                     },
+            "ext": "./lib/雷鲸.json"
         },
 	{
           "key": "海绵",
