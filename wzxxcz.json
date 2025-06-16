@@ -1639,18 +1639,19 @@
           "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视综合.js"
         },
 	{
-            "key": "玩偶哥哥",
-            "name": "🐲小橙子智能4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-	    "changeable": 0,
-            "ext": "./json/wogg.json"
+          "key": "玩偶",
+          "name": "🐲小橙子智能4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShare",
+	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 0,
+          "ext": "./json/玩偶.json"
         },
 	{
-            "key": "欧哥",
+            "key": "欧歌",
             "name":"🐲小橙子4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
@@ -1659,18 +1660,19 @@
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/og.json"
+            "ext": "./json/欧歌.json"
         },
 	{
             "key": "闪电",
             "name": "⚡️闪电4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/sd.json"
+            "ext": "./json/闪电.json"
         },
 	{
             "key": "下饭",
@@ -1689,11 +1691,12 @@
             "name": "🐅虎斑4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/hb.json"
+            "ext": "./json/虎斑.json"
         },
 	{
             "key": "二小",
@@ -1935,33 +1938,36 @@
             "name": "👠蜡笔在线",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/lb.json"
+            "ext": "./json/蜡笔.json"
         },
 	{
             "key": "木偶",
             "name": "🍁木偶资源4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-	    "changeable": 0,
-            "ext": "./json/mogg.json"
-        },
-	{
-            "key": "多多",
-            "name": "🍥多多弹幕4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/yyds.json"
+            "ext": "./json/木偶.json"
+        },
+        {
+           "key": "多多",
+           "name": "🍥多多弹幕4K弹幕",
+           "type": 3,
+           "api": "csp_PanWebShare",
+	   "jar": "https://xcz.iptv365.org/wzxqh.jar",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "changeable": 0,
+           "ext": "./json/多多.json"
         },
 	{
            "key": "至臻",
@@ -1973,7 +1979,7 @@
            "quickSearch": 1,
            "filterable": 1,
            "changeable": 0,
-           "ext": "./json/zz.json"
+           "ext": "./json/至臻.json"
         },
 	{
             "key": "团长",
