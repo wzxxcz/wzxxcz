@@ -2152,7 +2152,18 @@
                      "url": "http://tt.ysdqjs.cn"
                    }
         },
-	 {
+	{
+            "key": "csp_nongmin",
+            "name": "👨农民1080P",
+            "type": 3,
+            "api": "csp_Wwys",
+	    "jar": "https://xcz.iptv365.org/wzxfr.jar",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "https://wwgz.cn/"
+        },
+	{
             "key": "浪酷影视",
             "name": "💡浪酷影视",
             "type": 3,
