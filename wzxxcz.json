@@ -2176,7 +2176,7 @@
            "ext": {
                     "请求头": "User-Agent$MOBILE_UA",
                     "编码": "UTF-8",
-	            "数组":"<li class=\"list_n2&&</li>",
+	            "数组":"<a class=\"user_list_kz&&</a>",
 	            "标题": "title=\"&&\"",
 	            "副标题": "<span class=\"dbpf\">&&</span>", 
 	            "图片":"src=\"&&\"",
