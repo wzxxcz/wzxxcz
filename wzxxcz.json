@@ -2061,6 +2061,45 @@
             "filterable": 1
         },
 	{
+            "key": "瓜子影视",
+            "name": "🍉瓜子影视",
+            "type": 3,
+            "api": "csp_Gz360",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+	{
+            "key": "天天影视",
+            "name": "🦢天天影视",
+            "type": 3,
+            "api": "csp_AppRJ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 0,
+            "ext": {
+                     "url": "http://tt.ysdqjs.cn"
+                   }
+        },
+	 {
+            "key": "浪酷影视",
+            "name": "💡浪酷影视",
+            "type": 3,
+            "api": "csp_AppRJ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 0,
+            "ext": {
+                     "url": "http://v.lkuys.cn"
+                   }
+        },
+	{
+            "key": "三六零",
+            "name":"💡三六零视频",
+            "type": 3,
+            "api": "csp_SP360"
+        },
+	{
             "key": "快看影视",
             "name":"💡快看影视",
             "type": 3,
@@ -2074,15 +2113,6 @@
             "name": "💐来看影视",
             "type": 3,
             "api": "csp_Lkdy",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "瓜子影视",
-            "name": "🍉瓜子影视",
-            "type": 3,
-            "api": "csp_Gz360",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1
