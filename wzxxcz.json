@@ -2698,6 +2698,31 @@
                  }
         },
 	{
+           "key": "乾坤影院",
+           "name": "🍊乾坤影院",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+	            "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组":"/voddetail/&&</a>",
+	            "标题": "title=\"&&\"",
+	            "副标题": "<span>&&</span>",
+	            "图片": "data-original=\"&&\"",
+	            "链接":"/voddetail/+&&\"",
+	            "线路数组": "data-dropdown&&</small>",
+	            "线路标题": ">&&</",
+	            "播放数组": "<div class=\"module-play-list-content&&</div>",
+                    "播放列表": "<a&&</a>",
+                    "播放标题": ">&&</a>",
+                    "播放链接": "href=\"&&\"",
+	            "跳转播放链接": "var player_*\"url\":\"&&\"",
+                    "分类url": "https://www.qiankun.tv/vodshow/{cateId}--------{catePg}---{year}.html",
+                    "分类": "电影$movie#电视$tv#综艺$variety#动漫$anime#短剧$playlet#",
+	            "简介": "🍊小橙子为您介绍剧情👉+module-info-introduction-content\">&&</div>"
+                 }
+        },
+	{
           "key": "饺子影院",
           "name": "🥟饺子影院",
           "type": 3,
