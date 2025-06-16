@@ -2542,7 +2542,32 @@
                     "分类": "电影$dianying#连续剧$lianxuju#综艺$zonyi#动漫$dongman#体育赛事$tiyusaishi#",
                     "简介": "🍊小橙子为您介绍剧情👉+mo-paxs-5px mo-ptxs-0px\">&&</div>"
                   }
-        }, 	  	  
+        },
+	{
+            "key": "魅影视频",
+            "name": "🍊魅影视频",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                      "请求头": "User-Agent$MOBILE_UA",
+                      "编码": "UTF-8",
+	              "数组": "<li class=\"col-lg-2 col-sm-3 col-xs-4&&</li>",
+	              "标题": "title=\"&&\"",
+	              "副标题": "<span class=\"note text-bg-r\">&&</span>", 
+	              "图片":"data-original=\"&&\"",
+	              "链接": "href=\"&&\"",
+	              "线路数组": "<a class=\"gico wolong&&/a>",
+	              "线路标题": ">&&</a",
+	              "播放数组": "<ul class=\"clearfix fade&&</ul>",
+                      "播放列表": "<li&&</li>",
+                      "播放标题": ">&&</a>",
+                      "播放链接": "href=\"&&\"",
+	              "跳转播放链接": "var player_*\"url\":\"&&\"",
+                      "分类url": "https://www.heitujc.com/screen/{cateId}-{area}-------{catePg}---.html",
+                      "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
+                      "简介": "🍊小橙子为您介绍剧情👉+vod-content\">&&</div>"
+                   }
+        },  
 	{
           "key": "饺子影院",
           "name": "🥟饺子影院",
