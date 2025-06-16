@@ -2160,6 +2160,14 @@
           "ext": "eaHR0cHM6Ly9kLmRjbW92aWUudG9w"
         },
 	{
+          "key": "二三",
+          "name": "🍧二三蓝光",
+          "type": 3,
+          "api": "csp_Muou",
+          "playerType": 2,
+          "ext": "caHR0cHM6Ly8xMjN5c3cuY29tfDIz5b2x6KeGfDQuMS44"
+        },
+	{
             "key": "三六零",
             "name":"💡三六零视频",
             "type": 3,
