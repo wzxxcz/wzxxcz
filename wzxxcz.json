@@ -1984,16 +1984,6 @@
             "ext": "http://api2.rinhome.com"
         },
 	{
-          "key": "贱贱",
-          "name": "🐭荐片纯净",
-          "type": 3,
-          "api": "csp_JPJGuard",
-          "playerType": 2,
-          "searchable": 1,
-          "quickSearch": 1,
-          "changeable": 0
-        },
-	{
             "key": "修罗影视",
             "name": "🍊修罗磁力",
             "type": 3,
