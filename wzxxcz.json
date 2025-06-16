@@ -2567,7 +2567,33 @@
                       "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
                       "简介": "🍊小橙子为您介绍剧情👉+vod-content\">&&</div>"
                    }
-        },  
+        },
+	{
+           "key": "影趣网",
+           "name": "🍊影趣网",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                    "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组":"<a class=\"hl-item-thumb hl-lazy&&</a>",
+	            "标题": "title=\"&&\"",
+	            "副标题": "<span class=\"hl-lc-1 remarks\">&&</span>", 
+	            "图片":"data-original=\"&&\"",
+	            "链接": "href=\"&&\"",
+	            "线路数组": "<a class=\"hl-tabs-btn hl-slide-swiper&&/a>",
+	            "线路标题": "</i>&&<",
+	            "播放数组": "<ul class=\"hl-plays-list hl-sort-list&&</ul>",
+                    "播放列表": "<li&&</li>",
+                    "播放标题": ">&&</a>",
+                    "播放链接": "href=\"&&\"",
+	            "跳转播放链接": "var player_*\"url\":\"&&\"",
+	            "搜索url":"https://www.yingqu1.com/vodsearch/{wd}----------{pg}---.html",
+                    "分类url": "https://www.yingqu1.com/vodshow/{cateId}-{area}---{lang}----{catePg}---{year}.html",
+                    "分类": "电影$1#电视剧$2#动漫$3#综艺$4#番剧$66#",
+                    "简介": "🍊小橙子为您介绍剧情👉+hl-text-muted\">&&</div>"
+                  }
+        },
 	{
           "key": "饺子影院",
           "name": "🥟饺子影院",
