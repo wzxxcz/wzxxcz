@@ -2194,6 +2194,14 @@
             "ext": "sHR2rlsfjI4L3t4RXQMknw+zXdsvYSFPrylVBk8Otj7BtrOcImUIxu7uCmi/oCEVSH+1Tuw/tXHzW47SGQsj8bRydPRgWesjHAxv9eu8eO9hOGeUeBKsucMHODs09HXY4kiPp3p1vemBghpvJFm9mx/FFTQYaEQ33Bpqwk73VkDa2zWgoB0CNuBseJhbj2hRKqOiT08iymzh4sSfhjJ5tbS5yTDxPIJAjwMijWuyOJB++d859vxajKD2Jg5qw0lv"
         },
 	{
+            "key": "csp_LiteApple",
+            "name": "🍎苹果1080P",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_LiteApple",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg"
+        },
+	{
             "key": "天天影视",
             "name": "🦢天天影视",
             "type": 3,
