@@ -2130,16 +2130,6 @@
                  }
         },
 {
-  "key": "Dm84",
-  "name": "🚌巴士动漫",
-  "type": 3,
-  "api": "csp_Dm84Guard",
-  "timeout": 10,
-  "searchable": 1,
-  "quickSearch": 1,
-  "changeable": 1
-},
-{
   "key":"魔都资源",
   "name":"🤣魔都动漫",
   "type":1,
@@ -2154,7 +2144,6 @@
   "type": 3,
   "quickSearch": 1,
   "api": "csp_AppGet",
-  "jar": "https://xcz.iptv365.org/xczxs.jar",
   "ext": {
            "url": "https://pzoap.moedot.net",
            "dataKey": "1yZ2Spn9krnzVKoC",
