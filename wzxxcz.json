@@ -182,6 +182,16 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
              },
 	     {
+                "key": "酷狗音乐",
+                "name": "🎤酷狗音乐",
+                "type": 3,
+                "api": "csp_Kugou",
+                "jar": "https://xcz.iptv365.org/wzxwkx.jar",
+                "searchable": 0,
+                "quickSearch": 0,
+                "filterable": 0
+             },
+	     {
                 "name": "小橙子咪咕央卫视",
                 "type": 0,
                 "url": "http://gg.7749.org/z/i/赛事.txt",
