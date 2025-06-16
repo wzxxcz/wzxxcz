@@ -2153,23 +2153,11 @@
         }
 },
 {
-  "key": "mutefun",
-  "name": "🤣DFun动漫",
-  "type": 3,
-  "api": "csp_WebMuTeFun",
-  "jar": "https://xcz.iptv365.org/moyuer.php",
-  "searchable": 1,
-  "quickSearch": 0,
-  "filterable": 0,
-  "ext": "https://www.mutefun.tv"
-},
-{
   "key": "咕咕动漫",
   "name":"🤣咕咕动漫",
   "type": 3,
   "quickSearch": 1,
   "api": "csp_AppGet",
-  "jar": "https://xcz.iptv365.org/xczxs.jar",
   "ext": {
            "url": "https://www.gugu3.com",
            "dataKey": "nKfZ8KX6JTNWRzTD",
@@ -2184,7 +2172,6 @@
   "type": 3,
   "quickSearch": 1,
   "api": "csp_AppGet",
-  "jar": "https://xcz.iptv365.org/xczxs.jar",
   "ext": {
            "url": "http://45.43.29.111:9527",
            "dataKey": "GETMIFUNGEIMIFUN",
@@ -2199,7 +2186,6 @@
   "type": 3,
   "quickSearch": 1,
   "api": "csp_AppGet",
-  "jar": "https://xcz.iptv365.org/xczxs.jar",
   "ext": {
            "url": "https://app.omofun1.top",
            "dataKey": "66dc309cbeeca454",
@@ -2230,7 +2216,6 @@
   "name": "🤣哆啦新番社",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczsvip.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2262,7 +2247,6 @@
   "type": 3,
   "quickSearch": 1,
   "api": "csp_AppGet",
-  "jar": "https://xcz.iptv365.org/wzxm20250530.jar",
   "ext": "sHR2rlsfjI4L3t4RXQMknxpaIJpWVf3QzJplZjkP8PMRCMAhDX6EuvKn3nmHvaAsNUZGiKejIkSYz7ryONX2fTpbNlJxpW1MZZY7Zt3lbwTJw/1s2QIhPpqxOmR/0EWAwYNShA0Asl0C1lkcmCbV6PsNna5kYEh7as/WabRCm9KrPTGJu6URWhPGeAaWchMgMYJlwNXFIeA2neoQGplg4A=="
 },
 {
@@ -2270,7 +2254,6 @@
   "name": "🌟星芽短剧",
   "type":3,
   "api":"csp_AppXY",
-  "jar": "https://xcz.iptv365.org/wzxo20250523.php",
   "searchable":1,
   "quickSearch":0,
   "filterable":0
@@ -2280,7 +2263,6 @@
   "name": "🦛河马短剧",
   "type": 3,
   "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xczmy/refs/heads/maing/py/河马短剧.py",
-  "jar": "https://xcz.iptv365.org/xczsvip.jar",
   "searchable": 1,
   "changeable": 1,
   "quickSearch": 1,
@@ -2292,15 +2274,13 @@
   "name": "🐸上头短剧",
   "type": 3,
   "quickSearch": 1,
-  "api": "csp_AppXY",
-  "jar": "https://xcz.iptv365.org/wzxm20250530.jar"
+  "api": "csp_AppXY"
 },
 {
   "key": "短剧网",
   "name": "🍊短剧网",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "ext": "https://xcz.iptv365.org/XBPQ/短剧网.json"
 },
 {
@@ -2308,7 +2288,6 @@
   "name": "🍊偷乐短剧",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2319,7 +2298,6 @@
   "name": "🍊短剧屋",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/jar/xczzx.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2330,7 +2308,6 @@
   "name": "🍊蓝莓短剧",
   "type": 3,
   "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/drpy2.min.js",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2356,7 +2333,6 @@
 	   },
   "quickSearch": 0,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/0930/评书.json"
 }, 
 {
@@ -2364,7 +2340,6 @@
   "name": "🍊梨园春",
   "type": 3,
   "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2376,7 +2351,6 @@
   "name": "🍊听书网",
   "type": 3,
   "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2388,7 +2362,6 @@
   "name": "🍊听书博看",
   "type": 3,
   "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/drpy2.min.js",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "changeable": 0,
   "style": {
             "type": "rect",
@@ -2401,7 +2374,6 @@
   "name": "🍊听书六月",
   "type": 3,
   "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/drpy2.min.js",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "changeable": 0,
   "style": {
              "type": "rect",
@@ -2414,7 +2386,6 @@
   "name": "🍊爱上听书",
   "type": 3,
   "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/drpy_libs/drpy2.min.js",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2426,7 +2397,6 @@
   "name": "🐅贝乐虎",
   "type": 3,
   "api": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/drpy2.min.js",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2438,7 +2408,6 @@
   "name": "🐇兔小贝",
   "type": 3,
   "api": "csp_XYQHiker",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 1,
   "quickSearch": 1,
   "filterable": 1,
@@ -2449,7 +2418,6 @@
   "name": "🐇兔贝儿",
   "type": 3,
   "api": "csp_XYQHiker",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 0,
   "quickSearch": 1,
   "filterable": 1,
@@ -2460,7 +2428,6 @@
   "name": "🍊童趣",
   "type": 3,
   "api": "csp_XYQHiker",
-  "jar": "https://xcz.iptv365.org/spider.jar",
   "searchable": 0,
   "quickSearch": 0,
   "filterable": 1,
@@ -2486,7 +2453,6 @@
   "name": "📚听书BOOK",
   "type": 3,
   "api": "csp_TingBook",
-  "jar": "https://xcz.iptv365.org/wzxm20250530.jar",
   "searchable": 1,
   "ext": "http://www.6yueting.com"
 },
