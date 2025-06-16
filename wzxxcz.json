@@ -1842,7 +1842,7 @@
         },
 	{
           "key": "双子",
-          "name": "🍊子星4K",
+          "name": "🍊子星4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/drpy2.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1854,7 +1854,7 @@
         },
         {
           "key": "双星",
-          "name": "🍊双星4K",
+          "name": "🍊双星4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1865,7 +1865,7 @@
         },
 	{
           "key": "懒盘",
-          "name": "🍊懒盘4K",
+          "name": "🍊懒盘4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1876,7 +1876,7 @@
         },
 	{
           "key": "米搜",
-          "name": "🌾米搜4K4K",
+          "name": "🌾米搜4K4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1887,7 +1887,7 @@
         },
 	{
           "key": "UC4K",
-          "name": "🍊UC4K",
+          "name": "🍊UC4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1898,7 +1898,7 @@
         },
         {
           "key": "夸克4K",
-          "name": "🍊夸克4K",
+          "name": "🍊夸克4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1909,7 +1909,7 @@
         },
         {
           "key": "百度4K",
-          "name": "🍊百度4K",
+          "name": "🍊百度4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1920,7 +1920,7 @@
         },
         {
           "key": "全盘",
-          "name": "🍊全盘4K",
+          "name": "🍊全盘4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1931,7 +1931,7 @@
         },
         {
           "key": "盘搜",
-          "name": "🍊盘搜4K",
+          "name": "🍊盘搜4K弹幕",
           "type": 3,
           "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -2528,6 +2528,21 @@
       },
       "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xcz/refs/heads/master/json/阿里.json"
 },
+{
+      "key": "阿里云盘",
+      "name": "我的 | 阿里",
+      "type": 3,
+      "api": "csp_PanAli",
+      "searchable": 0,
+      "filterable": 0,
+      "changeable": 0,
+      "style": {
+        "type": "list",
+        "ratio": 1.433
+      },
+      "ext": "./lib/阿里.json"
+    },
+
 {
   "key": "夸克云盘",
   "name": "🍊我的夸克",
