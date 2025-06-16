@@ -2078,18 +2078,17 @@
           "quickSearch": 1
         },
 	{
-          "key": "仓鼠",
-          "name": "🐹仓鼠蓝光",
+          "key": "忍者",
+          "name": "🥷忍者蓝光",
           "type": 3,
           "quickSearch": 1,
-          "api": "csp_AppGet2",
-	  "jar": "https://xcz.iptv365.org/xczm.php",
+          "api": "csp_AppGet",
           "ext": {
-                   "url": "https://qjappcms.cs4k.top",
-                   "dataKey": "Z98KXaLtO2wC1Pte",
-                   "dataIv": "Z98KXaLtO2wC1Pte",
+                   "url": "https://mfxs123.sbs",
+                   "dataKey": "1234567887654321",
+                   "dataIv": "1234567887654321",
                    "deviceId": "",
-                   "version": "120"
+                   "version": ""
                  }
         },
 	{
