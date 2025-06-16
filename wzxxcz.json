@@ -2186,6 +2186,14 @@
             "ext": "sHR2rlsfjI4L3t4RXQMkn85YdqME5ZFXdHXyEUNrexXmXuKOZHlPhQJvT6ZKEMODJQuGTLg+gpKS+XoOxUH8DdjcutGqV/lfrY9l/Ww/J/LYA0AH34KTXsOeg1p5p+KSYaG5at+IT/dqPugeQjLLpkECHqWJpIs4B2evdM7dDIOBuPmMrT5lbU1yNZHMNkr8tConVxhS1qlq57WIByuNTQ=="
         },
 	{
+            "key": "人人",
+            "name": "⛄️人人1080P",
+            "type": 3,
+            "api": "csp_AppGet",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
+            "ext": "sHR2rlsfjI4L3t4RXQMknw+zXdsvYSFPrylVBk8Otj7BtrOcImUIxu7uCmi/oCEVSH+1Tuw/tXHzW47SGQsj8bRydPRgWesjHAxv9eu8eO9hOGeUeBKsucMHODs09HXY4kiPp3p1vemBghpvJFm9mx/FFTQYaEQ33Bpqwk73VkDa2zWgoB0CNuBseJhbj2hRKqOiT08iymzh4sSfhjJ5tbS5yTDxPIJAjwMijWuyOJB++d859vxajKD2Jg5qw0lv"
+        },
+	{
             "key": "天天影视",
             "name": "🦢天天影视",
             "type": 3,
