@@ -2115,14 +2115,17 @@
                    }
         },
 	{
-            "key": "菲儿影视",
-            "name": "🥪菲菲蓝光",
+            "key": "雨滴",
+            "name": "⛱️雨滴蓝光",
             "type": 3,
-            "api": "csp_AppFerr",
+            "quickSearch": 1,
+            "api": "csp_AppGet",
             "ext": {
-                     "url": "https://appcms.freehd.vip",
-                     "dataKey": "be5348dfb0c3c283",
-                     "dataIv": "5f5449dd14313217"
+                     "url": "https://c8w2ov7u5wg2z1o8p21c.aliyuncs.click:27899",
+                     "dataKey": "k9o3p2c8b7m3z0o8",
+                     "dataIv": "k9o3p2c8b7m3z0o8",
+                     "deviceId": "",
+                     "version": "100"
                    }
         },
 	{
