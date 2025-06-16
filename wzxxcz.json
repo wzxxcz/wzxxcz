@@ -2285,13 +2285,6 @@
             "quickSearch": 1,
             "filterable": 1
         },
-        {
-            "key": "农民影视",
-            "name": "👨农民影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/农民影视.json"
-        },
 	{
           "key": "饺子影院",
           "name": "🥟饺子影院",
