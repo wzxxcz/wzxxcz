@@ -1796,7 +1796,7 @@
         },
 	{
             "key": "盘库",
-            "name": "🍊盘库4K",
+            "name": "🍊盘库4K弹幕",
             "type": 3,
             "api": "csp_PanWebKuBa",
 	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1809,7 +1809,7 @@
         },
 	{
           "key": "趣盘",
-          "name": "🍊趣盘4K",
+          "name": "🍊趣盘4K弹幕",
           "type": 3,
           "api": "csp_PanWebQu",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
@@ -1826,18 +1826,19 @@
         },
 	{
             "key": "夸父",
-            "name": "🍊夸父4K",
+            "name": "🍊夸父4K弹幕",
             "type": 3,
             "api": "csp_PanWebShareCloudKF",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 1,
             "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/kf.json"
+                       "type": "list",
+                       "ratio": 1.433
+                     },
+            "ext": "./lib/夸父.json"
         },
 	{
           "key": "双子",
