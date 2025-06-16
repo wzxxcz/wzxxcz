@@ -2491,6 +2491,33 @@
                  }
         }, 
 	{
+           "key": "毒舌电影",
+           "name": "🐍毒舌电影",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "jar": "https://xcz.iptv365.org/xczzx.jar",
+           "ext": {
+                    "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组": "/detail/&&</a",
+	            "标题": "<div class=\"v-item-title\">&&</div>",
+	            "副标题": "<v-item-bottom\"><span>&&</span>",  
+	            "图片": "https://vres.wxwoq.com/+data-original=\"/&&\"",
+	            "链接": "/detail/+&&\"",
+	            "线路数组": "source-item-label&&/span>",
+	            "线路标题": ">&&<",
+	            "播放数组": "episode-list&&</div>",
+                    "播放列表": "<a&&</a>",
+                    "播放标题": ">&&</a>",
+                    "播放链接": "href=\"&&\"",
+	            "跳转播放链接": "var player_*\"url\":\"&&\"",
+	            "搜索url":"https://www.dushe9.app/search?k={wd}&page={pg}&t=gvh6t8YRtIEfXu%2FjSdQL1w%3D%3D",
+                    "分类url": "https://www.dushe9.app/show/{cateId}--{area}-{lang}-{year}-3-{catePg}.html",
+                    "分类": "电影$1#连续剧$2#动漫$3#综艺纪录$4#短剧$6#",
+                    "简介": "🍊小橙子为您介绍剧情👉+detail-desc\">&&</div>"
+                }
+        }, 
+	{
           "key": "饺子影院",
           "name": "🥟饺子影院",
           "type": 3,
