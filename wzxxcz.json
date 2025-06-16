@@ -2153,6 +2153,14 @@
         }
 },
 {
+  "key": "咕咕动漫",
+  "name": "🤣咕咕动漫",
+  "type": 3,
+  "api": "csp_Xdai",
+  "playerType": 1,
+  "ext": "jaHR0cHM6Ly93d3cuZ3VndTMuY29tfG5LZlo4S1g2SlROV1J6VER8bktmWjhLWDZKVE5XUnpURHw0MDE="
+},
+{
   "key": "去看吧",
   "name": "🍡看吧动漫",
   "type": 3,
@@ -2356,42 +2364,6 @@
   "changeable": 0
 },
 {
-  "key": "926",
-  "name": "⚽926看球",
-  "type": 3,
-  "api": "csp_kanqiu926Guard",
-  "timeout": 10,
-  "searchable": 0,
-  "changeable": 0,
-  "style": {
-             "type": "list"
-           }
-},
-{
-  "key": "看球",
-  "name": "⚽看球直播",
-  "type": 3,
-  "api": "csp_KanqiuGuard",
-  "timeout": 10,
-  "searchable": 0,
-  "changeable": 0,
-  "style": {
-             "type": "list"
-           }
-},
-{
-  "key": "88",
-  "name": "⚽88看球",
-  "type": 3,
-  "api": "csp_Sir88Guard",
-  "timeout": 10,
-  "searchable": 0,
-  "changeable": 0,
-  "style": {
-             "type": "list"
-           }
-},
-{
   "key": "Jrsjs",
   "name": "⚽ Jrs球迷",
   "type": 3,
@@ -2405,18 +2377,6 @@
   "quickSearch": 0,
   "changeable": 0
 },
-{
-  "key": "看球PY",
-  "name": "⚽球球看球",
-  "type": 3,
-  "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xczmy/refs/heads/maing/py/球球.py",
-  "jar": "https://xcz.iptv365.org/xczsvip.jar",	
-  "searchable": 1,
-  "changeable": 1,
-  "quickSearch": 1,
-  "filterable": 1,
-  "playerType": 2
-},		
 {
       "key": "阿里云盘",
       "name": "🍊我的阿里",
