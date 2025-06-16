@@ -2078,20 +2078,6 @@
           "quickSearch": 1
         },
 	{
-          "key": "忍者",
-          "name": "🥷忍者蓝光",
-          "type": 3,
-          "quickSearch": 1,
-          "api": "csp_AppGet",
-          "ext": {
-                   "url": "https://mfxs123.sbs",
-                   "dataKey": "1234567887654321",
-                   "dataIv": "1234567887654321",
-                   "deviceId": "",
-                   "version": ""
-                 }
-        },
-	{
             "key": "天天影视",
             "name": "🦢天天影视",
             "type": 3,
@@ -2181,6 +2167,33 @@
                    "简介": "🍊小橙子为您介绍剧情👉+text-muted col-pd\">&&</div>"
                  }
         },
+	{
+           "key": "108影院",
+           "name": "🍊108影院",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "jar": "https://xcz.iptv365.org/xczzx.jar",
+           "ext": {
+                    "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组":"<li class=\"list_n2&&</li>",
+	            "标题": "title=\"&&\"",
+	            "副标题": "<span class=\"dbpf\">&&</span>", 
+	            "图片":"src=\"&&\"",
+	            "链接": "href=\"&&\"",
+	            "线路数组": "data-toggle&&</a>",
+	            "线路标题": "tab\">&&<",
+	            "播放数组": "<ul class=\"page_ullist&&</ul>",
+                    "播放列表": "<a&&</a>",
+                    "播放标题": ">&&<",
+                    "播放链接": "href=\"&&\"",
+	            "跳转播放链接": "var player_*\"url\":\"&&\"",
+	            "搜索url":"http://guochan108yingyuan.hqbbq.com/so/{wd}/{pg}.html",
+                    "分类url": "http://guochan108yingyuan.hqbbq.com/hqbbqs/{cateId}/{catePg}.html",
+                    "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
+                    "简介": "🍊小橙子为您介绍剧情👉+HvkXcS col-xs-12\">&&</div>"
+                 }
+         }, 	  	  
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
