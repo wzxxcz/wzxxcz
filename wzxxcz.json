@@ -1703,39 +1703,43 @@
             "name": "🐂二小4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/ex.json"
+            "ext": "./json/二小.json"
         },
 	{
             "key": "百家",
             "name": "🍊百家4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/bj.json"
+            "ext": "./json/百家.json"
         },
 	{
             "key": "大玩",
             "name": "🍊大玩4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 0,
-            "ext": "./json/dawo.json"
+            "ext": "./json/大玩.json"
         },
 	{
             "key": "奥秘",
             "name": "🍊奥秘4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
+	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
