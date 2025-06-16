@@ -2526,23 +2526,8 @@
         "type": "list",
         "ratio": 1.433
       },
-      "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xcz/refs/heads/master/json/阿里.json"
+      "ext": "./json/阿里.json"
 },
-{
-      "key": "阿里云盘",
-      "name": "我的 | 阿里",
-      "type": 3,
-      "api": "csp_PanAli",
-      "searchable": 0,
-      "filterable": 0,
-      "changeable": 0,
-      "style": {
-        "type": "list",
-        "ratio": 1.433
-      },
-      "ext": "./lib/阿里.json"
-    },
-
 {
   "key": "夸克云盘",
   "name": "🍊我的夸克",
