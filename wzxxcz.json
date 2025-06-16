@@ -2141,6 +2141,15 @@
             "ext": "7lj763gg0939791h1l3888jig44gi291li"
         },
 	{
+            "key": "QD4K",
+            "name": "🐷猪猪4K",
+            "type": 3,
+            "api": "csp_AppYsV2",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
+            "playerType": 2,
+            "ext": "https://cnb.cool/xiaomideyun/xiaomideyun/-/git/raw/main/cs.txt"
+        },
+	{
             "key": "天天影视",
             "name": "🦢天天影视",
             "type": 3,
