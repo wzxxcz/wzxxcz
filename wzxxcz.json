@@ -2177,6 +2177,15 @@
             "ext": "7lj763gg0939790i413gi484k8058896highi4414h68l7g6hk8qiaojig9k2k289l9ik807i213k5j602"
         },
 	{
+            "key": "仓鼠",
+            "name": "🐀仓鼠1080P",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet2",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
+            "ext": "sHR2rlsfjI4L3t4RXQMkn85YdqME5ZFXdHXyEUNrexXmXuKOZHlPhQJvT6ZKEMODJQuGTLg+gpKS+XoOxUH8DdjcutGqV/lfrY9l/Ww/J/LYA0AH34KTXsOeg1p5p+KSYaG5at+IT/dqPugeQjLLpkECHqWJpIs4B2evdM7dDIOBuPmMrT5lbU1yNZHMNkr8tConVxhS1qlq57WIByuNTQ=="
+        },
+	{
             "key": "天天影视",
             "name": "🦢天天影视",
             "type": 3,
