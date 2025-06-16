@@ -2070,6 +2070,14 @@
             "filterable": 1
         },
 	{
+          "key": "移动",
+          "name": "🌀移动急速4K纯净",
+          "type": 3,
+          "api": "csp_YD",
+          "searchable": 1,
+          "quickSearch": 1
+        },
+	{
             "key": "天天影视",
             "name": "🦢天天影视",
             "type": 3,
