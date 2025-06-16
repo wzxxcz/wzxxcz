@@ -2529,58 +2529,58 @@
       "ext": "./json/阿里.json"
 },
 {
-  "key": "夸克云盘",
-  "name": "🍊我的夸克",
-  "type": 3,
-  "api": "csp_PanQuark",
-  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-  "searchable": 0,
-  "filterable": 0,
-  "changeable": 0,
-  "style": {
-             "type": "list",
-             "ratio": 1.433
-           },
-  "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xcz/refs/heads/master/json/夸克.json"
+      "key": "夸克云盘",
+      "name": "🍊我的夸克",
+      "type": 3,
+      "api": "csp_PanQuark",
+      "jar": "https://xcz.iptv365.org/wzxqh.jar",
+      "searchable": 0,
+      "filterable": 0,
+      "changeable": 0,
+      "style": {
+        "type": "list",
+        "ratio": 1.433
+      },
+      "ext": "./json/夸克.json"
 },
 {
-  "key": "UC",
-  "name": "🍊我的UC",
-  "type": 3,
-  "api": "csp_PanUc",
-  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-  "searchable": 0,
-  "filterable": 0,
-  "changeable": 0,
-  "style": {
-             "type": "list",
-             "ratio": 1.433
-           },
-  "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/xcz/refs/heads/master/json/UC.json"
+      "key": "UC",
+      "name": "🍊我的UC",
+      "type": 3,
+      "api": "csp_PanUc",
+      "jar": "https://xcz.iptv365.org/wzxqh.jar",
+      "searchable": 0,
+      "filterable": 0,
+      "changeable": 0,
+      "style": {
+        "type": "list",
+        "ratio": 1.433
+      },
+      "ext": "./json/UC.json"
 },
 {
-  "key": "百度云盘",
-  "name": "🍊我的百度",
-  "type": 3,
-  "api": "csp_PanBaiDu",
-  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-  "searchable": 0,
-  "filterable": 0,
-  "changeable": 0,
-  "style": {
-             "type": "list",
-             "ratio": 1.433
-           }
+      "key": "百度云盘",
+      "name": "🍊我的百度",
+      "type": 3,
+      "api": "csp_PanBaiDu",
+      "jar": "https://xcz.iptv365.org/wzxqh.jar",
+      "searchable": 0,
+      "filterable": 0,
+      "changeable": 0,
+      "style": {
+        "type": "list",
+        "ratio": 1.433
+      }
 },
 {
-  "key": "push_agent",
-  "name": "🍊手机电视推送",
-  "type": 3,
-  "api": "csp_Push",
-  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-  "searchable": 0,
-  "filterable": 0,
-  "changeable": 0
+      "key": "push_agent",
+      "name": "🍊网盘推送",
+      "type": 3,
+      "api": "csp_Push",
+      "jar": "https://xcz.iptv365.org/wzxqh.jar",
+      "searchable": 0,
+      "filterable": 0,
+      "changeable": 0
 }
 ],
   "parses": [
