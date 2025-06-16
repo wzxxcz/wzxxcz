@@ -1986,6 +1986,19 @@
             "changeable": 1
         },
 	{
+            "key": "Lib",
+            "name": "🌟立播秒播",
+            "type": 3,
+            "api": "csp_LibvioGuard",
+            "searchable": 1,
+            "quickSearch": 1,
+            "changeable": 1,
+            "ext": {
+                      "Cloud-drive": "TVBox/Cloud-drive.txt",
+                      "from": "4k|auto"
+                   }
+        },
+	{
             "key": "荐片",
             "name": "🍊荐片磁力",
             "api": "csp_Jianpian",
