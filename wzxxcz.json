@@ -2723,6 +2723,84 @@
                  }
         },
 	{
+           "key": "我闲的追剧",
+           "name": "🍊我闲的追剧",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                    "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组":"/voddetail/&&</a>",
+	            "标题": "title=\"&&\"",
+	            "副标题": "<span class=\"hl-lc-1 remarks\">&&</span>",
+                    "图片": "data-original=\"&&\"",
+	            "链接":"/voddetail/+&&\"",
+	            "线路数组": "iconfont hl-icon-tongzhi&&</span>",
+	            "线路标题": "</i>&nbsp;&&</a>",
+	            "播放数组": "<ul class=\"hl-plays-list hl-sort-list&&</ul>",
+                    "播放列表": "<li&&</li>",
+                    "播放标题": ">&&</a>",
+                    "播放链接": "href=\"&&\"",
+	            "跳转播放链接": "var player_*\"url\":\"&&\"",
+	            "搜索url": "https://tv3.woxian.de/vodsearch/{wd}----------{pg}---/",
+                    "分类url": "https://tv3.woxian.de/vodshow/{cateId}-{area}---{lang}----{catePg}---{year}/",
+                    "分类": "电影$1#连续剧$2#综艺$3#动漫$4#",
+	            "简介": "🍊小橙子为您介绍剧情👉+hl-content-text\">&&</div>"
+                }
+        },
+	{
+           "key": "老鹰影院",
+           "name": "🦅老鹰影院",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                    "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组": "class=\"rsveh916 myui-vodlist__box\"&&</a",
+	            "标题": "title=\"&&\"",
+	            "副标题": "<span class=\"lmshe916 pic-text text-right\">&&</span>", 
+	            "图片":"data-original=\"&&\"",
+	            "链接": "href=\"&&\"",
+	            "线路数组": "data-toggle&&</a>",
+	            "线路标题": ">&&<",
+	            "播放数组": "<ul class=\"tsgeb916 myui-content__list&&</ul>",
+                    "播放列表": "<li&&</li>",
+                    "播放标题": ">&&</a>",
+                    "播放链接": "href=\"&&\"",
+	            "跳转播放链接": "var player_*\"url\":\"&&\"",
+	            "搜索url":"https://www.lmkz66.com/search.php?page={pg}&searchword={wd}&searchtype=",
+                    "分类url": "https://www.lmkz66.com/search.php?page={catePg}&searchtype=5&yuyan={lang}&tid={cateId}&jq={class}&area={area}&year={year}",
+                    "分类": "短剧$30#电影$1#电视剧$2#综艺$3#动漫$4#",
+                    "简介": "🍊小橙子为您介绍剧情👉+left text-muted\">&&</div>"
+                  }
+        },
+	{
+           "key": "青蛙影视",
+           "name": "🐸青蛙影视",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                     "请求头": "User-Agent$MOBILE_UA",
+                     "编码": "UTF-8",
+	             "数组": "class=\"stui-vodlist__box\"&&</a",
+	             "标题": "title=\"&&\"",
+	             "副标题": "<span>&&</span>", 
+	             "图片":"url(&#39;&&&#39;)",
+	             "链接": "href=\"&&\"",
+	             "线路数组": "iconfontplay2\">&&</h4>",
+	             "线路标题": "</i>&&<",
+	             "播放数组": "<ul class=\"stui-content__playlist&&</ul>",
+                     "播放列表": "<li&&</li>",
+                     "播放标题": ">&&</a>",
+                     "播放链接": "href=\"&&\"",
+	             "跳转播放链接": "var player_*\"url\":\"&&\"",
+	             "搜索url":"https://qingwa.org/search.html?key={wd}&page={pg}",
+                     "分类url": "https://qingwa.org/{cateId}.html?page={catePg}&tag={class}&sort={by}&area={area}&year={year}",
+                     "分类": "电影$movie#电视剧$juji#美剧$meiju#韩剧$hanju#日剧$riju#泰剧$taiju",
+                     "简介": "🍊小橙子为您介绍剧情👉+left data2\">&&</div>"
+                  }
+        }, 
+	{
           "key": "饺子影院",
           "name": "🥟饺子影院",
           "type": 3,
@@ -2747,6 +2825,19 @@
                    "分类": "电影$1#剧集$2#动画$41#",
                    "简介": "🍊小橙子为您介绍剧情👉+text-muted col-pd\">&&</div>"
                  }
+        },
+	{
+            "key": "yiyi",
+            "name": "🍊yiyi影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppMuou",
+            "ext": {
+                "url": "http://134.175.165.203:5364",
+                "dataKey": "2058b980a6de181a",
+                "dataIv": "57356a8a9ada5099",
+                "jxurl": "http://app.yiyi521.top"
+            }
         },
 	{
            "key": "108影院",
