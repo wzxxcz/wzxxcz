@@ -2495,7 +2495,6 @@
            "name": "🐍毒舌电影",
            "type": 3,
            "api": "csp_XBPQ",
-           "jar": "https://xcz.iptv365.org/xczzx.jar",
            "ext": {
                     "请求头": "User-Agent$MOBILE_UA",
                     "编码": "UTF-8",
@@ -2831,7 +2830,6 @@
           "name": "🍵茶杯狐",
           "type": 3,
           "api": "csp_XBPQ",
-          "jar": "https://xcz.iptv365.org/xczzx.jar",
           "ext": {
                     "请求头": "User-Agent$MOBILE_UA",
                     "编码": "UTF-8",
@@ -2906,12 +2904,11 @@
                }
         }, 
         {
-  "key": "白嫖者联盟",
-  "name": "➿白嫖者联盟",
-  "type": 3,
-  "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
-  "ext": {
+          "key": "白嫖者联盟",
+          "name": "➿白嫖者联盟",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
 	        "数组": "module-item-pic&&span></div>",
@@ -2937,7 +2934,6 @@
   "name": "🍊1817影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -2964,7 +2960,6 @@
   "name": "🦊红狐狸影院",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -2990,7 +2985,6 @@
   "name": "🐂帕皮牛影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3016,7 +3010,6 @@
   "name": "🥕萝卜影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3043,7 +3036,6 @@
   "name": "🍂搞笑花影院",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3070,7 +3062,6 @@
   "name": "🌟星空影院",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3097,7 +3088,6 @@
   "name": "🍊好影快看",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3124,7 +3114,6 @@
   "name": "🍊4K影院网",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3151,7 +3140,6 @@
   "name": "📱手机影院",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3178,7 +3166,6 @@
   "name": "🐈网飞猫",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3204,7 +3191,6 @@
   "name": "🦆小鸭影音",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3227,7 +3213,6 @@
   "name": "🍊片吧影院",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3254,7 +3239,6 @@
   "name": "🐈花猫影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3280,7 +3264,6 @@
   "name": "🍊Kimivod影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3306,7 +3289,6 @@
   "name": "🍊皮皮蛋影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3333,7 +3315,6 @@
   "name": "👟来看点播",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3361,7 +3342,6 @@
   "name": "🍊泥视频",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3388,7 +3368,6 @@
   "name": "🍊秀儿影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3415,7 +3394,6 @@
   "name": "📺好的影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3441,7 +3419,6 @@
   "name": "🍊TEKAN影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3468,7 +3445,6 @@
   "name": "🕊️飞映网",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3494,7 +3470,6 @@
   "name": "🍊星辰影院",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3521,7 +3496,6 @@
   "name": "🍊PTTPLAY影视",
   "type": 3,
   "api": "csp_XBPQ",
-  "jar": "https://xcz.iptv365.org/xczzx.jar",
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -3572,7 +3546,6 @@
            "name": "🍊108影院",
            "type": 3,
            "api": "csp_XBPQ",
-           "jar": "https://xcz.iptv365.org/xczzx.jar",
            "ext": {
                     "请求头": "User-Agent$MOBILE_UA",
                     "编码": "UTF-8",
