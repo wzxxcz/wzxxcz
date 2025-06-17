@@ -2388,29 +2388,18 @@
         }, 
 	{
            "key": "蘑菇影视",
-  "name": "🍄蘑菇影视",
-  "type": 3,
-  "api": "csp_XBPQ",
-  "ext": {
-    "请求头": "User-Agent$MOBILE_UA\nReferer$https://www.5o5k.com/",
-    "编码": "UTF-8",
-    "数组": "class=\"module-items&&module-item\"",
-    "标题": "title=\"&&\"",
-    "副标题": "class=\"module-item-note\">&&<",
-    "图片": "data-original=\"&&\"",
-    "链接": "href=\"&&\"",
-    "线路数组": "data-dropdown-toggle.*?<span>(.*?)<",
-    "线路标题": ">&&<",
-    "播放数组": "class=\"module-play-list&&a\"",
-    "播放列表": "<a(.*?)</a>",
-    "播放标题": ">&&<",
-    "播放链接": "href=\"&&\"",
-    "跳转播放链接": "var player_.*?\"url\":\"(.*?)\"",
-    "搜索url": "https://www.5o5k.com/vodsearch/{{wd}}----------{{pg}}---.html",
-    "分类url": "https://www.5o5k.com/vodshow/{{cateId}}-{{area}}-------{{catePg}}---{{year}}.html",
-    "分类": "电影$20#连续剧$35#综艺$43#短剧$55#动漫$48#解说$54#",
-    "简介": "class=\"module-info-introduction-content\">&&<"
-  }
+           "name": "🍄蘑菇影视",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                     "请求头": "User-Agent$MOBILE_UA",
+                     "编码": "UTF-8",
+	             "标题": "title=\"&&\"",
+	             "图片":"data-original=\"&&\"",
+                     "分类url": "https://www.5o5k.com/vodshow/{cateId}-{area}-------{catePg}---{year}.html",
+                     "分类": "电影$20#连续剧$35#综艺节目$43#短剧$55#动漫$48#影视解说$54#",
+                     "简介": "🍊小橙子为您介绍剧情👉+module-info-introduction-content\">&&</div>"
+                  }
         }, 
 	{
             "key": "看戏影院",
