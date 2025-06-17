@@ -2394,11 +2394,11 @@
            "ext": {
                      "请求头": "User-Agent$MOBILE_UA",
                      "编码": "UTF-8",
-	             "数组": "class=\"module-poster-item module-item\"&&</a",
+	             "数组":"/voddetail/&&</a>",
 	             "标题": "title=\"&&\"",
 	             "副标题": "<div class=\"module-item-note\">&&</div>", 
 	             "图片":"data-original=\"&&\"",
-	             "链接": "href=\"&&\"",
+	             "链接":"/voddetail/+&&\"",
 	             "线路数组": "data-dropdown&&</span>",
 	             "线路标题": ">&&<",
 	             "播放数组": "module-play-list&&</a>",
