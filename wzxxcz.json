@@ -2447,10 +2447,8 @@
   "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-	        "数组":"/voddetail/&&</a>", 
 	        "标题":"title=\"&&\"",
 	        "图片": "data-original=\"&&\"",
-	        "链接":"/voddetail/+&&\"",
                 "分类url": "https://mengdm.vip/vodshow/{cateId}--------{catePg}---{year}.html",
 	        "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$405#",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+<p&&</p >"
