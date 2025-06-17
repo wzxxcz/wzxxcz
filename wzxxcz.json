@@ -2607,7 +2607,7 @@
 	            "副标题": "<span class=\"vtitle text-right\">&&</span>",
 	            "图片":"data-original=\"&&\"",
 	            "链接": "href=\"&&\"",
-	            "线路数组": "\\##con_playlist&&</a>",
+	            "线路数组": "\\#con_playlist&&</a>",
 	            "线路标题": "gico m3u8\">&&<",
 	            "播放数组": "<ul class=\"play-list fade-in&&</ul>",
                     "播放列表": "<a&&</a>",
