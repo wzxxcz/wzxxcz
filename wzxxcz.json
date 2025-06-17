@@ -2448,6 +2448,7 @@
                      "编码": "UTF-8",
 		     "数组":"/voddetail/&&</a>",
 	             "标题":"title=\"&&\"",
+		     "副标题": "<div class=\"module-item-note\">&&</div>",
 	             "图片": "data-original=\"&&\"",
 		     "链接":"/voddetail/+&&\"",
                      "分类url": "https://mengdm.vip/vodshow/{cateId}--------{catePg}---{year}.html",
