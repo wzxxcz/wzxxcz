@@ -2451,7 +2451,7 @@
 	             "副标题": "<div class=\"movie-rating cor4\">&&</div>",
 	             "图片":"data-original=\"&&\"",
 	             "链接": "href=\"&&\"",
-	             "线路数组": "titleName&&</a>",
+	             "线路数组": "titleName cr3&&</a>",
 	             "线路标题": "swiper-slide\">&&<",
 	             "播放数组": "<ul class=\"content_playlist&&</ul>",
                      "播放列表": "<a&&</a>",
