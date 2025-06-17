@@ -2435,7 +2435,7 @@
 	             "搜索url":"https://www.niuxiongdi.com/nivodsearch/{wd}----------{pg}---.html",
                      "分类url": "https://www.niuxiongdi.com/nivodshow/{cateId}-{area}-------{catePg}---.html",
                      "分类": "电影$1#电视剧$2#综艺$3#风车动漫$4#",
-                     "简介": "🍊小橙子为您介绍剧情👉+text-muted\">&&</div>"
+                     "简介": "🍊小橙子为您介绍剧情👉+简介：&&</p"
                    }
         }, 
 	{
