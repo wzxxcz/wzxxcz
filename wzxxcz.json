@@ -2446,7 +2446,7 @@
             "ext": {
                      "请求头": "User-Agent$MOBILE_UA",
                      "编码": "UTF-8",
-	             "数组": "class=\"movie-list-item\"&&</a",
+	             "数组": "lazyload&&</a>",
 	             "标题": "title=\"&&\"[不包含:影片信息]",
 	             "副标题": "<div class=\"movie-rating cor4\">&&</div>",
 	             "图片":"data-original=\"&&\"",
