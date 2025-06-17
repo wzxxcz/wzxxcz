@@ -2394,8 +2394,6 @@
            "ext": {
                      "请求头": "User-Agent$MOBILE_UA",
                      "编码": "UTF-8",
-	             "标题": "title=\"&&\"",
-	             "图片":"data-original=\"&&\"",
                      "分类url": "https://www.5o5k.com/vodshow/{cateId}-{area}-------{catePg}---{year}.html",
                      "分类": "电影$20#连续剧$35#综艺节目$43#短剧$55#动漫$48#影视解说$54#",
                      "简介": "🍊小橙子为您介绍剧情👉+module-info-introduction-content\">&&</div>"
