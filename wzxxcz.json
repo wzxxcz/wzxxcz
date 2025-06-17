@@ -2425,7 +2425,7 @@
 	             "副标题": "<span class=\"pic-text text-right\">&&</span>", 
 	             "图片":"data-original=\"&&\"",
 	             "链接": "href=\"&&\"",
-	             "线路数组": "<h3>&&/h3>",
+	             "线路数组": "<h3&&/h3>",
 	             "线路标题": ">&&<",
 	             "播放数组": "<ul class=\"stui-content__playlist&&</ul>",
                      "播放列表": "<a&&</a>",
