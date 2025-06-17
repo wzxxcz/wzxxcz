@@ -2801,6 +2801,111 @@
                   }
         }, 
 	{
+          "key": "海兔影院",
+          "name": "🐇海兔影院",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "ext": {
+                   "请求头": "User-Agent$MOBILE_UA",
+                   "编码": "UTF-8",
+	           "数组": "module-item-pic&&span></div>",
+	           "标题": "title=\"&&\"",
+	           "副标题": "<div class=\"module-item-text\">&&</div>", 
+	           "图片":"data-src=\"&&\"",
+	           "播放链接": "href=\"&&\"",
+	           "线路数组": "data-dropdown&&</div>",
+	           "线路标题": "<span>&&<",
+	           "播放数组": "<div class=\"module-blocklist&&</div>",
+                   "播放列表": "<a&&</a>",
+                   "播放标题":"<span>&&<",
+                   "播放链接": "href=\"&&\"",
+	           "跳转播放链接": "var player_*\"url\":\"&&\"",
+	           "搜索url":"https://www.haitu.xyz/vodsearch/{wd}----------{pg}---.html",
+                   "分类url": "https://www.haitu.xyz/vodshow/{cateId}-{area}---{lang}----{catePg}---{year}.html",
+                   "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$42#",
+                   "简介": "🍊小橙子为您介绍剧情👉+video-info-item video-info-content vod_content\">&&</div>"
+                }
+        }, 
+	{
+          "key": "茶杯狐",
+          "name": "🍵茶杯狐",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "jar": "https://xcz.iptv365.org/xczzx.jar",
+          "ext": {
+                    "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组": "class=\"stui-vodlist__box\"&&</a",
+	            "标题": "title=\"&&\"",
+	            "副标题": "<span class=\"pic-text text-right\">&&</span>",
+	            "图片": "data-original=\"&&\"",
+	            "链接": "href=\"&&\"",
+	            "线路数组": "data-toggle&&</a>",
+	            "线路标题": ">&&</a",
+	            "播放数组": "<ul class=\"stui-content__playlist&&</ul>",
+	            "播放列表": "<li&&</li>",
+                    "播放标题": ">&&</a>",
+                    "播放链接": "href=\"&&\"",
+	            "跳转播放链接": "var player_*\"url\":\"&&\"",
+	            "搜索url":"https://www.bnjxjd.com/vodsearch/page/{pg}/wd/{wd}.html",
+                    "分类url": "https://www.bnjxjd.com/vodshow/area/{area}/id/{cateId}/lang/{lang}/page/{catePg}.html",
+                    "分类": "电影$fenlei1#电视剧$fenlei2#综艺$fenlei3#动漫$fenlei4#",
+	            "简介": "🍊小橙子为您介绍剧情👉+left\">&&</div>"
+               }
+        },
+	{
+          "key": "4KLIVE",
+          "name": "🍊4K影院",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "ext": {
+                   "请求头": "User-Agent$MOBILE_UA",
+                   "编码": "UTF-8",
+	           "数组":"/voddetail/&&</a>",
+	           "标题": "title=\"&&\"",
+	           "副标题": "<div class=\"module-item-note\">&&</div>",
+                   "图片": "data-original=\"&&\"",
+	           "链接":"/voddetail/+&&\"",
+	           "线路数组": "data-dropdown&&</span>",
+	           "线路标题": "<span>&&<",
+	           "播放数组": "<div class=\"module-play-list&&</div>",
+	           "播放列表": "<a&&/a>",
+                   "播放标题":"<span>&&<",
+                   "播放链接": "href=\"&&\"",
+	           "跳转播放链接": "var player_*\"url\":\"&&\"",
+	           "搜索url":"https://www.4k4k.live/vodsearch/{wd}----------{pg}---/",
+                   "分类url": "https://www.4k4k.live/vodshow/{cateId}----{lang}----{catePg}---{year}/",
+                   "分类": "电影$1#电视剧$2#综艺$3#动漫$4",
+                   "简介": "🍊小橙子为您介绍剧情👉+module-info-item module-info-introduction\">&&</div>"
+                }
+        },
+	{
+          "key": "168影院",
+          "name": "▶️168影院",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "ext": {
+                   "请求头": "User-Agent$MOBILE_UA",
+                   "编码": "UTF-8",
+	           "数组": "lazyload&&</a>",
+	           "标题": "title=\"&&\"",
+	           "副标题": "<span class=\"pic-text text-right\">&&</span>", 
+	           "图片":"data-original=\"&&\"",
+	           "链接": "href=\"&&\"",
+	           "线路数组": "#playlist&&</a>",
+	           "线路标题": ">&&</a",
+	           "播放数组": "stui-content__playlist&&</ul>",
+                   "播放列表": "<li&&</li>",
+                   "播放标题": ">&&</a>",
+                   "播放链接": "href=\"&&\"",
+	           "跳转播放链接": "var player_*\"url\":\"&&\"",
+	           "搜索url":"https://www.xzyx168.com/xzyxvc/{wd}-wdyswzqun{pg}num.html",
+                   "分类url": "https://www.xzyx168.com/xzyxvs/{cateId}spsxdqlx{catePg}zmn.html",
+                   "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#短剧$duanju",
+                   "简介": "🍊小橙子为您介绍剧情👉+left text-muted\">&&</div>"
+               }
+        }, 
+	{
           "key": "饺子影院",
           "name": "🥟饺子影院",
           "type": 3,
@@ -2825,19 +2930,6 @@
                    "分类": "电影$1#剧集$2#动画$41#",
                    "简介": "🍊小橙子为您介绍剧情👉+text-muted col-pd\">&&</div>"
                  }
-        },
-	{
-            "key": "yiyi",
-            "name": "🍊yiyi影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppMuou",
-            "ext": {
-                "url": "http://134.175.165.203:5364",
-                "dataKey": "2058b980a6de181a",
-                "dataIv": "57356a8a9ada5099",
-                "jxurl": "http://app.yiyi521.top"
-            }
         },
 	{
            "key": "108影院",
