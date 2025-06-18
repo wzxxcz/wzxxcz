@@ -2924,32 +2924,6 @@
                   }
         },
 	{
-          "key": "饭团影视",
-          "name": "🍙饭团影视",
-          "type": 3,
-          "api": "csp_XBPQ",
-          "ext": {
-                   "请求头": "User-Agent$MOBILE_UA",
-                   "编码": "UTF-8",
-	           "数组": "li class=\"fed-list-item fed-padding fed-col-xs4 fed-col-sm3 fed-col-md2\"&&</li",
-	           "标题": "fed-list-title*>&&</a",
-	           "副标题": "<span class=\"fed-list-remarks fed-font-xii fed-text-white fed-text-center\">&&</span>",
-	           "图片":"data-original=\"&&\"",
-	           "链接": "href=\"&&\"",
-	           "线路数组": "fed-part-eon&&/a>",
-		   "线路标题": "javascript:;\">&&<",
-	           "播放数组": "my-find-frist-play&&</li>", 
-                   "播放列表": "<a&&/a>",
-                   "播放标题": ">&&<",
-                   "播放链接": "href=\"&&\"",
-	           "跳转播放链接": "var player_*\"url\":\"&&\"",
-		   "搜索url":"https://fantuansjz.com/sjvodsearch/{wd}----------{pg}---.html",
-                   "分类url": "https://fantuansjz.com/sjvodtype/{cateId}-{catePg}.html",
-                   "分类": "电影$1#电视剧$2#综艺$3#动漫大全$4#豆瓣电影$40#",
-                   "简介": "🍊小橙子为您介绍剧情👉+vod-content\">&&</div>"
-                 }
-        },
-	{
            "key": "动漫TV网",
            "name": "🍊动漫TV网",
            "type": 3,
