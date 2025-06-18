@@ -1722,6 +1722,33 @@
             "ext": "./json/二小.json"
         },
 	{
+            "key": "csp_Netfixtv2",
+            "name": "✈️二小4K弹幕",
+            "type": 3,
+            "changeable": "0",
+            "quickSearch": 1,
+            "api": "csp_Duopan",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
+            "filterable": 1,
+            "ext": {
+            "site_urls": [
+            "http://www.2xiaopan.fun/",
+            "https://2xiaopan.fun/",
+            "https://erxiaofn.click/",
+            "https://erixaopan.fun/",
+            "https://www.xhww.net/"
+          ],
+        "url_key": "UC",
+        "token": "",
+        "ucCookie": "",
+        "quarkCookie": "",
+        "threadinfo": {
+          "chunksize": 512,
+          "threads": 16
+           }
+          }
+        },
+	{
             "key": "百家",
             "name": "🍊百家4K弹幕",
             "type": 3,
