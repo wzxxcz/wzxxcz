@@ -1886,6 +1886,15 @@
                    }
         },
 	{
+          "key": "csp_MiSou",
+          "name": "🔍米搜盘聚",
+          "type": 3,
+          "quickSearch": 1,
+          "changeable": "0",
+          "api": "csp_MiSou",
+	  "jar": "https://xcz.iptv365.org/wzxm.jpg"
+        },
+	{
           "key": "UC4K",
           "name": "🍊UC4K弹幕",
           "type": 3,
