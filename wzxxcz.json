@@ -2470,7 +2470,8 @@
            "type": 3,
            "api": "csp_XBPQ",
            "ext": {
-                     "请求头": "User-Agent$MOBILE_UA",
+                     "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 14；； V2136A Build/UP1A.231005.007；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36&&Cookie@gg_iscookie=1；； gg_show_number6333=1；； _ok1_=JQGW/neaHv3GpVqz+igJ/vSLeeiwhvDZ+hyYKfmtTUmmCT9wZnJZ65gaS5vcLKPv846IIQ1Q/ijhIxGxj0k5cjc3uixA74K9b5vGLn0pF4lklZczVTwiKa+vd5CHqwn2；； PHPSESSID=",
+                "编码": "UTF-8",
                      "编码": "UTF-8",
 		     "数组":"/voddetail/&&</a>",
 	             "标题":"title=\"&&\"",
