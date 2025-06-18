@@ -2009,6 +2009,34 @@
            "ext": "./json/至臻.json"
         },
 	{
+          "key": "csp_Netfixtv",
+          "name": "💌至臻4K弹幕",
+          "type": 3,
+          "changeable": "0",
+          "quickSearch": 1,
+          "api": "csp_Duopan",
+	  "jar": "https://xcz.iptv365.org/wzxm.jpg",
+          "filterable": 1,
+          "ext": {
+          "site_urls": [
+          "https://mihdr.top",
+          "https://www.mihdr.top",
+          "https://www.miqk.cc",
+          "https://xiaomiai.site",
+          "https://xiaomi666.fun",
+          "https://www.zhizhenpan.fun"
+        ],
+        "url_key": "Netfixtv",
+        "token": "",
+        "ucCookie": "",
+        "quarkCookie": "",
+        "threadinfo": {
+          "chunksize": 512,
+          "threads": 16
+           }
+         }
+        },
+	{
             "key": "团长",
             "name": "🍊团长4K弹幕",
             "type": 3,
