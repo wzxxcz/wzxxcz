@@ -2263,6 +2263,15 @@
             "ext": "sHR2rlsfjI4L3t4RXQMknw+zXdsvYSFPrylVBk8Otj7BtrOcImUIxu7uCmi/oCEVSH+1Tuw/tXHzW47SGQsj8bRydPRgWesjHAxv9eu8eO9hOGeUeBKsucMHODs09HXY4kiPp3p1vemBghpvJFm9mx/FFTQYaEQ33Bpqwk73VkDa2zWgoB0CNuBseJhbj2hRKqOiT08iymzh4sSfhjJ5tbS5yTDxPIJAjwMijWuyOJB++d859vxajKD2Jg5qw0lv"
         },
 	{
+            "key": "电影",
+            "name": "🎬电影1080P",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
+            "ext": "0YM2rlqPCLd5eMAslwMf/mBbJX8M/CJVJCQyX2zM7tGdJikFHnx0KfXl4Mi9ORXxU3BxW+JS6MfS0whs911q3EwpaHe1R3A52b2fgxNOgvG5WXvTuLPxtCV9bQCcdRk/XVIoWdYLfkopEVDcAB5LPdzjO7/5FuJbIsGxUWtLsNdGr0PMMzIxq80pHqFeiqAk1uiMRyrtr+YjnEpwFqNZxDCdrdw7WXIAnI0cXjOQOV5WmFUb/3kvXMnEetzMn9tC"
+        },
+	{
             "key": "csp_LiteApple",
             "name": "🍎苹果1080P",
             "type": 3,
