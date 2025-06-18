@@ -2272,6 +2272,15 @@
             "ext": "0YM2rlqPCLd5eMAslwMf/mBbJX8M/CJVJCQyX2zM7tGdJikFHnx0KfXl4Mi9ORXxU3BxW+JS6MfS0whs911q3EwpaHe1R3A52b2fgxNOgvG5WXvTuLPxtCV9bQCcdRk/XVIoWdYLfkopEVDcAB5LPdzjO7/5FuJbIsGxUWtLsNdGr0PMMzIxq80pHqFeiqAk1uiMRyrtr+YjnEpwFqNZxDCdrdw7WXIAnI0cXjOQOV5WmFUb/3kvXMnEetzMn9tC"
         },
 	{
+            "key": "csp_baibai",
+            "name": "🐟白白秒播",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_SuBaiBai",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
+            "ext": "https://www.subaibai.com"
+        },
+	{
             "key": "csp_LiteApple",
             "name": "🍎苹果1080P",
             "type": 3,
