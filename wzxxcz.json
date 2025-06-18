@@ -2385,7 +2385,33 @@
                      "分类": "电影$dianying#电视剧$dsj#综艺$zongyi#动漫$dongman#爽文短剧$shuangwenduanju#4k电影$4kdianying#体育赛事$tiyusaishi",
                      "简介": "🍊小橙子为您介绍剧情👉+module-info-introduction-content\">&&</div>"
                   }
-        }, 
+        },
+	{
+            "key": "蘑菇影视",
+            "name": "🍄蘑菇影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 14；； V2136A Build/UP1A.231005.007；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36&&Cookie@gg_iscookie=1；； gg_show_number6333=1；； _ok1_=JQGW/neaHv3GpVqz+igJ/vSLeeiwhvDZ+hyYKfmtTUmmCT9wZnJZ65gaS5vcLKPv846IIQ1Q/ijhIxGxj0k5cjc3uixA74K9b5vGLn0pF4lklZczVTwiKa+vd5CHqwn2；； PHPSESSID=",
+                "编码": "UTF-8",
+                "数组": "/voddetail/&&</a >",
+                "标题": "title=\"&&\"",
+                "副标题": "item-note\">&&<",
+                "图片": "data-original=\"&&\"",
+                "链接": "/voddetail/+&&\"",
+                "线路数组": "data-dropdown&&</div>",
+                "线路标题": "<span>&&<",
+                "播放数组": "play-list\"&&</div>",
+                "播放列表": "<a&&/a>",
+                "播放标题": "<span>&&<",
+                "播放链接": "href=\"&&\"",
+                "跳转播放链接": "var player_*\"url\":\"&&\"",
+                "搜索url": "https://www.5o5k.com/vodsearch/{wd}----------{pg}---.html",
+                "分类url": "https://www.5o5k.com/vodshow/{cateId}-{area}-------{catePg}---{year}.html",
+                "分类": "电影$20#连续剧$35#综艺节目$43#短剧$55#动漫$48#影视解说$54#",
+                "简介": "🍊小橙子为您介绍剧情👉+module-info-introduction-content\">&&</div>"
+            }
+        },
 	{
             "key": "看戏影院",
             "name": "🍊看戏影院",
