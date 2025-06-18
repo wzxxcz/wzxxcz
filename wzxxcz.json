@@ -2000,6 +2000,29 @@
             "ext": "./json/蜡笔.json"
         },
 	{
+            "key": "csp_Duopan",
+            "name": "🖍蜡笔4K弹幕",
+            "type": 3,
+            "api": "csp_Duopan",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
+            "filterable": 1,
+        "ext": {
+        "site_urls": [
+          "https://feimao666.fun",
+          "http://feimao888.fun",
+          "http://feimaoai.site",
+          "http://www.labi88.sbs",
+          "http://fmao.site",
+          "https://fmao.shop"
+        ],
+        "threadinfo": {
+          "chunksize": 512,
+          "threads": 16
+        },
+        "url_key": "Duopan4"
+         }
+        },
+	{
             "key": "木偶",
             "name": "🍁木偶资源4K弹幕",
             "type": 3,
