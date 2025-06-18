@@ -2109,6 +2109,15 @@
 	    "jar": "https://xcz.iptv365.org/wzxxczapp"
         },
 	{
+           "key": "测试",
+           "name": "🐓剧霸1080P",
+           "type": 3,
+           "quickSearch": 0,
+           "api": "./py/jubaba.py",
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg",
+           "ext": ""
+        },
+	{
             "key": "爱壹帆",
             "name": "🍊爱壹帆",
             "type": 3,
