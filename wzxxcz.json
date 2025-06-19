@@ -2650,7 +2650,6 @@
                    "副标题": "<span class=\"fed-list-remarks fed-font-xii fed-text-white fed-text-center\">&&</span>",
                    "图片":"data-original=\"&&\"",
                    "链接": "href=\"&&\"",
-                   "线路数组": "fed-tabs-btn fed-btns-info fed-rims-info fed-part-eone&&/li>",
                    "线路标题": "javascript:;\">&&<",
 		   "线路二次截取":"fed-tabs-foot\">&&</ul>",
 		   "线路数组": "<li&&/li>",
