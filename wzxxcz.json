@@ -4120,11 +4120,11 @@
                   }
           },
 	  {
-          "key": "88影视网",
-          "name": "🍊88影视网",
-          "type": 3,
-          "api": "csp_XBPQ",
-          "ext": {
+           "key": "88影视网",
+           "name": "🍊88影视网",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
                    "请求头": "User-Agent$MOBILE_UA",
                    "编码": "UTF-8",
 	           "数组": "class=\"myui-vodlist__box\"&&</a",
