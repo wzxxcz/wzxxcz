@@ -2910,7 +2910,7 @@
 	             "副标题": "<span class=\"public-list-prb hide ft2\">&&</span>",
 	             "图片":"data-src=\"&&\"",
 	             "链接": "href=\"&&\"",
-	             "线路数组": "fa ds-dianying&&<span",
+	             "线路数组": "swiper-slide&&<span",
 	             "线路标题": "</i>&nbsp;&&<span",
 	             "播放数组": "<ul class=\"anthology-list-play size&&</ul>",
                      "播放列表": "<a&&</a>",
@@ -2920,7 +2920,7 @@
 	             "搜索url":"https://hong.hgyx.vip/index.php/vod/search/page/{pg}/wd/{wd}.html",
                      "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$20#",
                      "分类url": "https://hong.hgyx.vip/index.php/vod/show/area/{area}/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}.html",
-                     "简介": "🍊小橙子为您介绍剧情👉+cor4\">&&</div>"
+                     "简介": "🍊小橙子为您介绍剧情👉+text cor3\">&&</div>"
                    }
         }, 
 	{
