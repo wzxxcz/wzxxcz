@@ -2918,7 +2918,7 @@
                      "播放链接": "href=\"&&\"",
 	             "跳转播放链接": "var player_*\"url\":\"&&\"",
 	             "搜索url":"https://hong.hgyx.vip/index.php/vod/search/page/{pg}/wd/{wd}.html",
-                     "分类": "电影$20#连续剧$37#动漫$43#综艺$45#B站$47#体育$52",
+                     "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$20#",
                      "分类url": "https://hong.hgyx.vip/index.php/vod/show/area/{area}/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}.html",
                      "简介": "🍊小橙子为您介绍剧情👉+cor4\">&&</div>"
                    }
