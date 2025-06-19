@@ -2910,7 +2910,7 @@
 	             "副标题": "<span class=\"public-list-prb hide ft2\">&&</span>",
 	             "图片":"data-src=\"&&\"",
 	             "链接": "href=\"&&\"",
-	             "线路数组": "swiper-slide&&<span",
+	             "线路数组": "swiper-slide&&<a",
 	             "线路标题": "</i>&nbsp;&&<span",
 	             "播放数组": "<ul class=\"anthology-list-play size&&</ul>",
                      "播放列表": "<a&&</a>",
@@ -4119,6 +4119,32 @@
                     "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+<p&&</p>"
                   }
           },
+	  {
+          "key": "88影视网",
+          "name": "🍊88影视网",
+          "type": 3,
+          "api": "csp_XBPQ",
+          "ext": {
+                   "请求头": "User-Agent$MOBILE_UA",
+                   "编码": "UTF-8",
+	           "数组": "class=\"myui-vodlist__box\"&&</a",
+	           "标题": "title=\"&&\"",
+	           "副标题": "<span class=\"pic-text text-right\">&&</span>", 
+	           "图片": "data-original=\"&&\"",
+	           "链接": "href=\"&&\"",
+	           "线路数组": "\\#playlist&&</li>",
+		   "线路标题": ">&&<",
+	           "播放数组": "sort-list clearfix&&</ul>",
+                   "播放列表": "<a&&/a>",
+                   "播放标题": ">&&<",
+                   "播放链接": "href=\"&&\"",
+	           "跳转播放链接": "var player_*\"url\":\"&&\"",
+		   "搜索url":"https://www.88tv01.cc/vodsearch/{wd}--/page/{pg}/",
+                   "分类url": "https://www.88tv01.cc/show/{cateId}/area/{area}/page/{catePg}/year/{year}/",
+                   "分类": "电影$dy#电视剧$dsj#动漫$dm#陆剧$lj#美剧$mj#韩剧$hj#",
+                   "简介": "🍊小橙子为您介绍剧情👉+col-pd text-collapse content\">&&</div>"
+                 }
+          }, 
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
