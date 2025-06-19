@@ -2653,7 +2653,7 @@
                    "线路标题": "javascript:;\">&&<",
 		   "线路二次截取":"fed-tabs-foot\">&&</ul>",
 		   "线路数组": "<li&&/li>",
-                   "播放数组": "fed-tabs-btm fed-padding fed-part-rows fed-visible&&</ul>", 
+                   "播放数组": "fed-tabs-btm&&</ul>", 
                    "播放列表": "<a&&/a>",
                    "播放标题": ">&&<",
                    "播放链接": "href=\"&&\"",
