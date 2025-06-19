@@ -4050,7 +4050,22 @@
                     "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
                     "简介": "🍊小橙子为您介绍剧情👉+movie-introduce\">&&</div>"
                  }
-         }, 	  	  
+         }, 
+	 {
+           "key": "新时代影院",
+           "name": "🍊新时代影院",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+	        "图片": "data-original=\"&&\"",
+	        "链接":"href=\"&&\"",
+                "分类url": "https://www.xsdms.com/show/{cateId}----{lang}----{catePg}---{year}.html",
+	        "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧屋$30#伦理区$36#",
+                "简介": "🍊小橙子为您介绍剧情👉+detail-content\">&&</div>"
+          }
+},
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
