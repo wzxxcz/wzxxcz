@@ -2687,7 +2687,7 @@
 	        "搜索url":"https://www.kpkuang.us/vodsearch/{wd}----------{pg}---.html",
                 "分类url": "https://www.kpkuang.us/vodshow/{cateId}-{area}-------{catePg}---{year}--.html",
                 "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$37#",
-                "简介": "🍊小橙子为您介绍剧情👉+fed-text-muted\">&&</div>"
+                "简介": "🍊小橙子为您介绍剧情👉+fed-padding fed-part-both fed-text-muted\">&&</div>"
            }
         },	  
 	{
