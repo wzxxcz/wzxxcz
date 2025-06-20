@@ -3374,7 +3374,7 @@
 	            "副标题": "<span class=\"pic-text text-right\">&&</span>", 
 	            "图片":"data-original=\"&&\"",
 	            "链接": "href=\"&&\"",
-	            "线路数组": "data-toggle&&</a>",
+	            "线路数组": "data-toggle&&</li>",
 	            "线路标题": "tab\">&&<",
 	            "播放数组": "<ul class=\"myui-content__list sort-list scrollbar clearfix&&</ul>",
                     "播放列表": "<a&&</a>",
