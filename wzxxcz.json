@@ -3416,7 +3416,7 @@
                     "影片地区": "/area/*>&&<",
                     "导演": "导演：&&</div>",
                     "主演": "主演：&&</div>",
-                    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+你能喜欢。&&</div>",
+                    "简介": "🍊小橙子为您介绍剧情👉+video-info-itemtitle\">&&</div>"
                     "线路数组": "data-toggle&&</a>",
                     "线路标题": "swiper-slide-text\">&&<",
                     "播放数组": "tab-pane lists-box fade in&&</div></div>",
