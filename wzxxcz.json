@@ -3410,7 +3410,7 @@
 	            "搜索url":"https://www.bjfmjj.com/search/page/{pg}/wd/{wd}.html",
                     "分类url": "https://www.bjfmjj.com/show/{cateId}/area/{area}/page/{catePg}/year/{year}.html",
                     "分类": "电影$1#电视剧$2#动漫$4#综艺$3#短剧$19#",
-                    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+你能喜欢。&&</div>"
+                    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+你能喜欢.&&</div>"
                   }
         },
 	{
