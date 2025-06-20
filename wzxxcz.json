@@ -3397,20 +3397,20 @@
                     "编码": "UTF-8",
 	            "数组": "class=\"myui-vodbox-content\"&&</a",
 	            "标题": "title\">&&<",
-	            "副标题": "<span class=\"pic-text text-right\">&&</span>", 
+	            "副标题": "<div class=\"tag text-overflow\">&&</div>",
 	            "图片":"data-original=\"&&\"",
 	            "链接": "href=\"&&\"",
-	            "线路数组": "\\#playlist&&</a>",
+	            "线路数组": "data-toggle&&</a>",
 	            "线路标题": "tab\">&&<",
-	            "播放数组": "<ul class=\"myui-content__list sort-list scrollbar clearfix&&</ul>",
+	            "播放数组": "tab-pane lists-box fade in\"&&</div>",
                     "播放列表": "<a&&</a>",
                     "播放标题": ">&&<",
                     "播放链接": "href=\"&&\"",
 	            "跳转播放链接": "var player_*\"url\":\"&&\"",
-	            "搜索url":"http://www.szthd.com/search/{wd}----------{pg}---/",
-                    "分类url": "http://www.szthd.com/show/{cateId}-{area}-------{catePg}---{year}/",
-                    "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#",
-                    "简介": "🍊小橙子为您介绍剧情👉+col-pd text-collapse content\">&&</div>"
+	            "搜索url":"https://www.bjfmjj.com/search/page/{pg}/wd/{wd}.html",
+                    "分类url": "https://www.bjfmjj.com/show/{cateId}/area/{area}/page/{catePg}/year/{year}.html",
+                    "分类": "电影$1#电视剧$2#动漫$4#综艺$3#短剧$19#",
+                    "简介": "🍊小橙子为您介绍剧情👉+wrapper_more_text\">&&</div>"
                   }
         },
 	{
