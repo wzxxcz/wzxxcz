@@ -3384,7 +3384,7 @@
 	            "搜索url":"http://www.szthd.com/search/{wd}----------{pg}---/",
                     "分类url": "http://www.szthd.com/show/{cateId}-{area}-------{catePg}---{year}/",
                     "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#",
-                    "简介": "🍊小橙子为您介绍剧情👉+text-muted\">&&</div>"
+                    "简介": "🍊小橙子为您介绍剧情👉+col-pd text-collapse content\">&&</div>"
                   }
         },
 	{
