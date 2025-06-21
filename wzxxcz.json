@@ -4493,7 +4493,7 @@
                     "分类": "古装&虐恋&逆袭&神豪&重生&复仇&穿越&甜宠&强者&萌宝&其它",
                     "二次截取": "module-items\"&&id=\"page", 
 		    "数组": "module-item\"&&module-item-content",
-                    "标题": "title=\"&& ",
+                    "标题": "title=*>&&<",
                     "图片": "data-src=\"&&\"",
                     "副标题": "video-class\">&&<",
                     "链接": "/voddetail/+/vodplay/&&-1-1.html+.html",
