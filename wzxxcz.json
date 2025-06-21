@@ -2815,7 +2815,7 @@
                     "分类值": "1&2&3&4&35&40&36",
                     "数组": "class=\"stui-vodlist__box\"&&</a",
                     "标题": "title=\"&&\"",
-                    "图片": "data-original\"&&\"",
+                    "图片": "background-image: url("&&");",
                     "副标题": "<span class=\"pic-text text-right\">&&</span>",
                     "链接": "href=\"&&\"",
                     "影片年代": "/year/&&.html",
