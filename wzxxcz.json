@@ -2307,7 +2307,7 @@
 		    "二次截取": "module-items module-poster-items-base\"&&id=\"page",
                     "数组":"/voddetail/&&</a>",
                     "标题": "title=\"&&\"",
-                    "图片": "data-original=\"&&\"",
+                    "图片": "data-original=\"&&\"[替换:amp;>>空]",
                     "副标题": "<div class=\"module-item-douban\">&&</div>",
                     "链接":"/voddetail/+&&\"",
                     "影片年代": "年份：&&</a",
