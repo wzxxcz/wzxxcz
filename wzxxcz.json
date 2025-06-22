@@ -2325,7 +2325,7 @@
                     "播放链接": "href=\"&&\"",
                     "跳转播放链接": "var player_*\"url\":\"&&\"",
                     "搜索请求头": "User-Agent$MOBILE_UA",
-                    "搜索url": "https://www.neimaowang.com/vodsearch/{wd}----------{pg}---.html",
+                    "搜索url": "https://damkvq.wiki/vodsearch/{wd}----------{pg}---.html",
                     "搜索模式": "1",
 		    "搜索数组": "v-thumb stui-vodlist__thumb lazyload\"&&/a>",
                     "搜索标题": "title=\"&&\"",
