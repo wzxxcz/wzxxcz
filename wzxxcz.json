@@ -2362,11 +2362,6 @@
                     "分类url": "https://dy.8ttv.cn/index.php/vod/show/area/{area}/id/{cateId}/page/{catePg}/year/{year}.html",
                     "分类": "电影&连续剧&综艺&动漫&纪录片",
                     "分类值": "1&2&3&4&37",
-		    "数组":"/vod/detail&&</a >",
-                    "标题": "title=\"&&\"",
-                    "图片": "data-original=\"&&\"",
-                    "副标题": "<div class=\"module-item-note\">&&</div>", 
-                    "链接":"/index.php/vod/detail/id/+/id/&&",
                     "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>"
 
                    
