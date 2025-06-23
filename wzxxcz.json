@@ -2379,7 +2379,22 @@
 		    "播放数组": "play-list\"&&</div>",
                     "播放列表": "<a&&/a>",
                     "播放标题": "<span>&&</span>",
-                    "播放链接": "href=\"&&\""
+                    "播放链接": "href=\"&&\"",
+		    "跳转播放链接": "var player_*\"url\":\"&&\"",
+                    "搜索请求头": "User-Agent$MOBILE_UA",
+                    "搜索url": "https://dy.8ttv.cn/index.php/vod/search/page/{pg}/wd/{wd}.html",
+                    "搜索模式": "1",
+		    "搜索数组": "/index.php/&&</a>",
+                    "搜索标题": "title=\"&&\"",
+                    "搜索图片": "data-original=\"&&\"",
+                    "搜索副标题": "<div class=\"module-item-note\">&&</div>", 
+                    "搜索链接":"/index.php/+&&\"",
+                    "筛选": "1",
+                    "年份": "1990-2025",
+                    "年份值": "*",
+                    "语言值": "*",
+                    "排序": "时间&人气&评分",
+                    "排序值": "time&hits&score"
                   }
         },
 	{
