@@ -2369,7 +2369,7 @@
                     "副标题": "<div class=\"module-item-note\">&&</div>", 
 		    "链接":"/index.php/vod/detail/id/+/id/&&\"",
                     "影片年代": "/year/*>&&<",
-                    "影片地区": "地区：&&</a>",
+                    "影片地区": "/area/*>&&<",
                     "影片类型": "类型：&&</span>",
                     "状态": "module-info-item-content\">&&</div>",
                     "导演": "导演：&&</span>",
