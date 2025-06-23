@@ -2362,6 +2362,7 @@
                     "分类url": "https://dy.8ttv.cn/index.php/vod/show/area/{area}/id/{cateId}/page/{catePg}/year/{year}.html",
                     "分类": "电影&连续剧&综艺&动漫&纪录片",
                     "分类值": "1&2&3&4&37",
+		    "二次截取": "module-items module-poster-items-base\"&&id=\"page",
 		    "数组":"/vod/detail&&</a>",
                     "标题": "title=\"&&\"",
                     "图片": "data-original=\"&&\"",
