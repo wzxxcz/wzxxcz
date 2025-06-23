@@ -2423,6 +2423,8 @@
 	            "副标题": "<div class=\"tag text-overflow\">&&</div>", 
 	            "图片":"img src=\"&&\"",
 	            "链接":"/index.php/vod/detail/id/+/id/&&\"",
+		    "线路数组": "swiper-slide-text&&</a>",
+                    "线路标题": ">&&</a>",
                     "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>"
                   }
         },
