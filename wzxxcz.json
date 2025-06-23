@@ -2418,6 +2418,11 @@
                     "分类url": "https://www.lgys.xyz/index.php/vod/show/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}.html",
                     "分类": "电影&剧集&综艺&动漫&短剧&少儿",
                     "分类值": "1&2&3&4&20&21",
+		    "数组":"/vod/detail&&</a>",
+		    "标题": "alt=\"&&\"",
+	            "副标题": "<div class=\"tag text-overflow\">&&</div>", 
+	            "图片":"img src=\"&&\"",
+	            "链接":"/index.php/vod/detail/id/+/id/&&\"",
                     "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>"
                   }
         },
