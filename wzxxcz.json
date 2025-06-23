@@ -2400,7 +2400,7 @@
         },
 	{
            "key": "流光影视",
-           "name": "🪐流光影视",
+           "name": "⛱️流光影视",
            "type": 3,
            "api": "csp_XBPQ",
            "ext": {
@@ -2411,12 +2411,11 @@
 		    "图片代理": "",
                     "直接播放": "0",
                     "播放请求头": "",
-		    "嗅探词": ".mp4#.m3u8#.flv#hcts-m3u8#index.m3u8",
                     "过滤词": "",
                     "主页url": "https://www.lgys.xyz/",
                     "首页": "120",
                     "起始页": "1",
-                    "分类url": "https://www.lgys.xyz/index.php/vod/show/area/{area}/by/{by}/class/{class}/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}.html",
+                    "分类url": "https://www.lgys.xyz/index.php/vod/show/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}.html",
                     "分类": "电影&剧集&综艺&动漫&短剧&少儿",
                     "分类值": "1&2&3&4&20&21",
                     "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>"
