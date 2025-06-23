@@ -2367,9 +2367,7 @@
                     "图片": "data-original=\"&&\"",
                     "副标题": "<div class=\"module-item-note\">&&</div>", 
                     "链接":"/index.php/vod/detail/id/+/id/&&",
-                    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>",
-		    "线路数组": "data-dropdown&&</small>",
-                    "线路标题": "<span>&&</span>"
+                    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>"
 
                    
                   }
