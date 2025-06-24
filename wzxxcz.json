@@ -2488,7 +2488,7 @@
 		      "搜索url": "https://tyys2.com/index.php/vod/search/page/{pg}/wd/{wd}.html",
                       "搜索模式": "1",
                       "搜索数组": "<div class=\"search-box flex rel\"&&</div",
-                      "搜索标题": "alt=\"&&\"",
+                      "搜索标题": "alt=\"&&封面图\"",
                       "搜索图片": "data-src=\"&&\"",
                       "搜索副标题": "<span class=\"public-list-prb hide ft2\">&&</span>", 
                       "搜索链接":"href=\"&&\"",
