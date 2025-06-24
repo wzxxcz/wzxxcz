@@ -2494,6 +2494,19 @@
                   }
         }, 
 	{
+           "key": "星辰影院4K",
+           "name": "🌠星辰影院4K",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                     "请求头": "User-Agent$MOBILE_UA",
+                     "编码": "UTF-8",
+                     "分类url": "https://xc4k.cc/{cateId}/page/{catePg}",
+                     "分类": "电影$movie#国产剧$chinese-mainland#美剧$united-states#日剧$japan#韩剧$south-korea#泰剧$thailand#港剧$hong-kong#台剧$taiwan#海外剧$other-overseas#",
+                     "简介": "🍊小橙子为您介绍剧情👉+module-info-introduction-content\">&&</div>"
+                  }
+        }, 
+	{
             "key": "步步",
             "name": "👟步步1080P",
             "type": 3,
