@@ -3364,6 +3364,24 @@
             }
         },
 	{
+            "key": "统一影视",
+            "name": "🍊统一影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                      "请求头": "User-Agent$MOBILE_UA",
+                      "编码": "UTF-8",
+                      "数组": "<div class=\"public-list-box public-pic-b\"&&</div",
+                      "标题": "alt=\"&&\"",
+                      "副标题": "<span class=\"public-list-prb hide ft2\">&&</span>",
+                      "图片": "data-src=\"&&\"",
+                      "链接": "href=\"&&\"",
+                      "分类url": "https://tyys2.com/index.php/vod/show/area/{area}/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}.html",
+                      "分类": "电影$2#电视剧$1#动漫$3#综艺$4#体育赛事$5#短剧$41#",
+                      "简介": "🍊小橙子为您介绍剧情👉+module-item-style video-text\">&&</div>"
+            }
+        },
+	{
             "key": "视频库",
             "name": "🍊视频库",
             "type": 3,
