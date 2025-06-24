@@ -2423,8 +2423,7 @@
 		    "图片":"img src=\"&&\"",
 	            "副标题": "<div class=\"tag text-overflow\">&&</div>", 
 	            "链接":"/index.php/vod/detail/id/+/id/&&\"",
-		    "导演": "导演：&&</div></div>",
-                    "主演": "主演：&&</div></div>",
+		    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+intro\">&&</div>",
 		    "线路数组": "\\#playlist&&/a>",
                     "线路标题": "swiper-slide-text\">&&<",
 		    "播放二次截取": "tab-content\">&&猜你喜欢[替换:item\">>>id=\"playlist]",
@@ -2432,7 +2431,21 @@
                     "播放列表": "<a&&/a>",
                     "播放标题": ">&&</a>",
                     "播放链接": "href=\"&&\"",
-                    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+intro\">&&</div>"
+		    "跳转播放链接": "var player_*\"url\":\"&&\"",
+                    "搜索请求头": "User-Agent$MOBILE_UA",
+                    "搜索url": "https://www.lgys.xyz/index.php/vod/search/page/{pg}/wd/{wd}.html",
+                    "搜索模式": "1",
+		    "搜索数组": "/vod/detail&&</a>",
+                    "搜索标题": "alt=\"&&\"",
+                    "搜索图片": "img src=\"&&\"",
+                    "搜索副标题": "<div class=\"tag text-overflow\">&&</div>", 
+                    "搜索链接":"/index.php/vod/detail/id/+/id/&&\"",
+                    "筛选": "1",
+                    "年份": "1990-2025",
+                    "年份值": "*",
+                    "语言值": "*",
+                    "排序": "时间&人气&评分",
+                    "排序值": "time&hits&score"               
                   }
         },
 	{
