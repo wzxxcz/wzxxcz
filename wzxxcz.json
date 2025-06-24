@@ -3402,12 +3402,30 @@
 		      "导演": "导演：&&</li>",
 		      "主演": "主演：&&</li>",
                       "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&</p",
+		      "线路二次截取": "",
 		      "线路数组": "<a class=\"swiper-slide&&/a>",
 	              "线路标题": "</i>&nbsp;&&<span",
+		      "播放二次截取": "",
 		      "播放数组": "<ul class=\"anthology-list-play&&</ul>",
                       "播放列表": "<a&&</a>",
                       "播放标题": ">&&</a>",
-                      "播放链接": "href=\"&&\""
+                      "播放链接": "href=\"&&\"",
+		      "跳转播放链接": "var player_*\"url\":\"&&\"",
+                      "搜索请求头": "User-Agent$MOBILE_UA",
+		      "搜索url": "https://tyys2.com/index.php/vod/search/page/{pg}/wd/{wd}.html",
+                      "搜索模式": "1",
+                      "搜索数组": "<div class=\"search-box flex rel\"&&</div",
+                      "搜索标题": "alt=\"&&\"",
+                      "搜索图片": "data-src=\"&&\"",
+                      "搜索副标题": "<span class=\"public-list-prb hide ft2\">&&</span>", 
+                      "搜索链接":"href=\"&&\"",
+                      "筛选": "1",
+                      "年份": "1990-2025",
+                      "年份值": "*",
+                      "语言值": "*",
+                      "排序": "时间&人气&评分",
+                      "排序值": "time&hits&score"
+		      
             }
         },
 	{
