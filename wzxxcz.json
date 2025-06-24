@@ -2452,6 +2452,7 @@
                      "起始页": "1",
                      "分类url": "https://ylsp.tv/vodshow/{cateId}-{area}---{lang}----{catePg}---{year}/",
                      "分类": "电影$1#剧集$2#综艺$3#动漫$4#",
+		     "二次截取": "module-items module-poster-items-base\"&&id=\"page",
 		     "数组":"/voddetail/&&</a>",
 	             "标题": "title=\"&&\"",
 		     "图片":"data-original=\"&&\"",
