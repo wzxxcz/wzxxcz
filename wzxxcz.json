@@ -2438,6 +2438,9 @@
            "name": "⛱️永乐视频4K",
            "type": 3,
            "api": "csp_XBPQ",
+	   "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
            "ext": {
                      "作者": "🍊小橙子/250624",
                      "站名": "永乐视频", 
