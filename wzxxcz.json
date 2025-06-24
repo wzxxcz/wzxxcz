@@ -3372,7 +3372,7 @@
                       "请求头": "User-Agent$MOBILE_UA",
                       "编码": "UTF-8",
                       "数组": "<div class=\"public-list-box public-pic-b\"&&</div",
-                      "标题": "alt=\"&&\"",
+                      "标题": "alt=\"&&\"[不包含:封面图]",
                       "副标题": "<span class=\"public-list-prb hide ft2\">&&</span>",
                       "图片": "data-src=\"&&\"",
                       "链接": "href=\"&&\"",
