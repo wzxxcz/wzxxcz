@@ -2433,7 +2433,6 @@
                     "播放链接": "href=\"&&\"",
 		    "跳转播放链接": "var player_*\"url\":\"&&\"",
                     "搜索请求头": "User-Agent$MOBILE_UA",
-                    "搜索url": "https://www.lgys.xyz/index.php/vod/search/page/{pg}/wd/{wd}.html",
                     "搜索模式": "1",
                     "筛选": "1",
                     "年份": "1990-2025",
