@@ -3690,11 +3690,11 @@
             "ext": {
                       "请求头": "User-Agent$MOBILE_UA",
                       "编码": "UTF-8",
-                      "数组": "div class=\"module-item\"&&</div",
+                      "数组":"/vod/detail&&</a>",
                       "标题": "title=\"&&\"",
                       "副标题": "<div class=\"module-item-text\">&&</div>",
                       "图片": "data-src=\"&&\"",
-                      "链接": "href=\"&&\"",
+                      "链接":"/index.php/vod/detail/id/+/id/&&\"",
                       "线路数组": "data-dropdown-value&&</div>",
                       "线路标题": ">&&</small>",
                       "播放数组": "<div class=\"module-blocklist&&</div>",
