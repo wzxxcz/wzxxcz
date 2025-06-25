@@ -2573,21 +2573,6 @@
             "ext": "sHR2rlsfjI4L3t4RXQMkn85YdqME5ZFXdHXyEUNrexXmXuKOZHlPhQJvT6ZKEMODJQuGTLg+gpKS+XoOxUH8DdjcutGqV/lfrY9l/Ww/J/LYA0AH34KTXsOeg1p5p+KSYaG5at+IT/dqPugeQjLLpkECHqWJpIs4B2evdM7dDIOBuPmMrT5lbU1yNZHMNkr8tConVxhS1qlq57WIByuNTQ=="
         },
 	{
-            "key": "榴莲4k",
-            "name": "榴莲4k",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet2",
-	    "jar": "https://xcz.iptv365.org/xczspider.jar",
-            "ext": {
-                "url": "https://qjappcms.ll4k.xyz/",
-                "dataKey": "1yGA85sJ5STtE7uj",
-                "dataIv": "1yGA85sJ5STtE7uj",
-                "deviceId": "",
-                "version": "50000"
-            }
-        },
-	{
             "key": "光速",
             "name": "☁️云端1080P",
             "type": 3,
