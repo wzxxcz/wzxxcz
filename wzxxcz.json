@@ -3300,6 +3300,30 @@
                   }
         },
 	{
+           "key": "魁影视频",
+           "name": "🍊魁影视频",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                    "请求头": "User-Agent$MOBILE_UA",
+                    "编码": "UTF-8",
+	            "数组":"<li class=\"col8&&</li>",
+	            "标题": "alt=\"&&\"",
+	            "副标题": "<p class=\"text\">&&</p>", 
+	            "图片":"data-original=\"&&\"",
+	            "链接": "href=\"&&\"",
+	            "线路数组": "<div class=\"panel-hd&&</div>",
+	            "线路标题": "<h3>&&</h3>",
+	            "播放数组": "<ul class=\"shoutu-playlist sort-list playlist&&</ul>",
+                    "播放列表": "<a&&</a>",
+                    "播放标题": ">&&</a>",
+                    "播放链接": "href=\"&&\"",
+                    "分类url": "https://www.hangtong168.com/vodshow/{cateId}-{area}---{lang}----{catePg}---.html",
+                    "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
+                    "简介": "🍊小橙子为您介绍剧情👉+text hidden-xs\">&&</div>"
+                  }
+        },
+	{
            "key": "动漫TV网",
            "name": "🍊动漫TV网",
            "type": 3,
