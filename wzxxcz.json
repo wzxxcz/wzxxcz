@@ -3312,7 +3312,7 @@
 	            "副标题": "<p class=\"text\">&&</p>", 
 	            "图片":"data-original=\"&&\"",
 	            "链接": "href=\"&&\"",
-	            "线路数组": "<div class=\"panel-hd&&</div></div>",
+	            "线路数组": "<div class=\"panel-hd\">&&</div>",
 	            "线路标题": "<h3>&&</h3>",
 	            "播放数组": "<ul class=\"shoutu-playlist sort-list playlist&&</ul>",
                     "播放列表": "<a&&</a>",
