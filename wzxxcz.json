@@ -3269,6 +3269,7 @@
                      "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+<p&&</p >"
                   }
         },
+	
 	{
             "key": "泥巴影院",
             "name": "🍊泥巴影院",
@@ -3679,6 +3680,31 @@
                       "分类url": "https://laowang.co/vs/{cateId}-{area}--{class}-{lang}----{catePg}---{year}.html",
                       "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$5#",
                       "简介": "🍊小橙子为您介绍剧情👉+module-item-style video-text\">&&</div>"
+            }
+        },
+	{
+            "key": "奇迹影视",
+            "name": "🍊奇迹影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                      "请求头": "User-Agent$MOBILE_UA",
+                      "编码": "UTF-8",
+                      "数组": "div class=\"module-item\"&&</div",
+                      "标题": "title=\"&&\"",
+                      "副标题": "<div class=\"module-item-text\">&&</div>",
+                      "图片": "data-src=\"&&\"",
+                      "链接": "href=\"&&\"",
+                      "线路数组": "data-dropdown-value&&</div>",
+                      "线路标题": ">&&</small>",
+                      "播放数组": "<div class=\"module-blocklist&&</div>",
+                      "播放列表": "<a&&</a>",
+                      "播放标题": ">&&</a>",
+                      "播放链接": "href=\"&&\"",
+		      "跳转播放链接": "var player_*\"url\":\"&&\"",
+                      "分类url": "https://qiji.91by.top/index.php/vod/show/area/{area}/id/{cateId}/lang/{lang}/page/{catePg}.html",
+                      "分类": "电影$1#电视剧$2#综艺$3#动漫$4#纪录片$5#少儿$21#短剧$20#",
+                      "简介": "🍊小橙子为您介绍剧情👉+剧情：&&</div"
             }
         },
 	{
