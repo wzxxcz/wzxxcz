@@ -3683,19 +3683,6 @@
             }
         },
 	{
-            "key": "奇迹影视",
-            "name": "🍊奇迹影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                      "请求头": "User-Agent$MOBILE_UA",
-                      "编码": "UTF-8",
-                      "分类url": "https://qiji.91by.top/index.php/vod/show/area/{area}/id/{cateId}/lang/{lang}/page/{catePg}.html",
-                      "分类": "电影$1#电视剧$2#综艺$3#动漫$4#纪录片$5#少儿$21#短剧$20#",
-                      "简介": "🍊小橙子为您介绍剧情👉+剧情：&&</div"
-            }
-        },
-	{
             "key": "河马影视",
             "name": "🦛河马影视",
             "type": 3,
