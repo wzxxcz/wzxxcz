@@ -3408,6 +3408,7 @@
           "ext": {
                    "请求头": "User-Agent$MOBILE_UA",
                    "编码": "UTF-8",
+		   "嗅探词": ".mp4#.m3u8#.flv#hcts-m3u8#index.m3u8",
 	           "数组": "/video/&&</a",
 	           "标题": "title=\"&&\"",
 	           "副标题": "<div class=\"module-item-note\">&&</div>",
