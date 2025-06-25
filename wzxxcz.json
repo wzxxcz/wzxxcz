@@ -2578,7 +2578,7 @@
             "type": 3,
             "quickSearch": 1,
             "api": "csp_AppGet2",
-	    "jar": "https://xcz.iptv365.org/spider.jar",
+	    "jar": "https://xcz.iptv365.org/xczspider.jar",
             "ext": {
                 "url": "https://qjappcms.ll4k.xyz/",
                 "dataKey": "1yGA85sJ5STtE7uj",
