@@ -3957,14 +3957,26 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                      "请求头": "User-Agent$MOBILE_UA",
-                      "编码": "UTF-8",
-                      "分类url": "https://2k4k.sbs/index.php/vod/show/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}/",
-                      "分类": "电影$1#连续剧$2#短剧$3#综艺$4#动漫$5#4K电影$33#",
-		      "线路数组": "data-dropdown-value&&</div>",
-                      "线路标题": "<span>&&</span>",
-		      "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+剧情：&&</div>"
-
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "分类url": "https://2k4k.sbs/index.php/vod/show/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}/",
+                "分类": "电影$1#连续剧$2#短剧$3#综艺$4#动漫$5#4K电影$33",
+                "二次截取": "module-items\"&&id=\"page[替换:module-footer>>module-item]",
+                "数组": "module-item-pic&&module-item\"",
+                "副标题": "item-text\">&&<", "影片年代": "/year/*>&&<",
+                "影片地区": "/area/*>&&<",
+                "影片类型": "vod_class\":\"&&\"",
+                "状态": "更新：&&</li",
+                "演员": "vod_actor\":\"&&\"",
+                "导演": "vod_director\":\"&&\"",
+                "线路数组": "data-dropdown-value&&</div>",
+                "线路标题": "<span>&&</span>",
+                "播放数组": "id=\"sort-item&&shortcuts",
+                "播放列表": "<a&&/a>",
+                "播放标题": "<span>&&</span>",
+                "播放链接": "href=\"&&\"",
+                "跳转播放链接": "urlDecode(Base64(var player_*url\":\"&&\"))",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+剧情：&&</div>"
             }
         },
 	{
