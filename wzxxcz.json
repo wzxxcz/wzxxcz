@@ -3876,6 +3876,19 @@
             }
         },
 	{
+            "key": "2K4K影视",
+            "name": "🍊2K4K影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                      "请求头": "User-Agent$MOBILE_UA",
+                      "编码": "UTF-8",
+                      "分类url": "https://2k4k.sbs/index.php/vod/show/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}/",
+                      "分类": "电影$1#连续剧$2#短剧$3#综艺$4#动漫$5#4K电影$33#",
+                      "简介": "🍊小橙子为您介绍剧情👉+module-item-style video-text\">&&</div>"
+            }
+        },
+	{
             "key": "河马影视",
             "name": "🦛河马影视",
             "type": 3,
