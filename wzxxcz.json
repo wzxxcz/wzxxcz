@@ -3963,14 +3963,8 @@
                       "分类": "电影$1#连续剧$2#短剧$3#综艺$4#动漫$5#4K电影$33#",
 		      "线路数组": "data-dropdown-value&&</div>",
                       "线路标题": "<span>&&</span>",
-		      "播放数组": "id=\"sort-item&&shortcuts",
-		      "二次截取": "module-items\"&&id=\"page[替换:module-footer>>module-item]",
-                      "数组": "module-item-pic&&module-item\"",
                       "副标题": "item-text\">&&<",
-                      "播放列表": "<a&&/a>",
-                      "播放标题": "<span>&&</span>",
                       "播放链接": "href=\"&&\"",
-
 		      "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+剧情：&&</div>"
 
             }
