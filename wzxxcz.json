@@ -3961,8 +3961,8 @@
                       "编码": "UTF-8",
                       "分类url": "https://2k4k.sbs/index.php/vod/show/id/{cateId}/lang/{lang}/page/{catePg}/year/{year}/",
                       "分类": "电影$1#连续剧$2#短剧$3#综艺$4#动漫$5#4K电影$33#",
-		      "线路数组": "data-dropdown&&</span>",
-                      "线路标题": ">&&<",
+		      "线路数组": "data-dropdown-value&&</div>",
+                      "线路标题": "<span>&&</span>",
 		      
 		      "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+剧情：&&</div>"
 
