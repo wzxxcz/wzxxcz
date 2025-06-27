@@ -2420,7 +2420,7 @@
                     "播放列表": "<a&&</a>",
                     "播放标题": "<span>&&</span>",
                     "播放链接": "href=\"&&\"",
-		    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>"
+		    "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-item module-info-introduction\">&&</div>"
                   }
         },
 	{
