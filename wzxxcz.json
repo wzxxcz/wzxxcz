@@ -5456,6 +5456,30 @@
                    "简介": "🍊小橙子为您介绍剧情👉+col-pd text-collapse content\">&&</div>"
                  }
           }, 
+	  {
+           "key": "四海影院",
+           "name": "💧四海影院",
+           "type": 3,
+           "api": "csp_XBPQ",
+           "ext": {
+                   "请求头": "User-Agent$MOBILE_UA",
+                   "编码": "UTF-8",
+                   "分类url": "http://sihai88.com/show/{cateId}-{area}---{lang}----{catePg}---.html",
+                   "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#",
+		   "数组": "zy&&</a",
+                   "标题": "e=\"&&\"",
+                   "副标题": "ks\">&&<",
+                   "图片": "l=\"&&\"",
+                   "链接": "f=\"&&\"",
+		   "线路数组": "laiyuan\"&&</a",
+                   "线路标题": "</i>&&<",
+                   "播放数组": "id=\"hl-plays-list&&</ul>",
+                   "播放列表": "<a&&/a>",
+                   "播放标题": ">&&<",
+                   "播放链接": "href=\"&&\"",
+                   "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+hl-content-text\">&&</div>"
+                 }
+          }, 
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
