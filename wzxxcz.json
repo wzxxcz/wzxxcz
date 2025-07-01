@@ -3350,6 +3350,16 @@
             "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
 	{
+           "key": "云速",
+           "name": "☁️云速影视",
+           "type": 3,
+           "searchable": 1,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "XRksEN3W20hd3bSb1cdiKl6rrJZOM0otP1Ett1yknmjVA9fGeMUewl1QKCASY0WqO7ZP5egWNcwYI9Lu7YKJGxgbj0vsL/E+PlbKB7+mf8PyyFncR0WQp7wN0qj394aa"
+        },
+	{
             "key": "浪酷影视",
             "name": "💡浪酷影视",
             "type": 3,
