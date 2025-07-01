@@ -3214,6 +3214,8 @@
             "key": "QD4K",
             "name": "🐷猪猪4K",
             "type": 3,
+	    "searchable": 1,
+            "quickSearch": 1,
             "api": "csp_AppYsV2",
 	    "jar": "https://xcz.iptv365.org/wzxm.png",
             "playerType": 2,
