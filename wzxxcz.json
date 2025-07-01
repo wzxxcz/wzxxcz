@@ -3225,9 +3225,11 @@
             "key": "海豚",
             "name": "🐬海豚1080P",
             "type": 3,
+            "searchable": 1,
+            "quickSearch": 1,
             "api": "csp_AppGet",
 	    "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "sHR2rlsfjI4L3t4RXQMknx77uAkBngyVCOo9nRhjtYEYVZhfCVy1trqBss1N9z/rDj66qnYWTA57CvnxJsOMbb1R0y0vBLYBpNMTyfbz36dsqgawYeyyXpTwdiQYs9rb4CFK1aW6bX+LcZiFVV4uzNbizESdy9tdeYkjDnNiCbfRD1K5N84R+TKB+U4Im7pOR8gnvFFwwx6KSDahektkXrxVKpbBw/neJaeyX3K+BkxPEzxo40Ecg3vBNUzl7RZs"
+            "ext": "ncGO9IfuyMjbysvCamdzFokZEAwmwSptuElWkrNclaJraoEHFYkTWsdzkxcUKm4GSAvVz62pqT/WGUt01SzxLX7PwKwKIRwYjjymMhE7o7UpFgclIJOQN+MLXQ9aO5XuqCUYgwrMvYiLtWBb4LFmoQ=="
         },
 	{
             "key": "巧技",
