@@ -3343,10 +3343,11 @@
             "key": "热热",
             "name": "🔥热热1080P",
             "type": 3,
+            "searchable": 1,
             "quickSearch": 1,
-            "api": "csp_AppRJ2",
+            "api": "csp_AppRJ",
 	    "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "sHR2rlsfjI4L3t4RXQMkn9mmg6Ofmy66+wcs9waIyn4hKqT9jG9s4kO6qzcu2OSqWS1/T+wfkqe+UwoipekwvcM11PTDrQqKYI8lmMXUc1vBHxp/2uWIw5HUoscBNWEb"
+            "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
 	{
             "key": "浪酷影视",
