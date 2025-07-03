@@ -1839,18 +1839,6 @@
                     },
            "ext": "./json/夸父.json"
         },
-	{
-          "key": "双子",
-          "name": "🍊子星4K弹幕",
-          "type": 3,
-          "api": "http://38.165.20.168/js/drpy2.min.js",
-	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-          "searchable": 1,
-          "quickSearch": 1,
-          "filterable": 1,
-          "order_num": 0,
-          "ext": "http://38.165.20.168/js/子星.js"
-        },
         {
           "key": "双星",
           "name": "🍊双星4K弹幕",
