@@ -1760,12 +1760,7 @@
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "changeable": 0,
-            "style": {
-                        "type": "list",
-                        "ratio": 1.433
-                     },
-           "ext": "./lib/聚搜.json"
+            "changeable": 1
         },
 	{
             "key": "雷鲸",
