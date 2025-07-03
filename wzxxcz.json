@@ -36,15 +36,6 @@
                 "timeout": 10
              },
 	     {
-                "name": "BeeSport直播(小橙子)",
-                "type": 3,
-                "api": "https://json.doube.eu.org/python/live_beesport.py",
-                "ext": {},
-                "header": {
-                             "Referer": "https://p.m82xg4z0cdbz7.com/"
-                          }
-             },
-	     {
                 "name": "小橙子专用电视",
                 "type": 0,
                 "url": "https://fy.188766.xyz/?ip=home.kuaidi521.com",
@@ -81,42 +72,6 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
              },
 	     {
-                "name": "小橙子专用电视3",
-                "type": 0,
-                "url": "https://gh-proxy.com/raw.githubusercontent.com/cqshushu/tvjk/master/zqyd.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子专用电视4",
-                "type": 0,
-                "url": "http://is.is-great.org//ii/1748307151.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子专用电视5",
-                "type": 0,
-                "url": "http://ys.my.to/i/?T=ydyw",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-	        "name": "小橙子肥羊",
-                "type":0,
- 	        "url": "http://gg.7749.org/z/i/5788.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
                 "name": "小橙子专线港澳",
                 "type": 0,
                 "url": "https://www.lichenggang.asia/f/4o0CD/%F0%9F%87%A8%F0%9F%87%B3GT.txt",
@@ -126,54 +81,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
              },
 	     {
-                "name": "小橙子央卫咪咕体育",
-                "type": 0,
-                "url": "http://l.gmbbk.com/upload/24352435.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子央卫咪咕体育1",
-                "type": 0,
-                "url": "https://sourl.cn/v2MgNK",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子央卫咪咕体育2",
-                "type": 0,
-                "url": "http://php.cqshushu.ggff.net/515001.php?公众号【医工学习日志】",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
                 "name": "Gather电视直播",
                 "type": 0,
                 "url": "https://tv.iill.top/m3u/Gather",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子咪咕央卫视",
-                "type": 0,
-                "url": "http://gg.7749.org/z/i/赛事.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子咪咕央卫视1",
-                "type": 0,
-                "url": "http://gg.7749.org/z/i/咪咕.txt",
                 "playerType": 1,
                 "ua": "okhttp/3",
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -422,27 +332,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    },
 	    {
-	        "name": "中天港澳体育1",
-                "type":0,
- 	        "url": "http://cccccccoccccccc.ccccocccc.cc/uploads/%E6%8A%AC%E6%89%9B_1.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
 	        "name": "小橙子ggff",
                 "type":0,
  	        "url": "http://php.cqshushu.ggff.net/jzb.php?公众号【医工学习日志】",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子chuxinya",
-                "type":0,
- 	        "url": "https://chuxinya.top/f/jRjJHR/live.txt",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -457,24 +349,6 @@
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    },
-	    {
-	        "name": "小橙子512",
-                "type":0,
- 	        "url": "http://tvbox.bplaced.net/index.php?key=512",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-                "name": "小橙子APTV",
-                "type": 0,
-                "url": "https://github.moeyy.xyz/https://raw.githubusercontent.com/Kimentanm/aptv/refs/heads/master/m3u/iptv.m3u",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
 	    {
 	        "name": "小橙子Cx4x",
                 "type":0,
@@ -494,63 +368,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    },
 	    {
-	        "name": "小橙子pan",
-                "type":0,
- 	        "url": "http://pan.aa53.cn/down.php/5d88e3b534a976e9a95c39d7c5f2eec1.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
 	        "name": "小橙子看电视1",
                 "type":0,
  	        "url": "https://ghproxy.net/https://raw.githubusercontent.com/seadai794/tv/main/itvlist.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子看电视2",
-                "type":0,
- 	        "url": "https://smart.pendy.dpdns.org/m3u/merged_judy.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子看电视3",
-                "type":0,
- 	        "url": "https://14458.kstore.vip/xzy/twzb.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子看电视4",
-                "type":0,
- 	        "url": "https://app.ysctv.cn/tv/%E5%BD%B1%E8%A7%86%E8%BD%A6.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子mytv",
-                "type":0,
- 	        "url": "https://gitee.com/mytv-android/iptv-api/raw/master/output/result.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子咪咕体育",
-                "type":0,
- 	        "url": "https://smart.pendy.dpdns.org/m3u/judy.m3u",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -566,27 +386,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    },
 	    {
-	        "name": "小橙子360看球",
-                "type":0,
- 	        "url": "http://tv.cqshushu.ggff.net:2086/360pai.php",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
 	        "name": "小橙子88看球",
                 "type":0,
  	        "url": "http://php.cqshushu.ggff.net/kqt.php?公众号【医工学习日志】",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子88看球1",
-                "type":0,
- 	        "url": "http://tv.cqshushu.ggff.net:2086/kqt.php?公众号【医工学习日志】",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -629,15 +431,6 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    }, 
 	    {
-	        "name": "V6范明明（需开启V6网络）",
-                "type":0,
- 	        "url": "https://github.moeyy.xyz/https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/tv/m3u/ipv6.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
 	        "name": "小橙子AIGuovin",
                 "type":0,
  	        "url": "https://gitee.com/mytv-android/iptv-api/raw/master/output/result.txt",
@@ -647,33 +440,6 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    },
 	    {
-	        "name": "小橙子高速",
-                "type":0,
- 	        "url": "http://api.mytv666.top/lives/free.php?type=txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子闪电",
-                "type":0,
- 	        "url": "http://gg.7749.org/z/0/dzh.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子wwb521",
-                "type":0,
- 	        "url": "https://github.moeyy.xyz/https://raw.githubusercontent.com/wwb521/live/refs/heads/main/tv.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	    {
                 "name": "小橙子v25",
                 "type": 0,
                 "url": "http://8.138.7.223/v25.txt",
@@ -682,72 +448,10 @@
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
              },
-	     {
-	        "name": "小橙子TV",
-                "type":0,
- 	        "url": "https://gh-proxy.com/https://raw.githubusercontent.com/yoursmile66/TVBox/refs/heads/main/live.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-                "name": "自动采集",
-                "type": 0,
-                "url": "https://live.izbds.com/tv/iptv4.txt",
-                "epg": "http://epg.112114.xyz/?ch={name}&date={date}",
-                "logo": "https://epg.112114.xyz/logo/{name}.png",
-                "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-            },
-	    {
-	        "name": "小橙子alfy",
-                "type":0,
- 	        "url": "http://alfy.djian.top/tv.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
 	    {
 	        "name": "研究所体育(需梯子)",
                 "type":0,
  	        "url": "https://smart.pendy.dpdns.org/m3u/merged_judy.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子ysmy",
-                "type":0,
- 	        "url": "http://ys.my.to//i/?T=TV",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-            {
-	        "name": "小橙子HKTV",
-                "type":0,
- 	        "url": "http://kkk.888.3116598.xyz//user/HKTV.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "优质央卫视",
-                "type":0,
- 	        "url": "https://xcz.iptv365.org/优质央卫视.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子ipv4",
-                "type":0,
- 	        "url": "https://www.iyouhun.com/tv/ipv4.txt",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -763,54 +467,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    },
 	    {
-	        "name": "小橙子fhtv6",
-                "type":0,
- 	        "url": "https://ltjm.37o.cc/jm/fhtv6.php",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子西柚",
-                "type":0,
- 	        "url": "http://zozo.vmhost.cc/zx/i/1745668499.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子其它",
-                "type":0,
- 	        "url": "http://docker.livednow.dpdns.org/?type=m3u&proxy=true",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子ku9",
-                "type":0,
- 	        "url": "http://ku9.fr.to/ku9/1745855146.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
 	        "name": "小橙子易看",
                 "type":0,
  	        "url": "http://117.72.68.25:9230/latest.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子51",
-                "type":0,
- 	        "url": "http://8.138.7.223/51.txt",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -825,136 +484,10 @@
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	    },
-	    {
-	        "name": "小橙子国内fm",
-                "type":0,
- 	        "url": "http://fmys.top/lib/xinghuo1.0.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子zbds",
-                "type":0,
- 	        "url": "https://live.zbds.top/tv/iptv4.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子IPV4",
-                "type":0,
- 	        "url": "https://gitee.com/jin-xueling/lingl/raw/master/hu.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "小橙子gold",
-                "type":0,
- 	        "url": "http://goldtechk.com/4k/live.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "可欣电视",
-                "type":0,
- 	        "url": "https://gh-proxy.com/raw.githubusercontent.com/vbskycn/iptv/refs/heads/master/tv/iptv4.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	    {
-	        "name": "可欣电视1",
-                "type":0,
- 	        "url": "https://ghfast.top/https://raw.githubusercontent.com/Wirili/IPTV/main/live.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "可欣电视2",
-                "type":0,
- 	        "url": "http://home.jundie.top:81/Cat/tv/live.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    }, 
-	    {
-	        "name": "可欣电视3",
-                "type":0,
- 	        "url": "https://gh.qninq.cn/https://raw.githubusercontent.com/moonkeyhoo/iptv-api/master/output/result.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    }, 
-	    {
-	        "name": "AKTVku",
-                "type":0,
- 	        "url": "http://ku9.fr.to/ku9/1747366963.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	    },
-	    {
-	        "name": "AKTV港台",
-                "type":0,
- 	        "url": "http://cccccccoccccccc.ccccocccc.cc/uploads/2_%E6%89%B9%E9%87%8F%E6%B8%AF%E5%8F%B0.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "AKTV港台1",
-                "type":0,
- 	        "url": "https://www.lichenggang.asia/f/lg3ie/%E7%94%9F%E6%B4%BB.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "AKTVfe",
-                "type":0,
- 	        "url": "https://fel.forxhr.top:2022/down.php/554d49b4beb024a1c32d7cf11906c3f5.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
 	     {
 	        "name": "小橙子GAT",
                 "type":0,
  	        "url": "https://fel.forxhr.top:2022/down.php/2a295525d70cfc8430749aca104fc9aa.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "AKTV2",
-                "type":0,
- 	        "url": "http://go8.myartsonline.com/zx/2/夏夏·源.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "AKTV3",
-                "type":0,
- 	        "url": "http://go8.myartsonline.com/zx/2/AK47·港澳源.txt",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -988,42 +521,6 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	     },
 	     {
-	        "name": "AKTV123",
-                "type":0,
- 	        "url": "http://123.iptv6.icu/view.php/825c7e86e090bd17a6448db7d858281b.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "HK秒播",
-                "type":0,
- 	        "url": "http://is.is-great.org//ii/1747785577.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "HK秒播1",
-                "type":0,
- 	        "url": "http://is.is-great.org//ii/1747666300.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子体育频道1",
-                "type":0,
- 	        "url": "https://live.zbds.top/tv/iptv4.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
 	        "name": "小橙子湖北经视",
                 "type":0,
  	        "url": "https://ghproxy.net/raw.githubusercontent.com/PizazzGY/TV/master/output/user_result.txt",
@@ -1033,45 +530,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	     },
 	     {
-	        "name": "小橙子湖北经视1",
-                "type":0,
- 	        "url": "https://wget.la/https://raw.githubusercontent.com/PizazzGY/TV/master/output/user_result.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子范明",
-                "type":0,
- 	        "url": "https://github.moeyy.xyz/https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
 	        "name": "小橙子秒播",
                 "type":0,
  	        "url": "http://47.120.41.246:8899/zb.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子央卫港秒播",
-                "type":0,
- 	        "url": "https://d.kstore.dev/download/13923/%E6%8E%A8%E6%B5%81-150+%281%29.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子yoursmile66",
-                "type":0,
- 	        "url": "https://gh-proxy.com/raw.githubusercontent.com/yoursmile66/TVBox/refs/heads/main/live.txt",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -1105,63 +566,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
              },
 	     {
-                "name": "小橙子直播",
-                "type": 0,
-                "url": "https://gitee.com/jackie0158/tv1/raw/master/zy.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子国内",
-                "type": 0,
-                "url": "https://ghproxy.net/https://raw.githubusercontent.com/asdjkl6/tv/tv/.m3u/%E6%95%B4%E5%A5%97%E7%9B%B4%E6%92%AD%E6%BA%90/%E6%B5%8B%E8%AF%95/%E6%95%B4%E5%A5%97%E7%9B%B4%E6%92%AD%E6%BA%90/kk.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子国内1",
-                "type": 0,
-                "url": "https://gh.tryxd.cn/raw.githubusercontent.com/suxuang/myIPTV/main/ipv6.m3u",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-	        "name": "小橙子港澳1",
-                "type":0,
- 	        "url": "http://ttkx.cc:55/lib/kx2024.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
                 "name": "小橙子猫TV",
                 "type": 0,
                 "url": "http://rihou.cc:567/gggg.nzk",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子分享者",
-                "type": 0,
-                "url": "https://ghproxy.net/https://raw.githubusercontent.com/maoystv/000/master/live20220813.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子IPV46",
-                "type": 0,
-                "url": "http://kkk.jjjj.jiduo.me/user/tttt/api.txt",
                 "playerType": 1,
                 "ua": "okhttp/3",
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -1185,24 +592,6 @@
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	     },
-	     {
-                "name": "小橙子台湾频道",
-                "type": 0,
-                "url": "https://epg.pw/test_channels_taiwan.m3u",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子新加坡频道",
-                "type": 0,
-                "url": "https://epg.pw/test_channels_singapore.m3u",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
 	     {
 	        "name": "小橙子港澳综合(需梯子)",
                 "type":0,
@@ -1258,99 +647,9 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
 	     },
 	     {
-	        "name": "小橙子myIPV6",
-                "type":0,
- 	        "url": "https://gh.tryxd.cn/raw.githubusercontent.com/suxuang/myIPTV/main/ipv6.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
 	        "name": "小橙子拾光",
                 "type":0,
  	        "url": "https://ghproxy.net/raw.githubusercontent.com/xmbjm/TV/master/output/user_result.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子全球频道",
-                "type":0,
- 	        "url": "https://gitlab.com/hewittchoi/tvlist/-/raw/main/updated.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子宇宙频道",
-                "type":0,
- 	        "url": "https://ghproxy.cn/https://raw.githubusercontent.com/qinvision/Film-Television/main/dujuejiami.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子港澳广",
-                "type":0,
- 	        "url": "http://175.178.251.183:6689/live.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子电视11",
-                "type":0,
- 	        "url": "http://wx.thego.cn/df.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子电视111",
-                "type":0,
- 	        "url": "http://wx.thego.cn/cctv.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子电视1111",
-                "type":0,
- 	        "url": "http://wx.thego.cn/cw.m3u",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子春盈",
-                "type":0,
- 	        "url": "https://files.catbox.moe/feyax3.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子春盈1",
-                "type":0,
- 	        "url": "http://l.gmbbk.com/upload/0421421.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子春盈2",
-                "type":0,
- 	        "url": "http://l.gmbbk.com/upload/21652165.txt",
                 "ua": "okhttp/3.15",
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
@@ -1364,79 +663,7 @@
                 "playerType": 1,
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子电视2",
-                "type":0,
- 	        "url": "https://13354.kstore.space/29.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子电视3",
-                "type":0,
- 	        "url": "https://7337.kstore.space/twkj/tvzb.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "AKTV备1",
-                "type":0,
- 	        "url": "http://mdxgh.tpddns.cn:9999/new/mdzb.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-	        "name": "小橙子地方台",
-                "type":0,
- 	        "url": "https://ghproxy.net/raw.githubusercontent.com/Guovin/TV/gd/output/result.txt",
-                "ua": "okhttp/3.15",
-                "playerType": 1,
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-	     },
-	     {
-                "name": "小橙子国际合集",
-                "type": 0,
-                "url": "http://wx.thego.cn/backup.m3u",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子国际",
-                "type": 0,
-                "url": "http://php.666230.xyz/202501.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子央卫",
-                "type": 0,
-                "url": "http://wx.thego.cn/cctv.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             },
-	     {
-                "name": "小橙子FM",
-                "type": 0,
-                "url": "http://wx.thego.cn/fm.txt",
-                "playerType": 1,
-                "ua": "okhttp/3",
-                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
-     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-             }
+	     }
           ],
     "sites": [
         {
