@@ -1771,12 +1771,12 @@
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "changeable": 0,
+            "changeable": 1,
             "style": {
                        "type": "list",
                        "ratio": 1.433
                      },
-            "ext": "./lib/雷鲸.json"
+            "ext": "./json/雷鲸.json"
         },
 	{
           "key": "海绵",
