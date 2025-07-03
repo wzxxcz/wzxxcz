@@ -1763,6 +1763,17 @@
             "changeable": 1
         },
 	{
+          "key": "天堂",
+          "name": "🍊天堂搜索",
+          "type": 3,
+          "api": "http://38.165.20.168/lib/cloud.min.js",
+	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
+          "ext": "http://38.165.20.168/lib/天堂.js",
+          "style": {
+                     "type": "list"
+                   }
+        },
+	{
             "key": "雷鲸",
             "name": "🍊雷鲸4K弹幕",
             "type": 3,
@@ -1884,6 +1895,17 @@
                    }
         },
 	{
+           "key": "爱搜",
+           "name": "🍊爱搜搜索",
+           "type": 3,
+           "api": "http://38.165.20.168/lib/cloud.min.js",
+	   "jar": "https://xcz.iptv365.org/wzxqh.jar",
+           "ext": "http://38.165.20.168/lib/百度.js",
+           "style": {
+                       "type": "list"
+                    }
+        },
+	{
           "key": "csp_MiSou",
           "name": "🔍米搜盘聚",
           "type": 3,
@@ -1891,39 +1913,6 @@
           "quickSearch": 1,
           "api": "csp_MiSou",
 	  "jar": "https://xcz.iptv365.org/wzxm.png"
-        },
-	{
-          "key": "UC4K",
-          "name": "🍊UC4K弹幕",
-          "type": 3,
-          "api": "http://38.165.20.168/js/cloud.min.js",
-	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-          "ext": "http://38.165.20.168/js/UC.js",
-          "style": {
-                     "type": "list"
-                   }
-        },
-        {
-          "key": "夸克4K",
-          "name": "🍊夸克4K弹幕",
-          "type": 3,
-          "api": "http://38.165.20.168/js/cloud.min.js",
-	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-          "ext": "http://38.165.20.168/js/夸克.js",
-          "style": {
-                     "type": "list"
-                   }
-        },
-        {
-          "key": "百度4K",
-          "name": "🍊百度4K弹幕",
-          "type": 3,
-          "api": "http://38.165.20.168/js/cloud.min.js",
-	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-          "ext": "http://38.165.20.168/js/百度.js",
-          "style": {
-                     "type": "list"
-                   }
         },
         {
           "key": "全盘",
@@ -1946,6 +1935,15 @@
           "style": {
                      "type": "list"
                    }
+        },
+	{
+          "key": "糖果",
+          "name": "🍭糖果搜索",
+          "type": 3,
+          "api": "csp_TGSou",
+	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
+          "searchable": 1,
+          "changeable": 0
         },
 	{
             "key": "蜡笔",
