@@ -1264,12 +1264,18 @@
             "changeable": 1
         },
 	{
-            "key": "荐片",
-            "name": "🍊荐片磁力",
-            "api": "csp_Jianpian",
-            "type": 3,
-            "playerType": 1,
-            "ext": "http://api2.rinhome.com"
+           "key": "荐片",
+           "name": "🍊荐片磁力",
+           "quickSearch": 0,
+           "searchable": 1,
+           "type": 3,
+           "api": "csp_Jianpian",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "style": {
+                      "type": "rect",
+                      "ratio": 1.333
+                   },
+           "ext": ""
         },
 	{
             "key": "修罗影视",
