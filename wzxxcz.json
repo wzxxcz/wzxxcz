@@ -5517,6 +5517,20 @@
         }
 }, 
 {
+  "key": "耐看点播",
+  "name": "👟耐看点播",
+  "type": 3,
+  "api": "csp_XBPQ",
+  "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "分类url": "https://nkvod.com/show/{cateId}-{area}-------{catePg}---{year}.html",
+                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#",
+                "简介": "🍊小橙子为您介绍剧情👉+text cor3\">&&</div>"
+
+        }
+}, 
+{
   "key": "泥视频",
   "name": "🍊泥视频",
   "type": 3,
