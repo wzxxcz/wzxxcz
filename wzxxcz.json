@@ -29,6 +29,13 @@
                 "timeout": 10
              },
 	     {
+                "name": "小橙子咪咕",
+                "type": 0,
+                "url": "https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u",
+                "epg": "http://cdn.1678520.xyz/epg/?ch={name}&date={date}",
+                "timeout": 10
+             },
+	     {
                 "name": "小橙子看球",
                 "type": 0,
                 "url": "http://php.cqshushu.ggff.net/515001.php?公众号【医工学习日志】",
