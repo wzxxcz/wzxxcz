@@ -917,6 +917,18 @@
             "ext": "./json/虎斑.json"
         },
 	{
+          "key": "小斑",
+          "name": "🐅小斑4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShare",
+	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 0,
+          "ext": "./json/小斑.json"
+        },
+	{
             "key": "二小",
             "name": "🐂二小4K弹幕",
             "type": 3,
@@ -968,23 +980,12 @@
             "ext": "./json/奥秘.json"
         },
 	{
-            "key": "聚搜",
-            "name": "🍊聚搜4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebSearch",
-	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1
-        },
-	{
           "key": "天堂",
           "name": "🍊天堂搜索",
           "type": 3,
-          "api": "http://38.165.20.168/lib/cloud.min.js",
+          "api": "http://38.165.20.168/js/cloud.min.js",
 	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-          "ext": "http://38.165.20.168/lib/天堂.js",
+          "ext": "http://38.165.20.168/js/天堂.js",
           "style": {
                      "type": "list"
                    }
@@ -1114,9 +1115,9 @@
            "key": "爱搜",
            "name": "🍊爱搜搜索",
            "type": 3,
-           "api": "http://38.165.20.168/lib/cloud.min.js",
+           "api": "http://38.165.20.168/js/cloud.min.js",
 	   "jar": "https://xcz.iptv365.org/wzxqh.jar",
-           "ext": "http://38.165.20.168/lib/百度.js",
+           "ext": "http://38.165.20.168/js/百度.js",
            "style": {
                        "type": "list"
                     }
