@@ -941,31 +941,30 @@
             "ext": "./json/二小.json"
         },
 	{
-            "key": "csp_Netfixtv2",
-            "name": "✈️二小4K弹幕",
-            "type": 3,
-            "changeable": "0",
-            "quickSearch": 1,
-            "api": "csp_Duopan",
-	    "jar": "https://xcz.iptv365.org/wzxm.gif",
-            "filterable": 1,
-            "ext": {
-            "site_urls": [
-            "http://www.2xiaopan.fun/",
-            "https://2xiaopan.fun/",
-            "https://erxiaofn.click/",
-            "https://erixaopan.fun/",
-            "https://www.xhww.net/"
-          ],
-        "url_key": "UC",
-        "token": "",
-        "ucCookie": "",
-        "quarkCookie": "",
-        "threadinfo": {
-          "chunksize": 512,
-          "threads": 16
-           }
-          }
+           "key": "csp_Netfixtv2",
+           "name": "✈️二小4K弹幕",
+           "type": 3,
+           "changeable": "0",
+           "quickSearch": 1,
+           "api": "csp_Duopan",
+           "filterable": 1,
+           "ext": {
+                    "site_urls": [
+                                    "https://www.2xiaopan.fun/",
+                                    "https://2xiaopan.fun/",
+                                    "https://www.2xiaoyun.fun/",
+                                    "https://www.2xiaoyun.fun/",
+                                    "https://www.xhww.net/"
+                                 ],
+                    "url_key": "UC",
+                    "token": "",
+                    "ucCookie": "",
+                    "quarkCookie": "",
+                    "threadinfo": {
+                                      "chunksize": 512,
+                                      "threads": 16
+                                  }
+                  }
         },
 	{
             "key": "奥秘",
