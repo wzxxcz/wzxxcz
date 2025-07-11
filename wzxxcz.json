@@ -3881,14 +3881,9 @@
           "type": 3,
           "quickSearch": 1,
           "searchable": 1,
-          "api": "https://13826.kstore.space/get3.py",
+          "api": "csp_AppGet",
 	  "jar": "https://xcz.iptv365.org/wzxm.gif",
-          "ext": {
-                   "host": "https://cdn-tupic-duofun-neimenggu.56uxi.com/2.txt",
-                   "api": "/api.php/qijiappapi",
-                   "datakey": "qwertyuiopqwertt",
-                   "dataiv": "qwertyuiopqwertt"
-                }
+          "ext": "Koog6uPyOjHNZh8eY8CgUL+XGp1zR8d/K2NE9Ls6xomS8zNeZA6OEFwcZ27Zy0ZH9i0JczXR1zmcv9qIihz837BdnQrvJfE8QEyUmS3qKxs="
         },
 	{
           "key": "牛牛",
