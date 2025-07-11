@@ -3864,14 +3864,19 @@
            "ext": "7lj763gg402i7942463ji4qiaojijjh456889il6k6i35kj995h4j18li7kl2870klhg8hi647j5707k4ki7ig6953kj"
         },
 	{
-           "key": "咖啡",
-           "name": "☕咖啡影视",
-           "type": 3,
-           "quickSearch": 1,
-           "searchable": 1,
-           "api": "csp_AppGet",
-	   "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "XRksEN3W20hd3bSb1cdiKnk0ZQBQsvUPxPGBV2iwSAEQHwYVvVpglyV3dIXr7XclzuYphImygQa2rUxjoobDHDcfqQI10On5UzS0ouHA4b5IHJTGcTdw5Z1jMoMWs4095UzbXrjKHwridQugjlB5gw=="
+          "key": "咖啡",
+          "name": "☕咖啡影视",
+          "type": 3,
+          "quickSearch": 1,
+          "searchable": 1,
+          "api": "https://13826.kstore.space/get3.py",
+	  "jar": "https://xcz.iptv365.org/wzxm.png",
+          "ext": {
+                   "host": "https://cdn-tupic-duofun-neimenggu.56uxi.com/2.txt",
+                   "api": "/api.php/qijiappapi",
+                   "datakey": "qwertyuiopqwertt",
+                   "dataiv": "qwertyuiopqwertt"
+                }
         },
 	{
             "key": "csp_baibai",
