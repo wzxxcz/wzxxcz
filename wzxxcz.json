@@ -7871,6 +7871,20 @@
            }
 },
 {
+  "key": "娱乐",
+  "name": "🎮游戏娱乐",
+  "quickSearch": 0,
+  "searchable": 1,
+  "type": 3,
+  "api": "https://cnb.cool/zhyadc/PyramidStore/-/git/raw/main/plugin/html/LIVES.py",
+  "jar": "https://xcz.iptv365.org/wzxm.gif",
+  "style": {
+             "type": "rect",
+             "ratio": 1.333
+           },
+  "ext": ""
+},
+{
   "key": "虎牙直播js",
   "name": "🐯虎牙直播",
   "type": 3,
