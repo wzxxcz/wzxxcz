@@ -2004,6 +2004,18 @@
                    }
         },
 	{
+           "key": "猎手影视",
+           "name": "🦁猎手影院",
+           "type": 3,
+           "api": "https://git.acwing.com/xcz/tw/-/raw/master/py/%E7%8C%8E%E6%89%8B%E5%BD%B1%E8%A7%86.py",
+	   "jar": "https://xcz.iptv365.org/tvkj.jar",
+           "searchable": 1,
+           "changeable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "playerType": 2
+        },
+	{
            "key": "测试",
            "name": "🐓剧霸1080P",
            "type": 3,
