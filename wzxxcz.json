@@ -3951,14 +3951,14 @@
             "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
 	{
-           "key": "云速",
-           "name": "☁️云速影视",
-           "type": 3,
-           "searchable": 1,
-           "quickSearch": 1,
-           "api": "csp_AppGet",
-	   "jar": "https://xcz.iptv365.org/wzxm.gif",
-           "ext": "XRksEN3W20hd3bSb1cdiKgyQTbBO6aM0THhjKXE4Nl7W0aOx624xuIFTAGd0lwLd+GTB05zPlJYlZO1OgsJ6tfUd3LU926poUPnJ/jPh+h8GMdpo75H2pTl+Wb4waE5COjhN/OQGW7RRuI3cdPEtNw=="
+          "key": "云速",
+          "name": "☁️云速影视",
+          "type": 3,
+          "searchable": 1,
+          "quickSearch": 1,
+          "api": "csp_AppGet",
+	  "jar": "https://xcz.iptv365.org/wzxm.gif",
+          "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzfiJ2fHkCRZg4+8NFWs+b1X"
         },
 	{
             "key": "浪酷影视",
