@@ -7917,17 +7917,15 @@
   "changeable": 0
 },
 {
-  "key": "Jrsjs",
-  "name": "⚽ Jrs球迷",
+  "key": "88看球",
+  "name": "⚽88看球",
   "type": 3,
-  "api": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/drpy2.min.js",
-  "ext": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/jrk.js",
-  "style": {
-             "type": "list"
-           },
-  "timeout": 10,
+  "api": "csp_Kanqiu",
+  "jar": "https://xcz.iptv365.org/wzxm.gif",
   "searchable": 0,
   "quickSearch": 0,
+  "filterable": 1,
+  "order_num": 0,
   "changeable": 0
 },
 {
