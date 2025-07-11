@@ -3801,14 +3801,14 @@
             "ext": "https://cnb.cool/xiaomideyun/xiaomideyun/-/git/raw/main/cs.txt"
         },
 	{
-            "key": "海豚",
-            "name": "🐬海豚1080P",
-            "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "ncGO9IfuyMjbysvCamdzFokZEAwmwSptuElWkrNclaJraoEHFYkTWsdzkxcUKm4GSAvVz62pqT/WGUt01SzxLX7PwKwKIRwYjjymMhE7o7UpFgclIJOQN+MLXQ9aO5XuqCUYgwrMvYiLtWBb4LFmoQ=="
+           "key": "海豚",
+           "name": "🐬海豚1080P",
+           "type": 3,
+           "searchable": 1,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "XRksEN3W20hd3bSb1cdiKs8RUIegfh9/V/YlhVyjCL0eqxZYfImI5sC9kLAqQXjv66FYClFaEI40zh/NzOUPsBYCLt4NsSH1V+UpZf/dKjEDsI0tm9aILcvqHG2qxVoV8AVi+Ij/7n9IRf3pTN1BxQ=="
         },
 	{
             "key": "巧技",
