@@ -1209,16 +1209,16 @@
             "ext": "./json/木偶.json"
         },
         {
-           "key": "多多",
-           "name": "🍥多多弹幕4K弹幕",
-           "type": 3,
-           "api": "csp_PanWebShare",
-	   "jar": "https://xcz.iptv365.org/wzxqh.jar",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "changeable": 0,
-           "ext": "./json/多多.json"
+          "key": "多多",
+          "name": "🍥多多弹幕4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShare",
+	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 0,
+          "ext": "./json/多多.json"
         },
 	{
            "key": "至臻",
