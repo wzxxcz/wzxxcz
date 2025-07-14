@@ -669,31 +669,31 @@
             "api": "csp_Douban",
             "searchable": 0
         },
-        {
-            "key": "预告",
-            "name": "🍊小橙子新片预告",
-            "type": 3,
-            "api": "csp_DouBan",
-            "searchable": 0
-        },
-        {
-            "key": "本地",
-            "name": "🍊我的本地",
-            "type": 3,
-            "api": "csp_LocalFile"
+	{
+          "key": "预告",
+          "name": "🍊小橙子新片预告",
+          "type": 3,
+          "api": "csp_YGP",
+          "searchable": 0
         },
 	{
-            "key": "配置中心",
-            "name": "🍊配置中心",
-            "type": 3,
-            "api": "csp_Config",
-            "searchable": 0,
-            "changeable": 0,
-            "indexs": 0,
-            "style": {
-                "type": "rect",
-                "ratio": 1.597
-            }
+          "key": "本地",
+          "name": "🍊我的本地",
+          "type": 3,
+          "api": "csp_LocalFile"
+        },
+	{
+          "key": "配置中心",
+          "name": "🍊配置中心",
+          "type": 3,
+          "api": "csp_Config",
+          "searchable": 0,
+          "changeable": 0,
+          "indexs": 0,
+          "style": {
+                     "type": "rect",
+                     "ratio": 1.597
+                   }
         },
 	{
           "key": "hipy_js_好趣网",
