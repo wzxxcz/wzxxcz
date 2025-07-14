@@ -1392,6 +1392,18 @@
                  }
         },
 	{
+            "key": "天天影视",
+            "name": "🦢天天影视",
+            "type": 3,
+            "api": "csp_AppRJ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 0,
+            "ext": {
+                     "url": "http://tt.ysdqjs.cn"
+                   }
+        },
+	{
             "key": "鸭梨视频",
             "name": "🥑鸭梨视频",
             "type": 3,
@@ -3984,18 +3996,6 @@
             "quickSearch": 1,
             "api": "csp_LiteApple",
 	    "jar": "https://xcz.iptv365.org/wzxm.gif"
-        },
-	{
-            "key": "天天影视",
-            "name": "🦢天天影视",
-            "type": 3,
-            "api": "csp_AppRJ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 0,
-            "ext": {
-                     "url": "http://tt.ysdqjs.cn"
-                   }
         },
 	{
             "key": "csp_nongmin",
