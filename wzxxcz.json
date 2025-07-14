@@ -1224,16 +1224,15 @@
           "ext": "./json/多多.json"
         },
 	{
-           "key": "至臻",
-           "name": "🏆️至臻4K4K",
-           "type": 3,
-           "api": "csp_PanWebShare",
-	   "jar": "https://xcz.iptv365.org/wzxqh.jar",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "changeable": 0,
-           "ext": "./json/至臻.json"
+          "key": "至臻",
+          "name": "🏆️至臻4K4K",
+          "type": 3,
+          "api": "csp_PanWebShare",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "ext": "./json/zz.json"
         },
 	{
           "key": "csp_Netfixtv",
