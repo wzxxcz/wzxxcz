@@ -1101,12 +1101,7 @@
           "key": "米搜",
           "name": "🌾米搜4K4K弹幕",
           "type": 3,
-          "api": "http://38.165.20.168/js/cloud.min.js",
-	  "jar": "https://xcz.iptv365.org/wzxqh.jar",
-          "ext": "http://38.165.20.168/js/米搜.js",
-          "style": {
-                      "type": "list"
-                   }
+          "api": "csp_MiSou"
         },
 	{
            "key": "爱搜",
