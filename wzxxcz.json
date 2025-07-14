@@ -1,5 +1,5 @@
 {
-    "spider": "./xcz.jar",
+    "spider": "./wzx.jar",
     "wallpaper": "https://xcz.iptv365.org/xcz.php",
     "logo": "https://xcz.iptv365.org/logo.php",
     "lives": [
@@ -669,31 +669,31 @@
             "api": "csp_Douban",
             "searchable": 0
         },
-	{
-          "key": "预告",
-          "name": "🍊小橙子新片预告",
-          "type": 3,
-          "api": "csp_YGP",
-          "searchable": 0
+        {
+            "key": "预告",
+            "name": "🍊小橙子新片预告",
+            "type": 3,
+            "api": "csp_DouBan",
+            "searchable": 0
+        },
+        {
+            "key": "本地",
+            "name": "🍊我的本地",
+            "type": 3,
+            "api": "csp_LocalFile"
         },
 	{
-          "key": "本地",
-          "name": "🍊我的本地",
-          "type": 3,
-          "api": "csp_LocalFile"
-        },
-	{
-          "key": "配置中心",
-          "name": "🍊配置中心",
-          "type": 3,
-          "api": "csp_Config",
-          "searchable": 0,
-          "changeable": 0,
-          "indexs": 0,
-          "style": {
-                     "type": "rect",
-                     "ratio": 1.597
-                   }
+            "key": "配置中心",
+            "name": "🍊配置中心",
+            "type": 3,
+            "api": "csp_Config",
+            "searchable": 0,
+            "changeable": 0,
+            "indexs": 0,
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            }
         },
 	{
           "key": "hipy_js_好趣网",
@@ -1213,7 +1213,7 @@
             "changeable": 0,
             "ext": "./json/木偶.json"
         },
-        {
+	{
           "key": "多多",
           "name": "🍥多多弹幕4K弹幕",
           "type": 3,
@@ -4189,8 +4189,8 @@
                       "排序": "时间&人气&评分",
                       "排序值": "time&hits&score"
             }
-        },
-	{
+          },
+	  {
              "key": "量子",
              "name": "⚗量子秒播",
              "type": 1,
@@ -6330,7 +6330,7 @@
                 "简介": "🍊小橙子为您介绍剧情👉+text cor3\">&&</div>"
 
         }
-}, 
+},
 {
   "key": "泥视频",
   "name": "🍊泥视频",
@@ -6730,7 +6730,7 @@
                    "排序": "时间&人气&评分",
                    "排序值": "time&hits&score"
                  }
-          },
+          }, 
 	  {
             "key": "BT4K影院",
             "name": "🍊BT4K影院",
@@ -8001,8 +8001,8 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
-            }
-        },
+             }
+          },
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
