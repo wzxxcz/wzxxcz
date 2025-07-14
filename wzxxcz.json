@@ -1258,14 +1258,14 @@
          }
         },
 	{
-            "key": "团长",
-            "name": "🍊团长4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebTz",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1
+          "key": "团长",
+          "name": "🍊团长4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebTz",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1
         },
 	{
            "key": "荐片",
