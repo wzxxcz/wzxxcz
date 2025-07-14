@@ -909,16 +909,15 @@
             "ext": "./json/下饭.json"
         },
 	{
-            "key": "虎斑",
-            "name": "🐅虎斑4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 0,
-            "ext": "./json/虎斑.json"
+          "key": "虎斑",
+          "name": "🐅虎斑4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShare",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "ext": "./json/hb.json"
         },
 	{
           "key": "小斑快映",
