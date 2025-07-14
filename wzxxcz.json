@@ -1166,16 +1166,15 @@
           "changeable": 0
         },
 	{
-           "key": "蜡笔",
-           "name": "👠蜡笔在线",
-           "type": 3,
-           "api": "csp_PanWebShare",
-	   "jar": "https://xcz.iptv365.org/wzxqh.jar",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "changeable": 0,
-           "ext": "./json/蜡笔.json"
+          "key": "蜡笔",
+          "name": "👠蜡笔在线",
+          "type": 3,
+          "api": "csp_PanWebShare",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "ext": "./json/lb.json"
         },
 	{
             "key": "csp_Duopan",
