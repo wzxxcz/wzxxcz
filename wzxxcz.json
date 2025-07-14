@@ -932,16 +932,15 @@
           "ext": "./json/xbky.json"
         },
 	{
-            "key": "二小",
-            "name": "🐂二小4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 0,
-            "ext": "./json/二小.json"
+          "key": "二小",
+          "name": "🐂二小4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShare",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "ext": "./json/ex.json"
         },
 	{
            "key": "csp_Netfixtv2",
