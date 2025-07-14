@@ -1380,6 +1380,18 @@
 	   "jar": "https://xcz.iptv365.org/wzxm.gif"
         },
 	{
+          "key": "热播影视",
+          "name": "🍊热播影视",
+          "type": 3,
+          "api": "csp_AppRJ",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 0,
+          "ext": {
+                   "url": "http://v.rbotv.cn"
+                 }
+        },
+	{
             "key": "鸭梨视频",
             "name": "🥑鸭梨视频",
             "type": 3,
