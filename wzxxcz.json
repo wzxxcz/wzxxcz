@@ -990,20 +990,19 @@
                    }
         },
 	{
-            "key": "雷鲸",
-            "name": "🍊雷鲸4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShareCloudLJ",
-	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "style": {
-                       "type": "list",
-                       "ratio": 1.433
-                     },
-            "ext": "./json/雷鲸.json"
+          "key": "雷鲸",
+          "name": "🍊雷鲸4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShareCloudLJ",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "style": {
+                     "type": "list",
+                     "ratio": 1.433
+                   },
+          "ext": "./json/lj.json"
         },
 	{
           "key": "海绵",
