@@ -1371,7 +1371,10 @@
           "type": 3,
           "api": "csp_YD",
           "searchable": 1,
-          "quickSearch": 1
+          "quickSearch": 1,
+          "style": {
+                     "type": "list"
+                   }
         },
 	{
            "key": "csp_Jpys",
