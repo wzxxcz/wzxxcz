@@ -8119,6 +8119,17 @@
   "api": "csp_AppXY"
 },
 {
+  "key": "甜圈短剧",
+  "name": "甜圈｜短剧",
+  "type": 3,
+  "api": "./py/甜圈短剧.py",
+  "searchable": 1,
+  "changeable": 1,
+  "quickSearch": 1,
+  "filterable": 1,
+  "playerType": 2
+},
+{
   "key": "偷乐短剧",
   "name": "🍊偷乐短剧",
   "type": 3,
