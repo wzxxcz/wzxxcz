@@ -1404,6 +1404,18 @@
                    }
         },
 	{
+            "key": "浪酷影视",
+            "name": "💡浪酷影视",
+            "type": 3,
+            "api": "csp_AppRJ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 0,
+            "ext": {
+                     "url": "http://v.lkuys.cn"
+                   }
+        },
+	{
             "key": "鸭梨视频",
             "name": "🥑鸭梨视频",
             "type": 3,
@@ -4027,18 +4039,6 @@
           "api": "csp_AppGet",
 	  "jar": "https://xcz.iptv365.org/wzxm.gif",
           "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzfiJ2fHkCRZg4+8NFWs+b1X"
-        },
-	{
-            "key": "浪酷影视",
-            "name": "💡浪酷影视",
-            "type": 3,
-            "api": "csp_AppRJ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 0,
-            "ext": {
-                     "url": "http://v.lkuys.cn"
-                   }
         },
 	{
           "key": "蝴蝶",
