@@ -1050,19 +1050,19 @@
                  }
         },
 	{
-           "key": "夸父",
-           "name": "🍊夸父4K弹幕",
-           "type": 3,
-           "api": "csp_PanWebShareCloudKF",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "changeable": 1,
-           "style": {
-                      "type": "list",
-                      "ratio": 1.433
-                    },
-           "ext": "./json/夸父.json"
+          "key": "夸父",
+          "name": "🍊夸父4K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShareCloudKF",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "style": {
+                     "type": "list",
+                     "ratio": 1.433
+                   },
+          "ext": "./json/kf.json"
         },
         {
           "key": "双星",
