@@ -1054,6 +1054,21 @@
           "ext": "./json/kf.json"
         },
 	{
+          "key": "123",
+          "name": "🍊1234K弹幕",
+          "type": 3,
+          "api": "csp_PanWebShareCloud123",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "changeable": 1,
+          "style": {
+                      "type": "list",
+                      "ratio": 1.433
+                   },
+          "ext": "./json/123.json"
+        },
+	{
           "key": "米搜",
           "name": "🌾米搜4K4K弹幕",
           "type": 3,
