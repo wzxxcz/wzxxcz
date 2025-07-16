@@ -113,6 +113,15 @@
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
              },
 	     {
+                "name": "小橙子Guovin",
+                "type": 0,
+                "url": "https://gitee.com/mytv-android/iptv-api/raw/master/output/result.m3u",
+                "playerType": 1,
+                "ua": "okhttp/3",
+                "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
+     		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
+             },
+	     {
                 "name": "小云",
                 "url": "https://xcz.iptv365.org/tvbus/xiaoyun.m3u",
                 "core": {
@@ -1388,6 +1397,18 @@
             "ext": {
                      "url": "http://v.lkuys.cn"
                    }
+        },
+	{
+          "key": "行动",
+          "name": "⚽行动影视",
+          "type": 3,
+          "api": "csp_AppSy",
+          "ext": {
+                    "url": "http://160.202.246.9:2356",
+                    "key1": "aassddwwxxllsx1x",
+                    "key2": "aassddwwxxllsx1x",
+                    "key3": "aassddwwxxllsx1x"
+                 }
         },
 	{
           "key": "咖啡",
