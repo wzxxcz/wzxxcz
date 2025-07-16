@@ -2023,10 +2023,17 @@
           "ext": "eaHR0cHM6Ly9kLmRjbW92aWUudG9w"
         },
 	{
-            "key": "三六零",
-            "name":"💡三六零视频",
-            "type": 3,
-            "api": "csp_SP360"
+           "key": "360采集",
+           "name": "💡360采集",
+           "type": 1,
+           "api": "https://360zy.com/api.php/provide/vod/",
+           "searchable": 1,
+           "changeable": 1,
+           "categories": [
+                           "国产动漫",
+                           "日韩动漫",
+                           "国产剧"
+                         ]
         },
 	{
             "key": "快看影视",
