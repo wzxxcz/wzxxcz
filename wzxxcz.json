@@ -1427,6 +1427,20 @@
                 }
         },
 	{
+          "key": "APP4K",
+          "name": "🥏蓝光影视",
+          "type": 3,
+          "quickSearch": 1,
+          "api": "csp_AppGet",
+          "ext": {
+                    "url": "http://59.153.167.186",
+                    "dataKey": "SDSFET23215FDSF2",
+                    "dataIv": "SDSFET23215FDSF2",
+                    "deviceId": "",
+                    "version": "119"
+                 }
+        },
+	{
            "key": "豆丁",
            "name": "🥛豆丁影视",
            "type": 3,
