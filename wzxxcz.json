@@ -8698,6 +8698,15 @@
              ]
         },
 	{
+            "key": "魔抓采集资源",
+            "name": "🦅魔抓采集",
+            "type": 1,
+            "api": "https://mozhuazy.com/api.php/provide/vod/",
+            "playerType": 1,
+            "searchable": 1,
+            "changeable": 1
+        },
+	{
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
