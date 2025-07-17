@@ -9045,6 +9045,20 @@
                         ]
         },
 	{
+          "key": "天翼资源网",
+          "name": "🌀天翼采集",
+          "type": 1,
+          "api": "https://www.911ysw.top/tianyi.php/provide/vod/",
+          "playUrl": "",
+          "searchable": 1,
+          "quickSearch": 1,
+          "categories": [
+                         "国产动漫",
+                         "日韩动漫",
+                         "国产剧"
+                        ]
+        },
+	{
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
