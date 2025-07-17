@@ -1361,6 +1361,13 @@
           "ext": "https://www.czzymovie.com/"
         },
 	{
+          "key": "绝对影视",
+          "name": "🍷绝对影视",
+          "type": 3,
+          "api": "csp_FourK",
+          "ext": "https://www.4kvm.tv"
+        },
+	{
           "key": "热播影视",
           "name": "📺热播多线",
           "type": 3,
