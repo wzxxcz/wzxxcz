@@ -8989,6 +8989,20 @@
                         ]
         },
 	{
+          "key": "最大采集",
+          "name": "🥛最大采集",
+          "type": 1,
+          "api": "https://zuida.xyz/api.php/provide/vod/",
+          "quickSearch": 1,
+          "searchable": 1,
+          "changeable": 1,
+          "categories": [
+                          "国产动漫",
+                          "日韩动漫",
+                          "国产剧"
+                        ]
+        },
+	{
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
