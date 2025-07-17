@@ -1145,16 +1145,14 @@
          }
         },
 	{
-            "key": "木偶",
-            "name": "🍁木偶资源4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-	    "jar": "https://xcz.iptv365.org/wzxqh.jar",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 0,
-            "ext": "./json/木偶.json"
+           "key": "木偶",
+           "name": "🍁木偶资源4K弹幕",
+           "type": 3,
+           "api": "csp_PanWebShare",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "ext": "./json/mogg.json"
         },
 	{
           "key": "多多",
