@@ -1818,6 +1818,24 @@
                 }
         },
 	{
+           "key": "哔哩视频",
+           "name": "✒️哔哩视频",
+           "type": 3,
+           "api": "csp_BiliYS",
+           "searchable": 1,
+           "quickSearch": 0,
+           "filterable": 0,
+           "changeable": 0,
+           "style": {
+                      "type": "rect",
+                      "ratio": 1.433
+                    },
+           "ext": {
+                    "json": "./json/哔哩视频.json",
+                    "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
+                  }
+        },
+	{
             "key": "步步",
             "name": "👟步步1080P",
             "type": 3,
