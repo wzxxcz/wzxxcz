@@ -8961,6 +8961,20 @@
                         ]
         },
 	{
+          "key": "丫丫资源网采集",
+          "name": "🦆丫丫采集",
+          "type": 1,
+          "api": "https://yayazy2.com/api.php/provide/vod/",
+          "quickSearch": 1,
+          "searchable": 1,
+          "changeable": 1,
+          "categories": [
+                          "国产动漫",
+                          "日韩动漫",
+                          "国产剧"
+                        ]
+        },
+	{
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
