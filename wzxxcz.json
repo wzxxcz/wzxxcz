@@ -3514,14 +3514,14 @@
                    }
         },
 	{
-          "key": "测试",
-          "name": "🐓剧霸1080P",
-          "type": 3,
-          "searchable": 1,
-          "quickSearch": 1,
-          "api": "https://13826.kstore.space/jubaba.py",
-	  "jar": "https://xcz.iptv365.org/wzxm.gif",
-          "ext": ""
+           "key": "测试",
+           "name": "🐓剧霸1080P",
+           "type": 3,
+           "searchable": 1,
+           "quickSearch": 1,
+           "api": "https://13826.kstore.space/jubaba.py",
+	   "jar": "https://xcz.iptv365.org/wzxm.gif",
+           "ext": ""
         },
 	{
             "key": "爱壹帆",
