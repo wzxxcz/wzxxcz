@@ -1957,6 +1957,15 @@
                   }
         },
 	{
+           "key": "DAY",
+           "name": "🧵UPUP影视",
+           "type": 3,
+           "quickSearch": 1,
+           "searchable": 1,
+           "api": "https://13826.kstore.space/tt.py",
+	   "jar": "https://xcz.iptv365.org/wzxm.gif"
+        },
+	{
             "key": "步步",
             "name": "👟步步1080P",
             "type": 3,
