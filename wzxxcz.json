@@ -1537,15 +1537,10 @@
            "name": "🌯麻花影视",
            "type": 3,
            "quickSearch": 1,
+           "searchable": 1,
            "api": "csp_AppGet",
-           "ext": {
-                    "url": "http://124.223.27.166:130",
-                    "site": "",
-                    "dataKey": "q7gj4f9br3fls6nh",
-                    "dataIv": "q7gj4f9br3fls6nh",
-                    "deviceId": "",
-                    "version": ""
-                  }
+	   "jar": "https://xcz.iptv365.org/wzxm.gif",
+           "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzesNDM87sUul1Ii8NbP2XB5"
         },
 	{
            "key": "豆丁",
