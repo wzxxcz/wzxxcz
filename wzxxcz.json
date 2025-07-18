@@ -2595,6 +2595,16 @@
                    }
         },
 	{
+          "key": "农民影视",
+          "name": "👨‍🌾农民影视",
+          "type": 3,
+          "api": "csp_XYQHiker",
+          "searchable": 1,
+          "quickSearch": 1,
+          "filterable": 1,
+          "ext": "./XYQHiker/农民影视.json"
+        },
+	{
             "key":"海底高清",
             "name":"🥌海底高清",
             "type": 3,
