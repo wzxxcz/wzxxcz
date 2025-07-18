@@ -1523,6 +1523,21 @@
                  }
         },
 	{
+           "key": "麻花",
+           "name": "🌯麻花影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+           "ext": {
+                    "url": "http://124.223.27.166:130",
+                    "site": "",
+                    "dataKey": "q7gj4f9br3fls6nh",
+                    "dataIv": "q7gj4f9br3fls6nh",
+                    "deviceId": "",
+                    "version": ""
+                  }
+        },
+	{
            "key": "豆丁",
            "name": "🥛豆丁影视",
            "type": 3,
