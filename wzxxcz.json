@@ -737,6 +737,12 @@
           "ext": "https://gitee.com/wzbdyr/xcz/raw/master/lib/live.json"
         },
 	{
+           "key": "网络直播",
+           "name": "📺网络直播",
+           "type": 3,
+           "api": "./py/网络直播.py"
+        },
+	{
           "key": "酷狗音乐",
           "name": "🎤酷狗音乐",
           "type": 3,
