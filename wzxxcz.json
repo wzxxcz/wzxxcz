@@ -9527,6 +9527,20 @@
          }
 },
 {
+  "key": "丫丫",
+  "name": "🤣丫丫动漫",
+  "type": 3,
+  "quickSearch": 1,
+  "api": "csp_AppGet",
+  "ext": {
+           "url": "http://tv.yy-fun.cc",
+           "dataKey": "qkxnwkfjwpcnwycl",
+           "dataIv": "qkxnwkfjwpcnwycl",
+           "deviceId": "",
+           "version": ""
+         }
+},
+{
   "key": "56动漫",
   "name": "🤣56动漫",
   "type": 3,
