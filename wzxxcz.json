@@ -9541,6 +9541,13 @@
          }
 },
 {
+  "key": "巴士动漫",
+  "name": "🚐巴士动漫",
+  "type": 3,
+  "api": "csp_XYQHiker",
+  "ext": "./XYQHiker/巴士动漫.json"
+},
+{
   "key": "56动漫",
   "name": "🤣56动漫",
   "type": 3,
