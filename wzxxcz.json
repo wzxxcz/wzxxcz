@@ -1299,13 +1299,13 @@
             "ext": "./XBPQ/狐狸君.json"
         },
 	{
-            "key": "美剧天堂",
-            "name": "🍊美剧天堂磁力",
-            "type": 3,
-            "api": "csp_MeijuTT",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
+           "key": "美剧天堂",
+           "name": "🍊美剧天堂磁力",
+           "type": 3,
+           "api": "csp_MeijuTT",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1
         },
         {
             "key": "电影天堂",
