@@ -9527,13 +9527,6 @@
          }
 },
 {
-  "key": "去看吧",
-  "name": "🍡看吧动漫",
-  "type": 3,
-  "api": "https://github.moeyy.xyz/https://raw.githubusercontent.com/PizazzGY/TVBox/main/JS/drpy.min.js",
-  "ext": "https://github.moeyy.xyz/https://raw.githubusercontent.com/PizazzGY/TVBox/main/JS/去看吧.js"
-},
-{
   "key": "56动漫",
   "name": "🤣56动漫",
   "type": 3,
