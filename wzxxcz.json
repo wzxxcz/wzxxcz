@@ -9470,6 +9470,20 @@
   "ext": "./XBPQ/哆啦新番社.json"
 },
 {
+  "key": "曼波动漫",
+  "name": "🍸曼波动漫",
+  "type": 3,
+  "quickSearch": 1,
+  "api": "csp_AppGet",
+  "ext": {
+           "url": "https://app.omofun1.top",
+           "dataKey": "66dc309cbeeca454",
+           "dataIv": "66dc309cbeeca454",
+           "deviceId": "",
+           "version": ""
+         }
+},
+{
   "key": "稀饭动漫",
   "name":"🤣稀饭动漫",
   "type": 3,
