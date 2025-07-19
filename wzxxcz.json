@@ -1216,17 +1216,9 @@
         },
 	{
            "key": "荐片",
-           "name": "🍊荐片磁力",
-           "quickSearch": 0,
-           "searchable": 1,
-           "type": 3,
+           "name": "⚔️荐片磁力",
            "api": "csp_Jianpian",
-	   "jar": "https://xcz.iptv365.org/wzxm.gif",
-           "style": {
-                      "type": "rect",
-                      "ratio": 1.333
-                   },
-           "ext": ""
+           "type": 3
         },
 	{
             "key": "修罗影视",
