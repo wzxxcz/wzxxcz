@@ -9490,12 +9490,13 @@
   "quickSearch": 1,
   "api": "csp_AppGet",
   "ext": {
-           "url": "https://pzoap.moedot.net",
+           "url": "",
+           "site": "https://xfapp-1305390065.cos.ap-guangzhou.myqcloud.com/getapp.txt",
            "dataKey": "1yZ2Spn9krnzVKoC",
            "dataIv": "1yZ2Spn9krnzVKoC",
            "deviceId": "",
            "version": ""
-        }
+         }
 },
 {
   "key": "咕咕动漫",
