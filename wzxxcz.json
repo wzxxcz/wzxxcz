@@ -2244,6 +2244,13 @@
             "filterable": 1
         },
 	{
+           "key": "采集之王",
+           "name": "🐝采集合集",
+           "type": 3,
+           "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
+           "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/采集之王.js?type=url&params=../json/采集静态.json$1$1"
+        },
+	{
             "key": "爱看机器人",
             "name":"💡爱看影视",
             "type": 3,
