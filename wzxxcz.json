@@ -9502,9 +9502,29 @@
   "key": "咕咕动漫",
   "name": "🤣咕咕动漫",
   "type": 3,
-  "api": "csp_Xdai",
-  "playerType": 1,
-  "ext": "jaHR0cHM6Ly93d3cuZ3VndTMuY29tfG5LZlo4S1g2SlROV1J6VER8bktmWjhLWDZKVE5XUnpURHw0MDE="
+  "quickSearch": 1,
+  "api": "csp_AppGet",
+  "ext": {
+           "url": "https://www.gugu3.com",
+           "dataKey": "nKfZ8KX6JTNWRzTD",
+           "dataIv": "nKfZ8KX6JTNWRzTD",
+           "deviceId": "",
+           "version": ""
+         }
+},
+{
+  "key": "次元动漫",
+  "name": "🤣次元动漫",
+  "type": 3,
+  "quickSearch": 1,
+  "api": "csp_AppGet",
+  "ext": {
+           "url": "https://jjjj.nilinili.org",
+           "dataKey": "672263e98f232a05",
+           "dataIv": "672263e98f232a05",
+           "deviceId": "",
+           "version": "170"
+         }
 },
 {
   "key": "去看吧",
