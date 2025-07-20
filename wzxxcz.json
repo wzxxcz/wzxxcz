@@ -1520,20 +1520,34 @@
                  }
         },
 	{
-          "key": "咖啡",
-          "name": "☕咖啡影视",
+           "key": "咖啡",
+           "name": "☕咖啡影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet2",
+           "ext": {
+                     "url": "",
+                     "site": "https://omofun.lol/coffee.txt",
+                     "dataKey": "qwertyuiopqwertm",
+                     "dataIv": "qwertyuiopqwertm",
+                     "deviceId": "",
+                     "version": "",
+                     "ua": "okhttp/3.10.0"
+                  }
+        },
+	{
+          "key": "稀饭",
+          "name": "🍚稀饭影视",
           "type": 3,
           "quickSearch": 1,
-          "api": "csp_AppGet2",
+          "api": "csp_AppGet",
           "ext": {
-                   "url": "",
-                   "site": "https://cdn-tupic-duofun-neimenggu.56uxi.com/2.txt",
-                   "dataKey": "qwertyuiopqwertt",
-                   "dataIv": "qwertyuiopqwertt",
-                   "deviceId": "",
-                   "version": "109",
-                   "ua": "okhttp/3.10.0"
-                }
+                    "url": "https://app.xifanys.com",
+                    "dataKey": "HM6Ly9yeS4ya3dvL",
+                    "dataIv": "HM6Ly9yeS4ya3dvL",
+                    "deviceId": "",
+                    "version": "119"
+                 }
         },
 	{
           "key": "APP4K",
