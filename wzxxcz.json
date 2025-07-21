@@ -9739,6 +9739,20 @@
   "ext": "./XBPQ/哆啦新番社.json"
 },
 {
+  "key": "56动漫",
+  "name": "🛹56动漫",
+  "type": 3,
+  "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
+  "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/56动漫.js"
+},
+{
+  "key": "NT动漫",
+  "name": "🛴NT动漫",
+  "type": 3,
+  "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
+  "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/NT动漫.js"
+},
+{
   "key": "曼波动漫",
   "name": "🍸曼波动漫",
   "type": 3,
@@ -9796,6 +9810,20 @@
          }
 },
 {
+  "key": "派对动漫",
+  "name": "🤣派对动漫",
+  "type": 3,
+  "quickSearch": 1,
+  "api": "csp_AppGet",
+  "ext": {
+           "url": "https://qjappcms.acg.party",
+           "dataKey": "AmtMYFCJDPoTlK7z",
+           "dataIv": "AmtMYFCJDPoTlK7z",
+           "deviceId": "",
+           "version": ""
+        }
+},
+{
   "key": "丫丫",
   "name": "🤣丫丫动漫",
   "type": 3,
@@ -9809,6 +9837,27 @@
            "version": ""
          }
 },
+{
+  "key": "黑猫动漫",
+  "name": "🐈‍⬛黑猫动漫",
+  "type": 3,
+  "quickSearch": 1,
+  "api": "csp_AppGet",
+  "ext": {
+           "url": "https://dm.xxdm123.top:9991",
+           "dataKey": "0fe3b5781782c621",
+           "dataIv": "0fe3b5781782c621",
+           "deviceId": "",
+           "version": "203"
+        }
+},
+{
+  "key": "樱花动漫",
+  "name": "🌸樱花动漫",
+  "type": 3,
+  "api": "csp_HBPQ",
+  "ext": "./XBPQ/樱花动漫.json"
+},	    
 {
   "key": "巴士动漫",
   "name": "🚐巴士动漫",
