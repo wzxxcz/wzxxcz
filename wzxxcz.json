@@ -24,7 +24,7 @@
 	     {
                 "name": "小橙子综合TV(需翻墙)",
                 "type": 0,
-                "url": "https://judy.diver.eu.org//m3u/judy_neibu.m3u",
+                "url": "https://judy.diver.eu.org/m3u/20250719_neibu.m3u",
                 "epg": "http://cdn.1678520.xyz/epg/?ch={name}&date={date}",
                 "timeout": 10
              },
