@@ -1498,6 +1498,14 @@
                    }
         },
 	{
+           "key": "幕启",
+           "name": "🌉幕启影视",
+           "type": 3,
+           "api": "csp_AppSy",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "iUYplHbim/qVptUBrzCuqk72erYn+xHvZVGawkGUOqtLGtiWlDcWpUagYzdfPYeECbG+IjVf7Mhz2ZqZ70k6X72tkUhQDNEpIN/XScTGlUE="
+        },
+	{
            "key": "追忆",
            "name": "🎠追忆影视",
            "type": 3,
