@@ -10152,8 +10152,11 @@
   "key": "csp_AppXY",
   "name": "🐸上头短剧",
   "type": 3,
+  "searchable": 1,
   "quickSearch": 1,
-  "api": "csp_AppXY"
+  "api": "csp_AppXY",
+  "jar": "https://xcz.iptv365.org/wzxm.png",
+  "ext": "https://xvapp.xingya.com.cn"
 },
 {
   "key": "甜圈短剧",
