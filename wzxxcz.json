@@ -1667,12 +1667,12 @@
           "quickSearch": 1,
           "api": "csp_AppGet2",
           "ext": {
-                   "url": "https://qjappcms.cs4k.top",
+                   "url": "https://newappcms.cs4k.top",
                    "dataKey": "Z98KXaLtO2wC1Pte",
                    "dataIv": "Z98KXaLtO2wC1Pte",
                    "deviceId": "",
                    "version": "120"
-                }
+                 }
         },
 	{
           "key": "鲸鱼",
