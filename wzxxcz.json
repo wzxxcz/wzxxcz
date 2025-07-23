@@ -1369,6 +1369,17 @@
            "playerType": 2
         },
 	{
+           "key": "零度影视",
+           "name": "❄️零度影视",
+           "type": 3,
+           "api": "./py/零度影视.py",
+           "searchable": 1,
+           "changeable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "playerType": 2
+        },
+	{
             "key": "TVB云播",
             "name": "☁️TVB云播",
             "type": 3,
