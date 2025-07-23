@@ -38,7 +38,7 @@
 	     {
                 "name": "小橙子咪咕",
                 "type": 0,
-                "url": "https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u",
+                "url": "https://gh-proxy.com/https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u",
                 "epg": "http://cdn.1678520.xyz/epg/?ch={name}&date={date}",
                 "timeout": 10
              },
