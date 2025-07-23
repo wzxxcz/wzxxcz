@@ -2205,15 +2205,15 @@
             "filterable": 1
         },
 	{
-            "key": "csp_nongmin",
-            "name": "👨农民1080P",
-            "type": 3,
-            "api": "csp_Wwys",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "https://www.wwgz.cn"
+           "key": "csp_nongmin",
+           "name": "👨农民1080P",
+           "type": 3,
+           "api": "csp_Wwys",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "ext": "https://www.wwgz.cn"
         },
 	{
             "key": "热热",
