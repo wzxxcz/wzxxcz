@@ -2247,14 +2247,6 @@
           "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzfiJ2fHkCRZg4+8NFWs+b1X"
         },
 	{
-          "key": "蝴蝶",
-          "name": "🦋蝴蝶蓝光",
-          "type": 3,
-          "api": "csp_Hudie",
-          "playerType": 2,
-          "ext": "eaHR0cHM6Ly9kLmRjbW92aWUudG9w"
-        },
-	{
            "key": "360采集",
            "name": "💡360采集",
            "type": 1,
