@@ -1583,17 +1583,17 @@
                  }
         },
 	{
-          "key": "APP4K",
+          "key": "蓝光",
           "name": "🥏蓝光影视",
           "type": 3,
           "quickSearch": 1,
           "api": "csp_AppGet",
           "ext": {
-                    "url": "http://59.153.167.186",
-                    "dataKey": "SDSFET23215FDSF2",
-                    "dataIv": "SDSFET23215FDSF2",
-                    "deviceId": "",
-                    "version": "119"
+                   "url": "http://122.228.193.2:9654",
+                   "dataKey": "ca94b06ca3c7d80e",
+                   "dataIv": "ca94b06ca3c7d80e",
+                   "deviceId": "",
+                   "version": "119"
                  }
         },
 	{
