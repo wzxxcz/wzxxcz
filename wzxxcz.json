@@ -7692,7 +7692,7 @@
 	        "副标题":"<div class=\"absolute right bottom small-margin small-round black white-text small-text\">&&</div>", 
 	        "链接":"/vod/+&&\"",
                 "分类url": "https://kimivod.com/vod/show/id/{cateId}/page/{catePg}.html",
-	        "分类": "电视剧$1#电影$2#动漫$3#综艺$4#短剧$39#",
+	        "分类": "电影$2#电视剧$1#动漫$3#综艺$4#短剧$39#",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+right-align\">&&</div>"
           }
 },
