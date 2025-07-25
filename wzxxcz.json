@@ -10733,6 +10733,28 @@
   "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/0202/偷乐短剧.json"
 },
 {
+  "key": "爱看短剧",
+  "name": "🦔爱看短剧",
+  "type": 3,
+  "api": "./py/爱看短剧.py",
+  "searchable": 1,
+  "changeable": 1,
+  "quickSearch": 1,
+  "filterable": 1,
+  "playerType": 2
+},	    
+{
+  "key": "锦鲤短剧",
+  "name": "🐉锦鲤短剧",
+  "type": 3,
+  "api": "./py/锦鲤短剧.py",
+  "searchable": 1,
+  "changeable": 1,
+  "quickSearch": 1,
+  "filterable": 1,
+  "playerType": 2
+},
+{
   "key": "微云影视",
   "name": "🍊短剧屋",
   "type": 3,
