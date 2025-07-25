@@ -10131,6 +10131,33 @@
                    }
           },
 	  {
+            "key": "柠檬影视",
+            "name": "🍋柠檬影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "http://www.aweiks.com/",
+		"数组":"<a class=\"cover-img&&</div>",
+	        "标题": "title=\"&&\"",
+		"图片":"data-original=\"&&\"",
+	        "副标题": "<p class=\"text\">&&</p>", 
+	        "链接": "href=\"&&\"",
+		"影片年代":"年份：&&</p>",
+		"影片地区":"地区：&&</p>",
+                "影片类型":"类型：&&</p>",
+		"状态":"状态：&&</p>",
+		"导演":"导演：&&</p>",
+		"主演":"主演：&&</p>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+		"线路数组":"<div&&/div>",
+                "线路标题":"<h3>&&</h3>",
+                "分类url": "http://www.aweiks.com/show/{cateId}----{lang}----{catePg}---.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
+             }
+          },	
+	  {
              "key": "量子",
              "name": "⚗量子秒播",
              "type": 1,
@@ -10476,25 +10503,6 @@
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
              }
         },
-	{
-            "key": "柠檬影视",
-            "name": "🍋柠檬影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "http://www.aweiks.com/",
-		"数组":"<a class=\"cover-img&&</div>",
-	        "标题": "title=\"&&\"",
-		"图片":"data-original=\"&&\"",
-	        "副标题": "<p class=\"text\">&&</p>", 
-	        "链接": "href=\"&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "http://www.aweiks.com/show/{cateId}----{lang}----{catePg}---.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
-             }
-        },	
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
