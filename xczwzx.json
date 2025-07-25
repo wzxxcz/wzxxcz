@@ -660,13 +660,16 @@
             "ext": "./XBPQ/修罗影视.json"
         },
         {
-            "key": "七味",
-            "name": "🍊七味磁力",
-            "type": 3,
-            "api": "csp_QnMp4",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
+           "key": "七味",
+           "name": "🍢七味磁力",
+           "type": 3,
+           "api": "csp_QnMp4",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "ext": {
+                    "url": "https://www.pkmp4.xyz,https://www.qwnull.com,https://www.qwmkv.com,https://www.qwfilm.com,https://www.qnmp4.com,https://www.qnnull.com,https://www.qnhot.com"
+                  }
         },
         {
             "key": "80S",
