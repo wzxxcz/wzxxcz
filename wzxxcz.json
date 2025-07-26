@@ -10555,13 +10555,18 @@
         },
 	{
             "key": "久播影院",
-            "name": "💧久播影院",
+            "name": "🛰️久播影院",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.qysh027.com/",
+                "主页url":"https://www.qysh027.com/",
+		"数组":"<a class=\"sb-link-hover&&</a>",
+	        "标题":"title=\"&&\"",
+		"图片":"data-original=\"&&\"",
+	        "副标题":"<span class=\"show-h sb-list-score back-green\">&&</span>", 
+	        "链接":"href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.qysh027.com/search.php?page={catePg}&searchtype=5&tid={cateId}&year={year}",
                 "分类": "电影$1#电视剧$2#综艺$3#短剧$31#"
