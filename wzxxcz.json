@@ -1932,6 +1932,21 @@
                 }
         },
 	{
+           "key": "白蛇",
+           "name": "🐍白蛇影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+           "ext": {
+                     "url": "",
+                     "site": "http://tengxunyunaliyun.oss-cn-shanghai.aliyuncs.com/tengxunyun.txt",
+                     "dataKey": "f5e2tx53ykp6s2c9",
+                     "dataIv": "f5e2tx53ykp6s2c9",
+                     "deviceId": "",
+                     "version": "361"
+                 }
+        },
+	{
           "key": "在看",
           "name": "🦁在看影视",
           "type": 3,
