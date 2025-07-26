@@ -111,8 +111,8 @@
                 "ua": "okhttp/3",
                 "epg": "http://diyp2.112114.xyz/?ch={name}&date={date}",
      		"logo": "http://diyp2.112114.xyz/logo/{name}.png"
-            },
-	    {
+             },
+	     {
                 "name": "小橙子Guovin",
                 "type": 0,
                 "url": "https://gitee.com/mytv-android/iptv-api/raw/master/output/result.m3u",
@@ -659,7 +659,7 @@
             "filterable": 1,
             "ext": "./XBPQ/修罗影视.json"
         },
-        {
+	{
            "key": "七味",
            "name": "🍢七味磁力",
            "type": 3,
@@ -1025,15 +1025,10 @@
            "name": "🌯麻花影视",
            "type": 3,
            "quickSearch": 1,
+           "searchable": 1,
            "api": "csp_AppGet",
-           "ext": {
-                    "url": "http://124.223.27.166:130",
-                    "site": "",
-                    "dataKey": "q7gj4f9br3fls6nh",
-                    "dataIv": "q7gj4f9br3fls6nh",
-                    "deviceId": "",
-                    "version": ""
-                  }
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzesNDM87sUul1Ii8NbP2XB5"
         },
 	{
            "key": "豆丁",
@@ -1178,6 +1173,16 @@
                      "deviceId": "",
                      "version": ""
                  }
+        },
+	{
+           "key": "大豆",
+           "name": "🥔大豆影视",
+           "type": 3,
+           "quickSearch": 1,
+           "searchable": 1,
+           "api": "csp_AppGet",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeUKFHSUUbLyGMREENFjE1N9FXjZ6Z7tiLWs6P15Ol/g5Po80zDNWJPEEoj/nv3Yelo="
         },
 	{
            "key": "海豚",
@@ -1477,26 +1482,6 @@
             "playerType": 2,
             "jar": "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1749917849270/0615qj.jpg;md5;410ad21caad9e6f6d40c1ae5ca2be662",
             "ext": "7lj763gg402i79425739i7jghj118797l4hj840gi18633331l4708g2h7145403549g44l8ii56i187681hkjj3hhgh1ih3l32j250lk1k786lj20j468hk3hli4l46gig4i3g7g2722328j0136h01i7g5183k22k7gg3i72hk81gl8k9839kl7i0707"
-        },
-	{
-            "key": "追忆5",
-            "name": "💭追忆4K",
-            "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "csp_AppSy",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
-            "playerType": 2,
-            "jar": "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1749917849270/0615qj.jpg;md5;410ad21caad9e6f6d40c1ae5ca2be662",
-            "ext": "9rfWRaAx60J+W5F+j6agt6AHU3NkRl7m8WqfWIBU/MebSZgzY2wnsXwmAIMEYVqMzsnqr46bOn1q4JV/UJAKUVF6NUo2Xg8qcHgXrA63RWM="
-        },
-	{
-            "key": "幕启",
-            "name": "🌉幕启影视",
-            "type": 3,
-            "api": "csp_AppSy",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "iUYplHbim/qVptUBrzCuqk72erYn+xHvZVGawkGUOqtLGtiWlDcWpUagYzdfPYeECbG+IjVf7Mhz2ZqZ70k6X72tkUhQDNEpIN/XScTGlUE="
         },
 	{
            "key": "金牌app",
@@ -3291,14 +3276,14 @@
                    }
         },
 	{
-          "key": "测试",
-          "name": "🐓剧霸1080P",
-          "type": 3,
-          "searchable": 1,
-          "quickSearch": 1,
-          "api": "https://13826.kstore.space/jubaba.py",
-	  "jar": "https://xcz.iptv365.org/wzxm.png",
-          "ext": ""
+           "key": "测试",
+           "name": "🐓剧霸1080P",
+           "type": 3,
+           "searchable": 1,
+           "quickSearch": 1,
+           "api": "https://13826.kstore.space/jubaba.py",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": ""
         },
 	{
             "key": "爱壹帆",
@@ -6805,7 +6790,7 @@
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
              }
-},	    
+},
 {
   "key": "好影快看",
   "name": "🍊好影快看",
@@ -9180,7 +9165,7 @@
                       "排序": "时间&人气&评分",
                       "排序值": "time&hits&score"
                    }
-          },   
+          },  
 	  {
             "key": "三米影院",
             "name": "🍚三米影院",
@@ -9257,7 +9242,7 @@
                       "排序": "时间&人气&评分",
                       "排序值": "time&hits&score"
                     }
-          },  
+          }, 
 	  {
             "key": "兔兔影视",
             "name": "🐇兔兔影视",
@@ -9721,6 +9706,41 @@
                    }
           },
 	  {
+            "key": "一起看影视",
+            "name": "🏕️一起看影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@clothes=black&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码":"UTF-8",
+                "主页url":"https://m.yncmfs.com/",
+		"二次截取": "",
+		"数组":"<div class=\"module-item\"&&</div",
+                "标题":"title=\"&&\"",
+		"图片":"data-src=\"&&\"",
+                "副标题":"<div class=\"module-item-text\">&&</div>", 
+                "链接":"href=\"&&\"",
+		"影片年代":"年份：&&</div>",
+		"影片地区":"地区：&&</div>",
+                "影片类型":"类型：&&</div>",
+		"状态":"状态：&&</div>",
+		"导演":"导演：&&</div>",
+		"主演":"主演：&&</div>",
+                "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+video-info-item video-info-content vod_content\">&&</div>",
+		"线路二次截取":"",
+		"线路数组":"data-dropdown&&</div>",
+                "线路标题":"<span>&&</span>",
+		"播放二次截取":"",
+                "播放数组":"sort-item\"&&</div>",
+		"倒序":"0",
+                "播放列表":"<a&&</a>[不包含:дрр滈凊]",
+                "播放标题":"<span>&&</span>",
+                "播放链接":"href=\"&&\"",
+                "分类url":"https://m.yncmfs.com/vssysw/{cateId}----{lang}----{catePg}---{year}.html",
+                "分类":"电影$1#电视剧$2#综艺$3#动漫$4#短剧$31#"
+              }
+          },
+	  {
              "key": "量子",
              "name": "⚗量子秒播",
              "type": 1,
@@ -10065,7 +10085,7 @@
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
              }
-       },
+        },
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
@@ -10678,7 +10698,7 @@
              "type": "rect",
              "ratio": 1.597
            }
-},	    
+},
 {
   "key": "哔哩哔哩听书",
   "name": "🍊哔哩听书",
