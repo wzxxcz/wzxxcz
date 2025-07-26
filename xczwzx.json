@@ -993,6 +993,21 @@
                  }
         },
 	{
+           "key": "小野",
+           "name": "🐗小野影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+           "ext": {
+                     "url": "https://appcms.xy4k.com",
+                     "site": "",
+                     "dataKey": "7SDWjknU34zqFbVr",
+                     "dataIv": "7SDWjknU34zqFbVr",
+                     "deviceId": "",
+                     "version": ""
+                  }
+        },
+	{
            "key": "爱看",
            "name": "⛲爱看影视",
            "type": 3,
