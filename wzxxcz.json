@@ -1572,6 +1572,20 @@
                  }
         },
 	{
+           "key": "爱看",
+           "name": "⛲爱看影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+           "ext": {
+                     "url": "http://154.37.220.65",
+                     "dataKey": "uI1TkPJC8B46AyN3",
+                     "dataIv": "uI1TkPJC8B46AyN3",
+                     "deviceId": "2112fc5eac600314ba95c4d65da9286b3",
+                     "version": "120"
+                  }
+        },
+	{
           "key": "稀饭",
           "name": "🍚稀饭影视",
           "type": 3,
@@ -2425,7 +2439,7 @@
         },
 	{
             "key": "爱看机器人",
-            "name":"💡爱看影视",
+            "name":"💡爱看机器人",
             "type": 3,
             "api": "csp_Ikanbot",
             "searchable": 1,
