@@ -10829,38 +10829,6 @@
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
              }
         },
-	{
-            "key": "酷猫影视",
-            "name": "🐈酷猫影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.kmvod.cc/",
-		"二次截取": "",
-                "数组": "class=\"stui-vodlist__box\"&&</div>",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "更新",
-                "链接": "href=\"&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&</li>",
-		"线路二次截取":"",
-                "线路数组":"",
-                "线路标题":"",
-                "倒序": "0",
-                "直接播放": "0", 
-                "播放数组":"",
-	        "播放列表":"<a&&/a>",
-	        "播放标题":">&&<",
-	        "播放链接":"href=\"&&\"",
-                "跳转播放链接": "(http://kmvod.cc/kmcloud/index.php?vid=&&)",
-                "跳转解析": "http://kmvod.cc/kmcloud/index.php?vid=",
-                "搜索url": "http://kmvod.cc/vodsearch/{wd}-------------.html",
-                "分类url": "http://kmvod.cc/vodtype/{cateId}.html",
-                "分类": "电影$1#剧集$2#综艺$3#动漫$4#"
-             }
-        },
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
