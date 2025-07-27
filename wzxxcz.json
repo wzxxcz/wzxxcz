@@ -10757,11 +10757,6 @@
             "name":"🥂玖玖电影",
             "type": 3,
             "api": "csp_XBPQ",
-	    "searchable": 1,
-	    "quickSearch": 1,
-	    "changeable": 1,
-	    "filterable": 1,
-	    "timeout": 120,
             "ext": {
 		      "作者": "🍊小橙子/250727",
                       "站名": "玖玖电影", 
