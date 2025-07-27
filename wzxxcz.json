@@ -11011,7 +11011,7 @@
 		"播放二次截取": "",
 		"播放数组": "<ul class=\"stui-content__playlist clearfix&&</ul>",
 		"倒序": "0",
-                "播放列表": "<a&&</a>",
+                "播放列表": "<a&&</a>[不包含:首选播放超清线路]",
                 "播放标题": ">&&</a>",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://www.sobods.com/vodshow/{cateId}--------{catePg}---{year}.html",
