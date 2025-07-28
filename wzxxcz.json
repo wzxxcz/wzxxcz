@@ -11074,7 +11074,7 @@
 		"图片":"data-original=\"&&\"",
 		"副标题":"<span class=\"label label-success\">&&</span>", 
 		"链接":"href=\"&&\"",
-                "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&</div",
                 "分类url": "https://kuyun123.com/show/{cateId}-{area}-------{catePg}---.html",
                 "分类":"电影$1#连续剧$2#综艺$3#动漫$4#"
              }
