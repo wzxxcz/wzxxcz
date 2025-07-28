@@ -10121,6 +10121,33 @@
                   }
           },
 	  {
+            "key": "酷云影院",
+            "name": "🌥️酷云影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@mac_history=%7Blog%3A%5B%7B%22name%22%3A%22%5B%E5%9B%BD%E4%BA%A7%E5%89%A7%5D%E6%89%AB%E6%AF%92%E9%A3%8E%E6%9A%B42025%22%2C%22link%22%3A%22https%3A%2F%2Fkuyun123.com%2Fvod%2F76345.html%22%2C%22pic%22%3A%22https%3A%2F%2Fpic.youkupic.com%2Fupload%2Fvod%2F20250712-1%2F8446916fae1423c9c6d0e99e899272fe.jpg%22%7D%5D%7D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码":"UTF-8",
+                "主页url": "https://kuyun123.com/",
+		"数组":"media-wrapper&&/span>",
+		"标题":"alt=\"&&\"",
+		"图片":"data-original=\"&&\"",
+		"副标题":"label label-success\">&&<", 
+		"链接":"href=\"&&\"",
+		"影片年代":"年份：&&</p>",
+		"影片地区":"地区：&&</p>",
+                "影片类型":"类型：&&</p>",
+		"状态":"状态：&&</p>",
+		"导演":"导演：&&</p>",
+		"主演":"主演：&&</p>",
+                "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&</div",
+		"线路数组":"",
+	        "线路标题":"",
+                "分类url": "https://kuyun123.com/show/{cateId}-{area}-------{catePg}---.html",
+                "分类":"电影$1#连续剧$2#综艺$3#动漫$4#"
+             }
+          },
+	  {
              "key": "量子",
              "name": "⚗量子秒播",
              "type": 1,
