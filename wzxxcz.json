@@ -11072,7 +11072,7 @@
 		"数组":"wrapper&&/span>",
 		"标题":"alt=\"&&\"",
 		"图片":"data-original=\"&&\"",
-		"副标题":"<span class=\"label label-success\">&&</span>", 
+		"副标题":"success\">&&<", 
 		"链接":"href=\"&&\"",
 		"影片年代":"年份：&&</p>",
 		"影片地区":"地区：&&</p>",
