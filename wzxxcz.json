@@ -11451,8 +11451,15 @@
 		"导演":"导演：&&</li>",
 		"主演":"主演：&&</li>",
                 "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+hl-text-muted\">&&</div>",
-		"线路数组":"<li&&</li>",
-		"线路标题": ">&&</span>",
+		"线路二次截取":"",
+		"线路数组":"<a class=\"hl-tabs-btn hl-slide-swiper&&/a>",
+	        "线路标题":"</i>&&<",
+		"播放二次截取":"",
+	        "播放数组":"<ul class=\"hl-plays-list hl-sort-list&&</ul>",
+		"倒序":"0",
+                "播放列表":"<a&&</a>",
+                "播放标题":">&&</a>",
+                "播放链接":"href=\"&&\"",
                 "分类url":"https://www.weiyuntv.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类":"电影$dianying#连续剧$lianxuju#短剧$duanju#综艺$zongyi#动漫$dongman#"
              }
