@@ -11376,14 +11376,14 @@
 		     "跳转播放链接":"var player_*\"url\":\"&&\"",
 		     "跳转解析":"",
 		     "搜索请求头":"User-Agent$MOBILE_UA",
-		     "搜索url":"https://saohuody.com/search/{wd}----------{pg}---.html",
+		     "搜索url":"https://17k.me/vodsearch/{wd}----------{pg}---.html",
                      "搜索模式":"1",
 		     "搜索后缀":"",
 		     "搜索二次截取":"",
-                     "搜索数组":"media-wrapper&&/span>",
-                     "搜索标题":"alt=\"&&\"",
+                     "搜索数组":"hl-item-thumb hl-lazy&&</a",
+                     "搜索标题":"title=\"&&\"",
                      "搜索图片":"data-original=\"&&\"",
-                     "搜索副标题":"label label-success\">&&<", 
+                     "搜索副标题":"<span class=\"hl-lc-1 remarks\">&&</span>", 
                      "搜索链接":"href=\"&&\"",
                      "筛选":"1",
 		     "类型":"",
@@ -11399,7 +11399,7 @@
 		     "字母值": "*",
                      "排序": "时间&人气&评分",
                      "排序值": "time&hits&score"
-             }
+                  }
           },
 	  {
              "key": "量子",
