@@ -7539,6 +7539,20 @@
                }
         },
 	{
+          "key":"茶杯狐1",
+          "name":"🍵茶杯狐1",
+          "type":3,
+          "api":"csp_XBPQ",
+          "ext":{
+                    "请求头":"User-Agent$MOBILE_UA",
+                    "编码":"UTF-8",
+		    "主页url":"https://www.xuzhoucsw.com/",
+                    "分类url":"https://www.xuzhoucsw.com/vodshow/{cateId}--------{catePg}---.html",
+                    "分类":"电影$1#电视剧$2#综艺$3#动漫$4#动画片$34#短剧$37#有声动漫$36#",
+	            "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+left text-muted\">&&</div>"
+               }
+        },
+	{
           "key": "4KLIVE",
           "name": "🍊4K影院",
           "type": 3,
