@@ -11296,7 +11296,7 @@
                      "播放标题":">&&</a>",
                      "播放链接":"href=\"&&\"",
 		     "解析":"",
-		     "跳转播放链接":"var player_*\"url\":\"&&\"",
+		     "跳转播放链接":"",
 		     "跳转解析":"",
 		     "搜索请求头":"User-Agent$MOBILE_UA",
 		     "搜索url":"https://www.nycvod.com/vodsearch/{wd}----------{pg}---.html",
