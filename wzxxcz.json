@@ -11911,7 +11911,7 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.akysw.pro/",
 		"二次截取":"",
-	        "数组":"public-list-div public-list-bj",
+	        "数组": "class=\"public-list-exp\"&&</a",
 	        "标题":"title=\"&&\"",
 	        "图片":"data-src=\"&&\"",
 		"副标题":"<span class=\"public-list-prb hide ft2\">&&</span>", 
