@@ -12055,6 +12055,34 @@
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
              }
         },
+	{
+            "key": "星辰影视",
+            "name": "💧星辰影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "http://vedio.kundihulan.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
+             }
+        },
+	{
+            "key": "网飞啦",
+            "name": "🧿网飞啦",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.wangfei.la/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.wangfei.la/vod-show-id-{cateId}-page-{catePg}-year-{year}.html",
+                "分类": "电影$3#剧集$1#动漫$2#综艺$4#短剧$25#陆剧$6#美剧$7#日剧$10#韩剧$11#国漫$13#日漫$14#"
+             }
+        },
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
