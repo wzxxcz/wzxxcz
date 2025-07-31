@@ -12093,7 +12093,7 @@
                 "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+col-pd\">&&</div>",
 		"线路二次截取":"",
 		"线路数组":"stui-pannel__head bottom-line active clearfix&&</div>",
-	        "线路标题":"> && </h3>",
+	        "线路标题":">&&</h3",
 		"播放二次截取":"",
                 "播放数组":"<ul class=\"stui-content__playlist clearfix&&</ul>",
 		"倒序":"0",
