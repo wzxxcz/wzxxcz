@@ -1231,7 +1231,8 @@
           "quickSearch": 1,
           "api": "csp_AppGet2",
           "ext": {
-                   "url": "https://newappcms.cs4k.top",
+                   "url": "",
+                   "site": "https://ceshi307386.oss-cn-beijing.aliyuncs.com/csurl.txt",
                    "dataKey": "Z98KXaLtO2wC1Pte",
                    "dataIv": "Z98KXaLtO2wC1Pte",
                    "deviceId": "",
