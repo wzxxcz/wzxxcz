@@ -11924,6 +11924,21 @@
          }
 },
 {
+  "key": "多多动漫",
+  "name": "🤣多多动漫",
+  "type": 3,
+  "quickSearch": 1,
+  "api": "csp_AppGet",
+  "ext": {
+           "url": "",
+           "site": "https://app.cf4k.xyz/1.txt",
+           "dataKey": "qqqqqqqqqqqqqqqq",
+           "dataIv": "qqqqqqqqqqqqqqqq",
+           "deviceId": "",
+           "version": ""
+         }
+},
+{
   "key": "次元动漫",
   "name": "🤣次元动漫",
   "type": 3,
