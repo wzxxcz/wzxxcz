@@ -1462,17 +1462,19 @@
                 }
         },
 	{
-          "key": "火猫",
-          "name": "🐱火猫1080P",
-          "type": 3,
-          "quickSearch": 1,
-          "api": "csp_AppMuou",
-          "ext": {
-                   "url": "http://154.12.22.168:14988",
-                   "dataKey": "531f6082a43ac5d7",
-                   "dataIv": "531f6082a43ac5d7",
-                   "jxurl": "http://app.789dd.cn"
-                }
+           "key": "火猫",
+           "name": "🐱火猫1080P",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+           "ext": {
+                    "url": "",
+                    "site": "https://cunchu8.obs.cn-north-4.myhuaweicloud.com/03.txt",
+                    "dataKey": "J6AIORKJ3PQOJKM9",
+                    "dataIv": "J6AIORKJ3PQOJKM9",
+                    "deviceId": "",
+                    "version": ""
+                  }
         },
 	{
           "key": "若雪",
