@@ -1565,22 +1565,6 @@
                  }
         },
 	{
-           "key": "咖啡",
-           "name": "☕咖啡影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppGet",
-           "ext": {
-                     "url": "",
-                     "site": "https://omofun.lol/1.txt",
-                     "dataKey": "skdhalkshqklwkj1",
-                     "dataIv": "skdhalkshqklwkj1",
-                     "deviceId": "",
-                     "version": "109",
-                     "ua": "okhttp/3.10.0"
-                 }
-        },
-	{
            "key": "魔方",
            "name": "👝魔方影视",
            "type": 3,
