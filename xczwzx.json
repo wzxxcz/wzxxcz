@@ -965,18 +965,6 @@
            "ext": "http://38.47.213.61:41271/mogai_api.php/v1.vod"
         },
 	{
-          "key": "行动",
-          "name": "⚽行动影视",
-          "type": 3,
-          "api": "csp_AppSy",
-          "ext": {
-                    "url": "http://160.202.246.9:2356",
-                    "key1": "aassddwwxxllsx1x",
-                    "key2": "aassddwwxxllsx1x",
-                    "key3": "aassddwwxxllsx1x"
-                 }
-        },
-	{
            "key": "魔方",
            "name": "👝魔方影视",
            "type": 3,
