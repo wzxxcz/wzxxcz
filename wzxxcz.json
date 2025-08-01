@@ -12842,6 +12842,15 @@
   "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/兔小贝2.json"
 },
 {
+  "key": "csp_BookTing",
+  "name": "📕有声听书",
+  "api": "csp_BookTing",
+  "jar": "https://xcz.iptv365.org/wzxm.png",
+  "type": 3,
+  "quickSearch": 0,
+  "ext": "https://m.i275.com"
+},
+{
   "key": "Aid",
   "name": "🚑急救教学",
   "type": 3,
