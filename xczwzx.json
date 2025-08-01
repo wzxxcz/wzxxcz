@@ -943,18 +943,6 @@
            "ext": "iUYplHbim/qVptUBrzCuqk72erYn+xHvZVGawkGUOqtLGtiWlDcWpUagYzdfPYeECbG+IjVf7Mhz2ZqZ70k6X72tkUhQDNEpIN/XScTGlUE="
         },
 	{
-           "key": "追忆",
-           "name": "🎠追忆影视",
-           "type": 3,
-           "api": "csp_AppSy",
-           "ext": {
-                    "url": "http://110.42.7.130:1866",
-                    "key1": "aassddwwxxllsx1x",
-                    "key2": "2083c87e98b6ce08",
-                    "key3": "2083c87e98b6ce08"
-                  }
-        },    
-	{
            "key": "闪影",
            "name": "🌠闪影影视",
            "type": 3,
