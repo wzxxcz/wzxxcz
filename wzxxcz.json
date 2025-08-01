@@ -1755,21 +1755,6 @@
                   }
         },
 	{
-          "key": "灵虎",
-          "name": "🐅灵虎影视",
-          "type": 3,
-          "quickSearch": 1,
-          "api": "csp_AppGet",
-          "ext": {
-                   "url": "",
-                   "site": "https://bind.315999.xyz/89.txt",
-                   "dataKey": "#getapp@TMD@2025",
-                   "dataIv": "#getapp@TMD@2025",
-                   "deviceId": "",
-                   "version": ""
-                 }
-        },
-	{
           "key": "雄鹰",
           "name": "🦅雄鹰影视",
           "type": 3,
