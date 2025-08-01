@@ -1296,13 +1296,14 @@
            "name": "🐬海豚1080P",
            "type": 3,
            "quickSearch": 1,
-           "api": "csp_AppGet",
+           "api": "csp_AppGet2",
            "ext": {
-                     "url": "http://getapp.hiapp.com.cn",
-                     "dataKey": "2268331221bobobo",
-                     "dataIv": "2268331221bobobo",
-                     "deviceId": "",
-                     "version": "107"
+                    "url": "https://qjappcms.htsp4k.top",
+                    "site": "",
+                    "dataKey": "R69yVluzg6yLpjp0",
+                    "dataIv": "R69yVluzg6yLpjp0",
+                    "deviceId": "",
+                    "version": ""
                  }
         },
 	{
