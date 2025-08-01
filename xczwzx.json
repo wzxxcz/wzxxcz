@@ -1405,20 +1405,6 @@
                  }
         },
 	{
-          "key": "星河",
-          "name": "🌃星河影视",
-          "type": 3,
-          "quickSearch": 1,
-          "api": "csp_AppGet",
-          "ext": {
-                   "url": "http://121.62.22.204:9876",
-                   "dataKey": "f5e2tx53ykp6s2c9",
-                   "dataIv": "f5e2tx53ykp6s2c9",
-                   "deviceId": "",
-                   "version": "361"
-                }
-        },
-	{
           "key": "若惜",
           "name": "🦃若惜影视",
           "type": 3,
