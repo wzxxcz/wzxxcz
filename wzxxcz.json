@@ -12369,7 +12369,7 @@
             "type":3,
             "api":"csp_XBPQ",
             "ext":{
-                "请求头":"User-Agent$MOBILE_UA",
+                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=jo64d22a7510e1ht08i34ou3km；； Hm_lvt_e6e05229d15b2e3a2022db9be05f93a8=1754021295；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_e6e05229d15b2e3a2022db9be05f93a8=1754022186；； XLA_CI=cc9376c56aca215a71f4af3e02b8712f&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码":"UTF-8",
                 "主页url":"https://v.lianzhuokeji.com/",
 		"二次截取":"",
@@ -12378,7 +12378,16 @@
 		"图片":"data-original=\"&&\"",
 	        "副标题":"<span class=\"pic-text text-right\">&&</span>", 
 	        "链接":"href=\"&&\"",
-                "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+		"影片年代":"年份：&&</p>",
+		"影片地区":"地区：&&</p>",
+                "影片类型":"类型：&&</p>",
+		"状态":"状态：&&</p>",
+		"导演":"导演：&&</p>",
+		"主演":"主演：&&</p>",
+                "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+left text-muted\">&&</div>",
+		"线路二次截取": "",
+		"线路数组":"haiyang-pannel__head bottom-line active clearfix&&</div>",
+	        "线路标题":">&&<sup",
                 "分类url":"https://v.lianzhuokeji.com/search.php?page={catePg}&searchtype=5&tid={cateId}&area={area}&year={year}&yuyan={lang}",
                 "分类":"电影$1#电视剧$2#综艺$3#动漫$4#短剧$25#"
              }
