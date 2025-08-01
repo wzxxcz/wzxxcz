@@ -1501,19 +1501,6 @@
                 }
         },
 	{
-          "key": "樱桃",
-          "name": "🍒樱桃影视",
-          "type": 3,
-          "quickSearch": 1,
-          "api": "csp_AppMuou",
-          "ext": {
-                   "url": "http://sp.dxgsp.cc",
-                   "dataKey": "25f9e794323b4538",
-                   "dataIv": "25f9e794323b4538",
-                   "jxurl": "https://ap.dxgsp.cc"
-                 }
-        },
-	{
           "key": "火猫",
           "name": "🐱火猫1080P",
           "type": 3,
