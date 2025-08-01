@@ -793,6 +793,16 @@
            "playerType": 2
         },
 	{
+           "key": "咖啡",
+           "name": "☕咖啡影视",
+           "type": 3,
+           "quickSearch": 0,
+           "searchable": 1,
+           "api": "csp_AppGet",
+	   "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "qoNcYCY4SGJFWERC5ewNdoRMWRiiOH3dKBG5+Zte38B0REfz5STn0coM8gQ4pJtU"
+        },
+	{
            "key": "零度影视",
            "name": "❄️零度影视",
            "type": 3,
