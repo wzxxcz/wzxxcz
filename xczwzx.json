@@ -1217,11 +1217,12 @@
           "quickSearch": 1,
           "api": "csp_AppGet2",
           "ext": {
-                   "url": "http://172.247.192.138:18520",
-                   "dataKey": "SuNlEkOLAoWJj1Oe",
-                   "dataIv": "SuNlEkOLAoWJj1Oe",
+                   "url": "",
+                   "site": "https://lanyinghz.oss-cn-hangzhou.aliyuncs.com/lanyingxmy.txt",
+                   "dataKey": "ca94b06ca359d80e",
+                   "dataIv": "ca94b06ca359d80e",
                    "deviceId": "",
-                   "version": ""
+                   "version": "120"
                  }
         },
 	{
