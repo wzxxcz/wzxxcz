@@ -1867,7 +1867,7 @@
         },
 	{
            "key": "哔滴",
-           "name": "🍸哔滴影视",
+           "name": "🍷哔滴影视",
            "type": 3,
            "quickSearch": 1,
            "api": "csp_AppGet2",
