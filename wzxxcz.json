@@ -12363,6 +12363,20 @@
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
              }
         },
+	{
+            "key":"VS影视",
+            "name":"🌌VS影视",
+            "type":3,
+            "api":"csp_XBPQ",
+            "ext":{
+                "请求头":"User-Agent$MOBILE_UA",
+                "编码":"UTF-8",
+                "主页url":"https://v.lianzhuokeji.com/",
+                "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url":"https://v.lianzhuokeji.com/search.php?page={catePg}&searchtype=5&tid={cateId}&area={area}&year={year}&yuyan={lang}",
+                "分类":"电影$1#电视剧$2#综艺$3#动漫$4#短剧$25#"
+             }
+        },
 {
   "key":"魔都资源",
   "name":"🤣魔都动漫",
