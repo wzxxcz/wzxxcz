@@ -2845,10 +2845,11 @@
                   }
         },
 	{
-          "key": "云播影视",
-          "name": "☁️云播影视",
-          "type": 3,
-          "api": "csp_Tvyb"
+           "key": "云播影视",
+           "name": "☁️云播影视",
+           "type": 3,
+           "api": "csp_Tvyb",
+           "ext": "http://www.viptv01.com"
         },
 	{
           "key": "奇优影视",
