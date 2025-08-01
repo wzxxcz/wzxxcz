@@ -1348,20 +1348,6 @@
                  }
         },
 	{
-          "key": "雨滴",
-          "name": "💧雨滴影视",
-          "type": 3,
-          "quickSearch": 1,
-          "api": "csp_AppGet",
-          "ext": {
-                   "url": "https://c8w2ov7u5wg2z1o8p21c.aliyuncs.click:27899",
-                   "dataKey": "k9o3p2c8b7m3z0o8",
-                   "dataIv": "k9o3p2c8b7m3z0o8",
-                   "deviceId": "",
-                   "version": "100"
-                }
-        },
-	{
            "key": "萝卜",
            "name": "🥕萝卜影院",
            "type": 3,
