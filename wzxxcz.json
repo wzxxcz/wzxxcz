@@ -6388,7 +6388,7 @@
 		"二次截取": "",
 		"数组":"/vod-detail&&</a>",
                 "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
+                "图片": "data-original=\"&&\",
                 "副标题": "<div class=\"module-item-note\">&&</div>", 
 		"链接":"/vod-detail-id-+id&&"",
                 "简介":"🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content\">&&</div>",
