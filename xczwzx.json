@@ -1278,6 +1278,21 @@
                  }
         },
 	{
+           "key": "哔滴",
+           "name": "🥛哔滴影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet2",
+           "ext": {
+                    "url": "",
+                    "site": "https://ooxooxooxooxoo-1259561579.cos.ap-chengdu.myqcloud.com/ip.json",
+                    "dataKey": "5ae8ee4bb95ea0ce",
+                    "dataIv": "5ae8ee4bb95ea0ce",
+                    "deviceId": "",
+                    "version": "120"
+                 }
+        },
+	{
            "key": "瓜萌",
            "name": "🍈瓜萌影视",
            "type": 3,
