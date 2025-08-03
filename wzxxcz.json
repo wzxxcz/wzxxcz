@@ -3123,11 +3123,11 @@
 		      "嗅探词": ".mp4#.m3u8#.flv#hcts-m3u8#index.m3u8",
                       "免嗅": "1",
 		      "过滤词": "",
-                      "主页url": "https://saohuody.com/",
+                      "主页url": "https://v.shdy5.us/",
 		      "首页": "120",
 		      "起始页": "1",
-		      "分类url": "https://saohuody.com/list/{cateId}-{catePg}.html",
-                      "分类": "国产剧$12#港剧$13#台剧$14#日剧$15#韩剧$16#美剧$17#海外$18#泰剧$19#动作$5#喜剧$6#爱情$7#科幻$8#恐怖$9#剧情$10#战争$11#动画$33",
+		      "分类url": "https://v.shdy5.us/list/{cateId}-{catePg}.html",
+                      "分类": "大陆剧$20#港剧$21#韩剧$22#美剧$23#日剧$24#英剧$25#台剧$26#喜剧$6#爱情$7#恐怖$8#动作$9#科幻$10#战争$11#犯罪$12#动画$13#奇幻$14#剧情$15#冒险$16#悬疑$17#惊悚$18#",
 		      "二次截取": "",
 		      "数组":"v_img&&/div>",
 	              "标题":"title=\"&&\"",
@@ -13707,6 +13707,7 @@
   "ads":["mimg.0c1q0l.cn","www.googletagmanager.com","www.google-analytics.com","mc.usihnbcq.cn","mg.g1mm3d.cn","mscs.svaeuzh.cn","cnzz.hhttm.top","tp.vinuxhome.com","cnzz.mmstat.com","www.baihuillq.com","s23.cnzz.com","z3.cnzz.com","c.cnzz.com","stj.v1vo.top","z12.cnzz.com","img.mosflower.cn","tips.gamevvip.com","ehwe.yhdtns.com","xdn.cqqc3.com","www.jixunkyy.cn","sp.chemacid.cn","hm.baidu.com","s9.cnzz.com","z6.cnzz.com","um.cavuc.com","mav.mavuz.com","wofwk.aoidf3.com","z5.cnzz.com","xc.hubeijieshikj.cn","tj.tianwenhu.com","xg.gars57.cn","k.jinxiuzhilv.com","cdn.bootcss.com","ppl.xunzhuo123.com","xomk.jiangjunmh.top","img.xunzhuo123.com","z1.cnzz.com","s13.cnzz.com","xg.huataisangao.cn","z7.cnzz.com","xg.huataisangao.cn","z2.cnzz.com","s96.cnzz.com","q11.cnzz.com","thy.dacedsfa.cn","xg.whsbpw.cn","s19.cnzz.com","z8.cnzz.com","s4.cnzz.com","f5w.as12df.top","ae01.alicdn.com","www.92424.cn","k.wudejia.com","vivovip.mmszxc.top","qiu.xixiqiu.com","cdnjs.hnfenxun.com","cms.qdwght.com"],
 
   "warningText": "🍊欢迎进入小橙子影视！🍊"} 
+
 
 
 
