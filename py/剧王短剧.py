@@ -210,7 +210,7 @@ class Spider(Spider):
         name = self.extract_middle_text(code, "s1='", "'", 0)
         Jumps = self.extract_middle_text(code, "s2='", "'", 0)
 
-        content = '集多为您介绍剧情📢' + self.extract_middle_text(res,'class="info-detail">','<', 0)
+        content = '🍊小橙子为您介绍剧情📢' + self.extract_middle_text(res,'class="info-detail">','<', 0)
 
         remarks = self.extract_middle_text(res, 'class="info-mark">', '<', 0)
 
@@ -320,6 +320,7 @@ class Spider(Spider):
         elif params['type'] == "ts":
             return self.proxyTs(params)
         return None
+
 
 
 
