@@ -1648,15 +1648,18 @@
             "ext": "7lj763gg402i7942463j9j9jh84l8798l8gli652828g332i"
         },
 	{
-            "key": "QD4K",
-            "name": "🐷猪猪4K",
-            "type": 3,
-	    "searchable": 1,
-            "quickSearch": 1,
-            "api": "csp_AppYsV2",
-	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
-            "playerType": 2,
-            "ext": "https://cnb.cool/xiaomideyun/xiaomideyun/-/git/raw/main/cs.txt"
+          "key": "QD4K",
+          "name": "🐷猪猪4K",
+          "type": 3,
+          "searchable": 1,
+          "quickSearch": 0,
+          "api": "https://d.feiliupan.com/t/109056264444579840/AppV2.py",
+          "playerType": 2,
+          "ext": {
+                   "api": "http://dmmax.juxiafan.com/icciu_api.php/v1.vod",
+                   "datasignkey": "6QQNUsP3PkD2ajJCPCY8",
+                   "apisignkey": "lvdoutv-1.0.0"
+                }
         },
 	{
            "key": "巧技",
@@ -14883,6 +14886,7 @@
   "ads":["mimg.0c1q0l.cn","www.googletagmanager.com","www.google-analytics.com","mc.usihnbcq.cn","mg.g1mm3d.cn","mscs.svaeuzh.cn","cnzz.hhttm.top","tp.vinuxhome.com","cnzz.mmstat.com","www.baihuillq.com","s23.cnzz.com","z3.cnzz.com","c.cnzz.com","stj.v1vo.top","z12.cnzz.com","img.mosflower.cn","tips.gamevvip.com","ehwe.yhdtns.com","xdn.cqqc3.com","www.jixunkyy.cn","sp.chemacid.cn","hm.baidu.com","s9.cnzz.com","z6.cnzz.com","um.cavuc.com","mav.mavuz.com","wofwk.aoidf3.com","z5.cnzz.com","xc.hubeijieshikj.cn","tj.tianwenhu.com","xg.gars57.cn","k.jinxiuzhilv.com","cdn.bootcss.com","ppl.xunzhuo123.com","xomk.jiangjunmh.top","img.xunzhuo123.com","z1.cnzz.com","s13.cnzz.com","xg.huataisangao.cn","z7.cnzz.com","xg.huataisangao.cn","z2.cnzz.com","s96.cnzz.com","q11.cnzz.com","thy.dacedsfa.cn","xg.whsbpw.cn","s19.cnzz.com","z8.cnzz.com","s4.cnzz.com","f5w.as12df.top","ae01.alicdn.com","www.92424.cn","k.wudejia.com","vivovip.mmszxc.top","qiu.xixiqiu.com","cdnjs.hnfenxun.com","cms.qdwght.com"],
 
   "warningText": "🍊欢迎进入小橙子影视！🍊"} 
+
 
 
 
