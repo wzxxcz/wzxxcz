@@ -874,7 +874,7 @@
           "changeable": "0",
           "quickSearch": 1,
           "api": "csp_Duopan",
-	  "jar": "https://xcz.iptv365.org/wzxm.png",
+	  "jar": "https://xcz.iptv365.org/wzxm.jpg",
           "filterable": 1,
           "ext": {
           "site_urls": [
@@ -921,7 +921,7 @@
             "name": "🧸玩偶4K弹幕",
             "type": 3,
             "api": "csp_Wogg",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
             "changeable": "0",
             "quickSearch": 1,
             "filterable": 1,
@@ -1114,7 +1114,7 @@
           "searchable": 1,
           "quickSearch": 1,
           "api": "csp_MiSou",
-	  "jar": "https://xcz.iptv365.org/wzxm.png"
+	  "jar": "https://xcz.iptv365.org/wzxm.jpg"
         },
 	{
           "key": "糖果",
@@ -1141,7 +1141,7 @@
             "name": "🖍蜡笔4K弹幕",
             "type": 3,
             "api": "csp_Duopan",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
             "filterable": 1,
         "ext": {
         "site_urls": [
@@ -1377,7 +1377,7 @@
            "quickSearch": 0,
            "searchable": 1,
            "api": "csp_AppGet",
-	   "jar": "https://xcz.iptv365.org/wzxm.png",
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg",
            "ext": "qoNcYCY4SGJFWERC5ewNdoRMWRiiOH3dKBG5+Zte38B0REfz5STn0coM8gQ4pJtU"
         },
 	{
@@ -1537,7 +1537,7 @@
            "name": "🌉幕启影视",
            "type": 3,
            "api": "csp_AppSy",
-	   "jar": "https://xcz.iptv365.org/wzxm.png",
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg",
            "quickSearch": 0,
            "ext": "J7WBJTWvt49Rro0WaKnCpcwiAwtiA57atMnVBDAP3YRNynoyyCyLIvc6/nXpdo/2nerMlKFDJbIGRKuy0qJdB6Qkf23z5CWmuH7UTrHERqI="
         },
@@ -1857,7 +1857,7 @@
            "quickSearch": 1,
            "searchable": 1,
            "api": "csp_AppGet",
-	   "jar": "https://xcz.iptv365.org/wzxm.png",
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg",
            "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzesNDM87sUul1Ii8NbP2XB5"
         },
 	{
@@ -1970,7 +1970,7 @@
            "quickSearch": 1,
            "searchable": 1,
            "api": "csp_AppGet",
-	   "jar": "https://xcz.iptv365.org/wzxm.png",
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg",
            "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeUKFHSUUbLyGMREENFjE1N9FXjZ6Z7tiLWs6P15Ol/g5Po80zDNWJPEEoj/nv3Yelo="
         },
 	{
@@ -2225,7 +2225,7 @@
            "quickSearch": 1,
            "searchable": 1,
            "api": "https://13826.kstore.space/tt.py",
-	   "jar": "https://xcz.iptv365.org/wzxm.png"
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg"
         },
 	{
             "key": "步步",
@@ -2251,7 +2251,7 @@
 	    "searchable": 1,
             "quickSearch": 1,
             "api": "csp_AppYsV2",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
             "playerType": 2,
             "ext": "https://cnb.cool/xiaomideyun/xiaomideyun/-/git/raw/main/cs.txt"
         },
@@ -2295,7 +2295,7 @@
           "quickSearch": 1,
           "searchable": 1,
           "api": "https://13826.kstore.space/mioaying.py",
-	  "jar": "https://xcz.iptv365.org/wzxm.png"
+	  "jar": "https://xcz.iptv365.org/wzxm.jpg"
         },
 	{
           "key": "苹果影视",
@@ -2427,7 +2427,7 @@
            "name": "👨农民1080P",
            "type": 3,
            "api": "csp_Wwys",
-	   "jar": "https://xcz.iptv365.org/wzxm.png",
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg",
            "searchable": 1,
            "quickSearch": 1,
            "filterable": 1,
@@ -2450,7 +2450,7 @@
             "searchable": 1,
             "quickSearch": 1,
             "api": "csp_AppRJ",
-	    "jar": "https://xcz.iptv365.org/wzxm.png",
+	    "jar": "https://xcz.iptv365.org/wzxm.jpg",
             "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
 	{
@@ -2460,7 +2460,7 @@
           "searchable": 1,
           "quickSearch": 1,
           "api": "csp_AppGet",
-	  "jar": "https://xcz.iptv365.org/wzxm.png",
+	  "jar": "https://xcz.iptv365.org/wzxm.jpg",
           "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzfiJ2fHkCRZg4+8NFWs+b1X"
         },
 	{
@@ -4839,7 +4839,7 @@
            "searchable": 1,
            "quickSearch": 1,
            "api": "https://13826.kstore.space/jubaba.py",
-	   "jar": "https://xcz.iptv365.org/wzxm.png",
+	   "jar": "https://xcz.iptv365.org/wzxm.jpg",
            "ext": ""
         },
 	{
@@ -14871,7 +14871,7 @@
   "searchable": 1,
   "quickSearch": 1,
   "api": "csp_AppXY",
-  "jar": "https://xcz.iptv365.org/wzxm.png",
+  "jar": "https://xcz.iptv365.org/wzxm.jpg",
   "ext": "https://xvapp.xingya.com.cn"
 },
 {
@@ -15037,7 +15037,7 @@
   "key": "csp_BookTing",
   "name": "📕有声听书",
   "api": "csp_BookTing",
-  "jar": "https://xcz.iptv365.org/wzxm.png",
+  "jar": "https://xcz.iptv365.org/wzxm.jpg",
   "type": 3,
   "quickSearch": 0,
   "ext": "https://m.i275.com"
@@ -15126,7 +15126,7 @@
   "name": "🏵️哔哩哔哩",
   "type": 3,
   "api": "csp_Bili",
-  "jar": "https://xcz.iptv365.org/wzxm.png",
+  "jar": "https://xcz.iptv365.org/wzxm.jpg",
   "quickSearch": 0,
   "searchable": 1,
   "ext": {
@@ -15145,7 +15145,7 @@
   "searchable": 1,
   "type": 3,
   "api": "https://cnb.cool/zhyadc/PyramidStore/-/git/raw/main/plugin/html/LIVES.py",
-  "jar": "https://xcz.iptv365.org/wzxm.png",
+  "jar": "https://xcz.iptv365.org/wzxm.jpg",
   "style": {
              "type": "rect",
              "ratio": 1.333
@@ -15189,7 +15189,7 @@
   "name": "⚽88看球",
   "type": 3,
   "api": "csp_Kanqiu",
-  "jar": "https://xcz.iptv365.org/wzxm.png",
+  "jar": "https://xcz.iptv365.org/wzxm.jpg",
   "searchable": 0,
   "quickSearch": 0,
   "filterable": 1,
@@ -15494,6 +15494,7 @@
   "ads":["mimg.0c1q0l.cn","www.googletagmanager.com","www.google-analytics.com","mc.usihnbcq.cn","mg.g1mm3d.cn","mscs.svaeuzh.cn","cnzz.hhttm.top","tp.vinuxhome.com","cnzz.mmstat.com","www.baihuillq.com","s23.cnzz.com","z3.cnzz.com","c.cnzz.com","stj.v1vo.top","z12.cnzz.com","img.mosflower.cn","tips.gamevvip.com","ehwe.yhdtns.com","xdn.cqqc3.com","www.jixunkyy.cn","sp.chemacid.cn","hm.baidu.com","s9.cnzz.com","z6.cnzz.com","um.cavuc.com","mav.mavuz.com","wofwk.aoidf3.com","z5.cnzz.com","xc.hubeijieshikj.cn","tj.tianwenhu.com","xg.gars57.cn","k.jinxiuzhilv.com","cdn.bootcss.com","ppl.xunzhuo123.com","xomk.jiangjunmh.top","img.xunzhuo123.com","z1.cnzz.com","s13.cnzz.com","xg.huataisangao.cn","z7.cnzz.com","xg.huataisangao.cn","z2.cnzz.com","s96.cnzz.com","q11.cnzz.com","thy.dacedsfa.cn","xg.whsbpw.cn","s19.cnzz.com","z8.cnzz.com","s4.cnzz.com","f5w.as12df.top","ae01.alicdn.com","www.92424.cn","k.wudejia.com","vivovip.mmszxc.top","qiu.xixiqiu.com","cdnjs.hnfenxun.com","cms.qdwght.com"],
 
   "warningText": "🍊欢迎进入小橙子影视！🍊"} 
+
 
 
 
