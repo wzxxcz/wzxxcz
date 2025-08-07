@@ -1592,7 +1592,7 @@
                     "deviceId": "",
                     "version": "120"
                   }
-        },
+    },
 	{
           "key": "旗星",
           "name": "🏸旗星影视",
@@ -1607,7 +1607,7 @@
                    "deviceId": "",
                    "version": "120"
                  }
-        },
+    },
 	{
            "key": "云云",
            "name": "☁️云云影视",
@@ -1622,7 +1622,7 @@
                     "deviceId": "",
                     "version": "120"
                  }
-        },
+    },
 	{
            "key": "光影",
            "name": "🛸光影影视",
@@ -1636,22 +1636,7 @@
                     "deviceId": "",
                     "version": ""
                   }
-        },
-	{
-           "key": "魔方",
-           "name": "👝魔方影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppGet",
-           "ext": {
-                    "url": "",
-                    "site": "https://www.snysw.xyz/mfys.txt",
-                    "dataKey": "1234567887654321",
-                    "dataIv": "1234567887654321",
-                    "deviceId": "",
-                    "version": ""
-                  }
-        },
+    },
 	{
            "key": "爱看",
            "name": "⛲爱看影视",
@@ -1665,7 +1650,7 @@
                      "deviceId": "2112fc5eac600314ba95c4d65da9286b3",
                      "version": "120"
                   }
-        },
+    },
 	{
             "key":"爱看影视网",
             "name":"🧿爱看影视网",
@@ -15684,6 +15669,7 @@
   "ads":["mimg.0c1q0l.cn","www.googletagmanager.com","www.google-analytics.com","mc.usihnbcq.cn","mg.g1mm3d.cn","mscs.svaeuzh.cn","cnzz.hhttm.top","tp.vinuxhome.com","cnzz.mmstat.com","www.baihuillq.com","s23.cnzz.com","z3.cnzz.com","c.cnzz.com","stj.v1vo.top","z12.cnzz.com","img.mosflower.cn","tips.gamevvip.com","ehwe.yhdtns.com","xdn.cqqc3.com","www.jixunkyy.cn","sp.chemacid.cn","hm.baidu.com","s9.cnzz.com","z6.cnzz.com","um.cavuc.com","mav.mavuz.com","wofwk.aoidf3.com","z5.cnzz.com","xc.hubeijieshikj.cn","tj.tianwenhu.com","xg.gars57.cn","k.jinxiuzhilv.com","cdn.bootcss.com","ppl.xunzhuo123.com","xomk.jiangjunmh.top","img.xunzhuo123.com","z1.cnzz.com","s13.cnzz.com","xg.huataisangao.cn","z7.cnzz.com","xg.huataisangao.cn","z2.cnzz.com","s96.cnzz.com","q11.cnzz.com","thy.dacedsfa.cn","xg.whsbpw.cn","s19.cnzz.com","z8.cnzz.com","s4.cnzz.com","f5w.as12df.top","ae01.alicdn.com","www.92424.cn","k.wudejia.com","vivovip.mmszxc.top","qiu.xixiqiu.com","cdnjs.hnfenxun.com","cms.qdwght.com"],
 
   "warningText": "🍊欢迎进入小橙子影视！🍊"} 
+
 
 
 
