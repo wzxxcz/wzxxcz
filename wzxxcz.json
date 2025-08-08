@@ -14720,32 +14720,17 @@
             }
         },
         {
-            "key": "追剧电影网",
-            "name": "💧追剧电影网",
+            "key": "樱花影院",
+            "name": "🌸樱花影院",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "http://www.zjybzsgc.com/",
-                "二次截取": "",
-                "数组": "/vpost/&&</a>",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "<span class=\"pic-text text-right\">&&</span>",
-                "链接": "/vpost/+&&\"",
+                "主页url": "http://lnszshentu.com/index.php",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+DioAf3 detail-sketch\">&&</div>",
-                "线路二次截取": "",
-                "线路数组": "stui-pannel__head bottom-line active clearfix&&</div>",
-                "线路标题": "title\">&&</h3",
-                "播放二次截取": "",
-                "播放数组": "<ul class=\"stui-content__playlist clearfix&&</ul>",
-                "倒序": "0",
-                "播放列表": "<a&&</a>",
-                "播放标题": ">&&</a>",
-                "播放链接": "href=\"&&\"",
-                "分类url": "http://www.zjybzsgc.com/stvtype/{cateId}-{catePg}.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#动画片$37#老电影$38#"
+                "分类url": "http://lnszshentu.com/search.php?page={catePg}&searchtype=5&area={area}&year={year}&tid={cateId}",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$5#"
             }
         },
         {
@@ -16455,8 +16440,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
-
-
-
-
