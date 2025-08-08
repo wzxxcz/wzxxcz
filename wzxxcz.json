@@ -3326,6 +3326,31 @@
             }
         },
         {
+            "key": "海兔影院",
+            "name": "🐇海兔影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "数组": "module-item-pic&&span></div>",
+                "标题": "title=\"&&\"",
+                "副标题": "<div class=\"module-item-text\">&&</div>",
+                "图片": "data-src=\"&&\"",
+                "播放链接": "href=\"&&\"",
+                "线路数组": "data-dropdown&&</div>",
+                "线路标题": "<span>&&<",
+                "播放数组": "<div class=\"module-blocklist&&</div>",
+                "播放列表": "<a&&</a>",
+                "播放标题": "<span>&&<",
+                "跳转播放链接": "var player_*\"url\":\"&&\"",
+                "搜索url": "https://www.haitu.xyz/vodsearch/{wd}----------{pg}---.html",
+                "分类url": "https://www.haitu.xyz/vodshow/{cateId}-{area}---{lang}----{catePg}---{year}.html",
+                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$42#",
+                "简介": "🍊小橙子为您介绍剧情👉+video-info-item video-info-content vod_content\">&&</div>"
+            }
+        },
+        {
             "key": "360采集",
             "name": "💡360采集",
             "type": 1,
@@ -8225,31 +8250,6 @@
                 "分类url": "https://qingwa.org/{cateId}.html?page={catePg}&tag={class}&sort={by}&area={area}&year={year}",
                 "分类": "电影$movie#电视剧$juji#美剧$meiju#韩剧$hanju#日剧$riju#泰剧$taiju",
                 "简介": "🍊小橙子为您介绍剧情👉+left data2\">&&</div>"
-            }
-        },
-        {
-            "key": "海兔影院",
-            "name": "🐇海兔影院",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "数组": "module-item-pic&&span></div>",
-                "标题": "title=\"&&\"",
-                "副标题": "<div class=\"module-item-text\">&&</div>",
-                "图片": "data-src=\"&&\"",
-                "播放链接": "href=\"&&\"",
-                "线路数组": "data-dropdown&&</div>",
-                "线路标题": "<span>&&<",
-                "播放数组": "<div class=\"module-blocklist&&</div>",
-                "播放列表": "<a&&</a>",
-                "播放标题": "<span>&&<",
-                "跳转播放链接": "var player_*\"url\":\"&&\"",
-                "搜索url": "https://www.haitu.xyz/vodsearch/{wd}----------{pg}---.html",
-                "分类url": "https://www.haitu.xyz/vodshow/{cateId}-{area}---{lang}----{catePg}---{year}.html",
-                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$42#",
-                "简介": "🍊小橙子为您介绍剧情👉+video-info-item video-info-content vod_content\">&&</div>"
             }
         },
         {
