@@ -3597,13 +3597,6 @@
             "ext": "./XBPQ/面包影视.json"
         },
         {
-            "key": "文采秒播",
-            "name": "💮文采秒播",
-            "type": 3,
-            "api": "csp_HBPQ",
-            "ext": "./XBPQ/文才.json"
-        },
-        {
             "key": "雪糕TV",
             "name": "🍨雪糕TV",
             "type": 3,
@@ -16468,4 +16461,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
