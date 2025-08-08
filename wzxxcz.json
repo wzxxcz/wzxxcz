@@ -14740,32 +14740,17 @@
             }
         },
         {
-            "key": "泡泡影视",
-            "name": "🐳泡泡影视",
+            "key": "无极影视",
+            "name": "🐳无极影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.4008365165.com/",
-                "二次截取": "",
-                "数组": "hl-item-thumb hl-lazy&&</a",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "<span class=\"hl-lc-1 remarks\">&&</span>",
-                "链接": "href=\"&&\"",
-                "影片年代": "年份：&&</li>",
-                "影片地区": "地区：&&</li>",
-                "影片类型": "类型：&&</li>",
-                "状态": "状态：&&</li>",
-                "导演": "导演：&&</li>",
-                "主演": "主演：&&</li>",
+                "主页url": "https://www.xiaomange.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+hl-content-text\">&&</div>",
-                "线路二次截取": "",
-                "线路数组": "<li&&/li>",
-                "线路标题": ">&&</span>",
-                "分类url": "https://www.4008365165.com/vodshow/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$36#"
+                "分类url": "https://www.xiaomange.com/list/{cateId}/page/{catePg}.html",
+                "分类": "电影$1#电视剧$2#综艺$4#动漫$3#"
             }
         },
         {
@@ -16464,6 +16449,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
