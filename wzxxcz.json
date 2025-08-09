@@ -14951,7 +14951,7 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.fgt120.com/",
                 "二次截取": "",
-                "数组": "lazyload&&</a>",
+                "数组": "class=\"stui-vodlist__box\"&&</a",
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "小橙子影视",
@@ -16683,5 +16683,6 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
