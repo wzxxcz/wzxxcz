@@ -14875,7 +14875,7 @@
                 "主页url": "http://91.lybmc.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://91.lybmc.com/vodshow/{cateId}--------{catePg}---.html",
-                "分类": "电影$listdianying#电视剧$listdianshiju#综艺$listzongyi#樱花动漫$listyinghuadongman#纪录片$listjilupian#"
+                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#樱花动漫$yinghuadongman#纪录片$jilupian#"
             }
         },
         {
@@ -16585,4 +16585,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
