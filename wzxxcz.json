@@ -14788,17 +14788,17 @@
             }
         },
         {
-            "key": "789影视",
-            "name": "🍻789影视",
+            "key": "风车影视",
+            "name": "🍻风车影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://789ys.tv/",
+                "主页url": "https://tv.bz800hqw.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://789ys.tv/index.php/vod/show/id/{cateId}/lang/{lang}/page/{catePg}.html",
-                "分类": "电影$2#电视剧$3#综艺$4#动漫$25#短剧$1#"
+                "分类url": "https://tv.bz800hqw.com/fcshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$5#"
             }
         },
         {
@@ -16508,4 +16508,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
