@@ -14879,7 +14879,22 @@
                 "图片": "",
                 "副标题": "<div class=\"module-item-note\">&&</div>",
                 "链接": "/detail/+&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "影片年代": "",
+                "影片地区": "",
+                "影片类型": "",
+                "状态": "",
+                "导演": "",
+                "主演": "",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content show-desc\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "data-dropdown-value&&</div>",
+                "线路标题": "<span>&&</span>",
+                "播放二次截取": "",
+                "播放数组": "module-play-list-content&&</div>",
+                "倒序": "0",
+                "播放列表": "<a&&/a>",
+                "播放标题": "<span>&&</span>",
+                "播放链接": "href=\"&&\"",
                 "分类url": "https://www.id9756.com/vodshow/{cateId}----{lang}----{catePg}---{year}.html",
                 "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#短剧$duanju#"
             }
@@ -16591,6 +16606,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
