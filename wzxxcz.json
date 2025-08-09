@@ -14942,21 +14942,18 @@
             }
         },
         {
-            "key": "飞马影院",
-            "name": "🐎飞马影院",
+            "key": "奈雪影院",
+            "name": "⛄奈雪影院",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=1988e5807817-03a582cda0fed2-9092117-76fb6-1988e58078288；； CNZZDATA1281424682=1952364163-1754734791-%7C1754735449&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.fgt120.com/",
+                "主页url": "http://www.sdtianbao.com/",
                 "副标题": "小橙子影视",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+剧情简介：&&</div>",
-                "线路二次截取": "",
-                "线路数组": "stui-pannel__head bottom-line active clearfix&&</div>",
-                "线路标题": ">&&</h3",
-                "分类url": "https://www.fgt120.com/show/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#爽文短剧$30#"
+                "分类url": "http://www.sdtianbao.com/show/{cateId}----{lang}----{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$36#"
             }
         },
         {
@@ -16666,6 +16663,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
