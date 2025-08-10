@@ -2195,7 +2195,7 @@
             "type": 3,
             "searchable": 1,
             "quickSearch": 0,
-            "api": "https://d.feiliupan.com/t/109056264444579840/AppV2.py",
+            "api": "./py/AppV2.py",
             "playerType": 2,
             "ext": {
                 "api": "http://dmmax.juxiafan.com/icciu_api.php/v1.vod",
@@ -16744,3 +16744,4 @@
     "static-mozai.4gtv.tv"
   ]
 }
+
