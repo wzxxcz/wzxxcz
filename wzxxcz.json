@@ -3735,6 +3735,13 @@
             "ext": "./js/采集之王.js?type=url&params=../json/采集静态.json$1$1"
         },
         {
+            "key": "骚火影视",
+            "name": "🔥骚火影视",
+            "type": 3,
+            "api": "csp_HBPQ",
+            "ext": "./XBPQ/骚火影视.json"
+        },
+        {
             "key": "爱看机器人",
             "name": "💡爱看机器人",
             "type": 3,
@@ -16738,3 +16745,4 @@
     "static-mozai.4gtv.tv"
   ]
 }
+
