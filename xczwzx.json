@@ -14757,8 +14757,8 @@
             "key": "56动漫",
             "name": "🛹56动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/56动漫.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/56动漫.js"
         },
         {
             "key": "NT动漫",
