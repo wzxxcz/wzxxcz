@@ -15507,36 +15507,36 @@
             "key": "路漫漫",
             "name": "🛣️路漫漫动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/路漫漫.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/路漫漫.js"
         },
         {
             "key": "动漫岛",
             "name": "🛸动漫岛动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/动漫岛.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/动漫岛.js"
         },
         {
             "key": "去看吧",
             "name": "🍡去看吧动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/去看吧.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/去看吧.js"
         },
         {
             "key": "爱弹幕",
             "name": "💐爱弹幕动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/爱弹幕.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/爱弹幕.js"
         },
         {
             "key": "异世界",
             "name": "🛸异世界动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/异世界.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/异世界.js"
         },
         {
             "key": "明星动漫",
