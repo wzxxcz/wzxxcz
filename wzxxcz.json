@@ -1075,6 +1075,16 @@
                      }
         },
         {
+            "key": "校长",
+            "name": "🍊校长4K弹幕",
+            "type": 3,
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/校长.js",
+            "style": {
+                       "type": "list"
+                     }
+        },
+        {
             "key": "趣盘",
             "name": "🍊趣盘4K弹幕",
             "type": 3,
@@ -16718,3 +16728,4 @@
     "static-mozai.4gtv.tv"
   ]
 }
+
