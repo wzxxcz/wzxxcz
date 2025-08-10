@@ -1489,13 +1489,18 @@
             }
         },
         {
-            "key": "厂长",
+            "key": "厂长影视",
             "name": "🐨厂长影视",
             "type": 3,
-            "quickSearch": 0,
-            "api": "csp_Czsapp",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "https://www.czzymovie.com"
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.czzymovie.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.czzymovie.com/{cateId}/page/{catePg}",
+                "分类": "豆瓣电影Top250$dbtop250#最新电影$zuixindianying#剧场版$dongmanjuchangban#国产剧$gcj#美剧$meijutt#韩剧$hanjutv#番剧$fanju#"
+            }
         },
         {
             "key": "绝对影视",
@@ -16744,3 +16749,4 @@
     "static-mozai.4gtv.tv"
   ]
 }
+
