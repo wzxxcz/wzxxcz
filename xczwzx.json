@@ -1837,17 +1837,38 @@
             "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzfiJ2fHkCRZg4+8NFWs+b1X"
         },
         {
-            "key": "三六零",
-            "name": "💡三六零视频",
-            "type": 3,
-            "api": "csp_SP360"
-        },
-        {
             "key": "腾讯视频",
             "name": "🐚腾讯视频",
             "type": 3,
             "api": "./js/drpy2.min.js",
             "ext": "./js/腾讯视频.js"
+        },
+        {
+            "key": "优酷视频",
+            "name": "🐚优酷视频",
+            "type": 3,
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/优酷视频.js"
+        },
+        {
+            "key": "芒果视频",
+            "name": "🐚芒果视频",
+            "type": 3,
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/芒果视频.js"
+        },
+        {
+            "key": "爱奇艺",
+            "name": "🐚爱奇异视频",
+            "type": 3,
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/爱奇艺.js"
+        },
+        {
+            "key": "三六零",
+            "name": "🐚三六零视频",
+            "type": 3,
+            "api": "csp_SP360"
         },
         {
             "key": "万能影院",
