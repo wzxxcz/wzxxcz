@@ -15493,15 +15493,15 @@
             "key": "好看动漫",
             "name": "🦚好看动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/好看动漫.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/好看动漫.js"
         },
         {
             "key": "奇米动漫",
             "name": "🌽奇米动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/奇米动漫.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/奇米动漫.js"
         },
         {
             "key": "路漫漫",
