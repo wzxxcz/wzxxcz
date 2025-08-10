@@ -15351,15 +15351,15 @@
             "key": "NT动漫",
             "name": "🤣NT动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/NT动漫.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/NT动漫.js"
         },
         {
             "key": "Anime1",
             "name": "🤣A1动漫",
             "type": 3,
-            "api": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/drpy2.min.js",
-            "ext": "https://gh-proxy.com/https://github.com/wzxxcz/wzxxs/raw/refs/heads/master/xiaosa/js/Anime1.js"
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/Anime1.js"
         },
         {
             "key": "曼波动漫",
