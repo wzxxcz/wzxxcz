@@ -1489,14 +1489,13 @@
             }
         },
         {
-            "key": "测试2",
+            "key": "厂长",
             "name": "🐨厂长影视",
             "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "./py/厂长资源.py",
+            "quickSearch": 0,
+            "api": "csp_Czsapp",
             "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": ""
+            "ext": "https://www.czzymovie.com"
         },
         {
             "key": "绝对影视",
