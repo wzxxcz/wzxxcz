@@ -15596,7 +15596,7 @@
                 "编码": "UTF-8",
                 "主页url": "https://easysvip.com/",
                 "二次截取": "",
-                "数组": "/vod/detail&&</div>",
+                "数组": "/vod/detail&&</li>",
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<p class=\"item-status text-overflow\">&&</p>",
@@ -17309,6 +17309,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
