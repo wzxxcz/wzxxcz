@@ -15517,6 +15517,8 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
+                "嗅探词": ".mp4#.m3u8#.flv#hcts-m3u8#index.m3u8",
+                "免嗅": "1",
                 "主页url": "https://www.teaching-certificate.com/",
                 "二次截取": "",
                 "数组": "<div class=\"img-box cover-md&&</div>",
@@ -17246,6 +17248,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
