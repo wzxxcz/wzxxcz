@@ -15746,6 +15746,36 @@
             "url": "Parallel"
         },
         {
+            "name": "解析1080p",
+            "type": 0,
+            "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
+        },
+        { 			
+            "name": "NMTV", 			
+            "type": 0, 			
+            "url": "https://nm.xxxc137.top/static/player/artplayer.html?url=" 		
+        }, 
+        { 			
+            "name": "大厂", 			
+            "type": 0, 			
+            "url": "https://t2.qlplayer.cyou/player/analysis.php?v=" 		
+        }, 
+        { 			
+            "name": "m3u8", 			
+            "type": 0, 			
+            "url": "https://jx.m3u8.tv/jiexi/?url=" 		
+        },
+        { 			
+            "name": "虾米哩", 			
+            "type": 0, 			
+            "url": "https://jx.xmflv.com/?url=", 			
+            "ext": { 				
+                "header": { 					
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57" 				
+                } 			
+            } 		
+        },
+        {
             "name": "小橙子解析",
             "type": "1",
             "url": "https://欧歌解析.v.nxog.top/m/jx.php?ou=公众号欧歌APP&mz=0&url=",
