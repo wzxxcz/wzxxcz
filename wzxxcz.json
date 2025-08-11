@@ -16506,21 +16506,6 @@
             "type": 0,
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
         },
-        {
-            "name": "解析1080p1",
-            "type": 0,
-            "url": "https://jx.bozrc.com/yun.php?url="
-        },
-        {
-            "name": "解析1080p2",
-            "type": 0,
-            "url": "http://vip.jlsprh.com/index.php?url="
-        },
-        {
-            "name": "解析1080p3",
-            "type": 0,
-            "url": " https://www.cqyun.top/vip.php?url="
-        },
         { 			
             "name": "NMTV", 			
             "type": 0, 			
@@ -17241,4 +17226,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
