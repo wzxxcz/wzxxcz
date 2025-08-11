@@ -16347,17 +16347,6 @@
             "type": 0, 			
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v=" 		
         }, 
-        
-        {
-            "name": "小橙子解析",
-            "type": "1",
-            "url": "https://欧歌解析.v.nxog.top/m/jx.php?ou=公众号欧歌APP&mz=0&url=",
-            "ext": {
-                "header": {
-                    "user-agent": "Mozilla/5.0(Linux;Android13;V2049ABuild/TP1A.220624.014;wv)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/116.0.0.0MobileSafari/537.36"
-                }
-            }
-        },
         { 			
             "name": "m3u8", 			
             "type": 0, 			
@@ -16372,6 +16361,16 @@
                     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57" 				
                 } 			
             } 		
+        },
+        {
+            "name": "小橙子解析",
+            "type": "1",
+            "url": "https://欧歌解析.v.nxog.top/m/jx.php?ou=公众号欧歌APP&mz=0&url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0(Linux;Android13;V2049ABuild/TP1A.220624.014;wv)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/116.0.0.0MobileSafari/537.36"
+                }
+            }
         },
         {
             "name": "-关注小橙子-",
@@ -17058,4 +17057,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
