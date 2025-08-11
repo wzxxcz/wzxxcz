@@ -15021,20 +15021,6 @@
             }
         },
         {
-            "key": "次元动漫",
-            "name": "🤣次元动漫",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://jjjj.nilinili.org",
-                "dataKey": "672263e98f232a05",
-                "dataIv": "672263e98f232a05",
-                "deviceId": "",
-                "version": "170"
-            }
-        },
-        {
             "key": "派对动漫",
             "name": "🤣派对动漫",
             "type": 3,
