@@ -1870,6 +1870,41 @@
             "api": "csp_SP360"
         },
         {
+            "key":"腾讯视频1",
+            "name":"🐚腾讯4K",
+            "type":3,
+            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext":"https://tvbox.catvod.com/xs/js/腾讯视频.js"
+        },
+        {
+            "key":"优酷视频1",
+            "name":"🐚优酷4K",
+            "type":3,
+            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext":"https://tvbox.catvod.com/xs/js/优酷视频.js"
+        },
+        {
+            "key":"芒果视频1",
+            "name":"🐚芒果4K",
+            "type":3,
+            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext":"https://tvbox.catvod.com/xs/js/芒果视频.js"
+        },
+        {
+            "key":"爱奇艺1",
+            "name":"🐚奇异4K",
+            "type":3,
+            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext":"https://tvbox.catvod.com/xs/js/爱奇艺.js"
+        },
+        {
+            "key":"360影视1",
+            "name":"🐚3604K",
+            "type":3,
+            "api":"https://ghfast.top/https://raw.githubusercontent.com/1771245847/TvBox/master/js/drpy2.min.js",
+            "ext":"https://ghfast.top/https://raw.githubusercontent.com/1771245847/TvBox/master/js/360.js"
+        },
+        {
             "key": "万能影院",
             "name": "📡万能影院",
             "type": 3,
@@ -15725,26 +15760,6 @@
         }
     ],
     "parses": [
-        {
-            "name": "☯️自动解析聚合",
-            "type": 3,
-            "url": "Demo"
-        },
-        {
-            "name": "智能解析",
-            "type": 2,
-            "url": "Sequence"
-        },
-        {
-            "name": "Web聚合",
-            "type": 3,
-            "url": "Web"
-        },
-        {
-            "name": "Json并发",
-            "type": 2,
-            "url": "Parallel"
-        },
         {
             "name": "解析1080p",
             "type": 0,
