@@ -16355,26 +16355,6 @@
     ],
     "parses": [
         {
-            "name": "☯️自动解析聚合",
-            "type": 3,
-            "url": "Demo"
-        },
-        {
-            "name": "智能解析",
-            "type": 2,
-            "url": "Sequence"
-        },
-        {
-            "name": "Web聚合",
-            "type": 3,
-            "url": "Web"
-        },
-        {
-            "name": "Json并发",
-            "type": 2,
-            "url": "Parallel"
-        },
-        {
             "name": "解析1080p",
             "type": 0,
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
