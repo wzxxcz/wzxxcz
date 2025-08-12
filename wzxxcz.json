@@ -5937,6 +5937,25 @@
             }
         },
         {
+            "key": "麒麟影视",
+            "name": "🐲麒麟影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.70ys.site",
+                "数组": "lazyload&&</h3",
+                "标题": "<a*>&&</a",
+                "图片": "data-original=\"&&\"",
+                "副标题": "row-1\">&&<",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.70ys.site/index.php/vod/show/id/{cateId}/page/{catePg}/year/{year}.html",
+                "分类": "电影$1#剧集$2#短剧$5#动漫$4#少儿$46#综艺$3#"
+            }
+        },
+        {
             "key": "吃瓜影视",
             "name": "🥭吃瓜影视",
             "type": 3,
@@ -17401,6 +17420,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
