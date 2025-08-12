@@ -5937,17 +5937,17 @@
             }
         },
         {
-            "key": "三金影院",
-            "name": "🥇三金影院",
+            "key": "蓝雨6080影院",
+            "name": "🥇蓝雨6080影院",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "http://www.sanjin576.com/",
+                "主页url": "http://m.loyiyi.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+剧情：&&</div>",
                 "分类url": "http://www.sanjin576.com/news/{cateId}-{catePg}.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#爱情片$9#国产剧$14#"
+                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#爽文短剧$wenduan#"
             }
         },
         {
@@ -17380,6 +17380,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
