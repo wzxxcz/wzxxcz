@@ -14962,6 +14962,27 @@
             }
         },
         {
+            "key": "星褶影视",
+            "name": "☄️星褶影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=lfic9udfq3n7et0vvq0dleim67；； Hm_lvt_44b2ab1a861329be31debecc7727668a=1755005465；； HMACCOUNT=B9F6EFF9C1725FA2；； XLA_CI=1bf628c654a4aa6f28606358bfd2a967；； Hm_lpvt_44b2ab1a861329be31debecc7727668a=1755006310&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
+                "主页url": "http://www.wzlcpu.cn/",
+                "副标题": "<span class=\"www-wzlcpu-cn-86050a pic-text text-right\">&&</span>",
+                "影片年代": "年份：&&</p>",
+                "影片地区": "地区：&&</p>",
+                "影片类型": "类型：&&</p>",
+                "状态": "状态：&&</p>",
+                "导演": "导演：&&</p>",
+                "主演": "主演：&&</p>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+www-wzlcpu-cn-86050a col-pd text-collapse content\">&&</div>",
+                "分类url": "http://www.wzlcpu.cn/vodshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$4#动漫$3#短剧$5#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
