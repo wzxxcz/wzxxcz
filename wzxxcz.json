@@ -15673,7 +15673,7 @@
                 "编码":"UTF-8",
                 "主页url": "https://www.dldyzd.com/",
                 "二次截取": "",
-                "数组": "<div class=\"module-item\"&&</div",
+                "数组": "<div class=\"module-item\"&&</div></div>",
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<div class=\"module-item-text\">&&</div>",
@@ -17401,6 +17401,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
