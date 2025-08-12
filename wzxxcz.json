@@ -5942,15 +5942,30 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
+                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@__mxau__c2-4I3kFmdR=72fc3525-e0fa-4019-bf6e-3d06e6f46142；； __mxaf__c2-4I3kFmdR=1754965867；； Hm_tf_w2356gnrar6=1754965867；； Hm_lvt_w2356gnrar6=1754965867；； tips=ok；； PHPSESSID=7af6hekcukqa8f3219ad4p1o1h；； XLA_CI=047a68b08d63407f6ad2a0dfceb13bbb；； __mxas__c2-4I3kFmdR=%7B%22sid%22%3A%22ccc14c8a-de8e-473c-97c6-6ef2b5336977%22%2C%22vd%22%3A4%2C%22stt%22%3A14%2C%22dr%22%3A6%2C%22expires%22%3A1754984601%2C%22ct%22%3A1754982801%7D；； __mxav__c2-4I3kFmdR=14；； Hm_lpvt_w2356gnrar6=1754982801&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码":"UTF-8",
                 "主页url": "https://www.70ys.site",
                 "数组": "lazyload&&</h3",
                 "标题": "<a*>&&</a",
                 "图片": "data-original=\"&&\"",
-                "副标题": "row-1\">&&<",
+                "副标题": "<span class=\"text-row-1\">&&</span>",
                 "链接": "href=\"&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "影片年代": "年份：&&</li>",
+                "影片地区": "地区：&&</li>",
+                "影片类型": "类型：&&</li>",
+                "状态": "状态：&&</li>",
+                "导演": "导演：&&</li>",
+                "主演": "主演：&&</li>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+detail-intro-text text-row ewave-collapse-content\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "#ewave-playlist&&</li",
+                "线路标题": ">&&<",
+                "播放二次截取": "",
+                "播放数组": "id=\"ewave-playlist&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&/a>",
+                "播放标题": ">&&<",
+                "播放链接": "href=\"&&\"",
                 "分类url": "https://www.70ys.site/index.php/vod/show/id/{cateId}/page/{catePg}/year/{year}.html",
                 "分类": "电影$1#剧集$2#短剧$5#动漫$4#少儿$46#综艺$3#"
             }
@@ -17462,3 +17477,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
