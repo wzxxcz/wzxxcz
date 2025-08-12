@@ -15363,7 +15363,7 @@
                 "分类url": "https://www.dldyzd.com/ldysw/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$5#",
                 "二次截取": "",
-                "数组": "<div class=\"module-item\"&&</div>",
+                "数组": "<div class=\"module-item\"&&</div></div>",
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<div class=\"module-item-text\">&&</div>",
