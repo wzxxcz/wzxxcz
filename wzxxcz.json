@@ -16233,8 +16233,8 @@
                 "编码": "UTF-8",
                 "主页url": "http://www.jsjiyuan.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "http://www.jsjiyuan.com/t/{cateId}-{catePg}.html",
-                "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#"
+                "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#",
+                "分类url": "http://www.jsjiyuan.com/t/{cateId}-{catePg}.html"
             }
         },
         {
@@ -17954,5 +17954,6 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
