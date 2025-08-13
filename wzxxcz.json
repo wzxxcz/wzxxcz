@@ -16224,17 +16224,17 @@
             }
         },
         {
-            "key": "兄弟影视",
-            "name": "🍻兄弟影视",
+            "key": "八点半剧场",
+            "name": "🍻八点半剧场",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.brovods.top/",
+                "主页url": "http://www.jsjiyuan.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.brovods.top/show/{cateId}--------{catePg}---{year}/",
-                "分类": "电影$movie#电视剧$tv#综艺$show#动漫$cartoon#纪录片$documentary#"
+                "分类url": "http://www.jsjiyuan.com/t/{cateId}-{catePg}.html",
+                "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#"
             }
         },
         {
@@ -17954,4 +17954,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
