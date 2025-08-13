@@ -16414,29 +16414,53 @@
             } 		
         },
         {
-            "name": "小橙子解析",
-            "type": "1",
-            "url": "https://欧歌解析.v.nxog.top/m/jx.php?ou=公众号欧歌APP&mz=0&url=",
+            "name": "小橙子夜幕",
+            "type": 0,
+            "url": "https://www.yemu.xyz/?url=",
             "ext": {
                 "header": {
-                    "user-agent": "Mozilla/5.0(Linux;Android13;V2049ABuild/TP1A.220624.014;wv)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/116.0.0.0MobileSafari/537.36"
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
                 }
             }
         },
         {
-            "name": "-关注小橙子-",
-            "type": 1,
-            "url": "https://2.nxog.eu.org/jx.php?ou=公众号欧歌APP&mz=1&url="
+           "name": "腾腾专用4k",
+           "type": "1",
+           "url": "https://lanmeio.com/guanfang/zk.php?qq=2840852586&url=",
+           "ext": {
+               "flag": [
+                        "qq",
+                        "腾讯",
+                        "qiyi",
+                        "爱奇艺",
+                        "奇艺",
+                        "youku",
+                        "优酷",
+                        "sohu",
+                        "搜狐",
+                        "letv",
+                        "乐视",
+                        "mgtv",
+                        "芒果",
+                        "tnmb",
+                        "seven",
+                        "bilibili",
+                        "1905"
+                      ],
+          "header": {
+                     "User-Agent": "okhttp/4.9.1"
+                    }
+               }
         },
         {
-            "name": "-XCZ-",
-            "type": 1,
-            "url": "https://3.nxog.eu.org/jx.php?ou=公众号欧歌APP&mz=2&url="
-        },
-        {
-            "name": "-WZXXCZ-",
-            "type": 1,
-            "url": "https://2.nxog.eu.org/jx.php?ou=公众号欧歌APP&mz=3&url="
+           "name": "酷酷专线全解",
+           "type": 0,
+           "url": "https://jx.xmflv.com/?url=",
+           "ext": {
+                    "header": {
+                                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                              }
+                 }
         },
         {
             "name": "WZBXCZ",
@@ -16498,16 +16522,6 @@
             "name": "-红狐-",
             "type": 0,
             "url": "https://yparse.ik9.cc/index.php?url="
-        },
-        {
-            "name": "小橙子yemu",
-            "type": 0,
-            "url": "https://www.yemu.xyz/?url=",
-            "ext": {
-                "header": {
-                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
-                }
-            }
         },
         {
             "name": "小橙子jx",
