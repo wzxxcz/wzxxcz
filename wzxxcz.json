@@ -16147,17 +16147,17 @@
             }
         },
         {
-            "key": "青年影视",
-            "name": "🧚‍♂️青年影视",
+            "key": "汇看影视",
+            "name": "🍹汇看影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.xzzdm.com/",
+                "主页url": "http://h.hhyyqq.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.xzzdm.com/vodshow/{cateId}--------{catePg}---{year}.html",
-                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#"
+                "分类url": "http://h.hhyyqq.com/index.php/show/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$movie#连续剧$lianxuju#综艺$zongyi#动漫$dongman#短剧$duanju#"
             }
         },
         {
@@ -17877,4 +17877,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
