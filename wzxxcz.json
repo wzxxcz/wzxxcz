@@ -16263,6 +16263,20 @@
             }
         },
         {
+            "key": "芝麻影院",
+            "name": "🌯芝麻影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://xunji1994.safe10000.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://xunji1994.safe10000.com/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#电视剧$2#综艺$3#短剧区$30#日韩区$36#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -17979,3 +17993,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
