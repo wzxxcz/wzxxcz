@@ -11405,6 +11405,19 @@
             }
         },
         {
+    "key": "玫瑰",
+    "name": "💛3K玫瑰🔹",
+    "type": 3,
+    "jar": "./lib/XBPQ.jar",
+    "api": "csp_XBPQ",
+    "ext": {
+        "分类url": "https://www.mjgss.com/mgys/{cateId}-{catePg}/",
+        "分类": "邵氏电影&Ⅱ级电影&动作&爱情&喜剧&恐怖&惊悚&悬疑&犯罪&剧情&战争&灾难&科幻&奇幻&冒险&纪录&其他&国产剧&港台剧&韩国剧&日本剧&欧美剧&泰国剧&短剧&其他剧&国产动漫&日韩动漫&港台动漫&欧美动漫&动漫电影&其他动漫&动漫电影&内地综艺&港台综艺&日韩综艺&欧美综艺&电影解说",
+        "分类值": "shaos&%E2%85%A1jdy&dongz&aiq&xij&kongb&jings&xuany&fanz&juq&zhanz&zain&keh&qih&maox&jil&qita&guocj&gangtj&hangj&ribj&oumj&taigj&duanj&qitj&guocdm&rhdm&gtdm&omdm&dmdy&qtdm&donghdy&neidzy&gangtazy&rihzy&oumzy&dianyjs"
+    }
+},
+
+        {
             "key": "柠檬影视",
             "name": "🍋柠檬影视",
             "type": 3,
@@ -17954,5 +17967,6 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
