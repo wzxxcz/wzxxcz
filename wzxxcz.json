@@ -16301,6 +16301,20 @@
             }
         },
         {
+            "key": "哈哈影院",
+            "name": "🐩哈哈影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.etransgz.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.etransgz.com/vod/{cateId}-{catePg}/",
+                "分类": "电影片$hhdyp#连续剧$hhlxj#综艺片$hhzyp#动漫片$hhdmp#动漫片$hhdmp#短剧$hhdj#体育赛事$hhtyss#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -18017,3 +18031,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
