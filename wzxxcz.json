@@ -16310,7 +16310,7 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.etransgz.com/",
                 "二次截取": "",
-                "数组": "vod-item-default&&</a >"
+                "数组": "vod-item-default&&</a>",
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<div class=\"pic-label position-absolute btn btn-primary btn-sm top-0 end-0 px-2 py-1 VG8C0\">&&</div>",
@@ -18037,6 +18037,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
