@@ -16264,7 +16264,28 @@
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "https://www.dgjjf.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "二次截取": "",
+                "数组": "data-item vod-item-1&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<div class=\"btn btn-outline-primary btn-sm Prg6U\">&&</div>",
+                "链接": "href=\"&&\"",
+                "影片年代": "年份：&&</li>",
+                "影片地区": "地区：&&</li>",
+                "影片类型": "类型：&&</li>",
+                "状态": "状态：&&</li>",
+                "导演": "导演：&&</li>",
+                "主演": "主演：&&</li>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+section-content pb-2 pb-lg-3 L7w2h\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "section-head justify-content-start&&</div>",
+                "线路标题": ">&&</h2>",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"row CDrfG&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&</a>",
+                "播放链接": "href=\"&&\"",
                 "分类url": "https://www.dgjjf.com/vod/{cateId}-{catePg}/",
                 "分类": "电影片$xqdyp#连续剧$xqlxj#综艺片$xqzyp#动漫片$xqdmp#短剧$xqdj#体育赛事$xqtyss#"
             }
@@ -17986,4 +18007,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
