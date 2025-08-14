@@ -2106,20 +2106,6 @@
             }
         },
         {
-            "key": "外剧",
-            "name": "🛸外剧影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://guowaiju.com",
-                "dataKey": "7xv16h7qgkrs9b1p",
-                "dataIv": "7xv16h7qgkrs9b1p",
-                "deviceId": "",
-                "version": ""
-            }
-        },
-        {
             "key": "huomaoys",
             "name": "🐱火猫1080P",
             "type": 3,
