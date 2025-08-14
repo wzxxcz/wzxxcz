@@ -5420,6 +5420,13 @@
             }
         },
         {
+            "key": "麦田影视",
+            "name": "🍞麦田影视",
+            "type": 3,
+            "api": "csp_HBPQ",
+            "ext": "./XBPQ/麦田APP.json"
+        },
+        {
             "key": "麦田影院",
             "name": "🍊麦田影院",
             "type": 3,
@@ -16256,20 +16263,6 @@
             }
         },
         {
-            "key": "厂长资源",
-            "name": "🍞厂长资源",
-            "type": 3,
-            "api": "csp_HBPQ",
-            "ext": "./XBPQ/厂长资源.json"
-        },
-        {
-            "key": "麦田APP",
-            "name": "🍞麦田APP",
-            "type": 3,
-            "api": "csp_HBPQ",
-            "ext": "./XBPQ/麦田APP.json"
-        },
-        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -17986,6 +17979,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
-
-
