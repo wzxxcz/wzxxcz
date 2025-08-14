@@ -986,21 +986,6 @@
             }
         },
         {
-            "key": "乐达",
-            "name": "🎑乐达影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://ledayy.com",
-                "site": "",
-                "dataKey": "hjjp68c2okw12345",
-                "dataIv": "hjjp68c2okw12345",
-                "deviceId": "",
-                "version": ""
-            }
-        },
-        {
             "key": "灵虎",
             "name": "🐅灵虎影视",
             "type": 3,
