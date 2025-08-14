@@ -16365,7 +16365,7 @@
                 "线路数组": "data-dropdown-value&&</div>",
                 "线路标题": ">&&</span>",
                 "播放二次截取": "",
-                "播放数组": "<div class=\"module-blocklist&&</div>",
+                "播放数组": "<div class=\"module-tab-content&&</div>",
                 "倒序": "0",
                 "播放列表": "<a&&</a>",
                 "播放标题": ">&&</a>",
@@ -18091,6 +18091,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
