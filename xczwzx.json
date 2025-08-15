@@ -8249,7 +8249,7 @@
                 "数组": "module-item&&</a>",
                 "标题": "<div class=\"v-item-title\">&&</div>",
                 "副标题": "<div class=\"v-item-bottom\">&&</div>",
-                "图片": "https://vres.wxwoq.com/vod1/+/vod1/&&\"",
+                "图片": "https://vres.cfaqcgj.com/vod1/+/vod1/&&\"",
                 "链接": "href=\"&&\"",
                 "线路数组": "swiper-slide source-swiper-slide&&</div>",
                 "线路标题": "source-item-label\">&&<",
@@ -8261,6 +8261,37 @@
                 "分类url": "https://www.ncat2.com/show/{cateId}--{area}-{lang}-{year}-3-{catePg}.html",
                 "分类": "电影$1#连续剧$2#动漫$3#综艺纪录$4#短剧$6#",
                 "简介": "🍊小橙子为您介绍剧情👉+detail-desc\">&&</div>"
+            }
+        },
+        {
+            "key": "网飞猫1",
+            "name": "🐈网飞猫1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.ncat22.com/",
+                "数组": "/detail/&&</a>",
+                "标题": "<div class=\"v-item-title\">&&</div>",
+                "副标题": "<div class=\"v-item-bottom\">&&</div>",
+                "图片": "https://vres.cfaqcgj.com/vod1/+/vod1/&&\"",
+                "链接": "/detail/+&&\"",
+                "影片年代": "",
+                "影片地区": "",
+                "影片类型": "",
+                "状态": "",
+                "导演": "",
+                "主演": "",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+detail-desc\">&&</div>",
+                "线路数组": "swiper-slide source-swiper-slide&&</div>",
+                "线路标题": "source-item-label\">&&<",
+                "播放数组": "<div class=\"episode-list&&</div>",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&<",
+                "播放链接": "href=\"&&\"",
+                "分类url": "https://www.ncat22.com/show/{cateId}----{year}-3-{catePg}.html",
+                "分类": "电影$1#连续剧$2#综艺纪录$4#动漫$3#短剧$6#"
             }
         },
         {
