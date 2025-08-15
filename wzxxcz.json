@@ -2447,6 +2447,22 @@
             "ext":"https://ghfast.top/https://raw.githubusercontent.com/1771245847/TvBox/master/js/360.js"
         },
         {
+            "key": "天翼",
+            "name": "🐚天翼4K",
+            "type": 1,
+            "api": "http://7.qqqtv.top/api.php/provide/vod/",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "categories": [
+                            "推荐",
+                            "电影",
+                            "电视剧",
+                            "综艺",
+                            "动漫"
+                          ]
+        },
+        {
             "key": "麒麟影视",
             "name": "🐲麒麟影视",
             "type": 3,
@@ -18441,3 +18457,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
