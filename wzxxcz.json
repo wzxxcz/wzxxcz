@@ -8851,6 +8851,20 @@
             }
         },
         {
+            "key": "网飞猫1",
+            "name": "🐈网飞猫1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.ncat22.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.ncat22.com/show/{cateId}----{year}-3-{catePg}.html",
+                "分类": "电影$1#连续剧$2#综艺纪录$4#动漫$3#短剧$6#"
+            }
+        },
+        {
             "key": "小鸭影音",
             "name": "🦆小鸭影音",
             "type": 3,
@@ -18595,3 +18609,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
