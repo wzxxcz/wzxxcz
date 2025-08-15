@@ -16499,10 +16499,31 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
+                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=k9gvdicsv1l1lnhm1qb5a3qlm6；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755225007；； HMACCOUNT=21F8EC1C8D8BE050；； XLA_CI=da2eb8d8672c2b3fee93a3f567fe44b5；； c09b364b10ea69ccf1b6865d9248d66d=9e198b246a41290f23763b85daa6d5cc；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755226501&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码":"UTF-8",
                 "主页url": "http://www.zunkedao.com/index.php",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "二次截取": "",
+                "数组": "lazyload&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"pic-text text-right\">&&</span>",
+                "链接": "href=\"&&\"",
+                "影片年代": "年份：&&</p>",
+                "影片地区": "地区：&&</p>",
+                "影片类型": "类型：&&</p>",
+                "状态": "状态：&&</p>",
+                "导演": "导演：&&</p>",
+                "主演": "主演：&&</p>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+left text-muted\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "\\#playlist&&</a>",
+                "线路标题": "tab\">&&<",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"myui-content__list sort-list clearfix&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&<",
+                "播放链接": "href=\"&&\"",
                 "分类url": "http://www.zunkedao.com/search.php?page={catePg}&searchtype=5&tid={cateId}&year={year}",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
             }
@@ -18224,5 +18245,6 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
