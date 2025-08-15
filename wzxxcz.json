@@ -16345,8 +16345,8 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@gg_iscookie=1；； X_CACHE_KEY=fbf7f03d7c6a9dd5a590101b80b2075d；； PHPSESSID=9dfdj0lo45i7tfabdprq7a7iq2；； gg_iscookie=1；； __mxau__c1-BDpoxTLq=f8e19242-76f4-412c-a3b1-e13db3202a53；； __mxaf__c1-BDpoxTLq=1755182863；； __mxas__c1-BDpoxTLq=%7B%22sid%22%3A%229b6f2478-25c1-4d2c-b06f-f432444e1a18%22%2C%22vd%22%3A4%2C%22stt%22%3A530%2C%22dr%22%3A510%2C%22expires%22%3A1755185193%2C%22ct%22%3A1755183393%7D；； __mxav__c1-BDpoxTLq=4&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码": "UTF-8",
+                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=o2g775e66selr8mfhv4f9ij1gh；； __51uvsct__3LSsznL1iMSdnwgF=1；； __51vcke__3LSsznL1iMSdnwgF=47625288-8536-5d5a-b334-71ae40f60607；； __51vuft__3LSsznL1iMSdnwgF=1755216091496；； __vtins__3LSsznL1iMSdnwgF=%7B%22sid%22%3A%20%22ac252175-d2d4-52c1-b1dd-4dcd8129c682%22%2C%20%22vd%22%3A%2010%2C%20%22stt%22%3A%20154846%2C%20%22dr%22%3A%2010393%2C%20%22expires%22%3A%201755218046336%2C%20%22ct%22%3A%201755216246336%7D；； XLA_CI=9dc22521faab71a240cd071a16c8393b&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码":"UTF-8",
                 "主页url": "http://www.yiwujjq.net/",
                 "二次截取": "",
                 "数组": "lazyload&&</a>",
@@ -16354,7 +16354,22 @@
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"pic-text text-right\">&&</span>",
                 "链接": "href=\"&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+video-info-item video-info-content\">&&</div>",
+                "影片年代": "年份：&&</p",
+                "影片地区": "地区：&&</p>",
+                "影片类型": "类型：&&</p>",
+                "状态": "状态：&&</p>",
+                "导演": "导演：&&</p>",
+                "主演": "主演：&&</p>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+left text-muted\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "\\#playlist&&</a>",
+                "线路标题": "tab\">&&<",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"myui-content__list sort-list clearfix&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&<",
+                "播放链接": "href=\"&&\"",
                 "分类url": "http://www.yiwujjq.net/yi/{cateId}-{catePg}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#电影解说$40#免费抖音短剧$41#"
             }
@@ -18076,6 +18091,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
