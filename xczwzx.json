@@ -825,6 +825,17 @@
                   }
         },
         {
+           "key": "比迪",
+           "name": "🐕比迪影视",
+           "type": 3,
+           "quickSearch": 0,
+           "playerType": 1,
+           "searchable": 1,
+           "api": "csp_AppQi",
+           "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "HM+RJliOAzVbMKoUegXt5SVTp6lV507+wK0S5QCxiEEA9zs/swmgAb3z+F5RUY21tC1US86Wo/2RunTWZsPUxuLk0B4X5G0RneEJEfEV4CWzDmIx8mdFYBlSJiwJcoNYioDEVsg76bXpsGDfXTT4Mb092SQ1oS22g2A1GUtEcn8="
+        },
+        {
             "key": "零度影视",
             "name": "❄️零度影视",
             "type": 3,
