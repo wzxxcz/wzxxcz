@@ -1852,19 +1852,19 @@
             }
         },
         {
-            "key": "蓝鹰",
-            "name": "🦅蓝鹰影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet2",
-            "ext": {
-                "url": "",
-                "site": "https://lanyinghz.oss-cn-hangzhou.aliyuncs.com/lanyingxmy.txt",
-                "dataKey": "ca94b06ca359d80e",
-                "dataIv": "ca94b06ca359d80e",
-                "deviceId": "",
-                "version": "120"
-            }
+           "key": "蓝鹰",
+           "name": "🦅蓝鹰影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppQi",
+           "ext": {
+                    "url": "",
+                    "site": "https://lanyinghz.oss-cn-hangzhou.aliyuncs.com/lanyingxmy.txt",
+                    "dataKey": "ca94b06ca359d80e",
+                    "dataIv": "ca94b06ca359d80e",
+                    "deviceId": "",
+                    "version": "120"
+                  }
         },
         {
             "key": "仓鼠",
