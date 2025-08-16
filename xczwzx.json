@@ -1647,15 +1647,13 @@
             "ext": "7lj763gg402i7942593ki4jkhl458k99highi4qiaoji41456iikg49i839k2k289l9ik807i213k6j60h"
         },
         {
-            "key": "金牌app",
-            "name": "💣爆炸影视",
-            "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "csp_Muou",
-            "jar": "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1749917849270/0615qj.jpg;md5;410ad21caad9e6f6d40c1ae5ca2be662",
-            "playerType": 2,
-            "ext": "7lj763gg402i79425i3l85i6h848i295l5hiji5l828g3l3jjhg6kg7410lhjkqiaojij3ig1lg475178k7h0il4ig3h753h7hi516758699jh2g5h433li30gk11g73l90312h4g7"
+           "key": "金牌APP",
+           "name": "💣爆炸影视",
+           "quickSearch": 0,
+           "type": 3,
+           "api": "csp_AppMuou",
+           "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "ewogICJTaXRlVXJsIjogImh0dHBzOi8vbXVvdS53bGJicS54eXoiLAogICJFeHQiOiAiaXA5K1dadnQ5ODNzUzAwOGtyTktobno4Q2Fzb2d3QjlLYkp2U0FmNGJRZEg5aUlGVHE4Y0tGM3Y4RFBicnphUiIsCiAgIkluZm8iOiAiaHR0cHM6Ly9tdW91aHQuZ2d0dmIuY2MiCn0="
         },
         {
             "key": "公公",
@@ -18321,4 +18319,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
