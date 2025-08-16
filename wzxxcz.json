@@ -1586,6 +1586,20 @@
                   }
         },
         {
+           "key": "狂人",
+           "name": "🦸狂人影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+           "ext": {
+                    "url": "https://www.zjkrmv.vip",
+                    "dataKey": "vXeyuJFqTKqWUtWU",
+                    "dataIv": "vXeyuJFqTKqWUtWU",
+                    "deviceId": "",
+                    "version": ""
+                 }
+        },
+        {
            "key": "莱米",
            "name": "🍙莱米影视",
            "type": 3,
