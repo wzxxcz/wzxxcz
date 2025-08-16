@@ -1813,13 +1813,17 @@
             "ext": ""
         },
         {
-            "key": "追忆",
-            "name": "🐖追忆影视",
-            "type": 3,
-            "api": "csp_AppSy",
-            "jar": "https://xcz.iptv365.org/wzxm.jpg",
-            "quickSearch": 0,
-            "ext": "AUQ6gwosItxIVIl5lW4mhEtvhUCPptryd1HJ1YWlyhMUjanBk/MQ/w1C7FSy6t+ixWAXOVu69YmFiPrBGvM6iAGDIL6ietolI05Xt9wOc/k="
+           "key": "追忆",
+           "name": "🐖追忆影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppSy",
+           "ext": {
+                    "url": "http://110.42.37.69:1866",
+                    "key1": "aassddwwxxllsx1x",
+                    "key2": "73f330328cc0fe67",
+                    "key3": "73f330328cc0fe67"
+                  }
         },
         {
             "key": "热热",
