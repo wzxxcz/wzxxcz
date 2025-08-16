@@ -1421,12 +1421,13 @@
             "quickSearch": 1,
             "api": "csp_AppGet",
             "ext": {
-                "url": "https://www.guahd.com",
-                "dataKey": "f2A7D4B9E8C16531",
-                "dataIv": "f2A7D4B9E8C16531",
-                "deviceId": "",
-                "version": ""
-            }
+                     "url": "",
+                     "site": "https://www.guahd.com/1.txt",
+                     "dataKey": "f2A7D4B9E8C16531",
+                     "dataIv": "f2A7D4B9E8C16531",
+                     "deviceId": "",
+                     "version": ""
+                  }
         },
         {
             "key": "晴天",
