@@ -1694,11 +1694,10 @@
             "ext": "https://www.91qkw.com"
         },
         {
-            "key": "饺子影视",
-            "name": "🥟饺子影视",
-            "type": 3,
-            "api": "csp_Jiaozi",
-            "playerType": 2
+           "key": "饺子影视",
+           "name": "🥟饺子影视",
+           "type": 3,
+           "api": "csp_Jiaozi"
         },
         {
             "key": "鸭梨视频",
