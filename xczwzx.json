@@ -793,14 +793,20 @@
             "playerType": 2
         },
         {
-            "key": "咖啡",
-            "name": "☕咖啡影视",
-            "type": 3,
-            "quickSearch": 0,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "jar": "https://xcz.iptv365.org/wzxm.jpg",
-            "ext": "iCAfNu0lnzDbPNyRZNPADkQjEsRXYXbhzP+dNzKN1SEfbPPIOKvEKGUJbNHH/Enk8UofJl+f8LL+N/h69EZDaFMMPeCDLq9N1TV0aTDfIY89NkrX+nhIaX9d//xiiVns"
+           "key": "咖啡",
+           "name": "☕咖啡影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppQi",
+           "ext": {
+                    "url": "",
+                    "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxh.txt",
+                    "dataKey": "37kj83zs1q16jk6t",
+                    "dataIv": "37kj83zs1q16jk6t",
+                    "deviceId": "",
+                    "version": "101",
+                    "ua": ""
+                  }
         },
         {
             "key": "零度影视",
