@@ -16987,6 +16987,20 @@
             }
         },
         {
+            "key": "五五影视",
+            "name": "🪄五五影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.fn5j.net/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.fn5j.net/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$36#"
+            }
+        },
+        {
             "key": "金豆子影院",
             "name": "🔮金豆子影院",
             "type": 3,
@@ -18717,4 +18731,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
