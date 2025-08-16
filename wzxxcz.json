@@ -1964,19 +1964,36 @@
             }
         },
         {
-            "key": "哔滴",
-            "name": "🥛哔滴影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet2",
-            "ext": {
-                "url": "",
-                "site": "https://ooxooxooxooxoo-1259561579.cos.ap-chengdu.myqcloud.com/ip.json",
-                "dataKey": "5ae8ee4bb95ea0ce",
-                "dataIv": "5ae8ee4bb95ea0ce",
-                "deviceId": "",
-                "version": "120"
-            }
+           "key": "咖啡",
+           "name": "☕咖啡影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppQi",
+           "ext": {
+                    "url": "",
+                    "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxh.txt",
+                    "dataKey": "37kj83zs1q16jk6t",
+                    "dataIv": "37kj83zs1q16jk6t",
+                    "deviceId": "",
+                    "version": "101",
+                    "ua": ""
+                  }
+        },
+        {
+           "key": "哔滴",
+           "name": "🥛哔滴影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppQi",
+           "ext": {
+                     "url": "",
+                     "site": "https://ooxooxooxooxoo-1259561579.cos.ap-chengdu.myqcloud.com/ip.json",
+                     "dataKey": "5ae8ee4bb95ea0ce",
+                     "dataIv": "5ae8ee4bb95ea0ce",
+                     "deviceId": "",
+                     "version": "120",
+                     "ua": "okhttp/3.10.0 BDYS/109.0.0.8"
+                 }
         },
         {
             "key": "瓜萌",
