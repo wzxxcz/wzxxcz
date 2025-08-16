@@ -1058,19 +1058,19 @@
             }
         },
         {
-            "key": "云云",
-            "name": "☁️云云影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet2",
-            "ext": {
-                "url": "",
-                "site": "https://staraugust123456.oss-cn-hangzhou.aliyuncs.com/1.txt",
-                "dataKey": "staraugust123456",
-                "dataIv": "staraugust123456",
-                "deviceId": "",
-                "version": "120"
-            }
+           "key": "云云",
+           "name": "☁️云云影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppQi",
+           "ext": {
+                     "url": "",
+                     "site": "https://staraugust123456.oss-cn-hangzhou.aliyuncs.com/1.txt",
+                     "dataKey": "staraugust123456",
+                     "dataIv": "staraugust123456",
+                     "deviceId": "",
+                     "version": "120"
+                  }
         },
         {
             "key": "光影",
@@ -18294,3 +18294,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
