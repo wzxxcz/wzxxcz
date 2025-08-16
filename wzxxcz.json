@@ -1586,6 +1586,21 @@
                   }
         },
         {
+           "key": "莱米",
+           "name": "🍙莱米影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppGet",
+           "ext": {
+                    "url": "",
+                    "site": "http://laiget-1313189639.cos.ap-guangzhou.myqcloud.com/laimi.txt",
+                    "dataKey": "ce032244d093b3e2",
+                    "dataIv": "ce032244d093b3e2",
+                    "deviceId": "",
+                    "version": ""
+                 }
+        },
+        {
             "key": "灵虎",
             "name": "🐅灵虎影视",
             "type": 3,
@@ -18857,3 +18872,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
