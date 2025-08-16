@@ -1331,19 +1331,19 @@
                   }
         },
         {
-            "key": "仓鼠",
-            "name": "🐹仓鼠影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet2",
-            "ext": {
-                "url": "",
-                "site": "https://ceshi307386.oss-cn-beijing.aliyuncs.com/csurl.txt",
-                "dataKey": "Z98KXaLtO2wC1Pte",
-                "dataIv": "Z98KXaLtO2wC1Pte",
-                "deviceId": "",
-                "version": "120"
-            }
+           "key": "仓鼠",
+           "name": "🐹仓鼠影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppQi",
+           "ext": {
+                    "url": "",
+                    "site": "https://ceshi307386.oss-cn-beijing.aliyuncs.com/csurl.txt",
+                    "dataKey": "Z98KXaLtO2wC1Pte",
+                    "dataIv": "Z98KXaLtO2wC1Pte",
+                    "deviceId": "",
+                    "version": "120"
+                 }
         },
         {
             "key": "鲸鱼",
