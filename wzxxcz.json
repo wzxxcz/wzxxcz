@@ -5453,6 +5453,20 @@
             }
         },
         {
+            "key": "麦田影院1",
+            "name": "🎬麦田影院1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.mtyy4.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.mtyy4.com/vodshow/{cateId}-{area}-------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$26#"
+            }
+        },
+        {
             "key": "八天电影网",
             "name": "🍊八天电影网",
             "type": 3,
@@ -18780,4 +18794,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
