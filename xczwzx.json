@@ -1499,19 +1499,19 @@
             "ext": "7lj763gg0939790i413gi484k8058896highi4414h68l7g6hk8qiaojig9k2k289l9ik807i213k5j602"
         },
         {
-            "key": "若雪",
-            "name": "☃️若雪影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet2",
-            "ext": {
-                "url": "https://appcms.rx4k.top",
-                "site": "",
-                "dataKey": "ZX10ysTYZWtIJCTU",
-                "dataIv": "ZX10ysTYZWtIJCTU",
-                "deviceId": "",
-                "version": "120"
-            }
+           "key": "若雪",
+           "name": "☃️若雪影视",
+           "type": 3,
+           "quickSearch": 1,
+           "api": "csp_AppQi",
+           "ext": {
+                     "url": "https://appcms.rx4k.top",
+                     "site": "",
+                     "dataKey": "ZX10ysTYZWtIJCTU",
+                     "dataIv": "ZX10ysTYZWtIJCTU",
+                     "deviceId": "",
+                     "version": "120"
+                  }
         },
         {
             "key": "哔哩视频",
