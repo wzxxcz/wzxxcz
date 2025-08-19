@@ -4632,7 +4632,7 @@
                 "线路数组": "data-toggle&&</a>",
                 "线路标题": "swiper-slide-text\">&&<",
                 "播放二次截取": "",
-                "播放数组": "tab-pane  lists-box fade in&&</div></div>",
+                "播放数组": "id=\"playlist&&</div>",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
                 "播放标题": ">&&</a>",
@@ -19700,4 +19700,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
