@@ -4631,8 +4631,8 @@
                 "线路二次截取": "",
                 "线路数组": "data-toggle&&</a>",
                 "线路标题": "swiper-slide-text\">&&<",
-                "播放二次截取": "",
-                "播放数组": "listitem&&</div>",
+                "播放二次截取": "tab-content\"&&myui-vodbox[替换:item\">>id=\"playlist]",
+                "播放数组": "lists-box fade&&id=\"playlist",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
                 "播放标题": ">&&</a>",
@@ -19700,6 +19700,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
