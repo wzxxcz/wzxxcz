@@ -4616,7 +4616,7 @@
                 "分类url": "https://zzoc.cc/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$20#",
                 "二次截取": "",
-                "数组": "<div class=\"myui-vodbox-content\"&&</div",
+                "数组": "<div class=\"myui-vodbox-content\"&&hover-mask",
                 "标题": "alt=\"&&\"",
                 "图片": "src=\"&&\"",
                 "副标题": "<div class=\"tag text-overflow\">&&</div>",
