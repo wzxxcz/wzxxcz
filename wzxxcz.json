@@ -18013,7 +18013,13 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text-secondary\">&&</div>",
                 "线路二次截取": "",
                 "线路数组": "title&&</dl>",
-                "线路标题": "<dt*</dt>",
+                "线路标题": "<dt class="">&&</dt>",
+                "播放二次截取": "",
+                "播放数组": "<div class=\"playlist mod clearfix&&</div>",
+                "倒序": "0",
+                "播放列表": "<li&&li>",
+                "播放标题": ">&&</",
+                "播放链接": "href=\"&&\"",
                 "分类url": "https://www.duonaovod.com/index.php/vod/show/id/{cateId}/page/{catePg}/year/{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
             }
@@ -19750,6 +19756,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
