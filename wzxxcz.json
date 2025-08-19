@@ -17900,6 +17900,12 @@
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "https://zzoc.cc/",
+                "二次截取": "",
+                "数组": "<div class=\"myui-vodbox-content\"&&</div",
+                "标题": "alt=\"&&\"",
+                "图片": "src=\"&&\"",
+                "副标题": "<div class=\"tag text-overflow\">&&</div>",
+                "链接": "href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://zzoc.cc/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$20#"
@@ -19637,4 +19643,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
