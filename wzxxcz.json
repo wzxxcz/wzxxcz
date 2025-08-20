@@ -8481,7 +8481,7 @@
                 "数组": "div class=\"module-item\"&&</div",
                 "标题": "title=\"&&\"",
                 "图片": "data-src=\"&&\"",
-                "副标题": "<a>video-serial</a>",
+                "副标题": "<div class=\"module-item-text\">&&</div>",
                 "链接": "href=\"&&\"",
                 "影片年代": "/vs/*>&&<",
                 "影片地区": "/vs/*>&&<",
