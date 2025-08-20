@@ -8478,31 +8478,6 @@
             }
         },
         {
-            "key": "8号TV影视",
-            "name": "🍊8号TV影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "数组": "class=\"stui-vodlist__box\"&&</a",
-                "标题": "title=\"&&\"",
-                "副标题": "<span class=\"pic-text text-right\">&&</span>",
-                "图片": "data-original=\"&&\"",
-                "链接": "href=\"&&\"",
-                "线路数组": "<h3&&h3>",
-                "线路标题": ">&&</",
-                "播放数组": "<ul class=\"stui-content__playlist&&</ul>",
-                "播放列表": "<li&&</li>",
-                "播放标题": ">&&</a>",
-                "播放链接": "href=\"&&\"",
-                "跳转播放链接": "var player_*\"url\":\"&&\"",
-                "分类url": "https://www.8haotv.com/vodshow/{cateId}-{area}-------{catePg}---{year}/",
-                "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#爽文短剧$shuangwenduanju#",
-                "简介": "🍊小橙子为您介绍剧情👉+left text-muted\">&&</div>"
-            }
-        },
-        {
             "key": "乾坤影院",
             "name": "🍊乾坤影院",
             "type": 3,
@@ -18143,6 +18118,20 @@
             }
         },
         {
+            "key": "8号影院",
+            "name": "🍊8号影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.8haotv.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.8haotv.com/video/{cateId}/page/{catePg}/",
+                "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#爽文短剧$shuangwenduanju#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -19874,3 +19863,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
