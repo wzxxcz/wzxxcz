@@ -19136,6 +19136,11 @@
             "url":"Demo"
         },
         {
+            "name": "☯️自动解析聚合1",
+            "type":3,
+            "url": "Web"
+        },
+        {
             "name": "解析1080p",
             "type": 0,
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
@@ -19219,6 +19224,26 @@
                                 "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
                               }
                  }
+        },
+        {
+            "name": "小橙子4K解析5",
+            "url": "http://jx.hjfggzs.top/api/diy/?key=MgayuZRdJt07QuimYV&url=",
+            "type": "1"
+        },
+        {
+            "name": "AI自动",
+            "url": "http://wmm.ys.wmmys.cn/api/index?parsesId=3&appid=10000&videoUrl=",
+            "type": "1"
+        },
+        {
+            "name": "小橙子4K解析4",
+            "url": "https://api.huohua.live/api/?key=MYorZOeWRHg1I9FfJy&url=",
+            "type": "1"
+        },
+        {
+            "name": "如遇卡顿尝试切换LJK/EXO",
+            "url": "/",
+            "type": "1"
         },
         {
             "name": "-云析-",
@@ -19884,6 +19909,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
