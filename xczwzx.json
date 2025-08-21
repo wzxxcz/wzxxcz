@@ -18632,53 +18632,62 @@
             } 		
         },
         {
-            "name": "小橙子夜幕",
-            "type": 0,
-            "url": "https://www.yemu.xyz/?url=",
-            "ext": {
-                "header": {
-                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
-                }
-            }
-        },
-        {
-           "name": "腾腾专用4k",
-           "type": "1",
-           "url": "https://lanmeio.com/guanfang/zk.php?qq=2840852586&url=",
-           "ext": {
-               "flag": [
-                        "qq",
-                        "腾讯",
-                        "qiyi",
-                        "爱奇艺",
-                        "奇艺",
-                        "youku",
-                        "优酷",
-                        "sohu",
-                        "搜狐",
-                        "letv",
-                        "乐视",
-                        "mgtv",
-                        "芒果",
-                        "tnmb",
-                        "seven",
-                        "bilibili",
-                        "1905"
-                      ],
-          "header": {
-                     "User-Agent": "okhttp/4.9.1"
-                    }
-               }
-        },
-        {
-           "name": "酷酷专线全解",
+           "name": "小橙子夜幕",
            "type": 0,
-           "url": "https://jx.xmflv.com/?url=",
+           "url": "https://www.playm3u8.cn/jiexi.php?url=",
            "ext": {
-                    "header": {
-                                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
-                              }
-                 }
+                    "flag": [
+                              "qq",
+                              "腾讯",
+                              "qiyi",
+                              "爱奇艺",
+                              "奇艺",
+                              "youku",
+                              "优酷",
+                              "mgtv",
+                              "芒果",
+                              "letv",
+                              "乐视",
+                              "pptv",
+                              "PPTV",
+                              "sohu",
+                              "bilibili",
+                              "哔哩哔哩",
+                              "哔哩"
+                            ],
+                     "header": {
+                                 "User-Agent": "okhttp/4.1.0"
+                               }
+                }
+        },
+        {
+           "name": "小橙子爱奇艺",
+           "type": 0,
+           "url": "https://jx.nnsvip.cn/?url=",
+           "ext": {
+                    "flag": [
+                              "qq",
+                              "腾讯",
+                              "qiyi",
+                              "爱奇艺",
+                              "奇艺",
+                              "youku",
+                              "优酷",
+                              "mgtv",
+                              "芒果",
+                              "letv",
+                              "乐视",
+                              "pptv",
+                              "PPTV",
+                              "sohu",
+                              "bilibili",
+                              "哔哩哔哩",
+                              "哔哩"
+                            ],
+                   "header": {
+                               "User-Agent": "okhttp/4.1.0"
+                             }
+                }
         },
         {
             "name": "小橙子4K解析5",
