@@ -19106,12 +19106,12 @@
     "parses": [
         {
             "name": "☯️自动解析聚合",
-            "type":3,
-            "url":"Demo"
+            "type": 3,
+            "url": "Demo"
         },
         {
             "name": "☯️智能解析",
-            "type":3,
+            "type": 3,
             "url": "Web"
         },
         {
@@ -19119,94 +19119,361 @@
             "type": 0,
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
         },
-        { 			
-            "name": "NMTV", 			
-            "type": 0, 			
-            "url": "https://nm.xxxc137.top/static/player/artplayer.html?url=" 		
-        }, 
-        { 			
-            "name": "大厂", 			
-            "type": 0, 			
-            "url": "https://t2.qlplayer.cyou/player/analysis.php?v=" 		
-        }, 
         {
-            "name":"小橙子线路4",
-            "type":0,
-            "url":"https://jx.m3u8.tv/jiexi/?url=",
-            "ext":{"header":{"user-agent":"Mozilla/5.0(Linux;Android13;V2049ABuild/TP1A.220624.014;wv)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/116.0.0.0MobileSafari/537.36","referer":"https://jiejie.uk/"}}
-        },
-        { 			
-            "name": "m3u8", 			
-            "type": 0, 			
-            "url": "https://jx.m3u8.tv/jiexi/?url=" 		
-        },
-        { 			
-            "name": "虾米哩", 			
-            "type": 0, 			
-            "url": "https://jx.xmflv.com/?url=", 			
-            "ext": { 				
-                "header": { 					
-                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57" 				
-                } 			
-            } 		
+            "name": "小橙子4K解析4",
+            "url": "https://api.huohua.live/api/?key=MYorZOeWRHg1I9FfJy&url=",
+            "type": "1"
         },
         {
-           "name": "小橙子夜幕",
-           "type": 0,
-           "url": "https://www.playm3u8.cn/jiexi.php?url=",
-           "ext": {
-                    "flag": [
-                              "qq",
-                              "腾讯",
-                              "qiyi",
-                              "爱奇艺",
-                              "奇艺",
-                              "youku",
-                              "优酷",
-                              "mgtv",
-                              "芒果",
-                              "letv",
-                              "乐视",
-                              "pptv",
-                              "PPTV",
-                              "sohu",
-                              "bilibili",
-                              "哔哩哔哩",
-                              "哔哩"
-                            ],
-                     "header": {
-                                 "User-Agent": "okhttp/4.1.0"
-                               }
+            "name": "小橙子4K解析3",
+            "type": 1,
+            "url": "https://api.huohua.live/api/?key=MYorZOeWRHg1I9FfJy&url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
                 }
+            }
         },
         {
-           "name": "小橙子爱奇艺",
-           "type": 0,
-           "url": "https://jx.nnsvip.cn/?url=",
-           "ext": {
-                    "flag": [
-                              "qq",
-                              "腾讯",
-                              "qiyi",
-                              "爱奇艺",
-                              "奇艺",
-                              "youku",
-                              "优酷",
-                              "mgtv",
-                              "芒果",
-                              "letv",
-                              "乐视",
-                              "pptv",
-                              "PPTV",
-                              "sohu",
-                              "bilibili",
-                              "哔哩哔哩",
-                              "哔哩"
-                            ],
-                   "header": {
-                               "User-Agent": "okhttp/4.1.0"
-                             }
+            "name": "小橙子4K解析2",
+            "type": 1,
+            "url": "1http://8.155.50.80/xiayexk.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
                 }
+            }
+        },
+        {
+            "name": "随缘解析",
+            "type": "1",
+            "url": "https://api.huohua.live/api/?key=FJER9kOhK71YTePV3d&url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "影视臻享",
+            "type": "1",
+            "url": "https://zy.qiaoji8.com/gouzi.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "影视优选",
+            "type": 1,
+            "url": "http://1.94.221.189:88/algorithm.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "影视至臻",
+            "type": 1,
+            "url": "http://yunhai.qijiyun.vip/home/api?type=ys&uid=177259&key=dijnouxKNOQSTUWXY5&url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "影视无双",
+            "type": 1,
+            "url": "http://1.94.221.189:88/algorithm.php?url=",
+            "ext": {
+                "flag": [
+                    "hgvip"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "影视咸鱼",
+            "type": 0,
+            "url": "https://jx.xymp4.cc/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.3124.68"
+                }
+            }
+        },
+        {
+            "name": "影视虾米",
+            "type": 0,
+            "url": "https://jx.xmflv.com/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                }
+            }
+        },
+        {
+            "name": "影视淘片",
+            "type": 0,
+            "url": "https://jx.yparse.com/index.php?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36"
+                }
+            }
+        },
+        {
+            "name": "影视冰豆",
+            "type": 0,
+            "url": "https://bd.jx.cn/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36"
+                }
+            }
+        },
+        {
+            "name": "影视七七",
+            "type": 0,
+            "url": "https://jx.77flv.cc/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36"
+                }
+            }
+        },
+        {
+            "name": "影视盘古",
+            "type": 0,
+            "url": "https://www.playm3u8.cn/jiexi.php?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36"
+                }
+            }
+        },
+        {
+            "name": "影视夜幕",
+            "type": 0,
+            "url": "https://yemu.xyz/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36"
+                }
+            }
+        },
+        {
+            "name": "NMTV",
+            "type": 0,
+            "url": "https://nm.xxxc137.top/static/player/artplayer.html?url="
+        },
+        {
+            "name": "大厂",
+            "type": 0,
+            "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
+        },
+        {
+            "name": "小橙子线路4",
+            "type": 0,
+            "url": "https://jx.m3u8.tv/jiexi/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0(Linux;Android13;V2049ABuild/TP1A.220624.014;wv)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/116.0.0.0MobileSafari/537.36",
+                    "referer": "https://jiejie.uk/"
+                }
+            }
+        },
+        {
+            "name": "m3u8",
+            "type": 0,
+            "url": "https://jx.m3u8.tv/jiexi/?url="
+        },
+        {
+            "name": "虾米哩",
+            "type": 0,
+            "url": "https://jx.xmflv.com/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                }
+            }
+        },
+        {
+            "name": "小橙子夜幕",
+            "type": 0,
+            "url": "https://www.playm3u8.cn/jiexi.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "mgtv",
+                    "芒果",
+                    "letv",
+                    "乐视",
+                    "pptv",
+                    "PPTV",
+                    "sohu",
+                    "bilibili",
+                    "哔哩哔哩",
+                    "哔哩"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.1.0"
+                }
+            }
+        },
+        {
+            "name": "小橙子爱奇艺",
+            "type": 0,
+            "url": "https://jx.nnsvip.cn/?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "mgtv",
+                    "芒果",
+                    "letv",
+                    "乐视",
+                    "pptv",
+                    "PPTV",
+                    "sohu",
+                    "bilibili",
+                    "哔哩哔哩",
+                    "哔哩"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.1.0"
+                }
+            }
         },
         {
             "name": "小橙子4K解析5",
@@ -19219,58 +19486,53 @@
             "type": "1"
         },
         {
-            "name": "小橙子4K解析4",
-            "url": "https://api.huohua.live/api/?key=MYorZOeWRHg1I9FfJy&url=",
-            "type": "1"
-        },
-        {
-           "name": "ix99.cc解析",
-           "type": 1,
-           "url": "https://jx.ix99.cc/json.php?url=",
-           "ext": {
-                    "flag": [
-                               "qq",
-                               "腾讯",
-                               "qiyi",
-                               "爱奇艺",
-                               "奇艺",
-                               "youku",
-                               "优酷",
-                               "sohu",
-                               "搜狐",
-                               "letv",
-                               "乐视",
-                               "mgtv",
-                               "芒果",
-                               "tnmb",
-                               "seven",
-                               "bilibili",
-                               "1905"
-                           ],
-                 "header": {
-                       "User-Agent": "okhttp/4.9.1"
-                    }
-              }
+            "name": "ix99.cc解析",
+            "type": 1,
+            "url": "https://jx.ix99.cc/json.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
         },
         {
             "name": "小橙子4K",
             "type": 1,
             "url": "http://47.108.190.232:299/api/?key=3JcR3H2wCodztrlxOT&url=",
             "ext": {
-                     "flag": [
-                               "qq",
-                               "腾讯",
-                               "qiyi",
-                               "爱奇艺",
-                               "奇艺",
-                               "youku",
-                               "优酷",
-                               "mgtv",
-                               "芒果",
-                               "bilibili",
-                               "YuMi-vip"
-                            ]
-                   }
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "mgtv",
+                    "芒果",
+                    "bilibili",
+                    "YuMi-vip"
+                ]
+            }
         },
         {
             "name": "如遇卡顿尝试切换LJK/EXO",
@@ -19278,29 +19540,9 @@
             "type": "1"
         },
         {
-            "name": "-云析-",
-            "type": 0,
-            "url": "https://jx.yparse.com/index.php?url=",
-            "ext": {
-                "header": {
-                    "user-agent": "Mozilla/5.0(Linux;Android13;V2049ABuild/TP1A.220624.014;wv)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/116.0.0.0MobileSafari/537.36"
-                }
-            }
-        },
-        {
             "name": "WZBXCZ",
             "type": 1,
             "url": "https://mfjx.iwsyy.xyz/?url="
-        },
-        {
-            "name": "小橙子线路1",
-            "type": 0,
-            "url": "https://jx.xmflv.com/?url=",
-            "ext": {
-                "header": {
-                    "user-agent": "Mozilla/5.0(WindowsNT10.0;Win64;x64)AppleWebKit/537.36(KHTML,likeGecko)Chrome/110.0.0.0Safari/537.36Edg/110.0.1587.57"
-                }
-            }
         },
         {
             "name": "小橙子线路2",
@@ -19316,11 +19558,6 @@
             "name": "-关注小橙子1-",
             "type": 0,
             "url": "https://cdn.zyc888.top/?url="
-        },
-        {
-            "name": "蚂蚁天下",
-            "type": 0,
-            "url": "https://bd.jx.cn/?url="
         },
         {
             "name": "-红狐-",
