@@ -18519,7 +18519,7 @@
                 "主页url": "https://www.haying.cc/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.haying.cc/so/{cateId}/-------{catePg}---/",
-                "分类": "电影$movie#电视剧$tv#综艺$variety#动漫画$anime#"
+                "分类": "电影$menu/movie#电视剧$menu/tv#综艺$menu/variety#动漫画$menu/anime#"
             }
         },
         {
@@ -20337,4 +20337,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
