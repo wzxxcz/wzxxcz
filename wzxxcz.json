@@ -5052,6 +5052,41 @@
             }
         },
         {
+            "key": "摩托威影院",
+            "name": "🏍️摩托威影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198cffa255a38c-0996b12db0a54a-90c2111-64496-198cffa255f100；； CNZZDATA1281374169=122610491-1755835934-%7C1755836548&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码":"UTF-8",
+                "主页url": "https://www.dq19888.com/",
+                "二次截取": "",
+                "数组": "lazyload&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"pic-text text-right\">&&</span>",
+                "链接": "href=\"&&\"",
+                "影片年代": "年份：&&</p>",
+                "影片地区": "地区：&&</p>",
+                "影片类型": "类型：&&</p>",
+                "状态": "状态：&&</p>",
+                "导演": "导演：&&</p>",
+                "主演": "主演：&&</p>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+left text-muted\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "\\#playlist&&</a>",
+                "线路标题": "tab\">&&<",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"myui-content__list sort-list clearfix&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&<",
+                "播放链接": "href=\"&&\"",
+                "分类url": "https://www.dq19888.com/vodshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$29#"
+            }
+        },
+        {
             "key": "360采集",
             "name": "💡360采集",
             "type": 1,
@@ -18637,20 +18672,6 @@
             }
         },
         {
-            "key": "摩托威影院",
-            "name": "🏍️摩托威影院",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.dq19888.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.dq19888.com/vodshow/{cateId}--------{catePg}---{year}.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$29#"
-            }
-        },
-        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -20465,4 +20486,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
