@@ -18804,16 +18804,10 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.huazhantj.com/",
-                "二次截取": "",
-                "数组": "video-pic loading&&</a>",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "<span class=\"note text-bg-r\">&&</span>",
-                "链接": "href=\"&&\"",
+                "主页url": "https://www.tjysyjs.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.huazhantj.com/cantv/_{cateId}_{year}__{catePg}.html",
-                "分类": "电影$canfilm#电视剧$cantv#综艺$canvariety#动漫$cancg#"
+                "分类url": "https://www.tjysyjs.com/vodshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$31#动漫片$25#"
             }
         },
         {
@@ -20868,5 +20862,6 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
