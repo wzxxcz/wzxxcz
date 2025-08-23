@@ -18413,20 +18413,6 @@
             }
         },
         {
-            "key": "黑猫动漫",
-            "name": "🐈黑猫动漫",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://dm.xxdm123.top:9991",
-                "dataKey": "0fe3b5781782c621",
-                "dataIv": "0fe3b5781782c621",
-                "deviceId": "",
-                "version": "203"
-            }
-        },
-        {
             "key": "樱花动漫",
             "name": "🌸樱花动漫",
             "type": 3,
