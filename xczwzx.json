@@ -847,16 +847,6 @@
             "playerType": 2
         },
         {
-            "key": "追星影视",
-            "name": "🛰️追星影视",
-            "type": 3,
-            "api": "./py/追星影视.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
             "key": "TVB云播",
             "name": "☁️TVB云播",
             "type": 3,
