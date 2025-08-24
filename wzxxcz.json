@@ -868,34 +868,6 @@
             "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视综合.js"
         },
         {
-            "key": "csp_Netfixtv",
-            "name": "💌至臻4K弹幕",
-            "type": 3,
-            "changeable": "0",
-            "quickSearch": 1,
-            "api": "csp_Duopan",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "filterable": 1,
-            "ext": {
-                "site_urls": [
-                    "https://mihdr.top",
-                    "https://www.mihdr.top",
-                    "https://www.miqk.cc",
-                    "https://xiaomiai.site",
-                    "https://xiaomi666.fun",
-                    "https://www.zhizhenpan.fun"
-                ],
-                "url_key": "Netfixtv",
-                "token": "",
-                "ucCookie": "",
-                "quarkCookie": "",
-                "threadinfo": {
-                    "chunksize": 512,
-                    "threads": 16
-                }
-            }
-        },
-        {
            "key": "玩偶",
            "name": "🐲小橙子智能4K弹幕",
            "type": 3,
@@ -916,26 +888,6 @@
             "filterable": 1,
             "changeable": 1,
             "ext": "./json/og.json"
-        },
-        {
-            "key": "csp_Wogg",
-            "name": "🧸玩偶4K弹幕",
-            "type": 3,
-            "api": "csp_Wogg",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "changeable": "0",
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "Yu2Y3Q8tqDTqZ+GCqfQZz8i/vsP/tl9O+/0ZjpgnBg8rYFx7ctv7/EwYIQ8UriiQKDIJuqIvlQQje6dXLxWHRiSlxkxqMyYKI0d1JGw46AuOAoB1VAvOCaqYqiTezjHHt8wMymbT/vDdiFXkMbc44kNGdjpzSyL2/kBZIAQaYMPgSkEYlv4faMeCi3MaCLYaT3C7qaUzLc56RYGLF2rmtIoYgMFOG9eSpyjO66jU/3v2f1yXnqTEEKd1/+/m8DBi8KudUm92Pa/NN8zRcY5nClAo1Eqn9bGzuO/+M4V5KG/RhdFdHyzxIpxfgoBRhn4j7GEzWBxrg4JiW2kP8Vo0iQm0S8aJUTOf1ROVp2sKW36D2Q/IgMvEqazefGXZSyNSTsjbNbVc2cHMxKrbUQIPqhD5y93kdVqr5glHjuqjrDC8Pa54/l2nFeWMZIRN7ZxMpY9O1WSazlqA1GI2A6UtmKIx6r2dX7seMOOENI+Tjl2ojAYQscbGgYpzVNL9VNf/w7xQaHqjtWLUcAOmJYweA0mZb6cGoAd8Gjcwz7iper0s53AViof2QbBffDKJxF820BsiCZAMp+Nq1Y7wrFqnnEN7HiE+YHPDxNfvBXnEgubPXu6DeZGa6edzqVbRwO52"
-        },
-        {
-            "key": "csp_MiSou",
-            "name": "🔍米搜盘聚",
-            "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "csp_MiSou",
-            "jar": "https://xcz.iptv365.org/wzxm.png"
         },
         {
             "key": "闪电",
@@ -1165,29 +1117,6 @@
             "filterable": 1,
             "changeable": 1,
             "ext": "./json/lb.json"
-        },
-        {
-            "key": "csp_Duopan",
-            "name": "🖍蜡笔4K弹幕",
-            "type": 3,
-            "api": "csp_Duopan",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "filterable": 1,
-            "ext": {
-                "site_urls": [
-                    "https://feimao666.fun",
-                    "http://feimao888.fun",
-                    "http://feimaoai.site",
-                    "http://www.labi88.sbs",
-                    "http://fmao.site",
-                    "https://fmao.shop"
-                ],
-                "threadinfo": {
-                    "chunksize": 512,
-                    "threads": 16
-                },
-                "url_key": "Duopan4"
-            }
         },
         {
             "key": "木偶",
@@ -20965,4 +20894,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
