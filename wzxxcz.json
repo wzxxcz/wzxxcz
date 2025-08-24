@@ -9490,32 +9490,6 @@
             }
         },
         {
-            "key": "TEKAN",
-            "name": "🍊TEKAN影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "数组": "class=\"stui-vodlist__box\">&&</a>",
-                "标题": "title=\"&&\"",
-                "副标题": "<span class=\"pic-text text-right\">&&</span>",
-                "图片": "data-original=\"&&\"",
-                "链接": "href=\"&&\"",
-                "线路数组": "stui-pannel__head bottom-line active clearfix&&</div>",
-                "线路标题": "title\">&&</h3",
-                "播放数组": "playlist clearfix&&</ul>",
-                "播放列表": "<a&&/a>",
-                "播放标题": ">&&<",
-                "播放链接": "href=\"&&\"",
-                "跳转播放链接": "var player_*\"url\":\"&&\"",
-                "搜索url": "https://www.tekan.cc/search/{wd}--/page/{pg}/",
-                "分类url": "https://www.tekan.cc/show/{cateId}/area/{area}/lang/{lang}/page/{catePg}/year/{year}/",
-                "分类": "电影$dianying#电视剧$dianshiju#动漫$dongman#",
-                "简介": "🍊小橙子为您介绍剧情👉+left text-muted\">&&</div>"
-            }
-        },
-        {
             "key": "飞映网",
             "name": "🕊️飞映网",
             "type": 3,
