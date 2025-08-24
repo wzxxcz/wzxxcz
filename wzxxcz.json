@@ -896,14 +896,15 @@
             }
         },
         {
-            "key": "玩偶哥哥",
-            "name": "🐲小橙子智能4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./json/wogg.json"
+           "key": "玩偶",
+           "name": "🐲小橙子智能4K弹幕",
+           "type": 3,
+           "api": "csp_PanWebShare",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "changeable": 0,
+           "ext": "./json/玩偶.json"
         },
         {
             "key": "欧哥",
@@ -20964,3 +20965,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
