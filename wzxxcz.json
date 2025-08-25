@@ -1692,7 +1692,7 @@
         },
         {
             "key": "云端",
-            "name": "云端影视",
+            "name": "☁️云端影视",
             "type": 3,
             "quickSearch": 1,
             "api": "csp_AppGet",
