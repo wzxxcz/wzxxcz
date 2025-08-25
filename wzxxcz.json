@@ -1572,6 +1572,13 @@
             }
         },
         {
+            "key":"糯米影视",
+            "name":"💡糯米影视",
+            "type":3,
+            "api":"csp_Wwys",
+            "ext":"https://www.wwgz.cn"
+        },
+        {
             "key": "幕启",
             "name": "🌉幕启影视",
             "type": 3,
