@@ -1168,18 +1168,6 @@
             "ext": "https://ij1men.slsw6.com"
         },
         {
-            "key": "csp_Jianpian",
-            "name": "⚔️荐片磁力备",
-            "type": 3,
-            "api": "csp_Jianpian",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "filters": "./json/jianpian.json",
-                "sites": "https://ij1men.slsw6.com"
-            }
-        },
-        {
             "key": "修罗影视",
             "name": "🍊修罗磁力",
             "type": 3,
