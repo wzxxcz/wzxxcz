@@ -9716,10 +9716,10 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://885la.com/",
+                "主页url": "https://www.wezhongming.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://885la.com/show/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧屋$30#"
+                "分类url": "https://www.wezhongming.com/list/{cateId}-{catePg}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
             }
         },
         {
@@ -21164,6 +21164,7 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
 
 
