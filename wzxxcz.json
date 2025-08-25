@@ -2956,6 +2956,15 @@
             "type": 3
         },
         {
+            "key": "py_两个BTPY",
+            "name": "🥭两个BT",
+            "api": "./py/两个BT.py",
+            "filterable": 1,
+            "quickSearch": 1,
+            "searchable": 1,
+            "type": 3
+        },
+        {
             "key": "忘忧草影视",
             "name": "🌿忘忧草影视",
             "type": 3,
