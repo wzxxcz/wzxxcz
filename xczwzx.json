@@ -18799,6 +18799,21 @@
             }
         },
         {
+            "key": "米饭",
+            "name": "🍛米饭动漫",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://get.mymifun.com",
+                "site": "",
+                "dataKey": "GETMIFUNGEIMIFUN",
+                "dataIv": "GETMIFUNGEIMIFUN",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
             "key": "樱花动漫",
             "name": "🌸樱花动漫",
             "type": 3,
