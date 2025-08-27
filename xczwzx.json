@@ -1174,6 +1174,21 @@
                   }
         },
         {
+            "key": "迪吧",
+            "name": "🎸迪吧影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://154.37.152.97:5211",
+                "site": "",
+                "dataKey": "685bf108bc47b67d",
+                "dataIv": "685bf108bc47b67d",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
             "key": "橙飞",
             "name": "🍊橙飞影视",
             "type": 3,
