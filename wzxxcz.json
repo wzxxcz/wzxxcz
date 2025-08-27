@@ -2149,6 +2149,21 @@
             }
         },
         {
+            "key": "米饭",
+            "name": "🍛米饭影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://get.mymifun.com",
+                "site": "",
+                "dataKey": "GETMIFUNGEIMIFUN",
+                "dataIv": "GETMIFUNGEIMIFUN",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
             "key": "哔哩视频",
             "name": "✒️哔哩视频",
             "type": 3,
