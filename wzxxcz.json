@@ -1691,6 +1691,21 @@
             }
         },
         {
+            "key": "橙飞",
+            "name": "🍊橙飞影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://172.247.189.145:8989",
+                "site": "",
+                "dataKey": "6d1061a50b656564",
+                "dataIv": "6d1061a50b656564",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
             "key": "云端",
             "name": "☁️云端影视",
             "type": 3,
