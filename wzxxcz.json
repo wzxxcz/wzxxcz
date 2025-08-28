@@ -10034,20 +10034,6 @@
             }
         },
         {
-            "key": "高级影院",
-            "name": "🐳高级影院",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "http://www.ljmovie.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "http://www.ljmovie.com/list.php?cate_id={cateId}&class=&year={year}&order=time&page={catePg}",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$5#"
-            }
-        },
-        {
             "key": "平民影院",
             "name": "🧑‍🌾平民影院",
             "type": 3,
@@ -21370,4 +21356,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
