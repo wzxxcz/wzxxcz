@@ -1456,14 +1456,14 @@
             }
         },
         {
-            "key": "大豆",
-            "name": "🥔大豆影视",
-            "type": 3,
-            "quickSearch": 1,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeUKFHSUUbLyGMREENFjE1N9FXjZ6Z7tiLWs6P15Ol/g5Po80zDNWJPEEoj/nv3Yelo="
+           "key": "大豆",
+           "name": "🥔大豆影视",
+           "type": 3,
+           "quickSearch": 0,
+           "searchable": 1,
+           "api": "csp_AppGet",
+           "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "7PKaTzLgpGLqYV7cUF+dCEw/YtRQnWFqGURdQoZnM3s5khy5fqX3yGD7gACetGMWTQJv81SoDNcZI5UkNNLGqA=="
         },
         {
             "key": "海豚",
