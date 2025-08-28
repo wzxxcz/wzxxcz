@@ -648,7 +648,21 @@
             "name": "⚔️荐片磁力",
             "api": "csp_Jianpian",
             "type": 3,
-            "ext": "https://ij1men.slsw6.com"
+            "ext": "https://ka1dfj.slsw6.com"
+        },
+        {
+            "key": "荐片磁力",
+            "name": "⚔️荐片磁力备",
+            "quickSearch": 0,
+            "searchable": 1,
+            "type": 3,
+            "api": "csp_Jianpian",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "style": {
+                       "type": "rect",
+                       "ratio": 1.333
+                     },
+            "ext": "https://ka1dfj.slsw6.com"
         },
         {
             "key": "修罗影视",
