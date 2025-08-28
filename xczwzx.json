@@ -1872,6 +1872,15 @@
             "ext": ""
         },
         {
+           "key": "追忆",
+           "name": "🐖追忆影视",
+           "type": 3,
+           "api": "csp_AppSy",
+           "jar": "https://xcz.iptv365.org/wzxm.png",
+           "quickSearch": 0,
+           "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeWtPAwa8PAzOjbdregJfgecQjmbgYlvm+1rK87EwCqgaovlgh315Qrh90D+nl+f08o="
+        },
+        {
             "key": "热热",
             "name": "🔥热热1080P",
             "type": 3,
