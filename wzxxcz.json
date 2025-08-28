@@ -868,26 +868,26 @@
             "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视综合.js"
         },
         {
-           "key": "玩偶",
-           "name": "🐲小橙子智能4K弹幕",
-           "type": 3,
-           "api": "csp_PanWebShare",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "changeable": 0,
-           "ext": "./json/玩偶.json"
+            "key": "玩偶",
+            "name": "🐲小橙子智能4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 0,
+            "ext": "./json/玩偶.json"
         },
         {
-           "key": "欧歌",
-           "name": "🐲小橙子4K弹幕",
-           "type": 3,
-           "api": "csp_PanWebShare",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "changeable": 0,
-           "ext": "./json/欧歌.json"
+            "key": "欧歌",
+            "name": "🐲小橙子4K弹幕",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 0,
+            "ext": "./json/欧歌.json"
         },
         {
             "key": "闪电",
@@ -1108,15 +1108,15 @@
             "changeable": 0
         },
         {
-           "key": "蜡笔",
-           "name": "👠蜡笔在线",
-           "type": 3,
-           "api": "csp_PanWebShare",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "changeable": 0,
-           "ext": "./json/蜡笔.json"
+            "key": "蜡笔",
+            "name": "👠蜡笔在线",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 0,
+            "ext": "./json/蜡笔.json"
         },
         {
             "key": "木偶",
@@ -1176,9 +1176,9 @@
             "api": "csp_Jianpian",
             "jar": "https://xcz.iptv365.org/wzxm.png",
             "style": {
-                       "type": "rect",
-                       "ratio": 1.333
-                     },
+                "type": "rect",
+                "ratio": 1.333
+            },
             "ext": "https://ka1dfj.slsw6.com"
         },
         {
@@ -1919,14 +1919,14 @@
             }
         },
         {
-           "key": "麻花",
-           "name": "🌯麻花影视",
-           "type": 3,
-           "quickSearch": 0,
-           "searchable": 1,
-           "api": "csp_AppQi",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "lo54N2bJ4DtrhxC9P676hHekMnvMvX1mNNhVKf3kE5Wgy3H/b30VkkDKAYauTqZsDdvpB5GqFDm8YyeyiKclJTSLQ/tOARL2p/dbX8OIae9/PHnAUKONnpKuoD52E5AT"
+            "key": "麻花",
+            "name": "🌯麻花影视",
+            "type": 3,
+            "quickSearch": 0,
+            "searchable": 1,
+            "api": "csp_AppQi",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "lo54N2bJ4DtrhxC9P676hHekMnvMvX1mNNhVKf3kE5Wgy3H/b30VkkDKAYauTqZsDdvpB5GqFDm8YyeyiKclJTSLQ/tOARL2p/dbX8OIae9/PHnAUKONnpKuoD52E5AT"
         },
         {
             "key": "蓝鹰",
@@ -1959,15 +1959,15 @@
             }
         },
         {
-           "key": "AppQi1",
-           "name": "🎴爱盈影视",
-           "type": 3,
-           "api": "csp_AppQi",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "changeable": "0",
-           "quickSearch": 0,
-           "filterable": 1,
-           "ext": "BciM/oLDYQqSU++RAsI5xz2Dmz98Blyw0pp0T+0QPiq/bSU1IhcLmPsn25NijfG6B3fLoAmVGEL0/tWb+o0nZYn1u5i3pWNxWaYYmNV1x0c="
+            "key": "AppQi1",
+            "name": "🎴爱盈影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "changeable": "0",
+            "quickSearch": 0,
+            "filterable": 1,
+            "ext": "BciM/oLDYQqSU++RAsI5xz2Dmz98Blyw0pp0T+0QPiq/bSU1IhcLmPsn25NijfG6B3fLoAmVGEL0/tWb+o0nZYn1u5i3pWNxWaYYmNV1x0c="
         },
         {
             "key": "鲸鱼",
@@ -1998,14 +1998,14 @@
             }
         },
         {
-           "key": "大豆",
-           "name": "🥔大豆影视",
-           "type": 3,
-           "quickSearch": 0,
-           "searchable": 1,
-           "api": "csp_AppGet",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "7PKaTzLgpGLqYV7cUF+dCEw/YtRQnWFqGURdQoZnM3s5khy5fqX3yGD7gACetGMWTQJv81SoDNcZI5UkNNLGqA=="
+            "key": "大豆",
+            "name": "🥔大豆影视",
+            "type": 3,
+            "quickSearch": 0,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "7PKaTzLgpGLqYV7cUF+dCEw/YtRQnWFqGURdQoZnM3s5khy5fqX3yGD7gACetGMWTQJv81SoDNcZI5UkNNLGqA=="
         },
         {
             "key": "海豚",
@@ -2404,13 +2404,13 @@
             "ext": "https://www.wwgz.cn"
         },
         {
-           "key": "追忆",
-           "name": "🐖追忆影视",
-           "type": 3,
-           "api": "csp_AppSy",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "quickSearch": 0,
-           "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeWtPAwa8PAzOjbdregJfgecQjmbgYlvm+1rK87EwCqgaovlgh315Qrh90D+nl+f08o="
+            "key": "追忆",
+            "name": "🐖追忆影视",
+            "type": 3,
+            "api": "csp_AppSy",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "quickSearch": 0,
+            "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeWtPAwa8PAzOjbdregJfgecQjmbgYlvm+1rK87EwCqgaovlgh315Qrh90D+nl+f08o="
         },
         {
             "key": "热热",
@@ -2423,14 +2423,14 @@
             "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
         {
-           "key": "云速",
-           "name": "☁️云速影视",
-           "type": 3,
-           "searchable": 1,
-           "quickSearch": 0,
-           "api": "csp_AppQi",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "9ee0oa0Y30GapSvZ2C2RVE2HwH08KKvP0VhAZCVWpnluXpZNLRZrNCMeKyCWw1JOj3jlA6tSdRPHvvTyBCuIMzwlKeODvXst4zEi0DFYqmEXOu+cG8rF7/kIckBMVYvn"
+            "key": "云速",
+            "name": "☁️云速影视",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 0,
+            "api": "csp_AppQi",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "9ee0oa0Y30GapSvZ2C2RVE2HwH08KKvP0VhAZCVWpnluXpZNLRZrNCMeKyCWw1JOj3jlA6tSdRPHvvTyBCuIMzwlKeODvXst4zEi0DFYqmEXOu+cG8rF7/kIckBMVYvn"
         },
         {
             "key": "腾讯视频",
@@ -18254,8 +18254,8 @@
             "ext": {
                 "作者": "🍊小橙子/250822",
                 "站名": "电影天堂网",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=1dm0qs7vc59fcum224s8p790lf；； __51vcke__3LSsymjbQLKBbaF8=0157b238-b8cc-563a-95a5-fa144d2b52cb；； __51vuft__3LSsymjbQLKBbaF8=1755846989688；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755846991；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__3LSsymjbQLKBbaF8=2；； __vtins__3LSsymjbQLKBbaF8=%7B%22sid%22%3A%20%2249ebfaa9-ade9-5b4d-9f43-ff18957fd225%22%2C%20%22vd%22%3A%203%2C%20%22stt%22%3A%2058632%2C%20%22dr%22%3A%2051710%2C%20%22expires%22%3A%201755850810807%2C%20%22ct%22%3A%201755849010807%7D；； XLA_CI=79171a8c219eae1c4b6b735d92f2df89；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755849013&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=1dm0qs7vc59fcum224s8p790lf；； __51vcke__3LSsymjbQLKBbaF8=0157b238-b8cc-563a-95a5-fa144d2b52cb；； __51vuft__3LSsymjbQLKBbaF8=1755846989688；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755846991；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__3LSsymjbQLKBbaF8=2；； __vtins__3LSsymjbQLKBbaF8=%7B%22sid%22%3A%20%2249ebfaa9-ade9-5b4d-9f43-ff18957fd225%22%2C%20%22vd%22%3A%203%2C%20%22stt%22%3A%2058632%2C%20%22dr%22%3A%2051710%2C%20%22expires%22%3A%201755850810807%2C%20%22ct%22%3A%201755849010807%7D；； XLA_CI=79171a8c219eae1c4b6b735d92f2df89；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755849013&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -20613,6 +20613,26 @@
                     "bilibili",
                     "YuMi-vip"
                 ]
+            }
+        },
+        {
+            "name": "牛牛2",
+            "type": 1,
+            "url": "https://zy.qiaoji8.com/xiafan.php?url=",
+            "ext": {
+                "flag": [
+                    "QD4K",
+                    "iyf",
+                    "duanju",
+                    "gzcj",
+                    "GTV",
+                    "GZYS",
+                    "weggz",
+                    "Ace"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
             }
         },
         {
