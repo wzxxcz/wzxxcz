@@ -1428,6 +1428,17 @@
                  }
         },
         {
+           "key": "AppQi1",
+           "name": "🎴爱盈影视",
+           "type": 3,
+           "api": "csp_AppQi",
+           "jar": "https://xcz.iptv365.org/wzxm.png",
+           "changeable": "0",
+           "quickSearch": 0,
+           "filterable": 1,
+           "ext": "BciM/oLDYQqSU++RAsI5xz2Dmz98Blyw0pp0T+0QPiq/bSU1IhcLmPsn25NijfG6B3fLoAmVGEL0/tWb+o0nZYn1u5i3pWNxWaYYmNV1x0c="
+        },
+        {
            "key": "鲸鱼",
            "name": "🐳鲸鱼影视",
            "type": 3,
