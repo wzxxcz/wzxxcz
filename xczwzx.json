@@ -1862,16 +1862,6 @@
             "ext": "https://www.wwgz.cn"
         },
         {
-            "key": "斗量",
-            "name": "🍈南瓜影视",
-            "type": 3,
-            "api": "csp_NanGua",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "quickSearch": 0,
-            "playerType": 2,
-            "ext": ""
-        },
-        {
            "key": "追忆",
            "name": "🐖追忆影视",
            "type": 3,
