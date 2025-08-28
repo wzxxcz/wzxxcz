@@ -2399,14 +2399,14 @@
             "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
         {
-            "key": "云速",
-            "name": "☁️云速影视",
-            "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "rP+4azM8YFgp3eAhyeALtUUEFpbkqmzGj2V5VZryxRbpkSjlsHbarRCZPOInvId4s3WK9rZ2YJsDy8NvMqQKQXowVmh33j+qD55VxmvMzzfiJ2fHkCRZg4+8NFWs+b1X"
+           "key": "云速",
+           "name": "☁️云速影视",
+           "type": 3,
+           "searchable": 1,
+           "quickSearch": 0,
+           "api": "csp_AppQi",
+           "jar": "https://xcz.iptv365.org/wzxm.png",
+           "ext": "9ee0oa0Y30GapSvZ2C2RVE2HwH08KKvP0VhAZCVWpnluXpZNLRZrNCMeKyCWw1JOj3jlA6tSdRPHvvTyBCuIMzwlKeODvXst4zEi0DFYqmEXOu+cG8rF7/kIckBMVYvn"
         },
         {
             "key": "腾讯视频",
