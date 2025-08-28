@@ -659,9 +659,9 @@
             "api": "csp_Jianpian",
             "jar": "https://xcz.iptv365.org/wzxm.png",
             "style": {
-                       "type": "rect",
-                       "ratio": 1.333
-                     },
+                "type": "rect",
+                "ratio": 1.333
+            },
             "ext": "https://ka1dfj.slsw6.com"
         },
         {
@@ -814,41 +814,41 @@
             "quickSearch": 1,
             "api": "csp_AppQi",
             "ext": {
-                     "url": "",
-                     "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/qj1.txt",
-                     "dataKey": "dksvndkaAjekakcE",
-                     "dataIv": "dksvndkaAjekakcE",
-                     "deviceId": "",
-                     "version": "",
-                     "ua": ""
-                  }
+                "url": "",
+                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/qj1.txt",
+                "dataKey": "dksvndkaAjekakcE",
+                "dataIv": "dksvndkaAjekakcE",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
         },
         {
-           "key": "咖啡",
-           "name": "☕咖啡影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppQi",
-           "ext": {
-                    "url": "",
-                    "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxh.txt",
-                    "dataKey": "37kj83zs1q16jk6t",
-                    "dataIv": "37kj83zs1q16jk6t",
-                    "deviceId": "",
-                    "version": "101",
-                    "ua": ""
-                  }
+            "key": "咖啡",
+            "name": "☕咖啡影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxh.txt",
+                "dataKey": "37kj83zs1q16jk6t",
+                "dataIv": "37kj83zs1q16jk6t",
+                "deviceId": "",
+                "version": "101",
+                "ua": ""
+            }
         },
         {
-           "key": "比迪",
-           "name": "🐕比迪影视",
-           "type": 3,
-           "quickSearch": 0,
-           "playerType": 1,
-           "searchable": 1,
-           "api": "csp_AppQi",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "HM+RJliOAzVbMKoUegXt5SVTp6lV507+wK0S5QCxiEEA9zs/swmgAb3z+F5RUY21tC1US86Wo/2RunTWZsPUxuLk0B4X5G0RneEJEfEV4CWzDmIx8mdFYBlSJiwJcoNYioDEVsg76bXpsGDfXTT4Mb092SQ1oS22g2A1GUtEcn8="
+            "key": "比迪",
+            "name": "🐕比迪影视",
+            "type": 3,
+            "quickSearch": 0,
+            "playerType": 1,
+            "searchable": 1,
+            "api": "csp_AppQi",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "HM+RJliOAzVbMKoUegXt5SVTp6lV507+wK0S5QCxiEEA9zs/swmgAb3z+F5RUY21tC1US86Wo/2RunTWZsPUxuLk0B4X5G0RneEJEfEV4CWzDmIx8mdFYBlSJiwJcoNYioDEVsg76bXpsGDfXTT4Mb092SQ1oS22g2A1GUtEcn8="
         },
         {
             "key": "零度影视",
@@ -951,8 +951,8 @@
             "ext": {
                 "作者": "🍊小橙子/250820",
                 "站名": "TVB云播1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@gg_iscookie=1；； PHPSESSID=u5obeak7qn68kgmmt229pok8tu；； gg_iscookie=1；； __mxau__c1-BDpoxTLq=e2f67bb1-99b2-4ff0-8135-431fc7534166；； __mxaf__c1-BDpoxTLq=1755660874；； __mxas__c1-BDpoxTLq=%7B%22sid%22%3A%222683f2df-12da-4971-a4c2-39bbc3d6067b%22%2C%22vd%22%3A6%2C%22stt%22%3A1625%2C%22dr%22%3A1589%2C%22expires%22%3A1755664299%2C%22ct%22%3A1755662499%7D；； __mxav__c1-BDpoxTLq=6&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@gg_iscookie=1；； PHPSESSID=u5obeak7qn68kgmmt229pok8tu；； gg_iscookie=1；； __mxau__c1-BDpoxTLq=e2f67bb1-99b2-4ff0-8135-431fc7534166；； __mxaf__c1-BDpoxTLq=1755660874；； __mxas__c1-BDpoxTLq=%7B%22sid%22%3A%222683f2df-12da-4971-a4c2-39bbc3d6067b%22%2C%22vd%22%3A6%2C%22stt%22%3A1625%2C%22dr%22%3A1589%2C%22expires%22%3A1755664299%2C%22ct%22%3A1755662499%7D；； __mxav__c1-BDpoxTLq=6&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -1101,33 +1101,33 @@
             }
         },
         {
-           "key": "狂人",
-           "name": "🦸狂人影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppGet",
-           "ext": {
-                    "url": "https://www.zjkrmv.vip",
-                    "dataKey": "vXeyuJFqTKqWUtWU",
-                    "dataIv": "vXeyuJFqTKqWUtWU",
-                    "deviceId": "",
-                    "version": ""
-                 }
+            "key": "狂人",
+            "name": "🦸狂人影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://www.zjkrmv.vip",
+                "dataKey": "vXeyuJFqTKqWUtWU",
+                "dataIv": "vXeyuJFqTKqWUtWU",
+                "deviceId": "",
+                "version": ""
+            }
         },
         {
-           "key": "莱米",
-           "name": "🍙莱米影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppGet",
-           "ext": {
-                    "url": "",
-                    "site": "http://laiget-1313189639.cos.ap-guangzhou.myqcloud.com/laimi.txt",
-                    "dataKey": "ce032244d093b3e2",
-                    "dataIv": "ce032244d093b3e2",
-                    "deviceId": "",
-                    "version": ""
-                 }
+            "key": "莱米",
+            "name": "🍙莱米影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "",
+                "site": "http://laiget-1313189639.cos.ap-guangzhou.myqcloud.com/laimi.txt",
+                "dataKey": "ce032244d093b3e2",
+                "dataIv": "ce032244d093b3e2",
+                "deviceId": "",
+                "version": ""
+            }
         },
         {
             "key": "灵虎",
@@ -1160,19 +1160,19 @@
             }
         },
         {
-           "key": "云云",
-           "name": "☁️云云影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppQi",
-           "ext": {
-                     "url": "",
-                     "site": "https://staraugust123456.oss-cn-hangzhou.aliyuncs.com/1.txt",
-                     "dataKey": "staraugust123456",
-                     "dataIv": "staraugust123456",
-                     "deviceId": "",
-                     "version": "120"
-                  }
+            "key": "云云",
+            "name": "☁️云云影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://staraugust123456.oss-cn-hangzhou.aliyuncs.com/1.txt",
+                "dataKey": "staraugust123456",
+                "dataIv": "staraugust123456",
+                "deviceId": "",
+                "version": "120"
+            }
         },
         {
             "key": "迪吧",
@@ -1402,70 +1402,70 @@
             }
         },
         {
-           "key": "麻花",
-           "name": "🌯麻花影视",
-           "type": 3,
-           "quickSearch": 0,
-           "searchable": 1,
-           "api": "csp_AppQi",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "lo54N2bJ4DtrhxC9P676hHekMnvMvX1mNNhVKf3kE5Wgy3H/b30VkkDKAYauTqZsDdvpB5GqFDm8YyeyiKclJTSLQ/tOARL2p/dbX8OIae9/PHnAUKONnpKuoD52E5AT"
+            "key": "麻花",
+            "name": "🌯麻花影视",
+            "type": 3,
+            "quickSearch": 0,
+            "searchable": 1,
+            "api": "csp_AppQi",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "lo54N2bJ4DtrhxC9P676hHekMnvMvX1mNNhVKf3kE5Wgy3H/b30VkkDKAYauTqZsDdvpB5GqFDm8YyeyiKclJTSLQ/tOARL2p/dbX8OIae9/PHnAUKONnpKuoD52E5AT"
         },
         {
-           "key": "蓝鹰",
-           "name": "🦅蓝鹰影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppQi",
-           "ext": {
-                    "url": "",
-                    "site": "https://lanyinghz.oss-cn-hangzhou.aliyuncs.com/lanyingxmy.txt",
-                    "dataKey": "ca94b06ca359d80e",
-                    "dataIv": "ca94b06ca359d80e",
-                    "deviceId": "",
-                    "version": "120"
-                  }
+            "key": "蓝鹰",
+            "name": "🦅蓝鹰影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://lanyinghz.oss-cn-hangzhou.aliyuncs.com/lanyingxmy.txt",
+                "dataKey": "ca94b06ca359d80e",
+                "dataIv": "ca94b06ca359d80e",
+                "deviceId": "",
+                "version": "120"
+            }
         },
         {
-           "key": "仓鼠",
-           "name": "🐹仓鼠影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppQi",
-           "ext": {
-                    "url": "",
-                    "site": "https://ceshi307386.oss-cn-beijing.aliyuncs.com/csurl.txt",
-                    "dataKey": "Z98KXaLtO2wC1Pte",
-                    "dataIv": "Z98KXaLtO2wC1Pte",
-                    "deviceId": "",
-                    "version": "120"
-                 }
+            "key": "仓鼠",
+            "name": "🐹仓鼠影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://ceshi307386.oss-cn-beijing.aliyuncs.com/csurl.txt",
+                "dataKey": "Z98KXaLtO2wC1Pte",
+                "dataIv": "Z98KXaLtO2wC1Pte",
+                "deviceId": "",
+                "version": "120"
+            }
         },
         {
-           "key": "AppQi1",
-           "name": "🎴爱盈影视",
-           "type": 3,
-           "api": "csp_AppQi",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "changeable": "0",
-           "quickSearch": 0,
-           "filterable": 1,
-           "ext": "BciM/oLDYQqSU++RAsI5xz2Dmz98Blyw0pp0T+0QPiq/bSU1IhcLmPsn25NijfG6B3fLoAmVGEL0/tWb+o0nZYn1u5i3pWNxWaYYmNV1x0c="
+            "key": "AppQi1",
+            "name": "🎴爱盈影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "changeable": "0",
+            "quickSearch": 0,
+            "filterable": 1,
+            "ext": "BciM/oLDYQqSU++RAsI5xz2Dmz98Blyw0pp0T+0QPiq/bSU1IhcLmPsn25NijfG6B3fLoAmVGEL0/tWb+o0nZYn1u5i3pWNxWaYYmNV1x0c="
         },
         {
-           "key": "鲸鱼",
-           "name": "🐳鲸鱼影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppQi",
-           "ext": {
-                    "url": "",
-                    "site": "https://jingyu4k-1312635929.cos.ap-nanjing.myqcloud.com/1.json",
-                    "dataKey": "AAdgrdghjfgswerA",
-                    "dataIv": "AAdgrdghjfgswerA",
-                    "deviceId": "",
-                    "version": ""
-                 }
+            "key": "鲸鱼",
+            "name": "🐳鲸鱼影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://jingyu4k-1312635929.cos.ap-nanjing.myqcloud.com/1.json",
+                "dataKey": "AAdgrdghjfgswerA",
+                "dataIv": "AAdgrdghjfgswerA",
+                "deviceId": "",
+                "version": ""
+            }
         },
         {
             "key": "米诺",
@@ -1481,14 +1481,14 @@
             }
         },
         {
-           "key": "大豆",
-           "name": "🥔大豆影视",
-           "type": 3,
-           "quickSearch": 0,
-           "searchable": 1,
-           "api": "csp_AppGet",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "7PKaTzLgpGLqYV7cUF+dCEw/YtRQnWFqGURdQoZnM3s5khy5fqX3yGD7gACetGMWTQJv81SoDNcZI5UkNNLGqA=="
+            "key": "大豆",
+            "name": "🥔大豆影视",
+            "type": 3,
+            "quickSearch": 0,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "7PKaTzLgpGLqYV7cUF+dCEw/YtRQnWFqGURdQoZnM3s5khy5fqX3yGD7gACetGMWTQJv81SoDNcZI5UkNNLGqA=="
         },
         {
             "key": "海豚",
@@ -1506,20 +1506,20 @@
             }
         },
         {
-           "key": "哔滴",
-           "name": "🥛哔滴影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppQi",
-           "ext": {
-                     "url": "",
-                     "site": "https://ooxooxooxooxoo-1259561579.cos.ap-chengdu.myqcloud.com/ip.json",
-                     "dataKey": "5ae8ee4bb95ea0ce",
-                     "dataIv": "5ae8ee4bb95ea0ce",
-                     "deviceId": "",
-                     "version": "120",
-                     "ua": "okhttp/3.10.0 BDYS/109.0.0.8"
-                 }
+            "key": "哔滴",
+            "name": "🥛哔滴影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://ooxooxooxooxoo-1259561579.cos.ap-chengdu.myqcloud.com/ip.json",
+                "dataKey": "5ae8ee4bb95ea0ce",
+                "dataIv": "5ae8ee4bb95ea0ce",
+                "deviceId": "",
+                "version": "120",
+                "ua": "okhttp/3.10.0 BDYS/109.0.0.8"
+            }
         },
         {
             "key": "瓜萌",
@@ -1528,13 +1528,13 @@
             "quickSearch": 1,
             "api": "csp_AppGet",
             "ext": {
-                     "url": "",
-                     "site": "https://www.guahd.com/1.txt",
-                     "dataKey": "f2A7D4B9E8C16531",
-                     "dataIv": "f2A7D4B9E8C16531",
-                     "deviceId": "",
-                     "version": ""
-                  }
+                "url": "",
+                "site": "https://www.guahd.com/1.txt",
+                "dataKey": "f2A7D4B9E8C16531",
+                "dataIv": "f2A7D4B9E8C16531",
+                "deviceId": "",
+                "version": ""
+            }
         },
         {
             "key": "晴天",
@@ -1659,19 +1659,19 @@
             "ext": "7lj763gg0939790i413gi484k8058896highi4414h68l7g6hk8qiaojig9k2k289l9ik807i213k5j602"
         },
         {
-           "key": "若雪",
-           "name": "☃️若雪影视",
-           "type": 3,
-           "quickSearch": 1,
-           "api": "csp_AppQi",
-           "ext": {
-                     "url": "https://appcms.rx4k.top",
-                     "site": "",
-                     "dataKey": "ZX10ysTYZWtIJCTU",
-                     "dataIv": "ZX10ysTYZWtIJCTU",
-                     "deviceId": "",
-                     "version": "120"
-                  }
+            "key": "若雪",
+            "name": "☃️若雪影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "https://appcms.rx4k.top",
+                "site": "",
+                "dataKey": "ZX10ysTYZWtIJCTU",
+                "dataIv": "ZX10ysTYZWtIJCTU",
+                "deviceId": "",
+                "version": "120"
+            }
         },
         {
             "key": "哔哩视频",
@@ -1743,13 +1743,13 @@
             "ext": "7lj763gg402i79425739i7jghj118797l4hj840gi18633331l4708g2h7145403549g44l8ii56i187681hkjj3hhgh1ih3l32j250lk1k786lj20j468hk3hli4l46gig4i3g7g2722328j0136h01i7g5183k22k7gg3i72hk81gl8k9839kl7i0707"
         },
         {
-           "key": "金牌APP",
-           "name": "💣爆炸影视",
-           "quickSearch": 0,
-           "type": 3,
-           "api": "csp_AppMuou",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "ewogICJTaXRlVXJsIjogImh0dHBzOi8vbXVvdS53bGJicS54eXoiLAogICJFeHQiOiAiaXA5K1dadnQ5ODNzUzAwOGtyTktobno4Q2Fzb2d3QjlLYkp2U0FmNGJRZEg5aUlGVHE4Y0tGM3Y4RFBicnphUiIsCiAgIkluZm8iOiAiaHR0cHM6Ly9tdW91aHQuZ2d0dmIuY2MiCn0="
+            "key": "金牌APP",
+            "name": "💣爆炸影视",
+            "quickSearch": 0,
+            "type": 3,
+            "api": "csp_AppMuou",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "ewogICJTaXRlVXJsIjogImh0dHBzOi8vbXVvdS53bGJicS54eXoiLAogICJFeHQiOiAiaXA5K1dadnQ5ODNzUzAwOGtyTktobno4Q2Fzb2d3QjlLYkp2U0FmNGJRZEg5aUlGVHE4Y0tGM3Y4RFBicnphUiIsCiAgIkluZm8iOiAiaHR0cHM6Ly9tdW91aHQuZ2d0dmIuY2MiCn0="
         },
         {
             "key": "牛牛",
@@ -1777,10 +1777,10 @@
             "ext": "https://www.91qkw.com"
         },
         {
-           "key": "饺子影视",
-           "name": "🥟饺子影视",
-           "type": 3,
-           "api": "csp_Jiaozi"
+            "key": "饺子影视",
+            "name": "🥟饺子影视",
+            "type": 3,
+            "api": "csp_Jiaozi"
         },
         {
             "key": "鸭梨视频",
@@ -1887,13 +1887,13 @@
             "ext": "https://www.wwgz.cn"
         },
         {
-           "key": "追忆",
-           "name": "🐖追忆影视",
-           "type": 3,
-           "api": "csp_AppSy",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "quickSearch": 0,
-           "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeWtPAwa8PAzOjbdregJfgecQjmbgYlvm+1rK87EwCqgaovlgh315Qrh90D+nl+f08o="
+            "key": "追忆",
+            "name": "🐖追忆影视",
+            "type": 3,
+            "api": "csp_AppSy",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "quickSearch": 0,
+            "ext": "Qrf5S6Si5oF7dQyuv+Srh3uh0lT3z1Y7u59ip9hRVeWtPAwa8PAzOjbdregJfgecQjmbgYlvm+1rK87EwCqgaovlgh315Qrh90D+nl+f08o="
         },
         {
             "key": "热热",
@@ -1906,14 +1906,14 @@
             "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
         {
-           "key": "云速",
-           "name": "☁️云速影视",
-           "type": 3,
-           "searchable": 1,
-           "quickSearch": 0,
-           "api": "csp_AppQi",
-           "jar": "https://xcz.iptv365.org/wzxm.png",
-           "ext": "9ee0oa0Y30GapSvZ2C2RVE2HwH08KKvP0VhAZCVWpnluXpZNLRZrNCMeKyCWw1JOj3jlA6tSdRPHvvTyBCuIMzwlKeODvXst4zEi0DFYqmEXOu+cG8rF7/kIckBMVYvn"
+            "key": "云速",
+            "name": "☁️云速影视",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 0,
+            "api": "csp_AppQi",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "9ee0oa0Y30GapSvZ2C2RVE2HwH08KKvP0VhAZCVWpnluXpZNLRZrNCMeKyCWw1JOj3jlA6tSdRPHvvTyBCuIMzwlKeODvXst4zEi0DFYqmEXOu+cG8rF7/kIckBMVYvn"
         },
         {
             "key": "腾讯视频",
@@ -1950,39 +1950,39 @@
             "api": "csp_SP360"
         },
         {
-            "key":"腾讯视频1",
-            "name":"🐚腾讯4K",
-            "type":3,
-            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
-            "ext":"https://tvbox.catvod.com/xs/js/腾讯视频.js"
+            "key": "腾讯视频1",
+            "name": "🐚腾讯4K",
+            "type": 3,
+            "api": "https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext": "https://tvbox.catvod.com/xs/js/腾讯视频.js"
         },
         {
-            "key":"优酷视频1",
-            "name":"🐚优酷4K",
-            "type":3,
-            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
-            "ext":"https://tvbox.catvod.com/xs/js/优酷视频.js"
+            "key": "优酷视频1",
+            "name": "🐚优酷4K",
+            "type": 3,
+            "api": "https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext": "https://tvbox.catvod.com/xs/js/优酷视频.js"
         },
         {
-            "key":"芒果视频1",
-            "name":"🐚芒果4K",
-            "type":3,
-            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
-            "ext":"https://tvbox.catvod.com/xs/js/芒果视频.js"
+            "key": "芒果视频1",
+            "name": "🐚芒果4K",
+            "type": 3,
+            "api": "https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext": "https://tvbox.catvod.com/xs/js/芒果视频.js"
         },
         {
-            "key":"爱奇艺1",
-            "name":"🐚奇异4K",
-            "type":3,
-            "api":"https://tvbox.catvod.com/xs/js/drpy2.min.js",
-            "ext":"https://tvbox.catvod.com/xs/js/爱奇艺.js"
+            "key": "爱奇艺1",
+            "name": "🐚奇异4K",
+            "type": 3,
+            "api": "https://tvbox.catvod.com/xs/js/drpy2.min.js",
+            "ext": "https://tvbox.catvod.com/xs/js/爱奇艺.js"
         },
         {
-            "key":"360影视1",
-            "name":"🐚3604K",
-            "type":3,
-            "api":"https://ghfast.top/https://raw.githubusercontent.com/1771245847/TvBox/master/js/drpy2.min.js",
-            "ext":"https://ghfast.top/https://raw.githubusercontent.com/1771245847/TvBox/master/js/360.js"
+            "key": "360影视1",
+            "name": "🐚3604K",
+            "type": 3,
+            "api": "https://ghfast.top/https://raw.githubusercontent.com/1771245847/TvBox/master/js/drpy2.min.js",
+            "ext": "https://ghfast.top/https://raw.githubusercontent.com/1771245847/TvBox/master/js/360.js"
         },
         {
             "key": "麒麟影视",
@@ -1997,8 +1997,8 @@
             "ext": {
                 "作者": "🍊小橙子/250812",
                 "站名": "麒麟影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@__mxau__c2-4I3kFmdR=72fc3525-e0fa-4019-bf6e-3d06e6f46142；； __mxaf__c2-4I3kFmdR=1754965867；； Hm_tf_w2356gnrar6=1754965867；； Hm_lvt_w2356gnrar6=1754965867；； tips=ok；； PHPSESSID=7af6hekcukqa8f3219ad4p1o1h；； XLA_CI=047a68b08d63407f6ad2a0dfceb13bbb；； __mxas__c2-4I3kFmdR=%7B%22sid%22%3A%22ccc14c8a-de8e-473c-97c6-6ef2b5336977%22%2C%22vd%22%3A4%2C%22stt%22%3A14%2C%22dr%22%3A6%2C%22expires%22%3A1754984601%2C%22ct%22%3A1754982801%7D；； __mxav__c2-4I3kFmdR=14；； Hm_lpvt_w2356gnrar6=1754982801&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@__mxau__c2-4I3kFmdR=72fc3525-e0fa-4019-bf6e-3d06e6f46142；； __mxaf__c2-4I3kFmdR=1754965867；； Hm_tf_w2356gnrar6=1754965867；； Hm_lvt_w2356gnrar6=1754965867；； tips=ok；； PHPSESSID=7af6hekcukqa8f3219ad4p1o1h；； XLA_CI=047a68b08d63407f6ad2a0dfceb13bbb；； __mxas__c2-4I3kFmdR=%7B%22sid%22%3A%22ccc14c8a-de8e-473c-97c6-6ef2b5336977%22%2C%22vd%22%3A4%2C%22stt%22%3A14%2C%22dr%22%3A6%2C%22expires%22%3A1754984601%2C%22ct%22%3A1754982801%7D；； __mxav__c2-4I3kFmdR=14；； Hm_lpvt_w2356gnrar6=1754982801&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -2382,8 +2382,8 @@
             "ext": {
                 "作者": "🍊小橙子/250813",
                 "站名": "永乐视频",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@mx_style=black；； UM_distinctid=198a1520be1680-0744d6512bb9ed-90c2111-64496-198a1520be27f9；； CNZZDATA1281382704=376798191-1755053166-%7C1755055413&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@mx_style=black；； UM_distinctid=198a1520be1680-0744d6512bb9ed-90c2111-64496-198a1520be27f9；； CNZZDATA1281382704=376798191-1755053166-%7C1755055413&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -2468,8 +2468,8 @@
             "ext": {
                 "作者": "🍊小橙子/250813",
                 "站名": "忘忧草影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@clothes=black；； userBlockedPO=true&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@clothes=black；； userBlockedPO=true&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -3417,8 +3417,8 @@
             "ext": {
                 "作者": "🍊小橙子/250811",
                 "站名": "鲨鱼影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=vast4ejgtad1hbg04k70kdg1m0；； _ym_uid=1754879876708577104；； _ym_d=1754879876；； _ym_isad=2&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=vast4ejgtad1hbg04k70kdg1m0；； _ym_uid=1754879876708577104；； _ym_d=1754879876；； _ym_isad=2&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -3494,8 +3494,8 @@
             "ext": {
                 "作者": "🍊小橙子/250811",
                 "站名": "娃娃影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -3956,8 +3956,8 @@
             "ext": {
                 "作者": "🍊小橙子/250818",
                 "站名": "蜂鸟影院1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=2mbd3eglft234odthr4kiqj9eg；； _ym_uid=1755512603817656120；； _ym_d=1755512603；； _ym_isad=2；； BD_UPN=6&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=2mbd3eglft234odthr4kiqj9eg；； _ym_uid=1755512603817656120；； _ym_d=1755512603；； _ym_isad=2；； BD_UPN=6&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -4033,8 +4033,8 @@
             "ext": {
                 "作者": "🍊小橙子/250818",
                 "站名": "如意影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -4110,8 +4110,8 @@
             "ext": {
                 "作者": "🍊小橙子/250819",
                 "站名": "枝枝影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=maajfup79jsabamoh0vdjdnpjn&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=maajfup79jsabamoh0vdjdnpjn&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -4187,8 +4187,8 @@
             "ext": {
                 "作者": "🍊小橙子/250819",
                 "站名": "多瑙影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=87f51701f4ab7fc8218e3cf4d7fdf973&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=87f51701f4ab7fc8218e3cf4d7fdf973&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -4264,8 +4264,8 @@
             "ext": {
                 "作者": "🍊小橙子/250820",
                 "站名": "大师兄影视1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=p8n2c8tuao62ef5v6ku1mkb98a；； Hm_tf_sfhmwlxzce8=1755653031；； Hm_lvt_sfhmwlxzce8=1755653031；； X_CACHE_KEY=71658f245c2ca968893ac619293d300b；； Hm_lpvt_sfhmwlxzce8=1755654336；； recente=%5B%7B%22vod_name%22%3A%22%E9%94%A6%E6%9C%88%E5%A6%82%E6%AD%8C%22%2C%22vod_url%22%3A%22https%3A%2F%2Fwww.shuost.com%2Fokplay%2F140524-1-1.html%22%2C%22vod_part%22%3A%22%E7%AC%AC01%E9%9B%86%22%7D%5D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=p8n2c8tuao62ef5v6ku1mkb98a；； Hm_tf_sfhmwlxzce8=1755653031；； Hm_lvt_sfhmwlxzce8=1755653031；； X_CACHE_KEY=71658f245c2ca968893ac619293d300b；； Hm_lpvt_sfhmwlxzce8=1755654336；； recente=%5B%7B%22vod_name%22%3A%22%E9%94%A6%E6%9C%88%E5%A6%82%E6%AD%8C%22%2C%22vod_url%22%3A%22https%3A%2F%2Fwww.shuost.com%2Fokplay%2F140524-1-1.html%22%2C%22vod_part%22%3A%22%E7%AC%AC01%E9%9B%86%22%7D%5D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -4341,8 +4341,8 @@
             "ext": {
                 "作者": "🍊小橙子/250820",
                 "站名": "影趣影视网",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@hasVisited178a=1；； Hm_lvt_f362cd8d4646a98c0bc584b9bf1a5c63=1755670117；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__JwNW4IC7Tykg3q7o=1；； __51vcke__JwNW4IC7Tykg3q7o=6ced4b45-8fa9-5e77-97e2-4d6bf19dea59；； __51vuft__JwNW4IC7Tykg3q7o=1755670117502；； _clck=101pzfn%5E2%5Efym%5E0%5E2058；； Hm_lpvt_f362cd8d4646a98c0bc584b9bf1a5c63=1755671125；； __vtins__JwNW4IC7Tykg3q7o=%7B%22sid%22%3A%20%22416b6b20-a0ac-5cd5-9a8b-62ea16ded994%22%2C%20%22vd%22%3A%2010%2C%20%22stt%22%3A%201007569%2C%20%22dr%22%3A%20943022%2C%20%22expires%22%3A%201755672925065%2C%20%22ct%22%3A%201755671125065%7D；； _clsk=1gh0zic%5E1755671127088%5E11%5E1%5Ey.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@hasVisited178a=1；； Hm_lvt_f362cd8d4646a98c0bc584b9bf1a5c63=1755670117；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__JwNW4IC7Tykg3q7o=1；； __51vcke__JwNW4IC7Tykg3q7o=6ced4b45-8fa9-5e77-97e2-4d6bf19dea59；； __51vuft__JwNW4IC7Tykg3q7o=1755670117502；； _clck=101pzfn%5E2%5Efym%5E0%5E2058；； Hm_lpvt_f362cd8d4646a98c0bc584b9bf1a5c63=1755671125；； __vtins__JwNW4IC7Tykg3q7o=%7B%22sid%22%3A%20%22416b6b20-a0ac-5cd5-9a8b-62ea16ded994%22%2C%20%22vd%22%3A%2010%2C%20%22stt%22%3A%201007569%2C%20%22dr%22%3A%20943022%2C%20%22expires%22%3A%201755672925065%2C%20%22ct%22%3A%201755671125065%7D；； _clsk=1gh0zic%5E1755671127088%5E11%5E1%5Ey.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -4418,8 +4418,8 @@
             "ext": {
                 "作者": "🍊小橙子/250821",
                 "站名": "嫩草影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -4495,8 +4495,8 @@
             "ext": {
                 "作者": "🍊小橙子/250822",
                 "站名": "摩托威影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198cffa255a38c-0996b12db0a54a-90c2111-64496-198cffa255f100；； CNZZDATA1281374169=122610491-1755835934-%7C1755836548&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198cffa255a38c-0996b12db0a54a-90c2111-64496-198cffa255f100；； CNZZDATA1281374169=122610491-1755835934-%7C1755836548&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -14868,8 +14868,8 @@
             "ext": {
                 "作者": "🍊小橙子/250811",
                 "站名": "晴天影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -14945,8 +14945,8 @@
             "ext": {
                 "作者": "🍊小橙子/250811",
                 "站名": "荷花影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@X_CACHE_KEY=78423afcf7235d7447ec7396e21e5fd9；； Hm_lvt_c3147b7f0ef7f746db9d1142c7dbbbeb=1754894023；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_c3147b7f0ef7f746db9d1142c7dbbbeb=1754897199&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@X_CACHE_KEY=78423afcf7235d7447ec7396e21e5fd9；； Hm_lvt_c3147b7f0ef7f746db9d1142c7dbbbeb=1754894023；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_c3147b7f0ef7f746db9d1142c7dbbbeb=1754897199&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15022,8 +15022,8 @@
             "ext": {
                 "作者": "🍊小橙子/250812",
                 "站名": "包子影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1754962198；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1754962198；； HMACCOUNT=21F8EC1C8D8BE050；； PHPSESSID=pmelhudpts1a0hsanto0ff6o6k&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1754962198；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1754962198；； HMACCOUNT=21F8EC1C8D8BE050；； PHPSESSID=pmelhudpts1a0hsanto0ff6o6k&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15099,8 +15099,8 @@
             "ext": {
                 "作者": "🍊小橙子/250812",
                 "站名": "五洲影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_454ca432ee482135eb96baa2dbb0a92d=1754973778；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_454ca432ee482135eb96baa2dbb0a92d=1754974489&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_454ca432ee482135eb96baa2dbb0a92d=1754973778；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_454ca432ee482135eb96baa2dbb0a92d=1754974489&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15176,8 +15176,8 @@
             "ext": {
                 "作者": "🍊小橙子/250812",
                 "站名": "老牛影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@_ym_uid=1754988263739702404；； _ym_d=1754988263；； _ym_isad=2&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@_ym_uid=1754988263739702404；； _ym_d=1754988263；； _ym_isad=2&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15428,8 +15428,8 @@
             "ext": {
                 "作者": "🍊小橙子/250813",
                 "站名": "汇看影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@clothes=black；； userBlockedPO=true&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@clothes=black；； userBlockedPO=true&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15582,8 +15582,8 @@
             "ext": {
                 "作者": "🍊小橙子/250814",
                 "站名": "雅图影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755139924,1755139995；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755139995；； HMACCOUNT=21F8EC1C8D8BE050&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755139924,1755139995；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755139995；； HMACCOUNT=21F8EC1C8D8BE050&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15736,8 +15736,8 @@
             "ext": {
                 "作者": "🍊小橙子/250815",
                 "站名": "樱花影院1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=o2g775e66selr8mfhv4f9ij1gh；； __51uvsct__3LSsznL1iMSdnwgF=1；； __51vcke__3LSsznL1iMSdnwgF=47625288-8536-5d5a-b334-71ae40f60607；； __51vuft__3LSsznL1iMSdnwgF=1755216091496；； __vtins__3LSsznL1iMSdnwgF=%7B%22sid%22%3A%20%22ac252175-d2d4-52c1-b1dd-4dcd8129c682%22%2C%20%22vd%22%3A%2010%2C%20%22stt%22%3A%20154846%2C%20%22dr%22%3A%2010393%2C%20%22expires%22%3A%201755218046336%2C%20%22ct%22%3A%201755216246336%7D；； XLA_CI=9dc22521faab71a240cd071a16c8393b&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=o2g775e66selr8mfhv4f9ij1gh；； __51uvsct__3LSsznL1iMSdnwgF=1；； __51vcke__3LSsznL1iMSdnwgF=47625288-8536-5d5a-b334-71ae40f60607；； __51vuft__3LSsznL1iMSdnwgF=1755216091496；； __vtins__3LSsznL1iMSdnwgF=%7B%22sid%22%3A%20%22ac252175-d2d4-52c1-b1dd-4dcd8129c682%22%2C%20%22vd%22%3A%2010%2C%20%22stt%22%3A%20154846%2C%20%22dr%22%3A%2010393%2C%20%22expires%22%3A%201755218046336%2C%20%22ct%22%3A%201755216246336%7D；； XLA_CI=9dc22521faab71a240cd071a16c8393b&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15813,8 +15813,8 @@
             "ext": {
                 "作者": "🍊小橙子/250815",
                 "站名": "追剧网1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198ab3e3281388-04d47c6db2321c-90c2111-64496-198ab3e3282b73；； CNZZDATA1281397521=68793583-1755219637-%7C1755220311&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198ab3e3281388-04d47c6db2321c-90c2111-64496-198ab3e3282b73；； CNZZDATA1281397521=68793583-1755219637-%7C1755220311&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15890,8 +15890,8 @@
             "ext": {
                 "作者": "🍊小橙子/250815",
                 "站名": "尊客影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=k9gvdicsv1l1lnhm1qb5a3qlm6；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755225007；； HMACCOUNT=21F8EC1C8D8BE050；； XLA_CI=da2eb8d8672c2b3fee93a3f567fe44b5；； c09b364b10ea69ccf1b6865d9248d66d=9e198b246a41290f23763b85daa6d5cc；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755226501&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=k9gvdicsv1l1lnhm1qb5a3qlm6；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755225007；； HMACCOUNT=21F8EC1C8D8BE050；； XLA_CI=da2eb8d8672c2b3fee93a3f567fe44b5；； c09b364b10ea69ccf1b6865d9248d66d=9e198b246a41290f23763b85daa6d5cc；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755226501&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -15967,8 +15967,8 @@
             "ext": {
                 "作者": "🍊小橙子/250815",
                 "站名": "VS影视在线",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=glvs2avb3p99rhvhdgc0iglv4k；； Hm_lvt_c300461704f691cd89bf10387a2ca462=1755229200；； HMACCOUNT=21F8EC1C8D8BE050；； XLA_CI=40565682a75a5bec0116c9f18a959e9b；； Hm_lpvt_c300461704f691cd89bf10387a2ca462=1755230915&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=glvs2avb3p99rhvhdgc0iglv4k；； Hm_lvt_c300461704f691cd89bf10387a2ca462=1755229200；； HMACCOUNT=21F8EC1C8D8BE050；； XLA_CI=40565682a75a5bec0116c9f18a959e9b；； Hm_lpvt_c300461704f691cd89bf10387a2ca462=1755230915&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -16044,8 +16044,8 @@
             "ext": {
                 "作者": "🍊小橙子/250815",
                 "站名": "好好看影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_e3932456977999a03d758e6f8562cdb7=1755238597；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_e3932456977999a03d758e6f8562cdb7=1755239615&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_e3932456977999a03d758e6f8562cdb7=1755238597；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_e3932456977999a03d758e6f8562cdb7=1755239615&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -16121,8 +16121,8 @@
             "ext": {
                 "作者": "🍊小橙子/250815",
                 "站名": "88影视网1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@fikker-4Ltu-bGXc=b5pAVaXUpmRS0CPylCjWRsvgROpS8ytU；； fikker-4Ltu-bGXc=b5pAVaXUpmRS0CPylCjWRsvgROpS8ytU；； __51uvsct__K0P3NGx6VS9k1BH7=1；； __51vcke__K0P3NGx6VS9k1BH7=763d409d-f47b-50e1-ab8d-34b90d476b9f；； __51vuft__K0P3NGx6VS9k1BH7=1755241532127；； notice=2025815；； __vtins__K0P3NGx6VS9k1BH7=%7B%22sid%22%3A%20%2252142d82-c285-5f61-ac6a-9ba7409bf505%22%2C%20%22vd%22%3A%2013%2C%20%22stt%22%3A%202521225%2C%20%22dr%22%3A%207549%2C%20%22expires%22%3A%201755245853331%2C%20%22ct%22%3A%201755244053331%7D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@fikker-4Ltu-bGXc=b5pAVaXUpmRS0CPylCjWRsvgROpS8ytU；； fikker-4Ltu-bGXc=b5pAVaXUpmRS0CPylCjWRsvgROpS8ytU；； __51uvsct__K0P3NGx6VS9k1BH7=1；； __51vcke__K0P3NGx6VS9k1BH7=763d409d-f47b-50e1-ab8d-34b90d476b9f；； __51vuft__K0P3NGx6VS9k1BH7=1755241532127；； notice=2025815；； __vtins__K0P3NGx6VS9k1BH7=%7B%22sid%22%3A%20%2252142d82-c285-5f61-ac6a-9ba7409bf505%22%2C%20%22vd%22%3A%2013%2C%20%22stt%22%3A%202521225%2C%20%22dr%22%3A%207549%2C%20%22expires%22%3A%201755245853331%2C%20%22ct%22%3A%201755244053331%7D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -16583,8 +16583,8 @@
             "ext": {
                 "作者": "🍊小橙子/250818",
                 "站名": "白羊影院1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -16660,8 +16660,8 @@
             "ext": {
                 "作者": "🍊小橙子/250818",
                 "站名": "天堂影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=ka17ca7j9f28rkqv43s59o26kn；； __51uvsct__KmpyYaJb199WIc8y=1；； __51vcke__KmpyYaJb199WIc8y=54d45bf1-1c55-5e15-b1c7-49eb2cd944af；； __51vuft__KmpyYaJb199WIc8y=1755518303901；； Hm_lvt_a73ce837d09b961e85e9e7687146c7e7=1755518304；； HMACCOUNT=21F8EC1C8D8BE050；； __vtins__KmpyYaJb199WIc8y=%7B%22sid%22%3A%20%227b5252b6-d29f-5c42-9581-5e75ea179da1%22%2C%20%22vd%22%3A%208%2C%20%22stt%22%3A%20657647%2C%20%22dr%22%3A%2021415%2C%20%22expires%22%3A%201755520761540%2C%20%22ct%22%3A%201755518961540%7D；； Hm_lpvt_a73ce837d09b961e85e9e7687146c7e7=1755518962&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=ka17ca7j9f28rkqv43s59o26kn；； __51uvsct__KmpyYaJb199WIc8y=1；； __51vcke__KmpyYaJb199WIc8y=54d45bf1-1c55-5e15-b1c7-49eb2cd944af；； __51vuft__KmpyYaJb199WIc8y=1755518303901；； Hm_lvt_a73ce837d09b961e85e9e7687146c7e7=1755518304；； HMACCOUNT=21F8EC1C8D8BE050；； __vtins__KmpyYaJb199WIc8y=%7B%22sid%22%3A%20%227b5252b6-d29f-5c42-9581-5e75ea179da1%22%2C%20%22vd%22%3A%208%2C%20%22stt%22%3A%20657647%2C%20%22dr%22%3A%2021415%2C%20%22expires%22%3A%201755520761540%2C%20%22ct%22%3A%201755518961540%7D；； Hm_lpvt_a73ce837d09b961e85e9e7687146c7e7=1755518962&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -16765,8 +16765,8 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198bc0e1594410-022149824b6f91-90c2111-64496-198bc0e15958d7；； CNZZDATA1281428560=1815994569-1755501696-%7C1755502180&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198bc0e1594410-022149824b6f91-90c2111-64496-198bc0e15958d7；； CNZZDATA1281428560=1815994569-1755501696-%7C1755502180&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "主页url": "https://www.bjele.cn/",
                 "二次截取": "",
                 "数组": "lazyload&&</a>",
@@ -16807,8 +16807,8 @@
             "ext": {
                 "作者": "🍊小橙子/250818",
                 "站名": "饭碗TV",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@mx_style=white；； _clck=khjr04%7C2%7Cfyk%7C0%7C2056；； showBtn=true；； _clsk=1qnq52d%7C1755506275832%7C5%7C1%7Cy.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@mx_style=white；； _clck=khjr04%7C2%7Cfyk%7C0%7C2056；； showBtn=true；； _clsk=1qnq52d%7C1755506275832%7C5%7C1%7Cy.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -16884,8 +16884,8 @@
             "ext": {
                 "作者": "🍊小橙子/250818",
                 "站名": "王子TV",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@mx_style=white；； _clck=khjr04%7C2%7Cfyk%7C0%7C2056；； showBtn=true；； _clsk=1qnq52d%7C1755506275832%7C5%7C1%7Cy.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@mx_style=white；； _clck=khjr04%7C2%7Cfyk%7C0%7C2056；； showBtn=true；； _clsk=1qnq52d%7C1755506275832%7C5%7C1%7Cy.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -16961,8 +16961,8 @@
             "ext": {
                 "作者": "🍊小橙子/250819",
                 "站名": "星云影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@__51uvsct__KFliKXO1rlkI0Dbb=1；； __51vcke__KFliKXO1rlkI0Dbb=41e30926-020f-5bc3-a974-bbf62f687483；； __51vuft__KFliKXO1rlkI0Dbb=1755573500870；； __vtins__KFliKXO1rlkI0Dbb=%7B%22sid%22%3A%20%223ca59cd7-409c-5db7-a254-f00c6723d966%22%2C%20%22vd%22%3A%206%2C%20%22stt%22%3A%201137926%2C%20%22dr%22%3A%201118153%2C%20%22expires%22%3A%201755576438789%2C%20%22ct%22%3A%201755574638789%7D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@__51uvsct__KFliKXO1rlkI0Dbb=1；； __51vcke__KFliKXO1rlkI0Dbb=41e30926-020f-5bc3-a974-bbf62f687483；； __51vuft__KFliKXO1rlkI0Dbb=1755573500870；； __vtins__KFliKXO1rlkI0Dbb=%7B%22sid%22%3A%20%223ca59cd7-409c-5db7-a254-f00c6723d966%22%2C%20%22vd%22%3A%206%2C%20%22stt%22%3A%201137926%2C%20%22dr%22%3A%201118153%2C%20%22expires%22%3A%201755576438789%2C%20%22ct%22%3A%201755574638789%7D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17038,8 +17038,8 @@
             "ext": {
                 "作者": "🍊小橙子/250819",
                 "站名": "大师兄影视",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_441d5a40de2781fd2f53b6e5a0459207=1755592259；； HMACCOUNT=21F8EC1C8D8BE050；； XLA_CI=9bf9e6d208d2882816371c3c1daad466；； Hm_lpvt_441d5a40de2781fd2f53b6e5a0459207=1755593407&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_441d5a40de2781fd2f53b6e5a0459207=1755592259；； HMACCOUNT=21F8EC1C8D8BE050；； XLA_CI=9bf9e6d208d2882816371c3c1daad466；； Hm_lpvt_441d5a40de2781fd2f53b6e5a0459207=1755593407&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17115,8 +17115,8 @@
             "ext": {
                 "作者": "🍊小橙子/250820",
                 "站名": "老王电影",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@clothes=white；； closeclick=closeclick&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@clothes=white；； closeclick=closeclick&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17269,8 +17269,8 @@
             "ext": {
                 "作者": "🍊小橙子/250821",
                 "站名": "追剧影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17295,14 +17295,14 @@
                 "导演": "导演：&&</p>",
                 "主演": "主演：&&</p>",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+ysinfotext\">&&</div>",
-                "线路二次截取":"xianlu\">&&</div>",
-                "线路数组":"<a&&</a>",
-                "多线二次截取":"xianlu\">&&</div>",
+                "线路二次截取": "xianlu\">&&</div>",
+                "线路数组": "<a&&</a>",
+                "多线二次截取": "xianlu\">&&</div>",
                 "多线数组": "<a&&/a>",
                 "线路标题": ">&&<",
                 "多线链接": "href=\"&&\"",
                 "播放二次截取": "",
-                "播放数组":"jisu\">&&xianlu",
+                "播放数组": "jisu\">&&xianlu",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
                 "播放标题": ">&&</a",
@@ -17349,8 +17349,8 @@
             "ext": {
                 "作者": "🍊小橙子/250821",
                 "站名": "茶杯狐1",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=4etqav7ss8disfbpei8bgt8iq6；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755758423；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__3Ic2Nz2fkGTPpoub=1；； __51vcke__3Ic2Nz2fkGTPpoub=f6c546ff-6ee2-53b6-8b23-ce1ef82d1e61；； __51vuft__3Ic2Nz2fkGTPpoub=1755758679968；； __vtins__3Ic2Nz2fkGTPpoub=%7B%22sid%22%3A%20%22e735fb9a-ddcc-5f13-8fa0-2ddd15c0b367%22%2C%20%22vd%22%3A%202%2C%20%22stt%22%3A%2032121%2C%20%22dr%22%3A%2032121%2C%20%22expires%22%3A%201755760512024%2C%20%22ct%22%3A%201755758712024%7D；； XLA_CI=738d85c62e92c568419d47c3ebfb6fbd；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755759346&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=4etqav7ss8disfbpei8bgt8iq6；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755758423；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__3Ic2Nz2fkGTPpoub=1；； __51vcke__3Ic2Nz2fkGTPpoub=f6c546ff-6ee2-53b6-8b23-ce1ef82d1e61；； __51vuft__3Ic2Nz2fkGTPpoub=1755758679968；； __vtins__3Ic2Nz2fkGTPpoub=%7B%22sid%22%3A%20%22e735fb9a-ddcc-5f13-8fa0-2ddd15c0b367%22%2C%20%22vd%22%3A%202%2C%20%22stt%22%3A%2032121%2C%20%22dr%22%3A%2032121%2C%20%22expires%22%3A%201755760512024%2C%20%22ct%22%3A%201755758712024%7D；； XLA_CI=738d85c62e92c568419d47c3ebfb6fbd；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755759346&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17426,8 +17426,8 @@
             "ext": {
                 "作者": "🍊小橙子/250821",
                 "站名": "追剧网2",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198cb8398aff72-02667f3eff2532-90c2111-64496-198cb8398b079d；； CNZZDATA1281397584=1984284955-1755761056-%7C1755764609&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@UM_distinctid=198cb8398aff72-02667f3eff2532-90c2111-64496-198cb8398b079d；； CNZZDATA1281397584=1984284955-1755761056-%7C1755764609&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17503,8 +17503,8 @@
             "ext": {
                 "作者": "🍊小橙子/250822",
                 "站名": "优质电影网",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_3b2de8878ae22889c3aef6af7ba5a165=1755824671；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_3b2de8878ae22889c3aef6af7ba5a165=1755824732&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_3b2de8878ae22889c3aef6af7ba5a165=1755824671；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_3b2de8878ae22889c3aef6af7ba5a165=1755824732&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17529,14 +17529,14 @@
                 "导演": "",
                 "主演": "",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+ysinfotext\">&&</div>",
-                "线路二次截取":"xianlu\">&&</div>",
-                "线路数组":"<a&&</a>",
-                "多线二次截取":"xianlu\">&&</div>",
+                "线路二次截取": "xianlu\">&&</div>",
+                "线路数组": "<a&&</a>",
+                "多线二次截取": "xianlu\">&&</div>",
                 "多线数组": "<a&&/a>",
                 "线路标题": ">&&<",
                 "多线链接": "href=\"&&\"",
                 "播放二次截取": "",
-                "播放数组":"jisu\">&&xianlu",
+                "播放数组": "jisu\">&&xianlu",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
                 "播放标题": ">&&</a",
@@ -17583,8 +17583,8 @@
             "ext": {
                 "作者": "🍊小橙子/250822",
                 "站名": "星光影院",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_03874ca2d244c0c21e3501e4a17555f1=1755829928；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_03874ca2d244c0c21e3501e4a17555f1=1755830693；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755830694；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755830694&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_03874ca2d244c0c21e3501e4a17555f1=1755829928；； HMACCOUNT=21F8EC1C8D8BE050；； Hm_lpvt_03874ca2d244c0c21e3501e4a17555f1=1755830693；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755830694；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755830694&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17660,8 +17660,8 @@
             "ext": {
                 "作者": "🍊小橙子/250822",
                 "站名": "蜂鸟影院2",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_tf_rsjhlcw1akm=1755833033；； Hm_lvt_rsjhlcw1akm=1755833033；； Hm_lvt_d68014a7683f0f1f057290796d1efcdd=1755833034；； HMACCOUNT=C924673EB83EC08B；； Hm_lpvt_d68014a7683f0f1f057290796d1efcdd=1755833751；； Hm_lpvt_rsjhlcw1akm=1755833751&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_tf_rsjhlcw1akm=1755833033；； Hm_lvt_rsjhlcw1akm=1755833033；； Hm_lvt_d68014a7683f0f1f057290796d1efcdd=1755833034；； HMACCOUNT=C924673EB83EC08B；； Hm_lpvt_d68014a7683f0f1f057290796d1efcdd=1755833751；； Hm_lpvt_rsjhlcw1akm=1755833751&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -17737,8 +17737,8 @@
             "ext": {
                 "作者": "🍊小橙子/250822",
                 "站名": "电影天堂网",
-                "请求头":"User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=1dm0qs7vc59fcum224s8p790lf；； __51vcke__3LSsymjbQLKBbaF8=0157b238-b8cc-563a-95a5-fa144d2b52cb；； __51vuft__3LSsymjbQLKBbaF8=1755846989688；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755846991；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__3LSsymjbQLKBbaF8=2；； __vtins__3LSsymjbQLKBbaF8=%7B%22sid%22%3A%20%2249ebfaa9-ade9-5b4d-9f43-ff18957fd225%22%2C%20%22vd%22%3A%203%2C%20%22stt%22%3A%2058632%2C%20%22dr%22%3A%2051710%2C%20%22expires%22%3A%201755850810807%2C%20%22ct%22%3A%201755849010807%7D；； XLA_CI=79171a8c219eae1c4b6b735d92f2df89；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755849013&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
-                "编码":"UTF-8",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=1dm0qs7vc59fcum224s8p790lf；； __51vcke__3LSsymjbQLKBbaF8=0157b238-b8cc-563a-95a5-fa144d2b52cb；； __51vuft__3LSsymjbQLKBbaF8=1755846989688；； Hm_lvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755846991；； HMACCOUNT=21F8EC1C8D8BE050；； __51uvsct__3LSsymjbQLKBbaF8=2；； __vtins__3LSsymjbQLKBbaF8=%7B%22sid%22%3A%20%2249ebfaa9-ade9-5b4d-9f43-ff18957fd225%22%2C%20%22vd%22%3A%203%2C%20%22stt%22%3A%2058632%2C%20%22dr%22%3A%2051710%2C%20%22expires%22%3A%201755850810807%2C%20%22ct%22%3A%201755849010807%7D；； XLA_CI=79171a8c219eae1c4b6b735d92f2df89；； Hm_lpvt_47c0fa86ee1d66b7d3fd49e33eb4a72e=1755849013&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
                 "播放请求头": "",
@@ -20096,6 +20096,26 @@
                     "bilibili",
                     "YuMi-vip"
                 ]
+            }
+        },
+        {
+            "name": "牛牛2",
+            "type": 1,
+            "url": "https://zy.qiaoji8.com/xiafan.php?url=",
+            "ext": {
+                "flag": [
+                    "QD4K",
+                    "iyf",
+                    "duanju",
+                    "gzcj",
+                    "GTV",
+                    "GZYS",
+                    "weggz",
+                    "Ace"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
             }
         },
         {
