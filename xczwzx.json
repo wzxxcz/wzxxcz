@@ -5201,11 +5201,8 @@
             "key": "农民影视",
             "name": "👨‍🌾农民影视",
             "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/农民影视.json"
+            "api": "csp_Wwys",
+            "ext": "https://www.wwgz.cn"
         },
         {
             "key": "盒子影视",
