@@ -19238,7 +19238,7 @@
             "key": "养生堂",
             "name": "🐦‍🔥养生知识",
             "type": 3,
-            "api": "csp_HBPQ",
+            "api": "csp_XBPQ",
             "ext": "./XBPQ/养生堂.json",
             "style": {
                 "type": "rect",
