@@ -4963,7 +4963,7 @@
             "key": "面包影视",
             "name": "🍞面包影视",
             "type": 3,
-            "api": "csp_HBPQ",
+            "api": "csp_XBPQ",
             "ext": "./XBPQ/面包影视.json"
         },
         {
