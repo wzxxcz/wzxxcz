@@ -5231,6 +5231,41 @@
             }
         },
         {
+            "key": "素白白影视",
+            "name": "🐇素白白影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=r2m73596ff6s6pdurvrlno42n6；； __51uvsct__KIy6dRKyatX6YqZI=1；； __51vcke__KIy6dRKyatX6YqZI=1312d9a9-5113-5e36-ada6-94148024806f；； __51vuft__KIy6dRKyatX6YqZI=1756611623083；； Hm_lvt_4beb6299bb6d2870e5421d157a3d1dcf=1756611624；； HMACCOUNT=7FBEA9381F6A5AD2；； __vtins__KIy6dRKyatX6YqZI=%7B%22sid%22%3A%20%22b6982071-05d6-53da-a762-2e2d3a5f5345%22%2C%20%22vd%22%3A%206%2C%20%22stt%22%3A%201194566%2C%20%22dr%22%3A%2012174%2C%20%22expires%22%3A%201756614617622%2C%20%22ct%22%3A%201756612817622%7D；； Hm_lpvt_4beb6299bb6d2870e5421d157a3d1dcf=1756612818&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "编码": "UTF-8",
+                "主页url": "https://www.lianshengshimo.com/",
+                "二次截取": "",
+                "数组": "hl-item-thumb hl-lazy&&</a",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"hl-lc-1 remarks\">&&</span>",
+                "链接": "href=\"&&\"",
+                "影片年代": "年份：&&</li>",
+                "影片地区": "地区：&&</li>",
+                "影片类型": "类型：&&</li>",
+                "状态": "状态：&&</li>",
+                "导演": "导演：&&</li>",
+                "主演": "主演：&&</li>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&</div>",
+                "线路二次截取": "",
+                "线路数组": "<a class=\"hl-tabs-btn hl-slide-swiper&&/a>",
+                "线路标题": "</i>&&<",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"hl-plays-list hl-sort-list&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&</a>",
+                "播放链接": "href=\"&&\"",
+                "分类url": "https://www.lianshengshimo.com/vodshow/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$36#"
+            }
+        },
+        {
             "key": "360采集",
             "name": "💡360采集",
             "type": 1,
@@ -19296,20 +19331,6 @@
             }
         },
         {
-            "key": "素白白影视",
-            "name": "🐇素白白影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.lianshengshimo.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.lianshengshimo.com/vodshow/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$36#"
-            }
-        },
-        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -21551,3 +21572,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
