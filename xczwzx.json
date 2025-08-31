@@ -797,6 +797,13 @@
             }
         },
         {
+            "key": "金牌影视备",
+            "name": "🏅金牌影视备",
+            "type": 3,
+            "api": "csp_Jpys",
+            "ext": "https://m.hkybqufgh.com,https://m.sizhengxt.com,https://m.9zhoukj.com,https://m.sizhengxt.com,https://m.jiabaide.cn"
+        },
+        {
             "key": "猎手影视",
             "name": "🦁猎手影院",
             "type": 3,
