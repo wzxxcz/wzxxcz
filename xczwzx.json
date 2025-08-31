@@ -5205,6 +5205,13 @@
             "ext": "https://www.wwgz.cn"
         },
         {
+            "key": "三九影视",
+            "name": "🍸三九影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": "./XBPQ/三九影视.json"
+        },
+        {
             "key": "盒子影视",
             "name": "📦盒子影视",
             "type": 3,
