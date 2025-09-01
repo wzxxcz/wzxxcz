@@ -1,57 +1,58 @@
-{
-  "version": "2025.09.01",
-  "site_config": {
-    "primary_domain": "https://tv.yydsys.top",
-    "alternate_domains": ["https://tv.yydsys.cc"],
-    "site_info": {
-      "keyword": "多多",
-      "name": "多多",
-      "update_time": "2025-09-01T00:00:00Z"
-    }
-  },
-  "common_filters": {
-    "genres": {"key": "class", "values": [...]},
-    "regions": {"key": "area", "values": [...]},
-    "languages": {"key": "lang", "values": [...]},
-    "years": {"key": "year", "values": [...]},
-    "alphabet": {"key": "character", "values": [...]},
-    "sorting": {"key": "order", "values": [...]}
-  },
-  "content_categories": [
-    {
-      "id": "1",
-      "name": "电影",
-      "filters": ["genres", "regions", "languages", "years", "alphabet", "sorting"]
-    },
-    {
-      "id": "2", 
-      "name": "剧集",
-      "filters": ["genres", "regions", "languages", "years", "alphabet", "sorting"]
-    },
-    {
-      "id": "3",
-      "name": "综艺",
-      "filters": ["regions", "years", "alphabet", "sorting"]
-    },
-    {
-      "id": "4",
-      "name": "动漫",
-      "specific_filters": {
-        "anime_genres": {
-          "key": "class",
-          "values": [
-            {"id": "emotion", "name": "情感", "v": "情感"},
-            {"id": "sci_fi", "name": "科幻", "v": "科幻"},
-            // 其他动漫特定类型...
-          ]
-        }
-      },
-      "filters": ["regions", "languages", "years", "alphabet", "sorting"]
-    },
-    {
-      "id": "5",
-      "name": "短剧", 
-      "filters": ["years", "alphabet", "sorting"]
-    }
-  ]
+from flask import Flask, jsonify, request
+import json
+
+# 您提供的JSON数据
+your_json_data = {
+    "SiteUrl": "https://tv.yydsys.top",
+    ... # 您原始提供的完整JSON数据
 }
+
+app = Flask(__name__)
+
+@app.route('/api/get_filters', methods=['GET'])
+def get_filters():
+    """
+    获取指定类型的筛选条件API接口
+    参数：type_id - 分类ID（例如：1，2，3，4，5）
+    """
+    try:
+        # 从请求参数中获取type_id，例如 /api/get_filters?type_id=1
+        type_id = request.args.get('type_id', type=str)
+        
+        if not type_id:
+            return jsonify({"error": "Missing parameter: type_id"}), 400
+        
+        # 在Filters中查找对应的筛选条件
+        filters_for_type = your_json_data["Filters"].get(type_id)
+        
+        if filters_for_type is None:
+            return jsonify({"error": f"Invalid type_id: {type_id}. Available types: {list(your_json_data['Filters'].keys())}"}), 404
+        
+        # 构建返回数据，可以加入一些站点信息
+        response_data = {
+            "siteInfo": {
+                "siteUrl": your_json_data["SiteUrl"],
+                "siteName": your_json_data["SiteName"],
+                "domains": your_json_data["Domains"]
+            },
+            "filters": filters_for_type
+        }
+        
+        return jsonify(response_data), 200
+    
+    except Exception as e:
+        # 记录日志等更复杂的错误处理可以在这里添加
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+@app.route('/api/get_all_classes', methods=['GET'])
+def get_all_classes():
+    """
+    获取所有影视分类信息
+    """
+    try:
+        return jsonify(your_json_data["Classes"]), 200
+    except Exception as e:
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True) # 生产环境应关闭debug模式
