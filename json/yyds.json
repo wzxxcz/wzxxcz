@@ -1,297 +1,363 @@
 {
-  "version": "2.1.0",
-  "last_updated": "2025-01-01",
-  "site_info": {
-    "site_url": "https://tv.yydsys.top",
-    "domains": [
-      "https://tv.yydsys.cc"
-    ],
-    "site_word": "多多",
+  "config": {
+    "version": "2.2.0",
     "site_name": "多多视频",
-    "description": "高清视频播放平台",
-    "keywords": "电影,剧集,综艺,动漫,短剧,在线观看"
+    "site_domain": "https://tv.yydsys.top",
+    "backup_domains": ["https://tv.yydsys.cc"],
+    "update_time": "2025-01-20",
+    "data_structure_version": "v2"
   },
-  "categories": [
+  "site_metadata": {
+    "title": "多多视频 - 高清在线观看",
+    "description": "提供电影、剧集、综艺、动漫、短剧等高清视频在线观看服务",
+    "keywords": "电影,电视剧,综艺节目,动漫,短剧,在线观看,高清视频",
+    "language": "zh-CN",
+    "timezone": "Asia/Shanghai"
+  },
+  "content_categories": [
     {
-      "type_id": 1,
-      "type_name": "电影",
-      "type_icon": "film",
-      "type_order": 1,
-      "is_active": true
+      "id": 1,
+      "name": "电影",
+      "slug": "movie",
+      "sort_order": 1,
+      "is_active": true,
+      "icon_class": "icon-movie",
+      "description": "最新最全的电影资源"
     },
     {
-      "type_id": 2,
-      "type_name": "剧集",
-      "type_icon": "tv",
-      "type_order": 2,
-      "is_active": true
+      "id": 2,
+      "name": "剧集",
+      "slug": "tv",
+      "sort_order": 2,
+      "is_active": true,
+      "icon_class": "icon-tv",
+      "description": "热门电视剧、网络剧"
     },
     {
-      "type_id": 3,
-      "type_name": "综艺",
-      "type_icon": "variety",
-      "type_order": 3,
-      "is_active": true
+      "id": 3,
+      "name": "综艺",
+      "slug": "variety",
+      "sort_order": 3,
+      "is_active": true,
+      "icon_class": "icon-variety",
+      "description": "综艺节目、真人秀"
     },
     {
-      "type_id": 4,
-      "type_name": "动漫",
-      "type_icon": "anime",
-      "type_order": 4,
-      "is_active": true
+      "id": 4,
+      "name": "动漫",
+      "slug": "anime",
+      "sort_order": 4,
+      "is_active": true,
+      "icon_class": "icon-anime",
+      "description": "动画、动漫作品"
     },
     {
-      "type_id": 5,
-      "type_name": "短剧",
-      "type_icon": "short",
-      "type_order": 5,
-      "is_active": true
+      "id": 5,
+      "name": "短剧",
+      "slug": "short",
+      "sort_order": 5,
+      "is_active": true,
+      "icon_class": "icon-short",
+      "description": "网络短剧、迷你剧"
     }
   ],
-  "filters": {
-    "common_filters": {
-      "year": {
-        "name": "时间",
+  "filter_config": {
+    "global_filters": {
+      "time_range": {
         "key": "year",
-        "values": [
-          {"v": "2025", "n": "2025"},
-          {"v": "2024", "n": "2024"},
-          {"v": "2023", "n": "2023"},
-          {"v": "2022", "n": "2022"},
-          {"v": "2021", "n": "2021"},
-          {"v": "2020", "n": "2020"},
-          {"v": "2019", "n": "2019"},
-          {"v": "2018", "n": "2018"},
-          {"v": "2017", "n": "2017"},
-          {"v": "2016", "n": "2016"},
-          {"v": "2015", "n": "2015"},
-          {"v": "2014", "n": "2014"},
-          {"v": "2013", "n": "2013"},
-          {"v": "2012", "n": "2012"},
-          {"v": "2011", "n": "2011"},
-          {"v": "2010", "n": "2010"}
-        ]
+        "label": "年份",
+        "options": [
+          {"value": "2025", "label": "2025"},
+          {"value": "2024", "label": "2024"},
+          {"value": "2023", "label": "2023"},
+          {"value": "2022", "label": "2022"},
+          {"value": "2021", "label": "2021"},
+          {"value": "2020", "label": "2020"},
+          {"value": "2019", "label": "2019"},
+          {"value": "2018", "label": "2018"},
+          {"value": "2017", "label": "2017"},
+          {"value": "2016", "label": "2016"},
+          {"value": "2015", "label": "2015"},
+          {"value": "2014", "label": "2014"},
+          {"value": "2013", "label": "2013"},
+          {"value": "2012", "label": "2012"},
+          {"value": "2011", "label": "2011"},
+          {"value": "2010", "label": "2010"}
+        ],
+        "default": "2024",
+        "is_required": false
       },
-      "character": {
-        "name": "字母查找",
+      "alphabet_search": {
         "key": "character",
-        "values": [
-          {"v": "A", "n": "A"}, {"v": "B", "n": "B"}, {"v": "C", "n": "C"}, {"v": "D", "n": "D"},
-          {"v": "E", "n": "E"}, {"v": "F", "n": "F"}, {"v": "G", "n": "G"}, {"v": "H", "n": "H"},
-          {"v": "I", "n": "I"}, {"v": "J", "n": "J"}, {"v": "K", "n": "K"}, {"v": "L", "n": "L"},
-          {"v": "M", "n": "M"}, {"v": "N", "n": "N"}, {"v": "O", "n": "O"}, {"v": "P", "n": "P"},
-          {"v": "Q", "n": "Q"}, {"v": "R", "n": "R"}, {"v": "S", "n": "S"}, {"v": "T", "n": "T"},
-          {"v": "U", "n": "U"}, {"v": "V", "n": "V"}, {"v": "W", "n": "W"}, {"v": "X", "n": "X"},
-          {"v": "Y", "n": "Y"}, {"v": "Z", "n": "Z"}, {"v": "0-9", "n": "0-9"}
-        ]
+        "label": "字母搜索",
+        "options": [
+          {"value": "A", "label": "A"}, {"value": "B", "label": "B"}, {"value": "C", "label": "C"}, {"value": "D", "label": "D"},
+          {"value": "E", "label": "E"}, {"value": "F", "label": "F"}, {"value": "G", "label": "G"}, {"value": "H", "label": "H"},
+          {"value": "I", "label": "I"}, {"value": "J", "label": "J"}, {"value": "K", "label": "K"}, {"value": "L", "label": "L"},
+          {"value": "M", "label": "M"}, {"value": "N", "label": "N"}, {"value": "O", "label": "O"}, {"value": "P", "label": "P"},
+          {"value": "Q", "label": "Q"}, {"value": "R", "label": "R"}, {"value": "S", "label": "S"}, {"value": "T", "label": "T"},
+          {"value": "U", "label": "U"}, {"value": "V", "label": "V"}, {"value": "W", "label": "W"}, {"value": "X", "label": "X"},
+          {"value": "Y", "label": "Y"}, {"value": "Z", "label": "Z"}, {"value": "0-9", "label": "0-9"}
+        ],
+        "default": "",
+        "is_required": false
       },
-      "order": {
-        "name": "评分排序",
+      "sort_order": {
         "key": "order",
-        "values": [
-          {"v": "time", "n": "时间排序"},
-          {"v": "hits", "n": "人气排序"},
-          {"v": "score", "n": "评分排序"}
-        ]
+        "label": "排序方式",
+        "options": [
+          {"value": "time", "label": "最新发布"},
+          {"value": "hits", "label": "最多观看"},
+          {"value": "score", "label": "最高评分"}
+        ],
+        "default": "time",
+        "is_required": false
       }
     },
-    "specific_filters": {
-      "1": {  // 电影
-        "class": {
-          "name": "剧情",
-          "key": "class",
-          "values": [
-            {"v": "喜剧", "n": "喜剧"}, {"v": "爱情", "n": "爱情"}, {"v": "恐怖", "n": "恐怖"},
-            {"v": "动作", "n": "动作"}, {"v": "科幻", "n": "科幻"}, {"v": "剧情", "n": "剧情"},
-            {"v": "战争", "n": "战争"}, {"v": "警匪", "n": "警匪"}, {"v": "犯罪", "n": "犯罪"},
-            {"v": "古装", "n": "古装"}, {"v": "奇幻", "n": "奇幻"}, {"v": "武侠", "n": "武侠"},
-            {"v": "冒险", "n": "冒险"}, {"v": "枪战", "n": "枪战"}, {"v": "悬疑", "n": "悬疑"},
-            {"v": "惊悚", "n": "惊悚"}, {"v": "经典", "n": "经典"}, {"v": "青春", "n": "青春"},
-            {"v": "文艺", "n": "文艺"}, {"v": "微电影", "n": "微电影"}, {"v": "历史", "n": "历史"}
-          ]
+    "category_specific_filters": {
+      "1": {  // 电影分类筛选
+        "genre": {
+          "key": "genre",
+          "label": "类型",
+          "options": [
+            {"value": "喜剧", "label": "喜剧"}, {"value": "爱情", "label": "爱情"}, {"value": "恐怖", "label": "恐怖"},
+            {"value": "动作", "label": "动作"}, {"value": "科幻", "label": "科幻"}, {"value": "剧情", "label": "剧情"},
+            {"value": "战争", "label": "战争"}, {"value": "警匪", "label": "警匪"}, {"value": "犯罪", "label": "犯罪"},
+            {"value": "古装", "label": "古装"}, {"value": "奇幻", "label": "奇幻"}, {"value": "武侠", "label": "武侠"},
+            {"value": "冒险", "label": "冒险"}, {"value": "枪战", "label": "枪战"}, {"value": "悬疑", "label": "悬疑"},
+            {"value": "惊悚", "label": "惊悚"}, {"value": "经典", "label": "经典"}, {"value": "青春", "label": "青春"},
+            {"value": "文艺", "label": "文艺"}, {"value": "微电影", "label": "微电影"}, {"value": "历史", "label": "历史"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "area": {
-          "name": "地区",
-          "key": "area",
-          "values": [
-            {"v": "大陆", "n": "大陆"}, {"v": "香港", "n": "香港"}, {"v": "台湾", "n": "台湾"},
-            {"v": "美国", "n": "美国"}, {"v": "法国", "n": "法国"}, {"v": "英国", "n": "英国"},
-            {"v": "日本", "n": "日本"}, {"v": "韩国", "n": "韩国"}, {"v": "德国", "n": "德国"},
-            {"v": "泰国", "n": "泰国"}, {"v": "印度", "n": "印度"}, {"v": "意大利", "n": "意大利"},
-            {"v": "西班牙", "n": "西班牙"}, {"v": "加拿大", "n": "加拿大"}, {"v": "其他", "n": "其他"}
-          ]
+        "region": {
+          "key": "region",
+          "label": "地区",
+          "options": [
+            {"value": "大陆", "label": "大陆"}, {"value": "香港", "label": "香港"}, {"value": "台湾", "label": "台湾"},
+            {"value": "美国", "label": "美国"}, {"value": "法国", "label": "法国"}, {"value": "英国", "label": "英国"},
+            {"value": "日本", "label": "日本"}, {"value": "韩国", "label": "韩国"}, {"value": "德国", "label": "德国"},
+            {"value": "泰国", "label": "泰国"}, {"value": "印度", "label": "印度"}, {"value": "意大利", "label": "意大利"},
+            {"value": "西班牙", "label": "西班牙"}, {"value": "加拿大", "label": "加拿大"}, {"value": "其他", "label": "其他"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "lang": {
-          "name": "语言",
-          "key": "lang",
-          "values": [
-            {"v": "国语", "n": "国语"}, {"v": "英语", "n": "英语"}, {"v": "粤语", "n": "粤语"},
-            {"v": "闽南语", "n": "闽南语"}, {"v": "韩语", "n": "韩语"}, {"v": "日语", "n": "日语"},
-            {"v": "法语", "n": "法语"}, {"v": "德语", "n": "德语"}, {"v": "其它", "n": "其它"}
-          ]
+        "language": {
+          "key": "language",
+          "label": "语言",
+          "options": [
+            {"value": "国语", "label": "国语"}, {"value": "英语", "label": "英语"}, {"value": "粤语", "label": "粤语"},
+            {"value": "闽南语", "label": "闽南语"}, {"value": "韩语", "label": "韩语"}, {"value": "日语", "label": "日语"},
+            {"value": "法语", "label": "法语"}, {"value": "德语", "label": "德语"}, {"value": "其它", "label": "其它"}
+          ],
+          "default": "",
+          "is_required": false
         }
       },
-      "2": {  // 剧集
-        "class": {
-          "name": "剧情",
-          "key": "class",
-          "values": [
-            {"v": "喜剧", "n": "喜剧"}, {"v": "爱情", "n": "爱情"}, {"v": "恐怖", "n": "恐怖"},
-            {"v": "动作", "n": "动作"}, {"v": "科幻", "n": "科幻"}, {"v": "剧情", "n": "剧情"},
-            {"v": "战争", "n": "战争"}, {"v": "警匪", "n": "警匪"}, {"v": "犯罪", "n": "犯罪"},
-            {"v": "古装", "n": "古装"}, {"v": "奇幻", "n": "奇幻"}, {"v": "武侠", "n": "武侠"},
-            {"v": "冒险", "n": "冒险"}, {"v": "枪战", "n": "枪战"}, {"v": "悬疑", "n": "悬疑"},
-            {"v": "惊悚", "n": "惊悚"}, {"v": "经典", "n": "经典"}, {"v": "青春", "n": "青春"},
-            {"v": "文艺", "n": "文艺"}, {"v": "微电影", "n": "微电影"}, {"v": "历史", "n": "历史"}
-          ]
+      "2": {  // 剧集分类筛选
+        "genre": {
+          "key": "genre",
+          "label": "类型",
+          "options": [
+            {"value": "喜剧", "label": "喜剧"}, {"value": "爱情", "label": "爱情"}, {"value": "恐怖", "label": "恐怖"},
+            {"value": "动作", "label": "动作"}, {"value": "科幻", "label": "科幻"}, {"value": "剧情", "label": "剧情"},
+            {"value": "战争", "label": "战争"}, {"value": "警匪", "label": "警匪"}, {"value": "犯罪", "label": "犯罪"},
+            {"value": "古装", "label": "古装"}, {"value": "奇幻", "label": "奇幻"}, {"value": "武侠", "label": "武侠"},
+            {"value": "冒险", "label": "冒险"}, {"value": "枪战", "label": "枪战"}, {"value": "悬疑", "label": "悬疑"},
+            {"value": "惊悚", "label": "惊悚"}, {"value": "经典", "label": "经典"}, {"value": "青春", "label": "青春"},
+            {"value": "文艺", "label": "文艺"}, {"value": "微电影", "label": "微电影"}, {"value": "历史", "label": "历史"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "area": {
-          "name": "地区",
-          "key": "area",
-          "values": [
-            {"v": "大陆", "n": "大陆"}, {"v": "香港", "n": "香港"}, {"v": "台湾", "n": "台湾"},
-            {"v": "美国", "n": "美国"}, {"v": "法国", "n": "法国"}, {"v": "英国", "n": "英国"},
-            {"v": "日本", "n": "日本"}, {"v": "韩国", "n": "韩国"}, {"v": "德国", "n": "德国"},
-            {"v": "泰国", "n": "泰国"}, {"v": "印度", "n": "印度"}, {"v": "意大利", "n": "意大利"},
-            {"v": "西班牙", "n": "西班牙"}, {"v": "加拿大", "n": "加拿大"}, {"v": "其他", "n": "其他"}
-          ]
+        "region": {
+          "key": "region",
+          "label": "地区",
+          "options": [
+            {"value": "大陆", "label": "大陆"}, {"value": "香港", "label": "香港"}, {"value": "台湾", "label": "台湾"},
+            {"value": "美国", "label": "美国"}, {"value": "法国", "label": "法国"}, {"value": "英国", "label": "英国"},
+            {"value": "日本", "label": "日本"}, {"value": "韩国", "label": "韩国"}, {"value": "德国", "label": "德国"},
+            {"value": "泰国", "label": "泰国"}, {"value": "印度", "label": "印度"}, {"value": "意大利", "label": "意大利"},
+            {"value": "西班牙", "label": "西班牙"}, {"value": "加拿大", "label": "加拿大"}, {"value": "其他", "label": "其他"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "lang": {
-          "name": "语言",
-          "key": "lang",
-          "values": [
-            {"v": "国语", "n": "国语"}, {"v": "英语", "n": "英语"}, {"v": "粤语", "n": "粤语"},
-            {"v": "闽南语", "n": "闽南语"}, {"v": "韩语", "n": "韩语"}, {"v": "日语", "n": "日语"},
-            {"v": "法语", "n": "法语"}, {"v": "德语", "n": "德语"}, {"v": "其它", "n": "其它"}
-          ]
+        "language": {
+          "key": "language",
+          "label": "语言",
+          "options": [
+            {"value": "国语", "label": "国语"}, {"value": "英语", "label": "英语"}, {"value": "粤语", "label": "粤语"},
+            {"value": "闽南语", "label": "闽南语"}, {"value": "韩语", "label": "韩语"}, {"value": "日语", "label": "日语"},
+            {"value": "法语", "label": "法语"}, {"value": "德语", "label": "德语"}, {"value": "其它", "label": "其它"}
+          ],
+          "default": "",
+          "is_required": false
         }
       },
-      "4": {  // 动漫
-        "class": {
-          "name": "剧情",
-          "key": "class",
-          "values": [
-            {"v": "情感", "n": "情感"}, {"v": "科幻", "n": "科幻"}, {"v": "热血", "n": "热血"},
-            {"v": "推理", "n": "推理"}, {"v": "搞笑", "n": "搞笑"}, {"v": "冒险", "n": "冒险"},
-            {"v": "萝莉", "n": "萝莉"}, {"v": "校园", "n": "校园"}, {"v": "动作", "n": "动作"},
-            {"v": "机战", "n": "机战"}, {"v": "运动", "n": "运动"}, {"v": "战争", "n": "战争"},
-            {"v": "少年", "n": "少年"}, {"v": "少女", "n": "少女"}, {"v": "社会", "n": "社会"},
-            {"v": "原创", "n": "原创"}, {"v": "亲子", "n": "亲子"}, {"v": "益智", "n": "益智"},
-            {"v": "励志", "n": "励志"}, {"v": "其他", "n": "其他"}
-          ]
+      "4": {  // 动漫分类筛选
+        "genre": {
+          "key": "genre",
+          "label": "类型",
+          "options": [
+            {"value": "情感", "label": "情感"}, {"value": "科幻", "label": "科幻"}, {"value": "热血", "label": "热血"},
+            {"value": "推理", "label": "推理"}, {"value": "搞笑", "label": "搞笑"}, {"value": "冒险", "label": "冒险"},
+            {"value": "萝莉", "label": "萝莉"}, {"value": "校园", "label": "校园"}, {"value": "动作", "label": "动作"},
+            {"value": "机战", "label": "机战"}, {"value": "运动", "label": "运动"}, {"value": "战争", "label": "战争"},
+            {"value": "少年", "label": "少年"}, {"value": "少女", "label": "少女"}, {"value": "社会", "label": "社会"},
+            {"value": "原创", "label": "原创"}, {"value": "亲子", "label": "亲子"}, {"value": "益智", "label": "益智"},
+            {"value": "励志", "label": "励志"}, {"value": "其他", "label": "其他"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "area": {
-          "name": "地区",
-          "key": "area",
-          "values": [
-            {"v": "大陆", "n": "大陆"}, {"v": "香港", "n": "香港"}, {"v": "台湾", "n": "台湾"},
-            {"v": "美国", "n": "美国"}, {"v": "法国", "n": "法国"}, {"v": "英国", "n": "英国"},
-            {"v": "日本", "n": "日本"}, {"v": "韩国", "n": "韩国"}, {"v": "德国", "n": "德国"},
-            {"v": "泰国", "n": "泰国"}, {"v": "印度", "n": "印度"}, {"v": "意大利", "n": "意大利"},
-            {"v": "西班牙", "n": "西班牙"}, {"v": "加拿大", "n": "加拿大"}, {"v": "其他", "n": "其他"}
-          ]
+        "region": {
+          "key": "region",
+          "label": "地区",
+          "options": [
+            {"value": "大陆", "label": "大陆"}, {"value": "香港", "label": "香港"}, {"value": "台湾", "label": "台湾"},
+            {"value": "美国", "label": "美国"}, {"value": "法国", "label": "法国"}, {"value": "英国", "label": "英国"},
+            {"value": "日本", "label": "日本"}, {"value": "韩国", "label": "韩国"}, {"value": "德国", "label": "德国"},
+            {"value": "泰国", "label": "泰国"}, {"value": "印度", "label": "印度"}, {"value": "意大利", "label": "意大利"},
+            {"value": "西班牙", "label": "西班牙"}, {"value": "加拿大", "label": "加拿大"}, {"value": "其他", "label": "其他"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "lang": {
-          "name": "语言",
-          "key": "lang",
-          "values": [
-            {"v": "国语", "n": "国语"}, {"v": "英语", "n": "英语"}, {"v": "粤语", "n": "粤语"},
-            {"v": "闽南语", "n": "闽南语"}, {"v": "韩语", "n": "韩语"}, {"v": "日语", "n": "日语"},
-            {"v": "法语", "n": "法语"}, {"v": "德语", "n": "德语"}, {"v": "其它", "n": "其它"}
-          ]
+        "language": {
+          "key": "language",
+          "label": "语言",
+          "options": [
+            {"value": "国语", "label": "国语"}, {"value": "英语", "label": "英语"}, {"value": "粤语", "label": "粤语"},
+            {"value": "闽南语", "label": "闽南语"}, {"value": "韩语", "label": "韩语"}, {"value": "日语", "label": "日语"},
+            {"value": "法语", "label": "法语"}, {"value": "德语", "label": "德语"}, {"value": "其它", "label": "其它"}
+          ],
+          "default": "",
+          "is_required": false
         }
       },
-      "3": {  // 综艺
-        "area": {
-          "name": "地区",
-          "key": "area",
-          "values": [
-            {"v": "大陆", "n": "大陆"}, {"v": "香港", "n": "香港"}, {"v": "台湾", "n": "台湾"},
-            {"v": "美国", "n": "美国"}, {"v": "法国", "n": "法国"}, {"v": "英国", "n": "英国"},
-            {"v": "日本", "n": "日本"}, {"v": "韩国", "n": "韩国"}
-          ]
+      "3": {  // 综艺分类筛选
+        "region": {
+          "key": "region",
+          "label": "地区",
+          "options": [
+            {"value": "大陆", "label": "大陆"}, {"value": "香港", "label": "香港"}, {"value": "台湾", "label": "台湾"},
+            {"value": "美国", "label": "美国"}, {"value": "法国", "label": "法国"}, {"value": "英国", "label": "英国"},
+            {"value": "日本", "label": "日本"}, {"value": "韩国", "label": "韩国"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "year": {
-          "name": "时间",
+        "year_range": {
           "key": "year",
-          "values": [
-            {"v": "2025", "n": "2025"}, {"v": "2024", "n": "2024"}, {"v": "2023", "n": "2023"},
-            {"v": "2022", "n": "2022"}, {"v": "2021", "n": "2021"}, {"v": "2020", "n": "2020"},
-            {"v": "2019", "n": "2019"}, {"v": "2018", "n": "2018"}, {"v": "2017", "n": "2017"},
-            {"v": "2016", "n": "2016"}, {"v": "2015", "n": "2015"}, {"v": "2014", "n": "2014"},
-            {"v": "2013", "n": "2013"}, {"v": "2012", "n": "2012"}, {"v": "2011", "n": "2011"},
-            {"v": "2010", "n": "2010"}
-          ]
+          "label": "年份",
+          "options": [
+            {"value": "2025", "label": "2025"}, {"value": "2024", "label": "2024"}, {"value": "2023", "label": "2023"},
+            {"value": "2022", "label": "2022"}, {"value": "2021", "label": "2021"}, {"value": "2020", "label": "2020"},
+            {"value": "2019", "label": "2019"}, {"value": "2018", "label": "2018"}, {"value": "2017", "label": "2017"},
+            {"value": "2016", "label": "2016"}, {"value": "2015", "label": "2015"}, {"value": "2014", "label": "2014"},
+            {"value": "2013", "label": "2013"}, {"value": "2012", "label": "2012"}, {"value": "2011", "label": "2011"},
+            {"value": "2010", "label": "2010"}
+          ],
+          "default": "2024",
+          "is_required": false
         },
-        "character": {
-          "name": "字母查找",
+        "alphabet_search": {
           "key": "character",
-          "values": [
-            {"v": "A", "n": "A"}, {"v": "B", "n": "B"}, {"v": "C", "n": "C"}, {"v": "D", "n": "D"},
-            {"v": "E", "n": "E"}, {"v": "F", "n": "F"}, {"v": "G", "n": "G"}, {"v": "H", "n": "H"},
-            {"v": "I", "n": "I"}, {"v": "J", "n": "J"}, {"v": "K", "n": "K"}, {"v": "L", "n": "L"},
-            {"v": "M", "n": "M"}, {"v": "N", "n": "N"}, {"v": "O", "n": "O"}, {"v": "P", "n": "P"},
-            {"v": "Q", "n": "Q"}, {"v": "R", "n": "R"}, {"v": "S", "n": "S"}, {"v": "T", "n": "T"},
-            {"v": "U", "n": "U"}, {"v": "V", "n": "V"}, {"v": "W", "n": "W"}, {"v": "X", "n": "X"},
-            {"v": "Y", "n": "Y"}, {"v": "Z", "n": "Z"}, {"v": "0-9", "n": "0-9"}
-          ]
+          "label": "字母搜索",
+          "options": [
+            {"value": "A", "label": "A"}, {"value": "B", "label": "B"}, {"value": "C", "label": "C"}, {"value": "D", "label": "D"},
+            {"value": "E", "label": "E"}, {"value": "F", "label": "F"}, {"value": "G", "label": "G"}, {"value": "H", "label": "H"},
+            {"value": "I", "label": "I"}, {"value": "J", "label": "J"}, {"value": "K", "label": "K"}, {"value": "L", "label": "L"},
+            {"value": "M", "label": "M"}, {"value": "N", "label": "N"}, {"value": "O", "label": "O"}, {"value": "P", "label": "P"},
+            {"value": "Q", "label": "Q"}, {"value": "R", "label": "R"}, {"value": "S", "label": "S"}, {"value": "T", "label": "T"},
+            {"value": "U", "label": "U"}, {"value": "V", "label": "V"}, {"value": "W", "label": "W"}, {"value": "X", "label": "X"},
+            {"value": "Y", "label": "Y"}, {"value": "Z", "label": "Z"}, {"value": "0-9", "label": "0-9"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "order": {
-          "name": "评分排序",
+        "sort_order": {
           "key": "order",
-          "values": [
-            {"v": "time", "n": "时间排序"}, {"v": "hits", "n": "人气排序"}, {"v": "score", "n": "评分排序"}
-          ]
+          "label": "排序方式",
+          "options": [
+            {"value": "time", "label": "最新发布"},
+            {"value": "hits", "label": "最多观看"},
+            {"value": "score", "label": "最高评分"}
+          ],
+          "default": "time",
+          "is_required": false
         }
       },
-      "5": {  // 短剧
-        "year": {
-          "name": "时间",
+      "5": {  // 短剧分类筛选
+        "year_range": {
           "key": "year",
-          "values": [
-            {"v": "2025", "n": "2025"}, {"v": "2024", "n": "2024"}, {"v": "2023", "n": "2023"},
-            {"v": "2022", "n": "2022"}, {"v": "2021", "n": "2021"}, {"v": "2020", "n": "2020"},
-            {"v": "2019", "n": "2019"}, {"v": "2018", "n": "2018"}, {"v": "2017", "n": "2017"},
-            {"v": "2016", "n": "2016"}, {"v": "2015", "n": "2015"}, {"v": "2014", "n": "2014"},
-            {"v": "2013", "n": "2013"}, {"v": "2012", "n": "2012"}, {"v": "2011", "n": "2011"},
-            {"v": "2010", "n": "2010"}
-          ]
+          "label": "年份",
+          "options": [
+            {"value": "2025", "label": "2025"}, {"value": "2024", "label": "2024"}, {"value": "2023", "label": "2023"},
+            {"value": "2022", "label": "2022"}, {"value": "2021", "label": "2021"}, {"value": "2020", "label": "2020"},
+            {"value": "2019", "label": "2019"}, {"value": "2018", "label": "2018"}, {"value": "2017", "label": "2017"},
+            {"value": "2016", "label": "2016"}, {"value": "2015", "label": "2015"}, {"value": "2014", "label": "2014"},
+            {"value": "2013", "label": "2013"}, {"value": "2012", "label": "2012"}, {"value": "2011", "label": "2011"},
+            {"value": "2010", "label": "2010"}
+          ],
+          "default": "2024",
+          "is_required": false
         },
-        "character": {
-          "name": "字母查找",
+        "alphabet_search": {
           "key": "character",
-          "values": [
-            {"v": "A", "n": "A"}, {"v": "B", "n": "B"}, {"v": "C", "n": "C"}, {"v": "D", "n": "D"},
-            {"v": "E", "n": "E"}, {"v": "F", "n": "F"}, {"v": "G", "n": "G"}, {"v": "H", "n": "H"},
-            {"v": "I", "n": "I"}, {"v": "J", "n": "J"}, {"v": "K", "n": "K"}, {"v": "L", "n": "L"},
-            {"v": "M", "n": "M"}, {"v": "N", "n": "N"}, {"v": "O", "n": "O"}, {"v": "P", "n": "P"},
-            {"v": "Q", "n": "Q"}, {"v": "R", "n": "R"}, {"v": "S", "n": "S"}, {"v": "T", "n": "T"},
-            {"v": "U", "n": "U"}, {"v": "V", "n": "V"}, {"v": "W", "n": "W"}, {"v": "X", "n": "X"},
-            {"v": "Y", "n": "Y"}, {"v": "Z", "n": "Z"}, {"v": "0-9", "n": "0-9"}
-          ]
+          "label": "字母搜索",
+          "options": [
+            {"value": "A", "label": "A"}, {"value": "B", "label": "B"}, {"value": "C", "label": "C"}, {"value": "D", "label": "D"},
+            {"value": "E", "label": "E"}, {"value": "F", "label": "F"}, {"value": "G", "label": "G"}, {"value": "H", "label": "H"},
+            {"value": "I", "label": "I"}, {"value": "J", "label": "J"}, {"value": "K", "label": "K"}, {"value": "L", "label": "L"},
+            {"value": "M", "label": "M"}, {"value": "N", "label": "N"}, {"value": "O", "label": "O"}, {"value": "P", "label": "P"},
+            {"value": "Q", "label": "Q"}, {"value": "R", "label": "R"}, {"value": "S", "label": "S"}, {"value": "T", "label": "T"},
+            {"value": "U", "label": "U"}, {"value": "V", "label": "V"}, {"value": "W", "label": "W"}, {"极": "X"},
+            {"value": "Y", "label": "Y"}, {"value": "Z", "label": "Z"}, {"value": "0-9", "label": "0-9"}
+          ],
+          "default": "",
+          "is_required": false
         },
-        "order": {
-          "name": "评分排序",
+        "sort_order": {
           "key": "order",
-          "values": [
-            {"v": "time", "n": "时间排序"}, {"v": "hits", "n": "人气排序"}, {"v": "score", "n": "评分排序"}
-          ]
+          "label": "排序方式",
+          "options": [
+            {"value": "time", "label": "最新发布"},
+            {"value": "hits", "label": "最多观看"},
+            {"value": "score", "label": "最高评分"}
+          ],
+          "default": "time",
+          "is_required": false
         }
       }
     }
   },
-  "api_endpoints": {
-    "video_list": "/api/videos",
-    "video_detail": "/api/video/{id}",
-    "search": "/api/search",
-    "categories": "/api/categories",
-    "filters": "/api/filters"
+  "api_configuration": {
+    "base_url": "https://tv.yydsys.top/api",
+    "endpoints": {
+      "videos": "/videos",
+      "video_detail": "/video/{id}",
+      "search": "/search",
+      "categories": "/categories",
+      "filters": "/filters",
+      "recommendations": "/recommendations"
+    },
+    "request_timeout": 10000,
+    "cache_strategy": {
+      "enabled": true,
+      "default_ttl": 3600
+    }
   },
-  "config": {
-    "default_sort": "time",
+  "system_settings": {
     "default_page_size": 20,
-    "max_results": 100,
-    "supported_languages": ["zh-CN", "en-US"],
-    "cdn_enabled": true
+    "max_page_size": 100,
+    "default_sort": "time",
+    "supported_image_formats": ["jpg", "png", "webp"],
+    "supported_video_formats": ["mp4", "webm", "ogg"],
+    "cdn_enabled": true,
+    "enable_https": true
   }
 }
