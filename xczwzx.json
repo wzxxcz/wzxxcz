@@ -19082,6 +19082,22 @@
             "filterable": 1
         },
         {
+            "key": "一三",
+            "name": "🤣一三动漫",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://cdn-tupic-duofun-neimenggu.56uxi.com/1.txt",
+                "dataKey": "qwertyuiopqwerty",
+                "dataIv": "qwertyuiopqwerty",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "哆啦新番社",
             "name": "🤖哆啦新番社",
             "type": 3,
