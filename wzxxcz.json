@@ -1340,6 +1340,19 @@
             "playerType": 2
         },
         {
+            "key": "和友",
+            "name": "🍻和友影视",
+            "type": 3,
+            "api": "csp_AppSy",
+            "ext": {
+                "url": "",
+                "site": "http://qcb.sxtzg.com/api.txt",
+                "siteKey": "rectangleadsadxa",
+                "listKey": "gHSLmx3JQRasgztO",
+                "parsesKey": "gHSLmx3JQRasgztO"
+            }
+        },
+        {
             "key": "干饭",
             "name": "🍚干饭影视",
             "type": 3,
