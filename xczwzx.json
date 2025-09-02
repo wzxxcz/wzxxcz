@@ -1179,21 +1179,6 @@
             }
         },
         {
-            "key": "迪吧",
-            "name": "🎸迪吧影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://154.37.152.97:5211",
-                "site": "",
-                "dataKey": "685bf108bc47b67d",
-                "dataIv": "685bf108bc47b67d",
-                "deviceId": "",
-                "version": ""
-            }
-        },
-        {
             "key": "漫国",
             "name": "🏟️漫国影视",
             "type": 3,
