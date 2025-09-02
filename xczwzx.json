@@ -499,18 +499,18 @@
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 1,
-            "api": "https://gitee.com/wzbdyr/xcz/raw/master/js/lf_live10_min-output.js",
-            "ext": "https://gitee.com/wzbdyr/xcz/raw/master/lib/lf_live.json"
+            "api": "https://gitee.com/wzbdyr/hqds/raw/master/js/lf_live10_min-output.js",
+            "ext": "https://gitee.com/wzbdyr/hqds/raw/master/lib/lf_live.json"
         },
         {
             "key": "直播转点播",
             "name": "📺电视直播",
             "type": 3,
-            "api": "https://gitee.com/wzbdyr/xcz/raw/master/lib/live.js",
+            "api": "https://gitee.com/wzbdyr/hqds/raw/master/lib/live.js",
             "searchable": 0,
             "quickSearch": 1,
             "filterable": 0,
-            "ext": "https://gitee.com/wzbdyr/xcz/raw/master/lib/live.json"
+            "ext": "https://gitee.com/wzbdyr/hqds/raw/master/lib/live.json"
         },
         {
             "key": "网络直播",
