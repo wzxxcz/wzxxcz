@@ -924,14 +924,14 @@
             "ext": "./json/hb.json"
         },
         {
-            "key": "小斑快映",
+            "key":"小斑快映",
             "name": "🐅小斑4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "type":3,
+            "api":"csp_PanWebShare",
+            "searchable":1,
+            "quickSearch":1,
+            "filterable":1,
+            "changeable":1,
             "ext": "./json/xbky.json"
         },
         {
