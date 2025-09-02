@@ -868,17 +868,15 @@
             "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/js/央视综合.js"
         },
         {
-            "key":"csp_woog",
+            "key": "玩偶",
             "name": "🐲小橙子智能4K弹幕",
-            "type":3,
-            "changeable":"0",
-            "api":"csp_Duopan",
-            "filterable":1,
-            "jar":"https://jar.yy.xn--dkw.xn--6qq986b3xl/m/jar.php?id=og;md5;d4be9b4c1fc2a46911fb45726b8f109a ",
-            "ext":{
-                "site_urls":["https://woog.nxog.eu.org","https://woog.nxog.fun","https://woog.xn--dkw.xn--6qq986b3xl","https://ogwo.xn--dkw.xn--6qq986b3xl"],
-                "url_key":"woog",
-                "threadinfo":{"chunksize":295,"threads":16}}
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 0,
+            "ext": "./json/玩偶.json"
         },
         {
             "key": "欧歌",
