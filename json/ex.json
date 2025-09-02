@@ -9,93 +9,106 @@
             "https://erxiaofn.site"
         ],
         "SiteInfo": {
-            "Keyword": "ex",
-            "Name": "二小"
+            "Name": "二小",
+            "Keyword": "ex"
         },
-        // 核心修正：分类模块独立且明确，直接关联内容类型
-        "ContentCategories": [
+        // 分类数据（明确每个分类的ID、名称、关联的筛选规则）
+        "Categories": [
             {
-                "id": 1,                  // 分类唯一ID（对应原type_id）
-                "name": "电影",           // 分类名称（对应原type_name）
-                "alias": "movie",         // 分类别名（用于接口/路由标识）
-                "filterRules": "movie"    // 关联筛选规则（对应FilterRules中的键）
+                "id": 1,          // 分类唯一ID（对应原type_id）
+                "name": "电影",    // 用户可见的分类名称
+                "filterKey": "1"  // 关联筛选规则的键（必须与Filters中的键一致）
             },
             {
                 "id": 2,
                 "name": "剧集",
-                "alias": "tv",
-                "filterRules": "tv"
+                "filterKey": "2"
             },
             {
                 "id": 3,
                 "name": "动漫",
-                "alias": "anime",
-                "filterRules": "anime"
+                "filterKey": "3"
             },
             {
                 "id": 17,
                 "name": "综艺",
-                "alias": "variety",
-                "filterRules": "variety"
+                "filterKey": "17"  // 原Filters中无17，需补充对应规则（见下方Filters）
             }
         ],
-        // 筛选规则按分类别名组织，与ContentCategories强关联
-        "FilterRules": {
-            "movie": [  // 对应电影分类的筛选条件（alias=movie）
+        // 筛选规则（键为分类ID，确保与Categories的filterKey完全一致）
+        "Filters": {
+            "1": [  // 电影（对应Categories中id=1）
                 {
                     "name": "类型",
                     "key": "type",
-                    "options": [  // 更直观的字段名（原"value"→"options"）
-                        {"value": "25", "label": "科幻"},
-                        {"value": "26", "label": "战争"},
-                        {"value": "27", "label": "爱情"},
-                        {"value": "28", "label": "恐怖"},
-                        {"value": "29", "label": "院线"},
-                        {"value": "30", "label": "其他"}
+                    "options": [
+                        {"v": "25", "n": "科幻"},
+                        {"v": "26", "n": "战争"},
+                        {"v": "27", "n": "爱情"},
+                        {"v": "28", "n": "恐怖"},
+                        {"v": "29", "n": "院线"},
+                        {"v": "30", "n": "其他"}
                     ]
                 },
                 {
                     "name": "地区",
                     "key": "area",
                     "options": [
-                        {"value": "内地", "label": "内地"},
-                        {"value": "韩国", "label": "韩国"},
-                        {"value": "香港", "label": "香港"},
-                        {"value": "台湾", "label": "台湾"},
-                        {"value": "日本", "label": "日本"},
-                        {"value": "美国", "label": "美国"}
+                        {"v": "内地", "n": "内地"},
+                        {"v": "韩国", "n": "韩国"},
+                        {"v": "香港", "n": "香港"},
+                        {"v": "台湾", "n": "台湾"},
+                        {"v": "日本", "n": "日本"},
+                        {"v": "美国", "n": "美国"}
                     ]
                 },
-                // 其他筛选条件（剧情、语言、时间等）同理...
+                {
+                    "name": "时间",
+                    "key": "year",
+                    "options": [
+                        {"v": "2024", "n": "2024"},
+                        {"v": "2023", "n": "2023"},
+                        // 其他年份...
+                    ]
+                }
             ],
-            "tv": [     // 对应剧集分类的筛选条件（alias=tv）
+            "2": [  // 剧集（对应Categories中id=2）
                 {
                     "name": "类型",
                     "key": "type",
                     "options": [
-                        {"value": "31", "label": "国产剧"},
-                        {"value": "32", "label": "欧美剧"},
-                        {"value": "33", "label": "日韩剧"},
-                        {"value": "34", "label": "港台剧"},
-                        {"value": "35", "label": "其他剧"}
+                        {"v": "31", "n": "国产剧"},
+                        {"v": "32", "n": "欧美剧"},
+                        {"v": "33", "n": "日韩剧"},
+                        {"v": "34", "n": "港台剧"},
+                        {"v": "35", "n": "其他剧"}
                     ]
                 },
-                // 地区、语言等筛选条件与电影类似...
+                // 地区、时间等筛选条件...
             ],
-            "anime": [  // 对应动漫分类的筛选条件（alias=anime）
-                // 原type_id=3的筛选条件（类型含日韩/欧美/国产动漫）...
+            "3": [  // 动漫（对应Categories中id=3）
+                {
+                    "name": "类型",
+                    "key": "type",
+                    "options": [
+                        {"v": "36", "n": "国产动漫"},
+                        {"v": "37", "n": "日韩动漫"},
+                        {"v": "38", "n": "欧美动漫"}
+                    ]
+                },
+                // 地区、时间等筛选条件...
             ],
-            "variety": [ // 对应综艺分类的筛选条件（alias=variety）
-                // 原type_id=17的筛选条件（类型含国产/其他综艺）...
+            "17": [  // 综艺（原Filters中无17，现补充）
+                {
+                    "name": "类型",
+                    "key": "type",
+                    "options": [
+                        {"v": "39", "n": "国产综艺"},
+                        {"v": "40", "n": "其他综艺"}
+                    ]
+                },
+                // 时间、字母查找等筛选条件...
             ]
-        },
-        "PlayerConfig": {
-            "SupportedFormats": ["mp4", "m3u8", "flv"],
-            "PlayerUrl": "/player.html",
-            "ApiEndpoints": {
-                "getList": "/api/list",      // 获取分类内容列表接口（需传递分类alias）
-                "getPlayUrl": "/api/play"    // 获取播放地址接口
-            }
         }
     }
 }
