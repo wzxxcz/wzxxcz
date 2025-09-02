@@ -1119,6 +1119,17 @@
             "ext": "./json/蜡笔.json"
         },
         {
+            "key":"小米",
+            "name":"❤小米4K弹幕",
+            "type":3,
+            "api":"csp_PanWebShare",
+            "searchable":1,
+            "quickSearch":1,
+            "filterable":1,
+            "changeable":1,
+            "ext":"https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/json/xm.json"
+        },
+        {
             "key": "木偶",
             "name": "🍁木偶资源4K弹幕",
             "type": 3,
@@ -21815,3 +21826,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
