@@ -5049,6 +5049,17 @@
             "ext": "./js/采集之王.js?type=url&params=../json/采集静态.json$1$1"
         },
         {
+           "key": "hipy_js_采集之王[合]",
+           "name": "采集聚合(🐉)",
+           "type": 3,
+           "api": "./drpy_libs/drpy2.min.js",
+           "searchable": 1,
+           "quickSearch": 1,
+           "filterable": 1,
+           "order_num": 1,
+           "ext": "https://14338.kstore.space/tvbox1/drpy_js/%E9%87%87%E9%9B%86%E9%BE%99%E4%B9%8B%E7%8E%8B%5B%E5%90%88%5D.js?type=url&params=https://14338.kstore.space/tvbox1/json/%E9%BE%99%E5%B0%91%E9%9D%99%E6%80%81.json"
+        },
+        {
             "key": "骚火影视",
             "name": "🔥骚火影视",
             "type": 3,
