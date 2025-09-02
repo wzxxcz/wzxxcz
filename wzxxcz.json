@@ -1708,7 +1708,7 @@
         },
         {
             "key": "柚子",
-            "name": "🥥柚子影视",
+            "name": "🍋柚子影视",
             "type": 3,
             "quickSearch": 1,
             "api": "csp_AppGet",
