@@ -1209,6 +1209,22 @@
             }
         },
         {
+            "key": "豆丁",
+            "name": "🥛豆丁影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "",
+                "site": "http://45.66.157.77:9427/dd.txt",
+                "dataKey": "Xasdasd!123123dd",
+                "dataIv": "Xasdasd!123123dd",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "蔬菜",
             "name": "🥦蔬菜影视",
             "type": 3,
