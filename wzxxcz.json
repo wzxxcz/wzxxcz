@@ -1140,14 +1140,14 @@
             "ext": "./json/mogg.json"
         },
         {
-            "key": "多多",
+            "key":"多多",
             "name": "🍥多多弹幕4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "type":3,
+            "api":"csp_PanWebShare",
+            "searchable":1,
+            "quickSearch":1,
+            "filterable":1,
+            "changeable":1,
             "ext": "./json/yyds.json"
         },
         {
