@@ -5566,15 +5566,15 @@
             "ext": "./js/采集之王.js?type=url&params=../json/采集静态.json$1$1"
         },
         {
-           "key": "hipy_js_采集之王[合]",
-           "name": "采集聚合(🐉)",
-           "type": 3,
-           "api": "./drpy_libs/drpy2.min.js",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "order_num": 1,
-           "ext": "https://14338.kstore.space/tvbox1/drpy_js/%E9%87%87%E9%9B%86%E9%BE%99%E4%B9%8B%E7%8E%8B%5B%E5%90%88%5D.js?type=url&params=https://14338.kstore.space/tvbox1/json/%E9%BE%99%E5%B0%91%E9%9D%99%E6%80%81.json"
+            "key": "hipy_js_采集之王[合]",
+            "name": "采集聚合(🐉)",
+            "type": 3,
+            "api": "./drpy_libs/drpy2.min.js",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "order_num": 1,
+            "ext": "https://14338.kstore.space/tvbox1/drpy_js/%E9%87%87%E9%9B%86%E9%BE%99%E4%B9%8B%E7%8E%8B%5B%E5%90%88%5D.js?type=url&params=https://14338.kstore.space/tvbox1/json/%E9%BE%99%E5%B0%91%E9%9D%99%E6%80%81.json"
         },
         {
             "key": "骚火影视",
@@ -20593,6 +20593,35 @@
             "ext": {
                 "header": {
                     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                }
+            }
+        },
+        {
+            "name": "夜幕4",
+            "type": 0,
+            "url": "https://jx.xmflv.com/?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "mgtv",
+                    "芒果",
+                    "letv",
+                    "乐视",
+                    "pptv",
+                    "PPTV",
+                    "sohu",
+                    "bilibili",
+                    "哔哩哔哩",
+                    "哔哩"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.1.0"
                 }
             }
         },
