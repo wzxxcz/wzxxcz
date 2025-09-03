@@ -1281,7 +1281,7 @@
             "key": "移动",
             "name": "💡移动影视",
             "type": 3,
-            "jar": "./ok.jar;md5;5552a49db94271a17a28d29081d30950",
+            "jar": "./ok.jar",
             "api": "csp_PantaGuard",
             "quickSearch": 1,
             "changeable": 1,
