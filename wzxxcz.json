@@ -910,11 +910,10 @@
             "name": "⚡️闪电4K弹幕",
             "type": 3,
             "api": "csp_PanWebShare",
-            "jar": "https://xcz.iptv365.org/wzxqh.jar",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "changeable": 0,
+            "changeable": 1,
             "ext": "./json/sd.json"
         },
         {
