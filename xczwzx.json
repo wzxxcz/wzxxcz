@@ -546,6 +546,13 @@
             "filterable": 1
         },
         {
+            "key": "点歌台",
+            "name": "🎤点歌KTV",
+            "type": 3,
+            "api": "https://oplist.wya6.cn/d/lzyx/ysc/lib/drpy2.min.js",
+            "ext": "https://oplist.wya6.cn/d/lzyx/ysc/lib/ktv.js"
+        },
+        {
             "key": "DJ",
             "name": "🎤DJ嗨嗨",
             "type": 3,
