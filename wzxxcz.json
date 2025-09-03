@@ -1281,12 +1281,12 @@
             "key": "移动",
             "name": "💡移动影视",
             "type": 3,
-            "api": "csp_YD",
-            "searchable": 1,
+            "jar": "./ok.jar;md5;5552a49db94271a17a28d29081d30950",
+            "api": "csp_PantaGuard",
             "quickSearch": 1,
-            "style": {
-                "type": "list"
-            }
+            "changeable": 1,
+            "filterable": 1,
+            "timeout": 25
         },
         {
             "key": "金牌影视",
