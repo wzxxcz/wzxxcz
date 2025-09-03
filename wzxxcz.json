@@ -1281,12 +1281,12 @@
             "key": "移动",
             "name": "💡移动影视",
             "type": 3,
-            "jar": "https://xcz.iptv365.org/ok.jar",
-            "api": "csp_PantaGuard",
+            "api": "csp_YD",
+            "searchable": 1,
             "quickSearch": 1,
-            "changeable": 1,
-            "filterable": 1,
-            "timeout": 25
+            "style": {
+                "type": "list"
+            }
         },
         {
             "key": "金牌影视",
