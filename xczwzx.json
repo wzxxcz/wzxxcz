@@ -537,6 +537,15 @@
             "filterable": 0
         },
         {
+            "key": "MV大全",
+            "name": "🎤MV音乐",
+            "type": 4,
+            "api": "http://120.53.102.254/dsp/",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
             "key": "DJ",
             "name": "🎤DJ嗨嗨",
             "type": 3,
