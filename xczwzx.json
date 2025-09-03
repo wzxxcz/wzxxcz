@@ -1557,6 +1557,22 @@
             }
         },
         {
+            "key": "柠檬",
+            "name": "🍋柠檬影院",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                     "url": "http://45.207.212.137",
+                     "site": "",
+                     "dataKey": "a006661b01bdebbd",
+                     "dataIv": "a006661b01bdebbd",
+                     "deviceId": "",
+                     "version": "",
+                     "ua": ""
+                   }
+        },
+        {
             "key": "米诺",
             "name": "🌯米诺影视",
             "type": 3,
