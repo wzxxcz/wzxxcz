@@ -2010,6 +2010,17 @@
             "ext": "./XBPQ/糯米影视.json"
         },
         {
+            "key": "绝对",
+            "name": "🐵️绝对影视",
+            "type": 3,
+            "api": "./py/绝对影视.py",
+            "searchable": 1,
+            "quickSearch": 1,
+            "changeable": 1,
+            "filterable": 1,
+            "timeout": 60
+        },
+        {
             "key": "云速",
             "name": "☁️云速影视",
             "type": 3,
