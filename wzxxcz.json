@@ -961,6 +961,60 @@
             "ext": "./json/ex.json"
         },
         {
+            "key":"木偶",
+            "name": "🍁木偶资源4K弹幕",
+            "type":3,
+            "api":"csp_PanWebShare",
+            "searchable":1,
+            "quickSearch":1,
+            "filterable":1,
+            "ext": "./json/mogg.json"
+        },
+        {
+            "key":"多多",
+            "name": "🍥多多弹幕4K弹幕",
+            "type":3,
+            "api":"csp_PanWebShare",
+            "searchable":1,
+            "quickSearch":1,
+            "filterable":1,
+            "changeable":1,
+            "ext": "./json/yyds.json"
+        },
+        {
+            "key": "至臻",
+            "name": "🏆️至臻4K4K",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": "./json/zz.json"
+        },
+        {
+            "key":"蜡笔",
+            "name": "👠蜡笔在线",
+            "type":3,
+            "api":"csp_PanWebShare",
+            "searchable":1,
+            "quickSearch":1,
+            "filterable":1,
+            "changeable":1,
+            "ext": "./json/lb.json"
+        },
+        {
+            "key":"小米",
+            "name":"❤小米4K弹幕",
+            "type":3,
+            "api":"csp_PanWebShare",
+            "searchable":1,
+            "quickSearch":1,
+            "filterable":1,
+            "changeable":1,
+            "ext": "./json/xm.json"
+        },
+        {
             "key": "雷鲸",
             "name": "🍊雷鲸4K弹幕",
             "type": 3,
@@ -1001,36 +1055,6 @@
             "changeable": 1,
             "ext": {
                 "url": "https://panku8.com,https://yipanso.com"
-            }
-        },
-        {
-            "key": "双星",
-            "name": "🍊双星4K弹幕",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/双星.js",
-            "style": {
-                "type": "list"
-            }
-        },
-        {
-            "key": "校长",
-            "name": "🍊校长4K弹幕",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/校长.js",
-            "style": {
-                "type": "list"
-            }
-        },
-        {
-            "key": "人人电影网",
-            "name": "🍊人人4K弹幕",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/人人电影网.js",
-            "style": {
-                "type": "list"
             }
         },
         {
@@ -1085,68 +1109,6 @@
             "name": "🌾米搜4K4K弹幕",
             "type": 3,
             "api": "csp_MiSou"
-        },
-        {
-            "key": "糖果",
-            "name": "🍭糖果搜索",
-            "type": 3,
-            "api": "csp_TGSou",
-            "searchable": 1,
-            "changeable": 0
-        },
-        {
-            "key":"蜡笔",
-            "name": "👠蜡笔在线",
-            "type":3,
-            "api":"csp_PanWebShare",
-            "searchable":1,
-            "quickSearch":1,
-            "filterable":1,
-            "changeable":1,
-            "ext": "./json/lb.json"
-        },
-        {
-            "key":"小米",
-            "name":"❤小米4K弹幕",
-            "type":3,
-            "api":"csp_PanWebShare",
-            "searchable":1,
-            "quickSearch":1,
-            "filterable":1,
-            "changeable":1,
-            "ext": "./json/xm.json"
-        },
-        {
-            "key":"木偶",
-            "name": "🍁木偶资源4K弹幕",
-            "type":3,
-            "api":"csp_PanWebShare",
-            "searchable":1,
-            "quickSearch":1,
-            "filterable":1,
-            "ext": "./json/mogg.json"
-        },
-        {
-            "key":"多多",
-            "name": "🍥多多弹幕4K弹幕",
-            "type":3,
-            "api":"csp_PanWebShare",
-            "searchable":1,
-            "quickSearch":1,
-            "filterable":1,
-            "changeable":1,
-            "ext": "./json/yyds.json"
-        },
-        {
-            "key": "至臻",
-            "name": "🏆️至臻4K4K",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/zz.json"
         },
         {
             "key": "团长",
