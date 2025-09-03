@@ -737,14 +737,6 @@
             "ext": "https://gitee.com/wzbdyr/hqds/raw/master/lib/live.json"
         },
         {
-           "key": "味精",
-           "name": "📺味精直播自营",
-           "type": 3,
-           "api": "https://xcz.iptv365.org/sdtv.js",
-           "ext": "https://xcz.iptv365.org/线路直播.txt",
-           "jar": "https://xcz.iptv365.org/sdtv.jar"
-        },
-        {
             "key": "网络直播",
             "name": "📺网络直播",
             "type": 3,
@@ -21875,4 +21867,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
