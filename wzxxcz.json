@@ -1281,7 +1281,7 @@
             "key": "移动",
             "name": "💡移动影视",
             "type": 3,
-            "jar": "./ok.jar",
+            "jar": "https://xcz.iptv365.org/ok.jar",
             "api": "csp_PantaGuard",
             "quickSearch": 1,
             "changeable": 1,
