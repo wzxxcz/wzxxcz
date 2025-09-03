@@ -516,9 +516,9 @@
            "key": "味精",
            "name": "📺味精直播自营",
            "type": 3,
-           "api": "http://rihou.cc:567/sdtv.js",
-           "ext": "https://d.kstore.dev/download/9246/线路直播.txt",
-           "jar": "http://rihou.cc:567/sdtv.jar"
+           "api": "https://xcz.iptv365.org/sdtv.js",
+           "ext": "https://xcz.iptv365.org/线路直播.txt",
+           "jar": "https://xcz.iptv365.org/sdtv.jar"
         },
         {
             "key": "网络直播",
