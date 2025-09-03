@@ -2003,6 +2003,13 @@
             "ext": "jsSMEuhTZIAHjnUoLBzKdlRu5exzno6M4efF8LzwjWM="
         },
         {
+            "key": "糯米",
+            "name": "🍓糯米秒播",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": "./XBPQ/糯米影视.json"
+        },
+        {
             "key": "云速",
             "name": "☁️云速影视",
             "type": 3,
