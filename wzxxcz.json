@@ -1188,15 +1188,15 @@
             "ext": "https://ka1dfj.slsw6.com"
         },
         {
-            "key": "贱贱",
-            "name": "🐭贱贱P2P",
+            "key": "荐片",
+            "name": "🐭荐片P2P",
             "type": 3,
+            "api": "csp_JPJGuard",
+            "timeout": 15,
+            "playerType": 2,
             "searchable": 1,
             "quickSearch": 1,
-            "changeable": 1,
-            "playerType": "1",
-            "api": "https://gitlab.com/fantaiying/ext/-/raw/main/drpy2.min.js",
-            "ext": "https://gitlab.com/fantaiying/ext/-/raw/main/jp.js"
+            "changeable": 0
         },
         {
             "key": "修罗",
