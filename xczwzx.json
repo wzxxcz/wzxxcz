@@ -1965,13 +1965,6 @@
             }
         },
         {
-            "key": "白白影视",
-            "name": "🐟白白秒播",
-            "type": 3,
-            "api": "csp_SuBaiBai",
-            "ext": "https://www.subaibai.com"
-        },
-        {
             "key": "低端影视",
             "name": "🥃低端影视",
             "type": 3,
