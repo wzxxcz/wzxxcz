@@ -20520,13 +20520,13 @@
             "key": "合集",
             "name": "💋哔哩合集",
             "type": 3,
-            "api": "https://proxy.lalifeier.eu.org/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/drpy2.min.js",
-            "searchable": 1,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "searchable":1,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num": 142,
-            "ext": "https://proxy.lalifeier.eu.org/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/我的哔哩.js?type=url&params=https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/Bilibili/合集.json"
-        },
+            "order_num":142,
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/合集.json"
+        }, 
         {
             "key": "csp_Bili",
             "name": "🏵️哔哩哔哩",
