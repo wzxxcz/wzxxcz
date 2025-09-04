@@ -20409,26 +20409,26 @@
             "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/儿童武术.json"
         },
         {
-            "key": "csp_BBB",
-            "name": "🅱️套餐哔哩",
-            "type": 3,
-            "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/drpy2.min.js",
-            "searchable": 0,
+            "key":"csp_BBB",
+            "name":"🅱️套餐哔哩",
+            "type":3,
+            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "searchable":0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num": 142,
-            "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/我的哔哩.js?type=url&params=https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/Bilibili/哔哩套餐1.json"
+            "order_num":142,
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/哔哩套餐1.json"
         },
         {
             "key": "Bili",
             "name": "🅱️套餐2哔哩",
             "type": 3,
-            "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/drpy2.min.js",
-            "searchable": 0,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "searchable":0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num": 142,
-            "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/我的哔哩.js?type=url&params=https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/Bilibili/哔哩套餐2.json"
+            "order_num":142,
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/哔哩套餐2.json"
         },
         {
             "key": "软件",
