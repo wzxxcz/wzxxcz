@@ -19616,6 +19616,20 @@
             }
         },
         {
+            "key": "八戒影院2",
+            "name": "🐷八戒影院2",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.longshi88.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.longshi88.com/vodshow/{cateId}--------{catePg}---/",
+                "分类": "电影$dianying#电视剧$lianxuju#综艺$zongyi#动漫$dongman#短剧$duanju#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
