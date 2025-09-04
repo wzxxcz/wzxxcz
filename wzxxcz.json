@@ -1142,17 +1142,17 @@
             "ext": "https://ka1dfj.slsw6.com"
         },
         {
-      "key": "萌米",
-      "name": "👀萌米┃多线",
+      "key": "欢视",
+      "name": "👓欢视┃多线",
       "type": 3,
       "api": "csp_AppTTGuard",
-    "jar": "https://xcz.iptv365.org/wzx.jar",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
       "timeout": 15,
       "playerType": 2,
       "searchable": 1,
       "quickSearch": 1,
       "changeable": 1,
-      "ext": "uqGL1bNENEIVq+dC1p/Y9uWjuA=="
+      "ext": "uqGL1bNENExT9fFAy5mE5qU="
     },
         {
             "key": "修罗",
@@ -21915,4 +21915,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
