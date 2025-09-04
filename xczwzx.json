@@ -19904,15 +19904,15 @@
             "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/儿童思维.json"
         },
         {
-            "key": "儿童英语",
-            "name": " 🧒英语儿童",
-            "type": 3,
-            "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/drpy2.min.js",
-            "searchable": 0,
+            "key":"儿童英语",
+            "name":" 🧒英语儿童",
+            "type":3,
+            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "searchable":0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num": 142,
-            "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/我的哔哩.js?type=url&params=https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/Bilibili/儿童英语.json"
+            "order_num":142,
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/儿童英语.json"
         },
         {
             "key": "儿童硬笔",
