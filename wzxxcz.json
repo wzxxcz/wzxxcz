@@ -1692,22 +1692,6 @@
             }
         },
         {
-            "key": "漫国",
-            "name": "🏟️漫国影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://app.lkdyw.cn",
-                "site": "",
-                "dataKey": "e65144389e9361b5",
-                "dataIv": "e65144389e9361b5",
-                "deviceId": "",
-                "version": "",
-                "ua": ""
-            }
-        },
-        {
             "key": "豆丁",
             "name": "🥛豆丁影视",
             "type": 3,
