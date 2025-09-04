@@ -19829,6 +19829,18 @@
             "ext": "./js/Anime1.js"
         },
         {
+            "key": "漫国",
+            "name": "🤣漫国动漫",
+            "type": 3,
+            "api": "csp_AppSy",
+            "ext": {
+                "site": "https://dm-1255775577.cos.ap-guangzhou.myqcloud.com/dmg/api.txt",
+                "siteKey": "rectangleadsadxa",
+                "listKey": "aassddwwxxllsx1x",
+                "parsesKey": "aassddwwxxllsx1x"
+            }
+        },
+        {
             "key": "曼波动漫",
             "name": "🍸曼波动漫",
             "type": 3,
