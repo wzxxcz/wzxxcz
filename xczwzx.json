@@ -5323,6 +5323,13 @@
             "ext": "./js/采集之王.js?type=url&params=../json/采集静态.json$1$1"
         },
         {
+            "key":"采集之王1",
+            "name":"🐢采集搜索",
+            "type":3,
+            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/采集之王.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/json/采集静态.json$1$1"
+        }, 
+        {
            "key": "hipy_js_采集之王[合]",
            "name": "采集聚合(🐉)",
            "type": 3,
