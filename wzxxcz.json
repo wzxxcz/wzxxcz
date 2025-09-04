@@ -19693,6 +19693,20 @@
             }
         },
         {
+            "key": "迅播影院",
+            "name": "🦅迅播影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "http://xunbody.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "http://xunbody.com/?m=vod-type-id-{cateId}-pg-{catePg}.html",
+                "分类": "最新电影$1#最新连续剧$2#最新综艺$3#最新动漫$4#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
