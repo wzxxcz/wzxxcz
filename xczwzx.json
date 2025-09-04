@@ -19842,12 +19842,12 @@
             "key": "初中课堂",
             "name": "🅰️初中课堂",
             "type": 3,
-            "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/drpy2.min.js",
-            "searchable": 0,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "searchable":0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num": 142,
-            "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/我的哔哩.js?type=url&params=https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/Bilibili/初中课堂.json"
+            "order_num":142,
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/初中课堂.json"
         },
         {
             "key": "高中课堂",
