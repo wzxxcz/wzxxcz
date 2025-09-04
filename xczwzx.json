@@ -1557,6 +1557,22 @@
             }
         },
         {
+            "key": "小猪",
+            "name": "🐗小猪影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "",
+                "site": "https://xz4k.top/url.txt",
+                "dataKey": "1785acb6c963184b",
+                "dataIv": "1785acb6c963184b",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "柠檬",
             "name": "🍋柠檬影院",
             "type": 3,
