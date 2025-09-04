@@ -20275,7 +20275,7 @@
             "quickSearch": 0,
             "filterable": 1,
             "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/学堂教育.json"
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/学堂教育.json"
         }, 
         {
             "key": "少儿",
@@ -20286,7 +20286,7 @@
             "quickSearch": 0,
             "filterable": 1,
             "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/少儿合集.json"
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/少儿合集.json"
         },
         {
             "key": "小学课堂",
@@ -20297,7 +20297,7 @@
             "quickSearch": 0,
             "filterable": 1,
             "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/小学课堂.json"
+            "ext":"https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/小学课堂.json"
         },
         {
             "key": "初中课堂",
@@ -20308,7 +20308,7 @@
             "quickSearch": 0,
             "filterable": 1,
             "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/初中课堂.json"
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/初中课堂.json"
         },
         {
             "key": "高中课堂",
@@ -20319,7 +20319,7 @@
             "quickSearch": 0,
             "filterable": 1,
             "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/高中课堂.json"
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/高中课堂.json"
         },
         {
             "key":"儿童口才",
@@ -20330,29 +20330,28 @@
             "quickSearch": 0,
             "filterable": 1,
             "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/儿童口才.json"
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/儿童口才.json"
         },
         {
-            "key": "儿童拼音",
-            "name": " 🧒拼音儿童",
-            "type": 3,
-            "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/drpy2.min.js",
-            "searchable": 0,
+            "key":"儿童拼音",
+            "name":" 🧒拼音儿童",
+            "type":3,
+            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "searchable":0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num": 142,
-            "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/我的哔哩.js?type=url&params=https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/Bilibili/儿童拼音.json"
+            "order_num":142,"ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/儿童拼音.json"
         },
         {
-            "key": "儿童识字",
-            "name": " 🧒识字儿童",
-            "type": 3,
-            "api": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/drpy2.min.js",
-            "searchable": 0,
+            "key":"儿童识字",
+            "name":" 🧒识字儿童",
+            "type":3,
+            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/drpy2.min.js",
+            "searchable":0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num": 142,
-            "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/js/我的哔哩.js?type=url&params=https://gh-proxy.com/https://raw.githubusercontent.com/wzxxcz/tvbox/refs/heads/master/Bilibili/儿童识字.json"
+            "order_num":142,
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/Bilibili/儿童识字.json"
         },
         {
             "key": "儿童思维",
