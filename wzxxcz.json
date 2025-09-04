@@ -1128,6 +1128,13 @@
             "ext": "https://ka1dfj.slsw6.com"
         },
         {
+            "key":"荐片1",
+            "name":"💡荐片影视",
+            "api":"csp_Jianpian",
+            "type":3,
+            "ext":"https://ij1men.slsw6.com"
+        },
+        {
             "key": "荐片磁力",
             "name": "⚔️荐片磁力备",
             "quickSearch": 0,
