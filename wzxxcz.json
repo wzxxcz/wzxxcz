@@ -5540,6 +5540,26 @@
             }
         },
         {
+            "key": "迅播影院",
+            "name": "🦅迅播影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "http://xunbody.com/",
+                "二次截取": "",
+                "数组": "<div class=\"con\"&&</div",
+                "标题": "alt=\"&&\"",
+                "图片": "data-src=\"&&\"",
+                "副标题": "<em class=\"emScore\">&&</em>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "http://xunbody.com/?m=vod-type-id-{cateId}-pg-{catePg}.html",
+                "分类": "最新电影$1#最新连续剧$2#最新综艺$3#最新动漫$4#"
+            }
+        },
+        {
             "key": "360采集",
             "name": "💡360采集",
             "type": 1,
@@ -19690,20 +19710,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
-            }
-        },
-        {
-            "key": "迅播影院",
-            "name": "🦅迅播影院",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "http://xunbody.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "http://xunbody.com/?m=vod-type-id-{cateId}-pg-{catePg}.html",
-                "分类": "最新电影$1#最新连续剧$2#最新综艺$3#最新动漫$4#"
             }
         },
         {
