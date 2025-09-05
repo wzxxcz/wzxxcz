@@ -1240,21 +1240,6 @@
             }
         },
         {
-            "key": "柚子",
-            "name": "🍊柚子影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://cnm.guahd.com",
-                "dataKey": "f2A7D4B9E8C16531",
-                "dataIv": "f2A7D4B9E8C16531",
-                "deviceId": "",
-                "version": "",
-                "ua": ""
-            }
-        },
-        {
             "key": "豆丁",
             "name": "🥛豆丁影视",
             "type": 3,
