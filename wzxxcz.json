@@ -1303,7 +1303,7 @@
             "key":"猎手影视1",
             "name":"🧡猎手PY影视",
             "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main@main/py/猎手影视.py",
+            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/py/猎手影视.py",
             "searchable":1,
             "changeable":1,
             "quickSearch":1,
@@ -22167,4 +22167,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
