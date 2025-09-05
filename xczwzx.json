@@ -20105,8 +20105,8 @@
             "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/戏曲合集.json"
         },
         {
-            "key": "听书",
-            "name": "🅰听书合集",
+            "key": "哔哩哔哩听书",
+            "name":"🅰听书哔哩",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
             "searchable": 0,
