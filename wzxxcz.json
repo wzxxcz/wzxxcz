@@ -1121,6 +1121,13 @@
             "changeable": 1
         },
         {
+            "key": "荐片1",
+            "name": "🐭荐片P2P",
+            "api": "csp_Jianpian",
+            "type": 3,
+            "ext": "https://ij1men.slsw6.com"
+        },
+        {
             "key": "荐片",
             "name": "⚔️荐片磁力",
             "api": "csp_Jianpian",
