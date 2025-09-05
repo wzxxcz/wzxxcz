@@ -810,15 +810,17 @@
             }
         },
         {
-            "key":"金牌影视PY",
-            "name":"🧡金牌PY影视",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main@main/plugin/html/金牌.py",
-            "searchable":1,
-            "quickSearch":1,
-            "filterable":1,
-            "playerType":2,
-            "ext":{"site":"https://www.hkybqufgh.com,https://www.sizhengxt.com,https://0996zp.com,https://9zhoukj.com/,https://www.sizhengxt.com,https://www.tjrongze.com,https://www.jiabaide.cn,https://cqzuoer.com"}
+            "key": "金牌影视PY",
+            "name": "🧡金牌PY影视",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/plugin/html/金牌.py",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "playerType": 2,
+            "ext": {
+                "site": "https://www.hkybqufgh.com,https://www.sizhengxt.com,https://0996zp.com,https://9zhoukj.com/,https://www.sizhengxt.com,https://www.tjrongze.com,https://www.jiabaide.cn,https://cqzuoer.com"
+            }
         },
         {
             "key": "金牌影视备",
@@ -839,15 +841,15 @@
             "playerType": 2
         },
         {
-            "key":"猎手影视1",
-            "name":"🧡猎手PY影视",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/py/猎手影视.py",
-            "searchable":1,
-            "changeable":1,
-            "quickSearch":1,
-            "filterable":1,
-            "playerType":2
+            "key": "猎手影视1",
+            "name": "🧡猎手PY影视",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/py/猎手影视.py",
+            "searchable": 1,
+            "changeable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "playerType": 2
         },
         {
             "key": "和友",
@@ -1585,14 +1587,14 @@
             "quickSearch": 1,
             "api": "csp_AppGet",
             "ext": {
-                     "url": "http://45.207.212.137",
-                     "site": "",
-                     "dataKey": "a006661b01bdebbd",
-                     "dataIv": "a006661b01bdebbd",
-                     "deviceId": "",
-                     "version": "",
-                     "ua": ""
-                   }
+                "url": "http://45.207.212.137",
+                "site": "",
+                "dataKey": "a006661b01bdebbd",
+                "dataIv": "a006661b01bdebbd",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
         },
         {
             "key": "米诺",
@@ -2442,7 +2444,7 @@
             }
         },
         {
-            "key": "永乐视频",
+            "key": "永乐视频4K",
             "name": "⛱️永乐视频4K",
             "type": 3,
             "api": "csp_XBPQ",
@@ -2453,7 +2455,7 @@
             "timeout": 120,
             "ext": {
                 "作者": "🍊小橙子/250630",
-                "站名": "永乐视频",
+                "站名": "永乐视频4K",
                 "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 14；； V2136A Build/UP1A.231005.007；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36&&Cookie@gg_iscookie=1；； PHPSESSID=dp6gqin4iogi9e3es10t347cfn；； __zdzu__c1-jf1fibMe=b157301d-a7ec-4f14-a2f4-77da3cba83bb；； __zdzf__c1-jf1fibMe=1750170471；； _ga=GA1.1.597734863.1750170471；； mx_style=black；； gg_iscookie=1；； mac_history_mxpro=%5B%7B%22vod_name%22%3A%22%E5%BD%BC%E5%B2%B8%E7%81%AF%E5%A1%94%22%2C%22vod_url%22%3A%22https%3A%2F%2Fwww.5o5k.com%2Fvodplay%2F250703-7-1.html%22%2C%22vod_part%22%3A%22%E7%AC%AC01%E9%9B%86%22%7D%5D；； _ok1_=q2UYtDz0owcYjk576zwMWw2YcOJmKjJEQKMrjQOPE0S4g5RuPOlWfKqQ64ovOr1LCgv82jOLOAFIpUikMX1r2PQRa7HfR1DdrHUonhM5ondhnJz7HF/ElDFX02mdITXs；； _clck=skonx8%7C2%7Cfwv%7C0%7C1994；； gg_show_number6333=1；； __zdzs__c1-jf1fibMe=%7B%22sid%22%3A%22d92d78cb-a1e5-4bf8-8a17-b4d7c89f2ad3%22%2C%22vd%22%3A27%2C%22stt%22%3A38153%2C%22dr%22%3A3%2C%22expires%22%3A1752008624%2C%22ct%22%3A1750208624%7D；； __zdzv__c1-jf1fibMe=27；； _ga_C9CB9ZY4FS=GS2.1.s1750208584$o4$g1$t1750208624$j20$l0$h1991547924；； _clsk=1gauhhg%7C1750208625143%7C3%7C1%7Cq.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "图片代理": "0",
@@ -5047,7 +5049,7 @@
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"text_right\">&&</span>",
-                "链接": "href=\"&&\"[替换:voddetail>>vodplay#.html>>-1-1.html]",  
+                "链接": "href=\"&&\"[替换:voddetail>>vodplay#.html>>-1-1.html]",
                 "影片年代": "年份：&&</p>",
                 "影片地区": "地区：&&</p>",
                 "影片类型": "类型：&&</p>",
@@ -5055,7 +5057,7 @@
                 "导演": "导演：&&</p>",
                 "主演": "主演：&&</p>",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+txt\">&&</div>",
-                "线路二次截取": "id=\"NumTab\">&&</div>", 
+                "线路二次截取": "id=\"NumTab\">&&</div>",
                 "线路数组": "<a&&/a>",
                 "线路标题": "</i>&&<",
                 "播放二次截取": "",
@@ -5422,22 +5424,22 @@
             "ext": "./js/采集之王.js?type=url&params=../json/采集静态.json$1$1"
         },
         {
-            "key":"采集之王1",
-            "name":"🐢采集搜索",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/采集之王.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/json/采集静态.json$1$1"
-        }, 
+            "key": "采集之王1",
+            "name": "🐢采集搜索",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/采集之王.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/json/采集静态.json$1$1"
+        },
         {
-           "key": "hipy_js_采集之王[合]",
-           "name": "采集聚合(🐉)",
-           "type": 3,
-           "api": "./drpy_libs/drpy2.min.js",
-           "searchable": 1,
-           "quickSearch": 1,
-           "filterable": 1,
-           "order_num": 1,
-           "ext": "https://14338.kstore.space/tvbox1/drpy_js/%E9%87%87%E9%9B%86%E9%BE%99%E4%B9%8B%E7%8E%8B%5B%E5%90%88%5D.js?type=url&params=https://14338.kstore.space/tvbox1/json/%E9%BE%99%E5%B0%91%E9%9D%99%E6%80%81.json"
+            "key": "hipy_js_采集之王[合]",
+            "name": "采集聚合(🐉)",
+            "type": 3,
+            "api": "./drpy_libs/drpy2.min.js",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "order_num": 1,
+            "ext": "https://14338.kstore.space/tvbox1/drpy_js/%E9%87%87%E9%9B%86%E9%BE%99%E4%B9%8B%E7%8E%8B%5B%E5%90%88%5D.js?type=url&params=https://14338.kstore.space/tvbox1/json/%E9%BE%99%E5%B0%91%E9%9D%99%E6%80%81.json"
         },
         {
             "key": "骚火影视",
@@ -16723,7 +16725,7 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&</div",
                 "线路二次截取": "",
                 "线路数组": "data-toggle&&</a>",
-                "线路标题": ">&&</a>",
+                "线路标题": ">&&</a>[不包含:线路1]",
                 "播放二次截取": "",
                 "播放数组": "<ul class=\"stui-content__playlist clearfix&&</ul>",
                 "倒序": "0",
@@ -19909,164 +19911,165 @@
             "name": "🅰️学堂教育",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/学堂教育.json"
-        }, 
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/学堂教育.json"
+        },
         {
             "key": "少儿",
             "name": "🅰️少儿合集",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/少儿合集.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/少儿合集.json"
         },
         {
             "key": "小学课堂",
             "name": "🅰️小学课堂",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小学课堂.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小学课堂.json"
         },
         {
             "key": "初中课堂",
             "name": "🅰️初中课堂",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/初中课堂.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/初中课堂.json"
         },
         {
             "key": "高中课堂",
             "name": "🅰️高中课堂",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/高中课堂.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/高中课堂.json"
         },
         {
-            "key":"儿童口才",
-            "name":" 🧒口才儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童口才",
+            "name": " 🧒口才儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童口才.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童口才.json"
         },
         {
-            "key":"儿童拼音",
-            "name":" 🧒拼音儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童拼音",
+            "name": " 🧒拼音儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,"ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童拼音.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童拼音.json"
         },
         {
-            "key":"儿童识字",
-            "name":" 🧒识字儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童识字",
+            "name": " 🧒识字儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童识字.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童识字.json"
         },
         {
-            "key":"儿童思维",
-            "name":" 🧒思维儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童思维",
+            "name": " 🧒思维儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童思维.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童思维.json"
         },
         {
-            "key":"儿童英语",
-            "name":" 🧒英语儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童英语",
+            "name": " 🧒英语儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童英语.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童英语.json"
         },
         {
-            "key":"儿童硬笔",
-            "name":" 🧒硬笔儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童硬笔",
+            "name": " 🧒硬笔儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童硬笔.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童硬笔.json"
         },
         {
-            "key":"儿童编程",
-            "name":" 🧒编程儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童编程",
+            "name": " 🧒编程儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童编程.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童编程.json"
         },
         {
-            "key":"儿童武术",
-            "name":" 🧒武术儿童",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "儿童武术",
+            "name": " 🧒武术儿童",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童武术.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童武术.json"
         },
         {
-            "key":"csp_BBB",
-            "name":"🅱️套餐哔哩",
-            "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "key": "csp_BBB",
+            "name": "🅱️套餐哔哩",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/哔哩套餐1.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/哔哩套餐1.json"
         },
         {
             "key": "Bili",
             "name": "🅱️套餐2哔哩",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/哔哩套餐2.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/哔哩套餐2.json"
         },
         {
             "key": "软件",
@@ -20084,33 +20087,33 @@
             "name": "🅰️演唱会哔哩",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/演唱会.json"
-        }, 
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/演唱会.json"
+        },
         {
             "key": "戏曲",
             "name": "🅰️戏曲合集",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/戏曲合集.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/戏曲合集.json"
         },
         {
             "key": "听书",
             "name": "🅰听书合集",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小说.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小说.json"
         },
         {
             "key": "ly",
@@ -20132,56 +20135,56 @@
             "name": "🌈歌曲哔哩",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/歌曲MV.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/歌曲MV.json"
         },
         {
             "key": "美食",
             "name": "🌈美食哔哩",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/美食.json"
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/美食.json"
         },
         {
             "key": "球类",
             "name": "⚽️球类合集",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/球类合集.json"
-        }, 
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/球类合集.json"
+        },
         {
             "key": "球星",
             "name": "⚽️球星合集",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/球星合集.json"
-        }, 
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/球星合集.json"
+        },
         {
             "key": "合集",
             "name": "💋哔哩合集",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":1,
+            "searchable": 1,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/合集.json"
-        }, 
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/合集.json"
+        },
         {
             "key": "csp_Bili",
             "name": "🏵️哔哩哔哩",
