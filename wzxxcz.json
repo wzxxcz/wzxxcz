@@ -20565,7 +20565,15 @@
             "order_num": 142,
             "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/戏曲合集.json"
         },
-        {"key":"哔哩哔哩听书","name":"🅰听书┃哔哩","type":3,"api":"csp_Bili","searchable":0,"quickSearch":0,"filterable":0,"ext":{"cookie":"http://127.0.0.1:9978/file/TVBox/bili_cookie.txt","json":"https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bilibili/小说.json"},"style":{"type":"rect","ratio":1.597}},
+        {
+            "key":"哔哩哔哩听书",
+            "name":"🅰听书哔哩",
+            "type":3,"api":"csp_Bili",
+            "searchable":0,
+            "quickSearch":0,
+            "filterable":0,
+            "ext":{"cookie":"http://127.0.0.1:9978/file/TVBox/bili_cookie.txt","json":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小说.json"},"style":{"type":"rect","ratio":1.597}
+        },
         {
             "key": "ly",
             "name": "📻️戏曲娱乐",
@@ -22160,4 +22168,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
