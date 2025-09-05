@@ -813,7 +813,7 @@
             "key":"金牌影视PY",
             "name":"🧡金牌PY影视",
             "type":3,
-            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/plugin/html/金牌.py",
+            "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/plugin/html/%E9%87%91%E7%89%8C.py",
             "searchable":1,
             "quickSearch":1,
             "filterable":1,
