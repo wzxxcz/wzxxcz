@@ -1485,20 +1485,6 @@
             }
         },
         {
-            "key": "蓝光",
-            "name": "🥏蓝光影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://122.228.193.2:9654",
-                "dataKey": "ca94b06ca3c7d80e",
-                "dataIv": "ca94b06ca3c7d80e",
-                "deviceId": "",
-                "version": "119"
-            }
-        },
-        {
             "key": "麻花",
             "name": "🌯麻花影视",
             "type": 3,
