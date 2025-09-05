@@ -1289,7 +1289,7 @@
             "playerType": 2
         },
         {
-            "key":"猎手影视",
+            "key":"猎手影视1",
             "name":"🧡猎手PY影视",
             "type":3,
             "api":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox/py/猎手影视.py",
