@@ -2127,20 +2127,6 @@
             }
         },
         {
-            "key": "晴天",
-            "name": "🌤️晴天影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://qjappcms.sun4k.top",
-                "dataKey": "sBxqXVF5pAHbGzrH",
-                "dataIv": "sBxqXVF5pAHbGzrH",
-                "deviceId": "",
-                "version": "119"
-            }
-        },
-        {
             "key": "橘子",
             "name": "🍊橘子影视",
             "type": 3,
