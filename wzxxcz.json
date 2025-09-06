@@ -19545,6 +19545,26 @@
             }
         },
         {
+            "key": "短剧网",
+            "name": "🍊短剧网",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.sodj.cc/",
+                "二次截取": "",
+                "数组": "lazyload&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"pic-text text-right\">&&</span>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.sodj.cc/vodshow/{cateId}--------{catePg}---{year}/",
+                "分类": "电影$2#电视剧$3#综艺$38#动漫$4#短剧$1#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
@@ -19888,20 +19908,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
-            }
-        },
-        {
-            "key": "短剧网",
-            "name": "🍊短剧网",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.sodj.cc/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.sodj.cc/vodshow/{cateId}--------{catePg}---{year}/",
-                "分类": "电影$2#电视剧$3#综艺$38#动漫$4#短剧$1#"
             }
         },
         {
