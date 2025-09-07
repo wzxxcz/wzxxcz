@@ -2003,6 +2003,16 @@
             }
         },
         {
+            "key": "猪猪",
+            "name": "🐷小猪影院",
+            "quickSearch": 0,
+            "searchable": 1,
+            "type": 3,
+            "api": "csp_AppGet",
+            "jar": "https://xcz.iptv365.org/wzxm.png",
+            "ext": "I7L3u12iTGax7pIKDBrd0Czr1qZntIntytqeFyDzetDIICoeNSd3afmMXMhm296uAkb3qZ7kxihetfT8V6h4kw=="
+        },
+        {
             "key": "柠檬",
             "name": "🍋柠檬影院",
             "type": 3,
