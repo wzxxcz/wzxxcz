@@ -21050,21 +21050,6 @@
             "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小说.json"
         },
         {
-            "key": "ly",
-            "name": "📻️戏曲娱乐",
-            "type": 3,
-            "api": "csp_AppLY",
-            "jar": "https://xcz.iptv365.org/moyuer.php",
-            "searchable": 1,
-            "quickSearch": 0,
-            "changeable": 0,
-            "style": {
-                "type": "rect",
-                "ratio": 1.433
-            },
-            "ext": "w7TCmsOuw6LDqlpqUFfDlOWHuOmFouaQnuWRnV/lhpzkvYflkKfCs+W/pOipgOi2vea8iuesjMKNV1zCmcKaw57DnsOdwqXCqcKgwqTDhMOYw7PCoMK0U1fCp8Klw7LDnMKwwq/CsFrCrQ=="
-        },
-        {
             "key": "MV",
             "name": "🌈歌曲哔哩",
             "type": 3,
