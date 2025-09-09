@@ -1120,6 +1120,16 @@
             "changeable": 1
         },
         {
+            "key": "人人电影网",
+            "name": "🧑人人4K",
+            "type": 3,
+            "api": "./js/drpy2.min.js",
+            "ext": "./js/人人电影网.js",
+            "style": {
+                "type": "list"
+            }
+        },
+        {
             "key": "荐片1",
             "name": "🐭荐片P2P",
             "api": "csp_Jianpian",
