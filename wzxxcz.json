@@ -2017,6 +2017,22 @@
             }
         },
         {
+            "key": "追番",
+            "name": "⛵追番影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "",
+                "site": "https://ysappapi.oss-cn-shenzhen.aliyuncs.com/getapi.txt",
+                "dataKey": "A1akVPQmnnE4Fz9Z",
+                "dataIv": "A1akVPQmnnE4Fz9Z",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "万能",
             "name": "💰万能影视",
             "type": 3,
