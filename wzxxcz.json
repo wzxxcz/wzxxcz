@@ -20508,6 +20508,20 @@
             }
         },
         {
+            "key": "派对动漫",
+            "name": "🤣派对动漫",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://qjappcms.acg.party",
+                "dataKey": "AmtMYFCJDPoTlK7z",
+                "dataIv": "AmtMYFCJDPoTlK7z",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
             "key": "米饭",
             "name": "🍛米饭动漫",
             "type": 3,
