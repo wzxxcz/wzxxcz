@@ -20581,6 +20581,20 @@
             }
         },
         {
+            "key": "飘花影院",
+            "name": "🌸飘花影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "http://www.aijiafa.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "http://www.aijiafa.com/list.php?cate_id={cateId}&class=&year={year}&order=time&page={catePg}",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$5#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
