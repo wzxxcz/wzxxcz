@@ -20422,6 +20422,22 @@
             }
         },
         {
+            "key": "番薯",
+            "name": "🥔番薯动漫",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://new.app.bytegooty.com",
+                "site": "",
+                "dataKey": "N4yj7l7xKxHF4*gz",
+                "dataIv": "N4yj7l7xKxHF4*gz",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "凛冬",
             "name": "🤣凛冬动漫",
             "type": 3,
