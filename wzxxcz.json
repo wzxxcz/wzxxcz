@@ -21006,15 +21006,16 @@
             "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/哔哩套餐2.json"
         },
         {
-            "key":"哔️软件",
-            "name":"🅰️软件哔哩",
-            "type":3,
-            "api":"csp_Bili",
+            "key": "软件",
+            "name": "🅰️软件教程",
+            "type": 3,
+            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
             "searchable":0,
-            "quickSearch":0,
-            "filterable":0,
-            "ext":{"cookie":"http://127.0.0.1:9978/file/TVBox/bili_cookie.txt","json":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bil/软件教程.json"},"style":{"type":"rect","ratio":1.597}
-        },
+            "quickSearch": 0,
+            "filterable": 1,
+            "order_num":142,
+            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/软件教程.json"
+        }, 
         {
             "key": "演唱会",
             "name": "🅰️演唱会哔哩",
