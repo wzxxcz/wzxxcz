@@ -19962,6 +19962,22 @@
             }
         },
         {
+            "key": "元咲",
+            "name": "🤣元咲动漫",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://cic.aicg.fun",
+                "site": "",
+                "dataKey": "2c4h36abd96se10u",
+                "dataIv": "2c4h36abd96se10u",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "番薯",
             "name": "🥔番薯动漫",
             "type": 3,
