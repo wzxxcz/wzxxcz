@@ -2017,6 +2017,22 @@
             }
         },
         {
+            "key": "万能",
+            "name": "💰万能影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://wnvod.cc",
+                "site": "",
+                "dataKey": "5uBvur6znNUmE3zb",
+                "dataIv": "5uBvur6znNUmE3zb",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "驿站",
             "name": "🏩驿站影视",
             "type": 3,
