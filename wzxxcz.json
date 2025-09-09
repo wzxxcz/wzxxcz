@@ -2251,18 +2251,18 @@
             "ext": "7lj763gg402i7942463j9j9jh84l8798l8gli652828g332i"
         },
         {
-           "key": "QD4K",
-           "name": "🐷猪猪4K",
-           "type": 3,
-           "searchable": 1,
-           "quickSearch": 0,
-           "api": "./py/AppV2.py",
-           "playerType": 2,
-           "ext": {
-                    "api": "http://dmmax.kuailezhuiju2.com/icciu_api.php/v1.vod",
-                    "datasignkey": "6QQNUsP3PkD2ajJCPCY8",
-                    "apisignkey": "lvdoutv-1.0.0"
-                  }
+            "key": "QD4K",
+            "name": "🐷猪猪4K",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 0,
+            "api": "./py/AppV2.py",
+            "playerType": 2,
+            "ext": {
+                "api": "http://dmmax.kuailezhuiju2.com/icciu_api.php/v1.vod",
+                "datasignkey": "6QQNUsP3PkD2ajJCPCY8",
+                "apisignkey": "lvdoutv-1.0.0"
+            }
         },
         {
             "key": "巧技",
@@ -21010,12 +21010,12 @@
             "name": "🅰️软件教程",
             "type": 3,
             "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable":0,
+            "searchable": 0,
             "quickSearch": 0,
             "filterable": 1,
-            "order_num":142,
-            "ext":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/软件教程.json"
-        }, 
+            "order_num": 142,
+            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/软件教程.json"
+        },
         {
             "key": "演唱会",
             "name": "🅰️演唱会哔哩",
@@ -21096,12 +21096,19 @@
         {
             "key": "影视影视",
             "name": "🅰影视哔哩",
-            "type":3,
-            "api":"csp_Bili",
-            "searchable":0,
-            "quickSearch":0,
-            "filterable":0,
-            "ext":{"cookie":"http://127.0.0.1:9978/file/TVBox/bili_cookie.txt","json":"https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bil/合集.json"},"style":{"type":"rect","ratio":1.597}
+            "type": 3,
+            "api": "csp_Bili",
+            "searchable": 0,
+            "quickSearch": 0,
+            "filterable": 0,
+            "ext": {
+                "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt",
+                "json": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bil/合集.json"
+            },
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            }
         },
         {
             "key": "csp_Bili",
