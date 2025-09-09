@@ -1527,6 +1527,22 @@
             }
         },
         {
+            "key": "外剧",
+            "name": "🍊外剧影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://guowaiju.com",
+                "site": "",
+                "dataKey": "7xv16h7qgkrs9b1p",
+                "dataIv": "7xv16h7qgkrs9b1p",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "小猪",
             "name": "🐗小猪影视",
             "type": 3,
