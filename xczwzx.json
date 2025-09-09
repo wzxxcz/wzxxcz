@@ -19962,6 +19962,22 @@
             }
         },
         {
+            "key": "凛冬",
+            "name": "🤣凛冬动漫",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://cydd.xyz",
+                "site": "",
+                "dataKey": "cyddkeyf774b3b39",
+                "dataIv": "cyddkeyf774b3b39",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "曼波动漫",
             "name": "🍸曼波动漫",
             "type": 3,
