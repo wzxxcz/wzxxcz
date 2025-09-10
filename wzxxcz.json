@@ -22188,34 +22188,34 @@
             }
         },
         {
-      "name": "小橙子4K解析1",
-      "type": 1,
-      "url": "http://jx.4kbox.top/jx/?url=",
-      "ext": {
-        "flag": [
-          "qq",
-          "腾讯",
-          "qiyi",
-          "爱奇艺",
-          "奇艺",
-          "youku",
-          "优酷",
-          "sohu",
-          "搜狐",
-          "letv",
-          "乐视",
-          "mgtv",
-          "芒果",
-          "tnmb",
-          "seven",
-          "bilibili",
-          "1905"
-        ],
-        "header": {
-          "User-Agent": "okhttp/4.9.1"
-        }
-      }
-    },
+            "name": "小橙子4K解析1",
+            "type": 1,
+            "url": "http://jx.4kbox.top/jx/?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
         {
             "name": "如遇卡顿尝试切换LJK/EXO",
             "url": "/",
@@ -23029,4 +23029,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
