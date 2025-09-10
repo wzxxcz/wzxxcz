@@ -20887,7 +20887,7 @@
                 "主页url": "https://v.aikanbot.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://v.aikanbot.com/hot/index-tv-{cateId}-p-{catePg}.html",
-                "分类": "电影$movie#剧集$tv#"
+                "分类": "电影$index-movie#剧集$index-tv#"
             }
         },
         {
