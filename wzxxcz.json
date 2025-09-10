@@ -20877,6 +20877,20 @@
             }
         },
         {
+            "key": "爱看机器",
+            "name": "💡爱看机器",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://v.aikanbot.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://v.aikanbot.com/hot/index-tv-{cateId}-p-{catePg}.html",
+                "分类": "电影$movie#剧集$tv#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
