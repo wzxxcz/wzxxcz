@@ -20323,7 +20323,7 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+video-info-item video-info-content vod_content\">&&</div>",
                 "线路二次截取": "",
                 "线路数组": "data-dropdown&&</small>",
-                "线路标题": "value=\"&&\"+【共+<small>&&<+集】",
+                "线路标题": "value=\"&&\",
                 "播放二次截取": "",
                 "播放数组": "id=\"sort-item&&shortcuts",
                 "倒序": "0",
@@ -23052,3 +23052,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
