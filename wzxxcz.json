@@ -20837,6 +20837,41 @@
             }
         },
         {
+            "key": "人人影视",
+            "name": "🧑人人影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.rrys9.com/",
+                "二次截取": "",
+                "数组": "hl-item-thumb hl-lazy&&</a",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"hl-lc-1 remarks\">&&</span>",
+                "链接": "href=\"&&\"",
+                "影片年代": "年份：&&</li>",
+                "影片地区": "地区：&&</li>",
+                "影片类型": "类型：&&</li>",
+                "状态": "状态：&&</li>",
+                "导演": "导演：&&</li>",
+                "主演": "主演：&&</li>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&</div>",
+                "线路二次截取": "",
+                "线路数组": "<a class=\"hl-tabs-btn hl-slide-swiper&&/a>",
+                "线路标题": "</i>&&<",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"hl-plays-list hl-sort-list&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&</a>",
+                "播放链接": "href=\"&&\"",
+                "分类url": "https://www.rrys9.com/index.php/vod/show/id/{cateId}/page/{catePg}.html",
+                "分类": "电影$20#电视剧$21#综艺$24#动漫$22#短剧$23#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
@@ -21180,20 +21215,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
-            }
-        },
-        {
-            "key": "人人影视",
-            "name": "🧑人人影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.rrys9.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.rrys9.com/index.php/vod/show/id/{cateId}/page/{catePg}.html",
-                "分类": "电影$20#电视剧$21#综艺$24#动漫$22#短剧$23#"
             }
         },
         {
