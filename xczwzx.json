@@ -6454,16 +6454,6 @@
             "ext": "./XBPQ/三九影视.json"
         },
         {
-            "key": "盒子影视",
-            "name": "📦盒子影视",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/盒子影视.json"
-        },
-        {
             "key": "1905",
             "name": "🎞️1905影视",
             "type": 3,
