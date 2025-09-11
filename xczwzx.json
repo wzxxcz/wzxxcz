@@ -1145,6 +1145,22 @@
             "ext": "http://38.47.213.61:41271/mogai_api.php/v1.vod"
         },
         {
+            "key": "五八",
+            "name": "🍸五八影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://dy.58ys.vip",
+                "site": "",
+                "dataKey": "JEWibY1AgWF0V1xx",
+                "dataIv": "JEWibY1AgWF0V1xx",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "狂人",
             "name": "🦸狂人影视",
             "type": 3,
@@ -1152,10 +1168,12 @@
             "api": "csp_AppGet",
             "ext": {
                 "url": "https://www.zjkrmv.vip",
+                "site": "",
                 "dataKey": "vXeyuJFqTKqWUtWU",
                 "dataIv": "vXeyuJFqTKqWUtWU",
                 "deviceId": "",
-                "version": ""
+                "version": "",
+                "ua": ""
             }
         },
         {
