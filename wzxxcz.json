@@ -20531,6 +20531,26 @@
             }
         },
         {
+            "key": "哩哩影视",
+            "name": "🍊哩哩影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.9tvs.com/",
+                "二次截取": "",
+                "数组": "<div class=\"module-item\"&&</div",
+                "标题": "title=\"&&\"",
+                "图片": "data-src=\"&&\"",
+                "副标题": "<div class=\"module-item-text\">&&</div>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.9tvs.com/index.php/vod/show/id/{cateId}/page/{catePg}.html",
+                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#纪录片$20#短剧$21#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
@@ -20874,20 +20894,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
-            }
-        },
-        {
-            "key": "哩哩影视",
-            "name": "🍊哩哩影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.9tvs.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.9tvs.com/index.php/vod/show/id/{cateId}/page/{catePg}.html",
-                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#纪录片$20#短剧$21#"
             }
         },
         {
