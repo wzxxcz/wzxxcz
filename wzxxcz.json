@@ -21108,6 +21108,20 @@
             }
         },
         {
+            "key": "星空影院2",
+            "name": "🪐星空影院2",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.xkyy99.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.xkyy99.com/index.php/vod/show/id/{cateId}/page/{catePg}.html",
+                "分类": "电影$20#电视剧$21#综艺$24#动漫$22#短剧$23#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
