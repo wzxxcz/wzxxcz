@@ -21213,6 +21213,17 @@
             }
         },
         {
+            "key": "妈咪电影网",
+            "name": "💧妈咪电影网",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
+            "ext": {
+                "分类url": "https://www.bjele.cn/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$30#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
