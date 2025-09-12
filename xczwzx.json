@@ -5948,6 +5948,18 @@
             }
         },
         {
+            "key": "土豆影院",
+            "name": "🥔土豆影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
+            "ext": {
+                "链接": "href=\"&&\"[替换:weihu>>huishou#.html>>-1-1.html]",
+                "分类url": "http://www.xf-td.com/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$30#"
+            }
+        },
+        {
             "key": "360采集",
             "name": "💡360采集",
             "type": 1,
