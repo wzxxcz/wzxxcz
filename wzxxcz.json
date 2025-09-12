@@ -17914,7 +17914,7 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@__51uvsct__KC9ez7RMQfyeMYi6=1；； __51vcke__KC9ez7RMQfyeMYi6=bfff949b-711c-5fcf-894e-ede60a3dfd62；； __51vuft__KC9ez7RMQfyeMYi6=1757642188397；； __vtins__KC9ez7RMQfyeMYi6=%7B%22sid%22%3A%20%229b0cfcc9-1746-5ef2-a30e-9ed4af1b6e56%22%2C%20%22vd%22%3A%2013%2C%20%22stt%22%3A%201410600%2C%20%22dr%22%3A%208687%2C%20%22expires%22%3A%201757645398989%2C%20%22ct%22%3A%201757643598989%7D；； mac_history=%7Blog%3A%5B%7B%22name%22%3A%22%5B%E5%9B%BD%E4%BA%A7%E5%89%A7%5D%E4%BA%8C%E9%BE%99%E6%B9%96%C2%B7%E6%9D%91%E6%9A%96%E8%8A%B1%E5%BC%802%22%2C%22link%22%3A%22https%3A%2F%2Fjzjsxly.com%2Fvarticle%2F333506.html%22%2C%22pic%22%3A%22https%3A%2F%2Fmtzy0.com%2Fupload%2Fvod%2F20250831-1%2Ff52460e614105c8062c1ffa8f357a4e0.jpg%22%7D%2C%7B%22name%22%3A%22%5B%E5%9B%BD%E4%BA%A7%E5%89%A7%5D%E6%88%91%E4%BB%AC%E7%9A%84%E6%B2%B3%E5%B1%B1%22%2C%22link%22%3A%22https%3A%2F%2Fjzjsxly.com%2Fvarticle%2F331703.html%22%2C%22pic%22%3A%22https%3A%2F%2Fmtzy0.com%2Fupload%2Fvod%2F20250816-1%2F136e703c35d0cbcf9f50b7ec987ffce3.jpg%22%7D%5D%7D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "主页url": "https://jzjsxly.com/",
                 "二次截取": "",
