@@ -1765,12 +1765,13 @@
             "quickSearch": 1,
             "api": "csp_AppGet",
             "ext": {
-                "url": "http://114.134.185.234",
+                "url": "https://aikan.my",
                 "site": "",
-                "dataKey": "uI1TkPJC8B46AyN3",
-                "dataIv": "uI1TkPJC8B46AyN3",
+                "dataKey": "hzxjRSmyTmSE4ENE",
+                "dataIv": "hzxjRSmyTmSE4ENE",
                 "deviceId": "",
-                "version": ""
+                "version": "",
+                "ua": ""
             }
         },
         {
