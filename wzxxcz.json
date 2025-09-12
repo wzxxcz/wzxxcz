@@ -1045,19 +1045,6 @@
             "ext": "./json/hm.json"
         },
         {
-            "key": "盘库",
-            "name": "🍊盘库4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebKuBa",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": {
-                "url": "https://panku8.com,https://yipanso.com"
-            }
-        },
-        {
             "key": "趣盘",
             "name": "🍊趣盘4K弹幕",
             "type": 3,
