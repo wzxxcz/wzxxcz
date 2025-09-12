@@ -21219,7 +21219,7 @@
             "api": "csp_XBPQ",
             "jar": "https://xcz.iptv365.org/wzx.jar",
             "ext": {
-                "分类url": "https://www.99hanju.top/",
+                "分类url": "https://www.99hanju.top;;",
                 "分类": "电影$movie#电视剧$tv#综艺$variety#动漫$cartoon#短剧$shorts#"
             }
         },
@@ -23595,3 +23595,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
