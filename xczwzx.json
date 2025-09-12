@@ -1284,6 +1284,22 @@
             }
         },
         {
+            "key": "布雷",
+            "name": "🌩️布雷影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://cms.bl4k.cc",
+                "site": "",
+                "dataKey": "B7uaxcwdpX2dww82",
+                "dataIv": "B7uaxcwdpX2dww82",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "云端",
             "name": "☁️云端影视",
             "type": 3,
