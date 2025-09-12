@@ -21213,23 +21213,14 @@
             }
         },
         {
-            "key": "妈咪电影网",
-            "name": "💧妈咪电影网",
+            "key": "九九韩剧网",
+            "name": "🍸九九韩剧网",
             "type": 3,
             "api": "csp_XBPQ",
             "jar": "https://xcz.iptv365.org/wzx.jar",
             "ext": {
-                "线路二次截取": "",
-                "线路数组": "hd clearfix&&</div>",
-                "线路标题": ">&&</span>",
-                "播放二次截取": "",
-                "播放数组": "\"list\"&&</div>",
-                "倒序": "1",
-                "播放列表": "<a&&/a>",
-                "播放标题": ">&&</a>",
-                "播放链接": "href=\"&&\"",
-                "分类url": "https://www.bjele.cn/show/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$30#"
+                "分类url": "https://www.99hanju.top/vodshow/{cateId}-0-{year}-6-{catePg}.html",
+                "分类": "电影$movie#电视剧$tv#综艺$variety#动漫$cartoon#短剧$shorts#"
             }
         },
         {
