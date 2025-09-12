@@ -21190,6 +21190,22 @@
             }
         },
         {
+            "key": "土豆影院",
+            "name": "🥔土豆影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
+            "ext": {
+                "跳转数组": "<div class=\"gm-thumb&&</a",
+                "跳转链接": "href=\"&&\"",
+                "播放数组": "\"list\" &&</div>",
+                "播放列表": "<a&&/a>",
+                "播放标题": "<em></em>&&<",
+                "播放链接": "href=\"&&\"",
+                "分类url": "http://www.xf-td.com/show/{cateId}-{area}-{by}-{class}-{lang}-{letter}---{catePg}---{year}.html"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
