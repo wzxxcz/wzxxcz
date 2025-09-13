@@ -21255,7 +21255,7 @@
             "key": "光速资源",
             "name": "🛸光速采集",
             "type": 1,
-            "api": "https://api.guangsuapi.com/api.php/provide/vod/at/xml/",
+            "api": "https://api.guangsuapi.com/api.php/provide/vod/",
             "playerType": 1,
             "searchable": 1,
             "changeable": 1
