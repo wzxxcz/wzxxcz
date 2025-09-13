@@ -21255,10 +21255,29 @@
             "key": "光速资源",
             "name": "🛸光速采集",
             "type": 1,
-            "api": "https://api.guangsuapi.com/api.php/provide/vod/",
-            "playerType": 1,
+            "api": "http://api.guangsuapi.com/api.php/provide/vod/",
             "searchable": 1,
-            "changeable": 1
+            "changeable": 1,
+            "categories": [
+                "动作片",
+                "喜剧片",
+                "爱情片",
+                "科幻片",
+                "剧情片",
+                "恐怖片",
+                "战争片",
+                "动漫电影",
+                "大陆剧",
+                "欧美剧",
+                "港澳剧",
+                "韩剧",
+                "日剧",
+                "台湾剧",
+                "泰剧",
+                "综艺",
+                "动漫",
+                "记录片"
+            ]
         },
         {
             "key": "极速资源",
