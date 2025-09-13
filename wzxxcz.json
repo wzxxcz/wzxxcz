@@ -21434,17 +21434,6 @@
             }
         },
         {
-            "key": "韩剧TV",
-            "name": "🍊韩剧TV",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
-            "ext": {
-                "分类url": "https://www.hant.cc/{cateId}_{catePg}.html",
-                "分类": "电影$dianying#电视剧$hanguo#综艺$zongyi#动漫$dongman#视频解说$dyjieshuo#"
-            }
-        },
-        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
