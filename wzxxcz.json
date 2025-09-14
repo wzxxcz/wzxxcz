@@ -780,21 +780,6 @@
             "ext": "./json/DJyyyyw.json"
         },
         {
-            "key": "酷奇",
-            "name": "🎤酷奇MV",
-            "type": 3,
-            "api": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/drpy2.min.js",
-            "ext": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/酷奇MV.js",
-            "style": {
-                "type": "rect",
-                "ratio": 1.597
-            },
-            "timeout": 10,
-            "searchable": 0,
-            "quickSearch": 0,
-            "changeable": 0
-        },
-        {
             "key": "DJ呦呦音乐网",
             "name": "🎵DJ呦呦",
             "type": 3,
