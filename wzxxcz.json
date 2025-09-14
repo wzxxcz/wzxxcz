@@ -802,16 +802,16 @@
             "ext": "./json/wogg.json"
         },
         {
-            "key": "欧哥",
-            "name": "🐲小橙子4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/og.json"
-        },
+      "key": "欧歌",
+      "name": "🐲小橙子4K弹幕",
+      "type": 3,
+      "api": "csp_PanWebShare",
+      "searchable": 1,
+      "quickSearch": 1,
+      "filterable": 1,
+      "changeable": 0,
+      "ext": "./json/欧歌.json"
+    },
         {
             "key": "闪电",
             "name": "⚡️闪电4K弹幕",
@@ -24053,3 +24053,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
