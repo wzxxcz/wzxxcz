@@ -21682,11 +21682,10 @@
             }
         },
         {
-      "key": "狐狸君",
+      "key": "狐狸君1",
       "name": "狐狸君｜4K",
       "type": 3,
       "api": "csp_XBPQ",
-      "jar": "./xyqxbpq.jar",
       "changeable": 1,
       "searchable": 1,
       "quickSearch": 0,
