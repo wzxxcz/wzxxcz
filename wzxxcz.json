@@ -1638,6 +1638,23 @@
             }
         },
         {
+            "key": "稀饭1",
+            "name": "稀饭丨APP",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://app.xifanys.com",
+                "site": "",
+                "dataKey": "HM6Ly9yeS4ya3dvL",
+                "dataIv": "HM6Ly9yeS4ya3dvL",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+
+        {
             "key": "爱看",
             "name": "⛲爱看影视",
             "type": 3,
@@ -24372,3 +24389,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
