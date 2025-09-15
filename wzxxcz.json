@@ -21634,6 +21634,16 @@
             ]
         },
         {
+      "key": "卧龙",
+      "name": "卧龙┃资源",
+      "type": 1,
+      "searchable": 1,
+      "quickSearch": 0,
+      "filterable": 1,
+      "api": "http://wolongzyw.com/api.php/provide/vod/?ac=list"
+    },
+
+        {
             "key": "极速资源",
             "name": "🏄极速采集",
             "type": 1,
@@ -24362,3 +24372,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
