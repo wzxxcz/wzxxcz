@@ -21759,6 +21759,20 @@
             }
         },
         {
+            "key": "人人影视1",
+            "name": "🧑人人影视1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://rrys.lv/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://rrys.lv/k/{cateId}--------{catePg}---{year}/",
+                "分类": "电影$1#剧集$2#综艺$3#动漫$4#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
