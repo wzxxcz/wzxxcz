@@ -21899,13 +21899,14 @@
             ]
         },
         {
-      "key": "玩偶资源",
-      "name": "👽玩偶资源",
+      "key": "玩偶兄弟",
+      "name": "👽玩偶兄弟",
       "type": 1,
-      "api": "https://api.maozyapi.com/inc/apijson_vod.php",
+      "api": "https://api.sexnguon.com/api.php/provide/vod/",
       "searchable": 1,
       "quickSearch": 0
     },
+
 
         {
             "key": "星辰影视",
@@ -24371,4 +24372,5 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
 
