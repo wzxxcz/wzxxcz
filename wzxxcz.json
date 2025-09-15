@@ -21634,15 +21634,14 @@
             ]
         },
         {
-      "key": "淘片",
-      "name": "淘片┃资源",
-      "type": 1,
-      "searchable": 1,
-      "quickSearch": 0,
-      "api": "https://taopianapi.com/cjapi/mc/vod/json.html",
-      "playUrl": ""
-    },
-
+            "key": "淘片",
+            "name": "🍊淘片资源",
+            "type": 1,
+            "searchable": 1,
+            "quickSearch": 0,
+            "api": "https://taopianapi.com/cjapi/mc/vod/json.html",
+            "playUrl": ""
+        },
         {
             "key": "极速资源",
             "name": "🏄极速采集",
@@ -24372,6 +24371,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
-
-
