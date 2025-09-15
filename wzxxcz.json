@@ -1020,6 +1020,45 @@
             }
         },
         {
+            "key": "糖果",
+            "name": "🍊糖果搜索",
+            "type": 3,
+            "api": "csp_TGSou",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
+            "key": "音海",
+            "name": "🍊音海搜索",
+            "type": 3,
+            "api": "csp_YinHai",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
+            "key": "盘搜",
+            "name": "🍊盘搜搜索",
+            "type": 3,
+            "api": "csp_PanSou",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
+            "key": "百酷",
+            "name": "🍊百酷搜索",
+            "type": 3,
+            "api": "csp_Baiku"
+        },
+        {
+            "key": "派派",
+            "name": "🍊派派搜索",
+            "type": 3,
+            "api": "csp_PPQPan"
+        },
+        {
             "key": "荐片1",
             "name": "🐭荐片P2P",
             "api": "csp_Jianpian",
