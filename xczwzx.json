@@ -22628,7 +22628,8 @@
                     "tnmb",
                     "seven",
                     "bilibili",
-                    "1905"
+                    "1905",
+                    "NetFilx"
                 ],
                 "header": {
                     "User-Agent": "okhttp/4.9.1"
@@ -22713,6 +22714,73 @@
             "ext": {
                 "header": {
                     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.3124.68"
+                }
+            }
+        },
+        {
+            "name": "小橙子解析三",
+            "type": 0,
+            "url": "https://jx.xmflv.com/?url="
+        },
+        {
+            "name": "盘古解析",
+            "type": 0,
+            "url": "https://www.pangujiexi.com/pangu/?url="
+        },
+        {
+            "name": "小橙子解析3",
+            "type": 1,
+            "url": "http://pan.qiaoji8.com/tvbox/neibu.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "巧技",
+            "type": 1,
+            "url": "https://zy.qiaoji8.com/neibu.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
                 }
             }
         },
@@ -23006,6 +23074,16 @@
                     "User-Agent": "okhttp/4.9.1"
                 }
             }
+        },
+        {
+            "name": "小橙子解析1",
+            "type": 1,
+            "url": "http://103.36.221.75:81/ltbygbgg/api.php?url="
+        },
+        {
+            "name": "小橙子解析2",
+            "type": 1,
+            "url": "https://www.tcsbl.cn/api/lib/shuo.php?url="
         },
         {
             "name": "如遇卡顿尝试切换LJK/EXO",
