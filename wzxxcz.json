@@ -21643,16 +21643,6 @@
             "playUrl": ""
         },
         {
-      "key": "金鹰",
-      "name": "金鹰┃资源",
-      "type": 1,
-      "searchable": 1,
-      "quickSearch": 0,
-      "api": "https://jyzyapi.com/provide/vod/from/jinyingm3u8/at/json",
-      "playUrl": "https://hd.iapijy.com/play?url="
-    },
-
-        {
             "key": "极速资源",
             "name": "🏄极速采集",
             "type": 1,
@@ -24381,4 +24371,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
