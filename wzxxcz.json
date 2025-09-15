@@ -1034,14 +1034,14 @@
             "name": "🐭荐片P2P",
             "api": "csp_Jianpian",
             "type": 3,
-            "ext": "https://ij1men.slsw6.com"
+            "ext": "https://api.ztcgi.com"
         },
         {
             "key": "荐片",
             "name": "⚔️荐片磁力",
             "api": "csp_Jianpian",
             "type": 3,
-            "ext": "https://ka1dfj.slsw6.com"
+            "ext": "https://api.ztcgi.com"
         },
         {
             "key": "荐片磁力",
@@ -1055,7 +1055,7 @@
                 "type": "rect",
                 "ratio": 1.333
             },
-            "ext": "https://ka1dfj.slsw6.com"
+            "ext": "https://api.ztcgi.com"
         },
         {
             "key": "修罗",
