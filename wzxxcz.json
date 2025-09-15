@@ -21899,6 +21899,15 @@
             ]
         },
         {
+      "key": "玩偶资源",
+      "name": "👽玩偶资源",
+      "type": 1,
+      "api": "https://api.maozyapi.com/inc/apijson_vod.php",
+      "searchable": 1,
+      "quickSearch": 0
+    },
+
+        {
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
@@ -24362,3 +24371,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
