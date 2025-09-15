@@ -21682,6 +21682,38 @@
             }
         },
         {
+      "key": "狐狸君",
+      "name": "狐狸君｜4K",
+      "type": 3,
+      "api": "csp_XBPQ",
+      "jar": "./xyqxbpq.jar",
+      "changeable": 1,
+      "searchable": 1,
+      "quickSearch": 0,
+      "filterable": 1,
+      "ext": {
+        "搜索模式": "1",
+        "搜索url": "https://www.foxjun.com/s/?q={wd}",
+        "搜索数组": "class=\"media\">&&/div>",
+        "搜索图片": "src=\"&&\"",
+        "搜索标题": "《&&》",
+        "搜索副标题": "》&&\"",
+        "搜索链接": "href=\"&&\"",
+        "标题": "《&&》",
+        "副标题": "》&&\"",
+        "影片年代": "上映日期：&&</p>",
+        "影片类型": "类型：&&</p>",
+        "主演": "主演：&&</p>",
+        "简介": "🍁凯少爷🍁水印广告勿信，谨防诈骗🍁",
+        "播放数组": "<tbody>&&</tbody>",
+        "播放列表": "<a&&/a>[包含:magnet]",
+        "播放标题": ">&&<",
+        "播放链接": "href=\"&&\"",
+        "分类url": "https://www.foxjun.com/channel/{cateId}.html?apage={catePg}&apage1={catepg}",
+        "分类": "国产剧$guochanju#电影$dianying#动画$donghua#美欧剧$meiouju#日韩剧$rihanju"
+      }
+    },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
