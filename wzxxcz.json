@@ -1038,7 +1038,7 @@
         },
         {
             "key": "荐片",
-            "name": "⚔️荐片磁力",
+            "name": "荐片｜磁力",
             "api": "csp_Jianpian",
             "type": 3,
             "ext": "https://api.ztcgi.com"
@@ -24371,3 +24371,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
