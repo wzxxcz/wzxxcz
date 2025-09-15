@@ -21580,6 +21580,16 @@
             ]
         },
         {
+      "key": "豪华",
+      "name": "豪华┃资源",
+      "searchable": 1,
+      "quickSearch": 0,
+      "filterable": 1,
+      "type": 1,
+      "api": "https://hhzyapi.com/api.php/provide/vod/"
+    },
+
+        {
             "key": "红牛资源",
             "name": "🐂红牛采集",
             "type": 1,
@@ -24371,3 +24381,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
