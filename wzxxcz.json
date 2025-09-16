@@ -22505,6 +22505,22 @@
             }
         },
         {
+            "key": "方舟",
+            "name": "🛶方舟动漫",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://www.cyfz.vip",
+                "site": "",
+                "dataKey": "e72cdfd629e8895d",
+                "dataIv": "e72cdfd629e8895d",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "元咲",
             "name": "🤣元咲动漫",
             "type": 3,
