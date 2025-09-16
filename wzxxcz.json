@@ -22283,6 +22283,20 @@
             }
         },
         {
+            "key": "大海影视1",
+            "name": "💧大海影视1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.meiligx.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.meiligx.com/vodshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$31#动漫片$25#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -24732,4 +24746,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
