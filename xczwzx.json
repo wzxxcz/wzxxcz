@@ -963,16 +963,6 @@
             }
         },
         {
-            "key": "天天",
-            "name": "🦢天天影视",
-            "type": 3,
-            "quickSearch": 0,
-            "searchable": 1,
-            "api": "csp_AppRJ",
-            "jar": "https://xcz.iptv365.org/wzxm.png",
-            "ext": "vxw35/hHSj07Q+maxQzOVMq1rjRCOTXpUCx8iKu5jIg="
-        },
-        {
             "key": "浪酷影视",
             "name": "💡浪酷影视",
             "type": 3,
