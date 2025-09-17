@@ -3,8 +3,8 @@
 
 """
 
-作者 丢丢喵推荐 🚓 内容均从互联网收集而来 仅供交流学习使用 版权归原创者所有 如侵犯了您的权益 请通知作者 将及时删除侵权内容
-                    ====================Diudiumiao====================
+作者 小橙子推荐 🍊 内容均从互联网收集而来 仅供交流学习使用 版权归原创者所有 如侵犯了您的权益 请通知作者 将及时删除侵权内容
+                    ====================xcz====================
 
 """
 
@@ -210,7 +210,7 @@ class Spider(Spider):
         name = self.extract_middle_text(code, "s1='", "'", 0)
         Jumps = self.extract_middle_text(code, "s2='", "'", 0)
 
-        content = '集多为您介绍剧情📢' + self.extract_middle_text(res,'class="info-detail">','<', 0)
+        content = '🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！' + self.extract_middle_text(res,'class="info-detail">','<', 0)
 
         remarks = self.extract_middle_text(res, 'class="info-mark">', '<', 0)
 
@@ -320,6 +320,7 @@ class Spider(Spider):
         elif params['type'] == "ts":
             return self.proxyTs(params)
         return None
+
 
 
 
