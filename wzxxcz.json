@@ -6910,7 +6910,7 @@
             "name": "🐝采集合集",
             "type": 3,
             "api": "./js/drpy2.min.js",
-            "ext": "./js/采集之王.js?type=url&params=../json/采集静态.json$1$1"
+            "ext": "./js/采集之王.js?type=url&params=../json/CJJT.json$1$1"
         },
         {
             "key": "采集之王1",
