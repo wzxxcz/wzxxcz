@@ -23636,35 +23636,6 @@
             }
         },
         {
-            "name": "随缘解析",
-            "type": "1",
-            "url": "https://api.huohua.live/api/?key=FJER9kOhK71YTePV3d&url=",
-            "ext": {
-                "flag": [
-                    "qq",
-                    "腾讯",
-                    "qiyi",
-                    "爱奇艺",
-                    "奇艺",
-                    "youku",
-                    "优酷",
-                    "sohu",
-                    "搜狐",
-                    "letv",
-                    "乐视",
-                    "mgtv",
-                    "芒果",
-                    "tnmb",
-                    "seven",
-                    "bilibili",
-                    "1905"
-                ],
-                "header": {
-                    "User-Agent": "okhttp/4.9.1"
-                }
-            }
-        },
-        {
             "name": "影视臻享",
             "type": "1",
             "url": "https://zy.qiaoji8.com/gouzi.php?url=",
