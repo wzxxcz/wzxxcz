@@ -1731,15 +1731,6 @@
             "ext": "https://gitee.com/smallmi1007/mimi/raw/master/ceshi.js"
         },
         {
-            "key": "剧评",
-            "name": "🍊剧评影视",
-            "type": 3,
-            "api": "csp_Jpys",
-            "jar": "https://xcz.iptv365.org/wzxxczapp",
-            "playerType": 1,
-            "ext": "7lj763gg402i7942463j9j9jh84l8798l8gli652828g332i"
-        },
-        {
             "key": "QD4K",
             "name": "🐷猪猪4K",
             "type": 3,
