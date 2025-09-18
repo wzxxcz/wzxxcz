@@ -22170,7 +22170,7 @@
                 "倒序": "0",
                 "播放列表": "<a&&a>",
                 "播放标题": ">&&</",
-                "播放链接": "play&&\">[替换:(>>-#,>>-#);>>.html]",
+                "播放链接": "play(2,3);">",
                 "播放链接前缀": "/p/+/p/&&-1-1.html",
                 "分类url": "http://www.gpdyf.com/s/{cateId}/area/{area}/page/{catePg}/year/{year}.html",
                 "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#"
