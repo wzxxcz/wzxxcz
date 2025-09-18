@@ -22141,6 +22141,26 @@
             }
         },
         {
+            "key": "飞马影院",
+            "name": "🐎飞马影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.fgt120.com/",
+                "二次截取": "",
+                "数组": "lazyload&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"pic-text text-right\">&&</span>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.fgt120.com/show/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#爽文短剧$30#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
@@ -22541,20 +22561,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
-            }
-        },
-        {
-            "key": "飞马影院",
-            "name": "🐎飞马影院",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.fgt120.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.fgt120.com/show/{cateId}--------{catePg}---{year}.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#爽文短剧$30#"
             }
         },
         {
