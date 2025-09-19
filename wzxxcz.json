@@ -22776,15 +22776,17 @@
             }
         },
         {
-            "key": "CCTV央视",
-            "name": "💧CCTV央视",
+            "key": "即看影视",
+            "name": "🍊即看影视",
             "type": 3,
             "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "分类url": "http://tv.haoqu99.com/;;!"
+                "主页url": "https://www.jktv.app/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.jktv.app/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#电视剧$2#动漫$4#"
             }
         },
         {
