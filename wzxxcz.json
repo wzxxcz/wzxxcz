@@ -23017,7 +23017,7 @@
                 "主页url": "https://www.bjbhl.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.bjbhl.com/bh_television/_{cateId}_{year}__{catePg}.html",
-                "分类": "电影$film#电视剧$television#综艺$variety#动漫$cg#"
+                "分类": "电影$bh_film#电视剧$bh_television#综艺$bh_variety#动漫$bh_cg#"
             }
         },
         {
