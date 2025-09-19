@@ -22930,6 +22930,17 @@
             }
         },
         {
+            "key": "东东影院",
+            "name": "💧东东影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "分类url": "https://www.hudongdong.com/;;!"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
