@@ -2351,18 +2351,6 @@
             "timeout": 60
         },
         {
-            "key": "追剧狂人",
-            "name": "👀追剧狂人",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "分类url": "https://www.zjkrmv.cc/;;!"
-            }
-        },
-        {
             "key": "好好看",
             "name": "⛲好好看",
             "type": 3,
