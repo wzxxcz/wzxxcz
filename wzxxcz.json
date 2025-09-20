@@ -2814,6 +2814,12 @@
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "https://www.70ys.site/",
+                "二次截取": "",
+                "数组": "/vod/detail&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "img src=\"&&\"",
+                "副标题": "<span class=\"bottom2 pc\">&&</span>",
+                "链接": "/index.php/vod/detail/id/+/id/&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.70ys.site/index.php/vod/show/id/{cateId}/page/{catePg}/year/{year}.html",
                 "分类": "电影$1#剧集$2#动漫$4#少儿$46#短剧$5#"
