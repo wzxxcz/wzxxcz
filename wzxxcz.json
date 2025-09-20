@@ -23152,18 +23152,6 @@
             }
         },
         {
-            "key": "天悦影视",
-            "name": "🌞天悦影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "分类url": "https://3ewww.haojiandanbianqu.com/"
-            }
-        },
-        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
@@ -25524,4 +25512,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
