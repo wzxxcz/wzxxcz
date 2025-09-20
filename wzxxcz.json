@@ -24027,6 +24027,11 @@
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
         },
         {
+            "name": "VIP3",
+            "type": 0,
+            "url": "https://jx.m3u8.tv/jx/jx.php?url="
+        },
+        {
             "name": "小橙子4K解析4",
             "url": "https://api.huohua.live/api/?key=MYorZOeWRHg1I9FfJy&url=",
             "type": "1"
