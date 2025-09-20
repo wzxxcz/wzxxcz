@@ -24028,17 +24028,17 @@
         },
         {
             "name": "解析1080p1",
-            "type": 0,
+            "type": 1,
             "url": "http://167.234.211.77:4182/api/?key=VqcJRY8Gsi52iokkRZ&url="
         },
         {
             "name": "解析1080p2",
-            "type": 0,
+            "type": 1,
             "url": "https://jx.ariesc.cn/api/?key=8ab733bc3e1240b72ea608a8faaa47b2&url="
         },
         {
             "name": "解析1080p3",
-            "type": 0,
+            "type": 1,
             "url": "http://210.16.160.81:8122/api/?key=bdfA54MoB60AClAJu9&url="
         },
         {
