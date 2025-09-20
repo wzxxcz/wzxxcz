@@ -117,11 +117,11 @@ class Spider(Spider):
 
     def homeContent(self, filter):
         result = {}
-        result = {"class": [{"type_id": "1", "type_name": "集多电影🌠"},
-                            {"type_id": "2", "type_name": "集多剧集🌠"},
-                            {"type_id": "3", "type_name": "集多综艺🌠"},
-                            {"type_id": "4", "type_name": "集多动漫🌠"},
-                            {"type_id": "40", "type_name": "集多豆瓣🌠"}],
+        result = {"class": [{"type_id": "1", "type_name": "电影"},
+                            {"type_id": "2", "type_name": "剧集"},
+                            {"type_id": "3", "type_name": "综艺"},
+                            {"type_id": "4", "type_name": "动漫"},
+                            {"type_id": "40", "type_name": "豆瓣"}],
 
                   "list": [],
                   "filters": {"1": [{"key": "年代",
@@ -216,7 +216,7 @@ class Spider(Spider):
                         "vod_id": id,
                         "vod_name": name,
                         "vod_pic": pic,
-                        "vod_remarks": '集多▶️' + remark
+                        "vod_remarks": '' + remark
                              }
                     videos.append(video)
 
@@ -275,7 +275,7 @@ class Spider(Spider):
                         "vod_id": id,
                         "vod_name": name,
                         "vod_pic": pic,
-                        "vod_remarks": '集多▶️' + remark
+                        "vod_remarks": '' + remark
                             }
                     videos.append(video)
 
@@ -308,7 +308,7 @@ class Spider(Spider):
         name = self.extract_middle_text(code, "s1='", "'", 0)
         Jumps = self.extract_middle_text(code, "s2='", "'", 0)
 
-        content = '😸集多🎉为您介绍剧情📢' + self.extract_middle_text(res,'剧情介绍:','">', 0)
+        content = '🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！' + self.extract_middle_text(res,'剧情介绍:','">', 0)
 
         director = self.extract_middle_text(res, '导演：', '</li>',1,'target=".*?">(.*?)</a>')
 
@@ -471,6 +471,7 @@ class Spider(Spider):
         elif params['type'] == "ts":
             return self.proxyTs(params)
         return None
+
 
 
 
