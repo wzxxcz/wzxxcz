@@ -3270,7 +3270,7 @@
         {
             "key": "py_饭团PY",
             "name": "🍚饭团影视",
-            "api": "./py/饭团影视.py",
+            "api": "./py/饭团.py",
             "filterable": 1,
             "quickSearch": 1,
             "searchable": 1,
