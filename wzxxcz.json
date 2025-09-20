@@ -23156,13 +23156,11 @@
             "name": "🌞天悦影视",
             "type": 3,
             "api": "csp_XBPQ",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://3ewww.haojiandanbianqu.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://3ewww.haojiandanbianqu.com/show/{cateId}--------{catePg}---{year}.html",
-                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#"
+                "分类url": "https://3ewww.haojiandanbianqu.com/"
             }
         },
         {
@@ -25526,3 +25524,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
