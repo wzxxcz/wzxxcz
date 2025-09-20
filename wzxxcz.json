@@ -2816,6 +2816,8 @@
             "filterable": 1,
             "timeout": 120,
             "ext": {
+                "作者": "🍊小橙子/250920",
+                "站名": "麒麟影视",
                 "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@__mxau__c2-4I3kFmdR=faa483a2-bb47-4476-873b-b73dd4558866；； __mxaf__c2-4I3kFmdR=1758346481；； tips=ok；； __mxas__c2-4I3kFmdR=%7B%22sid%22%3A%22b4f59407-cc8c-424b-9a81-2db9f71b7f5c%22%2C%22vd%22%3A11%2C%22stt%22%3A1473%2C%22dr%22%3A8%2C%22expires%22%3A1758349754%2C%22ct%22%3A1758347954%7D；； __mxav__c2-4I3kFmdR=11&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "图片代理": "0",
