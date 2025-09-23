@@ -1819,6 +1819,22 @@
             }
         },
         {
+            "key": "米奇",
+            "name": "🐹米奇影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://www.milkidc.cn",
+                "site": "",
+                "dataKey": "20c79c979da8db0f",
+                "dataIv": "20c79c979da8db0f",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "星星",
             "name": "🌟星星影视",
             "type": 3,
