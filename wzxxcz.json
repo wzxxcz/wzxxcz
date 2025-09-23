@@ -1601,6 +1601,22 @@
             }
         },
         {
+            "key": "像素",
+            "name": "🐘像素影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://mcvod.top",
+                "site": "",
+                "dataKey": "cnmbknmbtounimab",
+                "dataIv": "cnmbknmbtounimab",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "豆丁",
             "name": "🥛豆丁影视",
             "type": 3,
