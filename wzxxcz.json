@@ -1819,6 +1819,22 @@
             }
         },
         {
+            "key": "迪吧",
+            "name": "🎸迪吧影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "",
+                "site": "https://appto2-1316376600.cos.ap-beijing.myqcloud.com/gap.txt",
+                "dataKey": "685bf108bc47b67d",
+                "dataIv": "685bf108bc47b67d",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "米奇",
             "name": "🐹米奇影视",
             "type": 3,
