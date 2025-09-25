@@ -1085,12 +1085,6 @@
             "api": "csp_Baiku"
         },
         {
-            "key": "派派",
-            "name": "🍊派派搜索",
-            "type": 3,
-            "api": "csp_PPQPan"
-        },
-        {
             "key": "荐片1",
             "name": "🐭荐片P2P",
             "api": "csp_Jianpian",
