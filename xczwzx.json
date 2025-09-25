@@ -7944,15 +7944,6 @@
             }
         },
         {
-            "key": "测试",
-            "name": "🐓剧霸1080P",
-            "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "./py/jubaba.py",
-            "ext": ""
-        },
-        {
             "key": "来看点播",
             "name": "🎡来看点播",
             "type": 3,
