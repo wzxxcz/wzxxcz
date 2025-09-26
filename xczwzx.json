@@ -8047,13 +8047,6 @@
             }
         },
         {
-            "key": "麦田影视",
-            "name": "🍞麦田影视",
-            "type": 3,
-            "api": "csp_HBPQ",
-            "ext": "./XBPQ/麦田APP.json"
-        },
-        {
             "key": "麦田影院",
             "name": "🍊麦田影院",
             "type": 3,
