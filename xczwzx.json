@@ -23582,10 +23582,11 @@
             "key": "星芽短剧",
             "name": "🌟星芽短剧",
             "type": 3,
-            "api": "csp_AppXY",
+            "api": "./py/星芽短剧.py",
             "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0
+            "changeable": 1,
+            "quickSearch": 1,
+            "filterable": 1
         },
         {
             "key": "河马短剧",
