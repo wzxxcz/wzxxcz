@@ -1075,6 +1075,24 @@
             "api": "csp_Baiku"
         },
         {
+            "key": "酷乐搜索",
+            "name": "🍊酷乐搜索",
+            "type": 3,
+            "api": "csp_KuLe"
+        },
+        {
+            "key": "爱看搜索",
+            "name": "🍊爱看搜索",
+            "type": 3,
+            "api": "csp_AiKan"
+        },
+        {
+            "key": "鬼鬼搜索",
+            "name": "🍊鬼鬼搜索",
+            "type": 3,
+            "api": "csp_GuiGui"
+        },
+        {
             "key": "荐片1",
             "name": "🐭荐片P2P",
             "api": "csp_Jianpian",
@@ -24691,32 +24709,16 @@
             }
         },
         {
-            "key": "夸克云盘",
+            "key": "夸克推送",
             "name": "🍊我的夸克",
-            "type": 3,
-            "api": "csp_PanQuark",
-            "searchable": 0,
-            "filterable": 0,
-            "changeable": 0,
-            "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/quarkShare.json"
+            "type": 4,
+            "api": "https://so.yinpai.xyz/api.php?type=quark"
         },
         {
-            "key": "UC",
+            "key": "UC推送",
             "name": "🍊我的UC",
-            "type": 3,
-            "api": "csp_PanUc",
-            "searchable": 0,
-            "filterable": 0,
-            "changeable": 0,
-            "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": "./json/ucShare.json"
+            "type": 4,
+            "api": "https://so.yinpai.xyz/api.php?type=uc"
         },
         {
             "key": "天翼推送",
