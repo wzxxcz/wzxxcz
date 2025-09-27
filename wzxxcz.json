@@ -13713,9 +13713,9 @@
                 "线路标题": "tab\">&&<",
                 "播放二次截取": "",
                 "播放数组": "myui-content__list sort-list clearfix&&</ul>",
-                "倒序": "0",
+                "倒序": "1",
                 "播放列表": "<a&&</a>",
-                "播放标题": ">&&<",
+                "播放标题": ">&&</a>[不包含:APP秒播]",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://m.wojinrong.cn/search.php?page={catePg}&searchtype=5&tid={cateId}&year={year}",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$30#"
