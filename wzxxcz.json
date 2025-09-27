@@ -23675,6 +23675,16 @@
             }
         },
         {
+            "key": "旋风视频",
+            "name": "⛱️旋风视频",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
+            "ext": {
+                "分类url": "https://miao101.com/"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
