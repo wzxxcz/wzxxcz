@@ -23979,7 +23979,7 @@
                 "线路数组": "fed-rims-info fed-part-eone&&</li>",
                 "线路标题": ">&&<",
                 "播放二次截取": "fed-drop-sort&&fed-tabs-item&&</div>",
-                "播放数组": "fed-part-rows&&</ul>",
+                "播放数组": "<ul class=\"fed-part-rows&&</ul>",
                 "倒序": "0",
                 "播放列表": "<a&&a>",
                 "播放标题": ">&&<",
