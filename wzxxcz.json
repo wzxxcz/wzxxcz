@@ -1597,8 +1597,8 @@
             "quickSearch": 1,
             "api": "csp_AppGet",
             "ext": {
-                "url": "",
-                "site": "http://45.66.157.77:9427/dd.txt",
+                "url": "http://45.66.157.77:9427",
+                "site": "",
                 "dataKey": "Xasdasd!123123dd",
                 "dataIv": "Xasdasd!123123dd",
                 "deviceId": "",
