@@ -2277,14 +2277,6 @@
             }
         },
         {
-            "key": "步步",
-            "name": "👟步步1080P",
-            "type": 3,
-            "api": "https://weixine.net/js/lib/drpy2.min.js",
-            "jar": "https://xcz.iptv365.org/wzxxczapp",
-            "ext": "https://gitee.com/smallmi1007/mimi/raw/master/ceshi.js"
-        },
-        {
             "key": "QD4K",
             "name": "🐷猪猪4K",
             "type": 3,
