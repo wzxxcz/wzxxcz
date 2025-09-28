@@ -1901,22 +1901,6 @@
             }
         },
         {
-            "key": "魔方",
-            "name": "🍊魔方影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://www.pjb523.sbs",
-                "site": "",
-                "dataKey": "1234567887654321",
-                "dataIv": "1234567887654321",
-                "deviceId": "",
-                "version": "",
-                "ua": ""
-            }
-        },
-        {
             "key": "稀饭",
             "name": "🍚稀饭影视",
             "type": 3,
