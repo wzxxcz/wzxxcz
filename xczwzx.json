@@ -1310,6 +1310,38 @@
             }
         },
         {
+            "key": "狂欢",
+            "name": "🎢狂欢影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://m.m.m.kahzw.com",
+                "site": "",
+                "dataKey": "xnybssspqtwotuwj",
+                "dataIv": "xnybssspqtwotuwj",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
+            "key": "奈飞",
+            "name": "🕊️奈飞影院",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://movier.ink",
+                "site": "",
+                "dataKey": "moviermovierink9",
+                "dataIv": "moviermovierink9",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "迪吧",
             "name": "🎸迪吧影视",
             "type": 3,
