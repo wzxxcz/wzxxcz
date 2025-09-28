@@ -23848,17 +23848,6 @@
             "playerType": 2
         },
         {
-            "key": "爱看短剧",
-            "name": "🦔爱看短剧",
-            "type": 3,
-            "api": "./py/爱看短剧.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
-        {
             "key": "锦鲤短剧",
             "name": "🐉锦鲤短剧",
             "type": 3,
