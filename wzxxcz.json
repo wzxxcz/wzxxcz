@@ -23605,7 +23605,7 @@
                 "数组": "module-item&&</div>",
                 "标题": "title=\"&&\"",
                 "图片": "data-src=\"&&\"",
-                "副标题": "<div class=\"module-item-caption\">&&</div>",
+                "副标题": "module-item-caption\"><span>&&<",
                 "链接": "href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://8090mov.com/vodshow/{cateId}-{area}-------{catePg}---{year}.html",
