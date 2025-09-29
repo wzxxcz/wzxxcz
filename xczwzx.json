@@ -1282,6 +1282,22 @@
             }
         },
         {
+            "key": "小猪",
+            "name": "🐗小猪影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppQi",
+            "ext": {
+                "url": "",
+                "site": "https://tiantangyoulu.oss-cn-beijing.aliyuncs.com/tengxunyun.txt",
+                "dataKey": "seb5tq9mykp2w9ry",
+                "dataIv": "seb5tq9mykp2w9ry",
+                "deviceId": "",
+                "version": "",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+        {
             "key": "狂欢",
             "name": "🎢狂欢影视",
             "type": 3,
