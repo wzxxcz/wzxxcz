@@ -23619,7 +23619,7 @@
                 "分类url": "https://8090mov.com/vodshow/{cateId}-{area}-------{catePg}---{year}.html",
                 "分类": "电影$dianying#连续剧$lianxuju#动漫$dongman#短剧$duanju#",
                 "二次截取": "",
-                "数组": "module-item&&</div>",
+                "数组": "module-item\">&&/span>",
                 "标题": "title=\"&&\"",
                 "图片": "data-src=\"&&\"",
                 "副标题": "<span>&&<",
