@@ -24089,6 +24089,20 @@
             }
         },
         {
+            "key": "玖月影视1",
+            "name": "🌙玖月影视1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "http://lltlandfill.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "http://lltlandfill.com/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#电影解说$jieshuo#爽文短剧$wenduan#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
