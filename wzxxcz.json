@@ -24140,15 +24140,15 @@
             }
         },
         {
-      "key": "3Q",
-      "name": "🎞️3Q影视",
-      "type": 3,
-      "api": "csp_XBPQ",
-      "searchable": 1,
-      "quickSearch": 1,
-      "filterable": 1,
-      "ext": "./lib/3Q.json"
-    },
+            "key": "3Q",
+            "name": "🎞️3Q影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./XBPQ/3Q.json"
+        },
         {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
