@@ -3310,6 +3310,16 @@
             "ext": "./XBPQ/3Q.json"
         },
         {
+      "key": "555影视",
+      "name": "🎞️555影视",
+      "type": 3,
+      "api": "csp_XBPQ",
+      "searchable": 1,
+      "quickSearch": 1,
+      "filterable": 1,
+      "ext": "./XBPQ/xbpq_555App.json"
+    },
+        {
             "key": "腾讯视频",
             "name": "🐚腾讯视频",
             "type": 3,
@@ -26474,3 +26484,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
