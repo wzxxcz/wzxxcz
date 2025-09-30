@@ -3320,6 +3320,16 @@
             "ext": "./XBPQ/xbpq_555App.json"
         },
         {
+            "key": "黑蚂蚁影院",
+            "name": "🎞️黑蚂蚁影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./lib/黑蚂蚁影院.json"
+        },
+        {
             "key": "腾讯视频",
             "name": "🐚腾讯视频",
             "type": 3,
