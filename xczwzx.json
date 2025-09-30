@@ -2773,6 +2773,16 @@
             }
         },
         {
+            "key": "3Q",
+            "name": "🎞️3Q影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./XBPQ/3Q.json"
+        },
+        {
             "key": "腾讯视频",
             "name": "🐚腾讯视频",
             "type": 3,
