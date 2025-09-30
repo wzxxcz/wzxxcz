@@ -3330,16 +3330,6 @@
             "ext": "./XBPQ/旋风视频.json"
         },
         {
-            "key": "LIBVIO",
-            "name": "🍊LIBVIO",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/LIBVIO-xyq.json"
-        },
-        {
             "key": "腾讯视频",
             "name": "🐚腾讯视频",
             "type": 3,
