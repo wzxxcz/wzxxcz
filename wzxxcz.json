@@ -2321,6 +2321,19 @@
             "timeout": 60
         },
         {
+      "key": "羊羊学院",
+      "name": "🐑羊羊影视",
+      "type": 3,
+      "api": "csp_AppMuou",
+            "jar": "https://xcz.iptv365.org/xczlg.jar",
+      "ext": {
+        "host": "http://ht.zhenxun.love",
+        "name": "羊羊学院",
+        "version": "4.2.0"
+      }
+    },
+
+        {
             "key": "好好看",
             "name": "⛲好好看",
             "type": 3,
@@ -26494,3 +26507,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
