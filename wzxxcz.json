@@ -1842,7 +1842,7 @@
         },
         {
             "key": "紫金",
-            "name": "☕紫金影视",
+            "name": "🍵紫金影视",
             "type": 3,
             "quickSearch": 1,
             "api": "csp_AppGet",
