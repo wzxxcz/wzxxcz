@@ -24477,6 +24477,20 @@
             }
         },
         {
+            "key": "米语视频",
+            "name": "🌯米语视频",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.336622.cc/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.336622.cc/vod/show/{cateId}/13/page/{catePg}/year/{year}.html",
+                "分类": "电影$1#连续剧$2#综艺纪录$3#动漫$4#短剧$20#影视解说$39#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
