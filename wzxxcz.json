@@ -24482,18 +24482,27 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.336622.cc/",
-                "二次截取": "",
-                "数组": "class=\"ewave-vodlist__thumb lazyload&&</div>",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "<span class=\"pic-text text-center\">&&</span>",
-                "链接": "href=\"&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.336622.cc/vod/show/{cateId}/13/page/{catePg}/year/{year}.html",
-                "分类": "电影$1#连续剧$2#综艺纪录$3#动漫$4#短剧$20#影视解说$39#"
+                "作者": "",
+    "站名": "https://www.336622.cc/",
+    "请求头": "User-Agent$MOBILE_UA",
+    "编码": "UTF-8",
+    "主页url": "https://www.336622.cc/",
+    "首页": "120",
+    "起始页": "1",
+    "数组": "class=\"ewave-vodlist__thumb lazyload&&</div>",
+    "标题": "title=\"&&\"",
+    "图片": "https://+src=&&\"",
+    "链接": "href=\"&&\"",
+    "导演": "导演：&&<span",
+    "主演": "主演：&&</div",
+    "简介": "</b>&&</b",
+    "线路数组": "#playlist&&</a>[排序:Y1高速>YK1线路>R1线路>*]",
+    "线路标题": ">&&</span",
+    "搜索url": "https://www.336622.cc/vod/search/page/{pg}/wd/{wd}.html",
+    "分类url": "https://www.336622.cc/vod/show/area/{area}/by/{by}/id/{cateId}/lang/{lang}/letter/{letter}/page/{catePg}/year/{year}.html",
+    "分类": "电影$1#连续剧$2#综艺记录$3#动漫$4#短路$20#影视解说$39",
+    "类型": "动作片$6#喜剧片$7#爱情片$8#科幻片$9#恐怖片$10#剧情片$11#战争片$12#古装片$60#惊悚片$59#动画片$31#预告片$56||国产剧$13#港台剧$14#日韩剧$15#欧美剧$16#泰国剧$34#海外剧$35||大陆综艺$23#港台综艺$22#日韩综艺$36#欧美综艺$37#演唱会$40#记录片$41||国产动漫$25#日韩动漫$24#欧美动漫$42#港台动漫$43#其他动漫$44||反转爽剧$30#现代都市$45#脑洞悬疑$46#古装仙侠$47#女频恋爱$48#年代穿越$26||空"
+
             }
         },
         {
@@ -26821,3 +26830,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
