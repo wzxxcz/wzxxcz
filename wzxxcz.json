@@ -24522,20 +24522,6 @@
             }
         },
         {
-            "key": "兄弟影视",
-            "name": "🍊兄弟影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.brovods.top/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.brovods.top/show/{cateId}-{area}-------{catePg}---{year}/",
-                "分类": "电影$Movies#剧集$TV#综艺$Shows#动漫$Anime#短剧$Snaps#纪录片$Documentaries#"
-            }
-        },
-        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
