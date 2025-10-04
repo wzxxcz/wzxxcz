@@ -12113,12 +12113,10 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "图片": "data-original=\"&&\"",
-                "链接": "href=\"&&\"",
-                "副标题": "小橙子影视",
-                "分类url": "https://www.xsdms.com/show/{cateId}----{lang}----{catePg}---{year}.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧屋$30#伦理区$36#",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+<p&&</p>"
+                "主页url": "http://www.cnzhijiao.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "http://www.cnzhijiao.com/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#"
             }
         },
         {
