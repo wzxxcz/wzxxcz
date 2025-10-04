@@ -25517,14 +25517,14 @@
             "url": "Web"
         },
         {
-            "name": "解析1080p",
-            "type": 0,
-            "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
-        },
-        {
             "name": "智能云解析",
             "type": 0,
             "url": "http://v9j.net/?url="
+        },
+        {
+            "name": "解析1080p",
+            "type": 0,
+            "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
         },
         {
             "name": "解析1080p1",
