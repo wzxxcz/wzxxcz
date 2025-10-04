@@ -25522,6 +25522,11 @@
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
         },
         {
+            "name": "智能云解析",
+            "type": 1,
+            "url": "http://v9j.net/?url="
+        },
+        {
             "name": "解析1080p1",
             "type": 1,
             "url": "http://167.234.211.77:4182/api/?key=VqcJRY8Gsi52iokkRZ&url="
