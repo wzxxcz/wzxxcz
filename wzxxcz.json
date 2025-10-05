@@ -24263,6 +24263,26 @@
             }
         },
         {
+            "key": "剧迷Gimy",
+            "name": "🍊剧迷Gimy",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.shhkks.com/",
+                "二次截取": "",
+                "数组": "/Gimydetail/&&</a>",
+                "标题": "alt=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"label text-truncate\">&&</span>",
+                "链接": "/Gimydetail/+&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.shhkks.com/Gimyshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#短剧$duanju#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
@@ -24663,20 +24683,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
-            }
-        },
-        {
-            "key": "剧迷Gimy",
-            "name": "🍊剧迷Gimy",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.shhkks.com/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.shhkks.com/Gimyshow/{cateId}--------{catePg}---{year}.html",
-                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#动漫$duanju#"
             }
         },
         {
