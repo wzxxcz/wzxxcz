@@ -25528,12 +25528,6 @@
             "api": "https://so.yinpai.xyz/api.php?type=tianyi"
         },
         {
-            "key": "123推送",
-            "name": "🍊我的123",
-            "type": 4,
-            "api": "https://so.yinpai.xyz/api.php?type=123"
-        },
-        {
             "key": "百度云盘",
             "name": "🍊我的百度",
             "type": 3,
