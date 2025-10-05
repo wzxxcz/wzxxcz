@@ -25522,12 +25522,6 @@
             "api": "https://so.yinpai.xyz/api.php?type=uc"
         },
         {
-            "key": "天翼推送",
-            "name": "🍊我的天翼",
-            "type": 4,
-            "api": "https://so.yinpai.xyz/api.php?type=tianyi"
-        },
-        {
             "key": "百度云盘",
             "name": "🍊我的百度",
             "type": 3,
