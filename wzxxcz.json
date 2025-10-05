@@ -25516,12 +25516,6 @@
             "api": "https://so.yinpai.xyz/api.php?type=quark"
         },
         {
-            "key": "UC推送",
-            "name": "🍊我的UC",
-            "type": 4,
-            "api": "https://so.yinpai.xyz/api.php?type=uc"
-        },
-        {
             "key": "百度云盘",
             "name": "🍊我的百度",
             "type": 3,
