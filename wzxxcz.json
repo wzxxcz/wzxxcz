@@ -1107,17 +1107,6 @@
             "ext": "https://api.ztcgi.com"
         },
         {
-            "key": "荐片影视",
-            "name": "⚔️荐片APP",
-            "type": 3,
-            "api": "./py/荐片影视.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
-        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
