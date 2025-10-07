@@ -12861,10 +12861,10 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "http://vatos.org.cn/",
+                "主页url": "http://www.jiebenjixie.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "http://vatos.org.cn/sshow/{cateId}--------{catePg}---",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
+                "分类url": "http://www.jiebenjixie.com/stvshow/{cateId}.html?year={year}&page={catePg}",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#韩国剧$24#短剧$30#"
             }
         },
         {
