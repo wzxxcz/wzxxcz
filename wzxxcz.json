@@ -1827,6 +1827,22 @@
             }
         },
         {
+            "key": "刷剧",
+            "name": "🍊刷剧影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "",
+                "site": "https://dingchaowangzhan.oss-cn-beijing.aliyuncs.com/1.txt",
+                "dataKey": "1387006363333333",
+                "dataIv": "1387006363333333",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "九零",
             "name": "🍸九零影视",
             "type": 3,
