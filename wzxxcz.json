@@ -9304,9 +9304,15 @@
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "https://www.yfvod.com/",
+                "二次截取": "",
+                "数组": "hl-item-thumb hl-lazy&&</a",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"hl-lc-1 remarks\">&&</span>",
+                "链接": "href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.yfvod.com/vod-show/{cateId}--------{catePg}---{year}.html",
-                "分类": "电影$movie#连续剧$series#综艺$show#动漫$animation#"
+                "分类": "电影$movie#连续剧$tv-series#综艺$show#动漫$animation#"
             }
         },
         {
