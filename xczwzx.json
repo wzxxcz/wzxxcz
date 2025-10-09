@@ -1159,20 +1159,6 @@
             }
         },
         {
-            "key": "光影",
-            "name": "🛸光影影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://www.guangyingmi.com",
-                "dataKey": "230fnsodfsdhfon2",
-                "dataIv": "230fnsodfsdhfon2",
-                "deviceId": "",
-                "version": ""
-            }
-        },
-        {
             "key": "爱看影视网",
             "name": "🧿爱看影视网",
             "type": 3,
