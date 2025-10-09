@@ -25134,8 +25134,7 @@
             "api": "csp_XBPQ",
             "jar": "https://xcz.iptv365.org/wzx.jar",
             "ext": {
-                "分类url": "https://www.naifei2.org/vodshow/id/{cateId}/page/{catePg}/year/{year}.html",
-                "分类": "电影$1#剧集$2#综艺$3#动漫$4#短剧$47#"
+                "分类url": "https://www.naifei2.org/"
             }
         },
         {
