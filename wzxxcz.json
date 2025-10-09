@@ -25128,16 +25128,6 @@
             }
         },
         {
-            "key": "奈飞中文",
-            "name": "🍊奈飞中文",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
-            "ext": {
-                "分类url": "https://www.naifei2.org/"
-            }
-        },
-        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
