@@ -1623,22 +1623,6 @@
             }
         },
         {
-            "key": "爱看",
-            "name": "⛲爱看影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://aikan.my",
-                "site": "",
-                "dataKey": "hzxjRSmyTmSE4ENE",
-                "dataIv": "hzxjRSmyTmSE4ENE",
-                "deviceId": "",
-                "version": "",
-                "ua": ""
-            }
-        },
-        {
             "key": "布雷",
             "name": "🌩️布雷影视",
             "type": 3,
