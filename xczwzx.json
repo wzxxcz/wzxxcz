@@ -519,6 +519,15 @@
             "api": "./py/网络直播.py"
         },
         {
+            "key": "戏曲多多",
+            "name": "📺戏曲多多",
+            "type": 3,
+            "api": "csp_AppLY",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
             "key": "酷狗音乐",
             "name": "🎤酷狗音乐",
             "type": 3,
