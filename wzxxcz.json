@@ -25182,20 +25182,6 @@
             }
         },
         {
-            "key": "88影视网2",
-            "name": "🍊88影视网2",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.88tv01.cc/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.88tv01.cc/show/{cateId}/page/{catePg}/year/{year}/",
-                "分类": "电影$dy#电视剧$dsj#动漫$dm#陆剧$lj#美剧$mj#韩剧$hj#"
-            }
-        },
-        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
