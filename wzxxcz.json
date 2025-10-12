@@ -1820,6 +1820,22 @@
             }
         },
         {
+            "key": "火花",
+            "name": "🔥火花影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "",
+                "site": "http://v.itcxo.cn/txt/1.txt",
+                "dataKey": "PoiUytRedFghjklm",
+                "dataIv": "PoiUytRedFghjklm",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "八天",
             "name": "🍵八天影视",
             "type": 3,
