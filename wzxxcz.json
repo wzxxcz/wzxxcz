@@ -1860,7 +1860,7 @@
         },
         {
             "key": "火锅",
-            "name": "🫕火锅影视",
+            "name": "🍊火锅影视",
             "type": 3,
             "quickSearch": 1,
             "api": "csp_AppGet",
