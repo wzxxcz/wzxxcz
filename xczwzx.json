@@ -1306,6 +1306,67 @@
             }
         },
         {
+            "key": "于浅",
+            "name": "🍊于浅影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://202.140.143.116:88",
+                "site": "",
+                "dataKey": "leroulerop.lerom",
+                "dataIv": "leroulerop.lerom",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
+            "key": "火锅",
+            "name": "🍊火锅影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://ios.hgyx.vip",
+                "site": "",
+                "dataKey": "062dec75d039980e",
+                "dataIv": "062dec75d039980e",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
+            "key": "爱看",
+            "name": "⛲爱看影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://www.appdm.akandm.com",
+                "site": "",
+                "dataKey": "uI1TkPJC8B46AyN3",
+                "dataIv": "uI1TkPJC8B46AyN3",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
+            "key": "万能",
+            "name": "💰万能影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://wnvod.cc",
+                "site": "",
+                "dataKey": "5uBvur6znNUmE3zb",
+                "dataIv": "5uBvur6znNUmE3zb",
+                "deviceId": "",
+                "version": "",
+                "ua": "myapp/1.0.3"
+            }
+        },
+        {
             "key": "坚果",
             "name": "🍊坚果影视",
             "type": 3,
