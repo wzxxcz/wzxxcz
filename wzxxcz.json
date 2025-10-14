@@ -822,14 +822,10 @@
             "api": "./py/枫叶音乐.py"
         },
         {
-            "key": "闪闪音乐网",
-            "name": "🎵闪闪音乐",
+            "key": "深港音乐汇",
+            "name": "🎵深港音乐",
             "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./json/闪闪音乐网.json"
+            "api": "./py/深港音乐汇.py"
         },
         {
             "key": "玩偶哥哥",
