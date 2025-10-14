@@ -576,6 +576,34 @@
             "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/DJyyyyw.json"
         },
         {
+            "key": "HIFI音乐APP",
+            "name": "🎵HIFI音乐",
+            "type": 3,
+            "api": "./py/HIFI音乐APP.py"
+        },
+        {
+            "key": "啊哈DJ网",
+            "name": "🎵啊哈DJ音乐",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./json/闪闪音乐网.json"
+        },
+        {
+            "key": "枫叶音乐",
+            "name": "🎵枫叶音乐",
+            "type": 3,
+            "api": "./py/枫叶音乐.py"
+        },
+        {
+            "key": "网易云音乐",
+            "name": "🎵网易云音乐",
+            "type": 3,
+            "api": "./py/网易云音乐.py"
+        },
+        {
             "key": "荐片1",
             "name": "🐭荐片P2P",
             "api": "csp_Jianpian",
