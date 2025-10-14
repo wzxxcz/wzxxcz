@@ -1844,6 +1844,22 @@
             }
         },
         {
+            "key": "坚果",
+            "name": "🫘坚果影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://a.ngdy1.cn",
+                "site": "",
+                "dataKey": "2015692015692015",
+                "dataIv": "2015692015692015",
+                "deviceId": "",
+                "version": "",
+                "ua": ""
+            }
+        },
+        {
             "key": "火花",
             "name": "🔥火花影视",
             "type": 3,
