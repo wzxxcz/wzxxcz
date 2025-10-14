@@ -121,13 +121,13 @@ class Spider(Spider):
 
     def homeContent(self, filter):
         result = {}
-        result = {"class": [{"type_id": "/list/new@play_list", "type_name": "丢丢🌠新歌榜"},
-                            {"type_id": "/list/top@play_list", "type_name": "丢丢🌠TOP榜单"},
-                            {"type_id": "/list/djwuqu@play_list", "type_name": "丢丢🌠DJ舞曲"},
-                            {"type_id": "/singerlist/index/index/index/index@singer_list", "type_name": "丢丢🌠歌手"},
-                            {"type_id": "/playtype/index@video_list", "type_name": "丢丢🌠歌单"},
-                            {"type_id": "/radiolist/index@video_list", "type_name": "丢丢🌠电台"},
-                            {"type_id": "/mvlist/index@video_list", "type_name": "丢丢🌠高清MV"}],
+        result = {"class": [{"type_id": "/list/new@play_list", "type_name": "小橙子🍊新歌榜"},
+                            {"type_id": "/list/top@play_list", "type_name": "小橙子🍊TOP榜单"},
+                            {"type_id": "/list/djwuqu@play_list", "type_name": "小橙子🍊DJ舞曲"},
+                            {"type_id": "/singerlist/index/index/index/index@singer_list", "type_name": "小橙子🍊歌手"},
+                            {"type_id": "/playtype/index@video_list", "type_name": "小橙子🍊歌单"},
+                            {"type_id": "/radiolist/index@video_list", "type_name": "小橙子🍊电台"},
+                            {"type_id": "/mvlist/index@video_list", "type_name": "小橙子🍊高清MV"}],
                  }
 
         return result
@@ -157,7 +157,7 @@ class Spider(Spider):
                 except (TypeError, KeyError):
                     pic = "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1749123189920/1749123156315.png"
 
-                remark = "丢丢▶️请您欣赏"
+                remark = "小橙子🍊请您欣赏"
 
                 video = {
                     "vod_id": id,
@@ -203,7 +203,7 @@ class Spider(Spider):
                 except (TypeError, KeyError):
                     pic = "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1749123189920/1749123156315.png"
 
-                remark = "丢丢▶️请您欣赏"
+                remark = "小橙子🍊请您欣赏"
 
                 video = {
                     "vod_id": id,
@@ -242,14 +242,14 @@ class Spider(Spider):
             name = self.extract_middle_text(code, "s1='", "'", 0)
             Jumps = self.extract_middle_text(code, "s2='", "'", 0)
 
-            content = '丢丢🎉为您介绍剧情📢' + self.extract_middle_text(res,'温馨提示：','</div>', 0)
+            content = '小橙子🍊为您介绍剧情📢' + self.extract_middle_text(res,'温馨提示：','</div>', 0)
 
             if name not in content:
                 bofang = Jumps
                 xianlu = '1'
             else:
                 bofang = did
-                xianlu = '丢丢音乐专线'
+                xianlu = '小橙子音乐专线'
 
                 videos.append({
                     "vod_id": did,
@@ -271,7 +271,7 @@ class Spider(Spider):
                 name = self.extract_middle_text(code, "s1='", "'", 0)
                 Jumps = self.extract_middle_text(code, "s2='", "'", 0)
 
-                content = '丢丢🎉为您介绍剧情📢' + self.extract_middle_text(res,'温馨提示：','</div>', 0)
+                content = '小橙子🍊为您介绍剧情📢' + self.extract_middle_text(res,'温馨提示：','</div>', 0)
 
                 if name not in content:
                     bofang = Jumps
@@ -294,7 +294,7 @@ class Spider(Spider):
 
                     bofang = bofang[:-1]
 
-                    xianlu = '丢丢音乐专线'
+                    xianlu = '小橙子音乐专线'
 
                     videos.append({
                         "vod_id": did,
@@ -343,7 +343,7 @@ class Spider(Spider):
                     name = self.extract_middle_text(code, "s1='", "'", 0)
                     Jumps = self.extract_middle_text(code, "s2='", "'", 0)
 
-                    content = '丢丢为您介绍剧情' + self.extract_middle_text(res, '温馨提示：', '</div>', 0)
+                    content = '小橙子为您介绍剧情' + self.extract_middle_text(res, '温馨提示：', '</div>', 0)
 
                     if name not in content:
                         bofang = Jumps
@@ -364,7 +364,7 @@ class Spider(Spider):
                             name = sou.text.strip()
                             play_urls.append(f"{name}${id}")
 
-                        xianlu = '丢丢音乐专线'
+                        xianlu = '小橙子音乐专线'
                         if not vod_content:
                             vod_content = content
                         if not vod_play_from:
@@ -454,7 +454,7 @@ class Spider(Spider):
                 except (TypeError, KeyError):
                     pic = "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1749123189920/1749123156315.png"
 
-                remark = "丢丢▶️请您欣赏"
+                remark = "小橙子🍊请您欣赏"
 
                 video = {
                     "vod_id": id,
@@ -482,6 +482,7 @@ class Spider(Spider):
         elif params['type'] == "ts":
             return self.proxyTs(params)
         return None
+
 
 
 
