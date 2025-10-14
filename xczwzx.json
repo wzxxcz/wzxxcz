@@ -26933,7 +26933,8 @@
                     "芒果",
                     "tnmb",
                     "seven",
-                    "bilibili"
+                    "bilibili",
+                    "1905"
                 ],
                 "header": {
                     "User-Agent": "okhttp/4.9.1"
@@ -26978,6 +26979,41 @@
                     "User-Agent": "okhttp/4.1.0"
                 }
             }
+        },
+        {
+            "name": "夜幕5",
+            "type": 0,
+            "url": "https://jx.xmflv.com/?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "芒果TV",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                }
+            }
+        },
+        {
+            "name": "解析4",
+            "type": 0,
+            "url": "https://www.ckplayer.vip/jiexi/?url="
         },
         {
             "name": "影视淘片",
@@ -27038,6 +27074,17 @@
             "name": "大厂",
             "type": 0,
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
+        },
+        {
+            "name": "解析7",
+            "type": 0,
+            "url": "https://jx.aidouer.net/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36",
+                    "referer": "https://jiejie.uk/"
+                }
+            }
         },
         {
             "name": "小橙子线路4",
