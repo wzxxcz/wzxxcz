@@ -806,60 +806,6 @@
             "api": "./py/HIFI音乐APP.py"
         },
         {
-            "key": "YYMP3音乐网",
-            "name": "🎵YYMP3音乐",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./json/YYMP3音乐网.json"
-        },
-        {
-            "key": "啊哈DJ网",
-            "name": "🎵啊哈DJ音乐",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./json/闪闪音乐网.json"
-        },
-        {
-            "key": "爱听音乐网",
-            "name": "🎵爱听｜音乐",
-            "type": 3,
-            "api": "./py/爱听音乐网.py"
-        },
-        {
-            "key": "枫叶音乐",
-            "name": "🎵枫叶｜音乐",
-            "type": 3,
-            "api": "./py/枫叶音乐.py"
-        },
-        {
-            "key": "枫叶音乐1",
-            "name": "🎵枫叶1音乐",
-            "type": 3,
-            "api": "./py/枫叶音乐1.py"
-        },
-        {
-            "key": "闪闪音乐网",
-            "name": "🎵闪闪｜音乐",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./json/闪闪音乐网.json"
-        },
-        {
-            "key": "深港音乐汇",
-            "name": "🎵深港音乐",
-            "type": 3,
-            "api": "./py/深港音乐汇.py"
-        },
-        {
             "key": "玩偶哥哥",
             "name": "🐲小橙子智能4K弹幕",
             "type": 3,
