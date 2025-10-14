@@ -806,6 +806,16 @@
             "api": "./py/HIFI音乐APP.py"
         },
         {
+            "key": "YYMP3音乐网",
+            "name": "🎵YYMP3音乐",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "./json/YYMP3音乐网.json"
+        },
+        {
             "key": "玩偶哥哥",
             "name": "🐲小橙子智能4K弹幕",
             "type": 3,
