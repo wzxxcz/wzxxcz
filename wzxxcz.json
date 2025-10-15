@@ -26355,13 +26355,13 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.yingyin9.com/",
                 "二次截取": "",
-                "数组": "tu&&</a>",
+                "数组": "<a class=\"tu&&</a>",
                 "标题": "title=\"&&\"",
                 "图片": "img src=\"&&\"",
                 "副标题": "<span class=\"tip\">&&</span>",
                 "链接": "href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.yingyin9.com/news/R-tv-{cateId}/area/{area}/year/{year}/",
+                "分类url": "https://www.yingyin9.com/news/{cateId}/area/{area}/year/{year}/",
                 "分类": "电影$R-movie#电视剧$R-tv#综艺$R-varietyshow#动漫$R-cartoon#短剧$R-skits#"
             }
         },
