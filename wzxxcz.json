@@ -26500,6 +26500,20 @@
             }
         },
         {
+            "key": "晚秋影院",
+            "name": "⛲晚秋影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://cocozhiyi.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://cocozhiyi.com/vod/{wd}-{pg}/",
+                "分类": "电影片$wqdyp#连续剧$wqlxj#综艺片$wqzyp#动漫片$wqdmp#短剧$wqdj#体育赛事$wqtyss#"
+            }
+        },
+        {
             "key": "魔都资源",
             "name": "🤣魔都动漫",
             "type": 1,
