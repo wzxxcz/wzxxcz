@@ -1305,6 +1305,19 @@
             "ext": "https://m.hkybqufgh.com,https://m.sizhengxt.com,https://m.9zhoukj.com,https://m.sizhengxt.com,https://m.jiabaide.cn"
         },
         {
+            "key": "金牌",
+            "name": "🏅金牌影视备1",
+            "type": 3,
+            "api": "csp_AppMuou",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "",
+                "site": "https://muouapp.oss-cn-hangzhou.aliyuncs.com/MUOUAPP/godbbq.txt",
+                "name": "金牌影院（请断网再安装）"
+            }
+        },
+        {
             "key": "猎手影视",
             "name": "🦁猎手影院",
             "type": 3,
@@ -1325,6 +1338,33 @@
             "quickSearch": 1,
             "filterable": 1,
             "playerType": 2
+        },
+        {
+            "key": "冷心",
+            "name": "🍊冷心影视",
+            "type": 3,
+            "api": "csp_AppMuou",
+            "ext": {
+                "url": "http://app.789dd.cn",
+                "name": "火猫影视"
+            }
+        },
+        {
+            "key": "余白",
+            "name": "🍊余白影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://app.yb4k.top",
+                "site": "",
+                "dataKey": "pk5CemuwgQ4gh8dl",
+                "dataIv": "pk5CemuwgQ4gh8dl",
+                "deviceId": "",
+                "version": "",
+                "token": "71ef95295e56f3dfce2d008b1b07dc83f20f2bd8c5444202b6957587c9a5e57e",
+                "ua": ""
+            }
         },
         {
             "key": "咖啡",
