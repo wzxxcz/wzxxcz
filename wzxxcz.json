@@ -27107,10 +27107,10 @@
             "changeable": 1
         },
         {
-            "key": "豆瓣资源",
-            "name": "🌀豆瓣资源",
+            "key": "魔都资源",
+            "name": "🌀魔都资源",
             "type": 1,
-            "api": "https://dbzy.tv/api.php/provide/vod",
+            "api": "https://www.mdzyapi.com/api.php/provide/vod",
             "playerType": 1,
             "searchable": 1,
             "changeable": 1
