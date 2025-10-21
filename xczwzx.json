@@ -1313,6 +1313,21 @@
             }
         },
         {
+            "key": "数字",
+            "name": "♾️数字影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://app1-0-0.87333.cc",
+                "site": "",
+                "dataKey": "VwsHxkCViDXEExWa",
+                "dataIv": "VwsHxkCViDXEExWa",
+                "deviceId": "",
+                "version": ""
+            }
+        },
+        {
             "key": "火锅",
             "name": "🍊火锅影视",
             "type": 3,
