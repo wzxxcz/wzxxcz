@@ -27098,6 +27098,15 @@
             "changeable": 1
         },
         {
+            "key": "卧龙资源",
+            "name": "🌀卧龙资源",
+            "type": 1,
+            "api": "https://wolongzyw.com/api.php/provide/vod",
+            "playerType": 1,
+            "searchable": 1,
+            "changeable": 1
+        },
+        {
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
