@@ -27116,10 +27116,10 @@
             "changeable": 1
         },
         {
-            "key": "樱花资源",
-            "name": "🌀樱花资源",
+            "key": "无尽资源",
+            "name": "🌀无尽资源",
             "type": 1,
-            "api": "https://m3u8.apiyhzy.com/api.php/provide/vod",
+            "api": "https://api.wujinapi.me/api.php/provide/vod",
             "playerType": 1,
             "searchable": 1,
             "changeable": 1
