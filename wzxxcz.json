@@ -27969,6 +27969,20 @@
             }
         },
         {
+            "key": "短剧场",
+            "name": "🍊短剧场短剧",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.duanjuchang.cc/vodtype/duanju.html",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.duanjuchang.cc/vodshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "现代都市$xdds#女频恋爱$npla#反转爽剧$fzsj#古装仙侠$gzxx#年代穿越$ndcy#脑洞悬疑$ndxy#有声动漫$ysdm#"
+            }
+        },
+        {
             "key": "hipy_js_贝乐虎[儿]",
             "name": "🐅贝乐虎",
             "type": 3,
