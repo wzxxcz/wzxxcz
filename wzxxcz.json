@@ -27098,15 +27098,6 @@
             "changeable": 1
         },
         {
-            "key": "茅台资源",
-            "name": "🌀茅台资源",
-            "type": 1,
-            "api": "https://caiji.maotaizy.cc/api.php/provide/vod",
-            "playerType": 1,
-            "searchable": 1,
-            "changeable": 1
-        },
-        {
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
