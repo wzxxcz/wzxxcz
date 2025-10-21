@@ -26542,6 +26542,51 @@
             ]
         },
         {
+            "key": "电影天堂资源",
+            "name": "🌀电影天堂资源",
+            "type": 1,
+            "api": "http://caiji.dyttzyapi.com/api.php/provide/vod",
+            "playerType": 1,
+            "searchable": 1,
+            "changeable": 1
+        },
+        {
+            "key": "如意资源",
+            "name": "🌀如意资源",
+            "type": 1,
+            "api": "http://cj.rycjapi.com/api.php/provide/vod",
+            "playerType": 1,
+            "searchable": 1,
+            "changeable": 1
+        },
+        {
+            "key": "卧龙资源",
+            "name": "🌀卧龙资源",
+            "type": 1,
+            "api": "https://wolongzyw.com/api.php/provide/vod",
+            "playerType": 1,
+            "searchable": 1,
+            "changeable": 1
+        },
+        {
+            "key": "魔都资源",
+            "name": "🌀魔都资源",
+            "type": 1,
+            "api": "https://www.mdzyapi.com/api.php/provide/vod",
+            "playerType": 1,
+            "searchable": 1,
+            "changeable": 1
+        },
+        {
+            "key": "无尽资源",
+            "name": "🌀无尽资源",
+            "type": 1,
+            "api": "https://api.wujinapi.me/api.php/provide/vod",
+            "playerType": 1,
+            "searchable": 1,
+            "changeable": 1
+        },
+        {
             "key": "星辰影视",
             "name": "💧星辰影视",
             "type": 3,
