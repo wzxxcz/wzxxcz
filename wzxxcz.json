@@ -27125,10 +27125,10 @@
             "changeable": 1
         },
         {
-            "key": "iKun资源",
-            "name": "🌀iKun资源",
+            "key": "小猫咪资源",
+            "name": "🌀小猫咪资源",
             "type": 1,
-            "api": "https://ikunzyapi.com/api.php/provide/vod",
+            "api": "https://zy.xmm.hk/api.php/provide/vod",
             "playerType": 1,
             "searchable": 1,
             "changeable": 1
