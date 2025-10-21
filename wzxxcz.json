@@ -27125,10 +27125,10 @@
             "changeable": 1
         },
         {
-            "key": "旺旺短剧",
-            "name": "🌀旺旺短剧",
+            "key": "iKun资源",
+            "name": "🌀iKun资源",
             "type": 1,
-            "api": "https://wwzy.tv/api.php/provide/vod",
+            "api": "https://ikunzyapi.com/api.php/provide/vod",
             "playerType": 1,
             "searchable": 1,
             "changeable": 1
