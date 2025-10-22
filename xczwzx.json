@@ -774,7 +774,6 @@
             "searchable": 1,
             "changeable": 1,
             "ext": {
-                "url": "",
                 "site": "https://muouapp.oss-cn-hangzhou.aliyuncs.com/MUOUAPP/godbbq.txt",
                 "name": "金牌影院（请断网再安装）"
             }
@@ -819,13 +818,9 @@
             "api": "csp_AppGet",
             "ext": {
                 "url": "https://dec.yb4k.top",
-                "site": "",
                 "dataKey": "KsmJgfp3MVQFKWRa",
                 "dataIv": "KsmJgfp3MVQFKWRa",
-                "deviceId": "",
-                "version": "",
-                "token": "d51f0cf047e7d4c5f76e2720cfdcaa927055e77c5e8cc0a1a7e49ca198067161",
-                "ua": ""
+                "token": "d51f0cf047e7d4c5f76e2720cfdcaa927055e77c5e8cc0a1a7e49ca198067161"
             }
         },
         {
@@ -835,13 +830,10 @@
             "quickSearch": 1,
             "api": "csp_AppQi",
             "ext": {
-                "url": "",
                 "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxh.txt",
                 "dataKey": "37kj83zs1q16jk6t",
                 "dataIv": "37kj83zs1q16jk6t",
-                "deviceId": "",
-                "version": "101",
-                "ua": ""
+                "version": "101"
             }
         },
         {
