@@ -1056,12 +1056,8 @@
             "api": "csp_AppGet",
             "ext": {
                 "url": "https://www.zjkrmv.vip",
-                "site": "",
                 "dataKey": "vXeyuJFqTKqWUtWU",
-                "dataIv": "vXeyuJFqTKqWUtWU",
-                "deviceId": "",
-                "version": "",
-                "ua": ""
+                "dataIv": "vXeyuJFqTKqWUtWU"
             }
         },
         {
