@@ -1102,10 +1102,8 @@
             "api": "csp_AppGet",
             "ext": {
                 "url": "http://ys.qist.top",
-                "site": "",
                 "dataKey": "2SWSPFxugBLPPOKo",
                 "dataIv": "2SWSPFxugBLPPOKo",
-                "deviceId": "",
                 "version": "120"
             }
         },
