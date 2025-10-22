@@ -1664,12 +1664,9 @@
             "api": "csp_AppGet",
             "ext": {
                 "url": "http://huohu.yihn.cc",
-                "site": "",
                 "dataKey": "huohushipingetap",
                 "dataIv": "huohushipingetap",
-                "deviceId": "",
-                "version": "140",
-                "ua": ""
+                "version": "140"
             }
         },
         {
