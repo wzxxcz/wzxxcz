@@ -2203,13 +2203,9 @@
             "quickSearch": 1,
             "api": "csp_AppGet",
             "ext": {
-                "url": "",
                 "site": "https://dyyztvappapigoodgx.68.gy:12689/ciwk28vu38io8/apiurl.txt",
                 "dataKey": "dyyztvapiappyyds",
-                "dataIv": "dyyztvapiappyyds",
-                "deviceId": "",
-                "version": "",
-                "ua": ""
+                "dataIv": "dyyztvapiappyyds"
             }
         },
         {
