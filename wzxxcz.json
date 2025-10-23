@@ -27436,16 +27436,6 @@
             }
         },
         {
-            "key": "王者TV",
-            "name": "🍊王者TV",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
-            "ext": {
-                "分类url": "https://wzzy.cc/"
-            }
-        },
-        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
