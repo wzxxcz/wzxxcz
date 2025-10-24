@@ -27454,6 +27454,7 @@
             "name": "💧神马影院1",
             "type": 3,
             "api": "csp_XBPQ",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
