@@ -21227,16 +21227,11 @@
             "name": "🍊第七影院",
             "type": 3,
             "api": "csp_XBPQ",
+            "jar": "https://xcz.iptv365.org/wzx.jar",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "https://www.qlxyzlok.com/",
-                "二次截取": "module-items\"&&id=\"page[替换:module-footer>>module-item]",
-                "数组": "module-item-pic&&module-item\"",
-                "标题": "title=\"&&\"",
-                "图片": "src=\"&&\"",
-                "副标题": "<div class=\"module-item-text\">&&</div>",
-                "链接": "href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.qlxyzlok.com/mov_list/{cateId}/12/0/0/{year}/{catePg}/",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#纪录片$5#"
