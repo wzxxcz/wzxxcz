@@ -27472,11 +27472,11 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.jlhsgg.com/",
                 "二次截取": "",
-                "数组": "/voddetail/&&</a>",
+                "数组": "<li class=\"ff-vod-img-list col-md-2 col-sm-2 col-xs-4 text-center ff-vod-img-new ff-col&&</li>",
                 "标题": "alt=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<em class=\"label littplus\">&&</em>",
-                "链接": "/voddetail/+&&\"",
+                "链接": "href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.jlhsgg.com/class/{cateId}-{catePg}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$33#"
