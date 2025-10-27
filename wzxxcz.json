@@ -27309,23 +27309,17 @@
             }
         },
         {
-            "key": "大西瓜影院",
-            "name": "🍉大西瓜影院",
+            "key": "普江影院",
+            "name": "🍊普江影院",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.bjrsfund.com/",
-                "二次截取": "module-items&&id=\"page",
-                "数组": "<a&&</a>",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "<div class=\"module-item-note ddvH0\">&&</div>",
-                "链接": "href=\"&&\"",
+                "主页url": "http://jspjjx.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.bjrsfund.com/vod/{cateId}-{catePg}/",
-                "分类": "电影$dxdyp#连续剧$dxlxj#综艺$dxzyp#动漫$dxdmp#短剧$dxdj#体育赛事$dxdj#"
+                "分类url": "http://jspjjx.com/show/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
             }
         },
         {
