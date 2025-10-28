@@ -1378,7 +1378,7 @@
         },
         {
             "key": "清风",
-            "name": "🪶清风影视",
+            "name": "⌛清风影视",
             "type": 3,
             "quickSearch": 1,
             "api": "csp_AppGet",
