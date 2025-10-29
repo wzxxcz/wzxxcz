@@ -762,26 +762,19 @@
             "filterable": 0
         },
         {
-            "key": "DJ",
-            "name": "🎤DJ嗨嗨",
+            "key": "酷奇",
+            "name": "🎤酷奇MV",
             "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "jar": "https://xcz.iptv365.org/wzxwkx.jar",
-            "ext": "./json/DJyyyyw.json"
-        },
-        {
-            "key": "DJ呦呦音乐网",
-            "name": "🎵DJ呦呦",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "jar": "https://xcz.iptv365.org/spider.jar",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "https://git.acwing.com/xcz/cc1/-/raw/master/%E6%8B%BE%E5%85%89/lib/DJyyyyw.json"
+            "api": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/drpy2.min.js",
+            "ext": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/酷奇MV.js",
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            },
+            "timeout": 10,
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0
         },
         {
             "key": "HIFI音乐APP",
