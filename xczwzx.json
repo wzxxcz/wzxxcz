@@ -26835,56 +26835,6 @@
             ]
         },
         {
-            "key": "天翼资源网",
-            "name": "🌀天翼采集",
-            "type": 1,
-            "api": "https://www.911ysw.top/tianyi.php/provide/vod/",
-            "playUrl": "",
-            "searchable": 1,
-            "quickSearch": 1,
-            "categories": [
-                "国产动漫",
-                "日韩动漫",
-                "国产剧"
-            ]
-        },
-        {
-            "key": "电影天堂资源",
-            "name": "🌀电影天堂资源",
-            "type": 1,
-            "api": "http://caiji.dyttzyapi.com/api.php/provide/vod",
-            "playerType": 1,
-            "searchable": 1,
-            "changeable": 1
-        },
-        {
-            "key": "如意资源",
-            "name": "🌀如意资源",
-            "type": 1,
-            "api": "http://cj.rycjapi.com/api.php/provide/vod",
-            "playerType": 1,
-            "searchable": 1,
-            "changeable": 1
-        },
-        {
-            "key": "卧龙资源",
-            "name": "🌀卧龙资源",
-            "type": 1,
-            "api": "https://wolongzyw.com/api.php/provide/vod",
-            "playerType": 1,
-            "searchable": 1,
-            "changeable": 1
-        },
-        {
-            "key": "魔都资源",
-            "name": "🌀魔都资源",
-            "type": 1,
-            "api": "https://www.mdzyapi.com/api.php/provide/vod",
-            "playerType": 1,
-            "searchable": 1,
-            "changeable": 1
-        },
-        {
             "key": "无尽资源",
             "name": "🌀无尽资源",
             "type": 1,
