@@ -27327,6 +27327,19 @@
             }
         },
         {
+            "key": "映像星球",
+            "name": "🌕映像星球",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://yxxq1.cc/",
+                "分类url": "https://yxxq1.cc/top/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#纪录片$5#短剧$6#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
