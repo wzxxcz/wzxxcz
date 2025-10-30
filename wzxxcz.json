@@ -27518,6 +27518,20 @@
             }
         },
         {
+            "key": "奈飞中文站",
+            "name": "🍊奈飞中文站",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.meidali.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.meidali.com/Movie/show/{cateId}7777K--------{catePg}---/",
+                "分类": "电影$K#电视剧$T#综艺$0#动漫$n#短剧$1#纪录片$e#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
