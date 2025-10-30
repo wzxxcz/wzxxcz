@@ -1869,18 +1869,6 @@
             }
         },
         {
-            "key": "九零",
-            "name": "🍸九零影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://65fs2d9awaa1d2a7ea8.019990.xyz",
-                "dataKey": "5a9w6x58dsq6z3a6",
-                "dataIv": "5a9w6x58dsq6z3a6"
-            }
-        },
-        {
             "key": "狂欢",
             "name": "🎢狂欢影视",
             "type": 3,
