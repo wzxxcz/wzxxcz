@@ -28870,6 +28870,28 @@
             "url": "http://v9j.net/?url="
         },
         {
+        "name": "云解析",
+        "type": 0,
+        "url": "https://yparse.ik9.cc/index.php?url=",
+        "ext": {
+            "flag": ["qq", "腾讯", "qiyi", "爱奇艺", "奇艺", "youku", "优酷", "mgtv", "芒果", "letv", "乐视", "pptv", "PPTV", "sohu", "bilibili", "哔哩哔哩", "哔哩"],
+            "header": {
+                "User-Agent": "okhttp/4.1.0"
+            }
+        }
+    },
+        {
+        "name": "HLS解析",
+        "type": 0,
+        "url": "https://jx.hls.one/?url=",
+        "ext": {
+            "flag": ["qq", "腾讯", "qiyi", "爱奇艺", "奇艺", "youku", "优酷", "mgtv", "芒果", "letv", "乐视", "pptv", "PPTV", "sohu", "bilibili", "哔哩哔哩", "哔哩"],
+            "header": {
+                "User-Agent": "okhttp/4.1.0"
+            }
+        }
+    },
+        {
             "name": "推荐",
             "type": 1,
             "url": "http://niiuma.qi-simple.top//nn.php?url=",
@@ -29502,11 +29524,6 @@
             "name": "-关注小橙子1-",
             "type": 0,
             "url": "https://cdn.zyc888.top/?url="
-        },
-        {
-            "name": "-红狐-",
-            "type": 0,
-            "url": "https://yparse.ik9.cc/index.php?url="
         },
         {
             "name": "小橙子jx",
