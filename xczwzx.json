@@ -28323,35 +28323,6 @@
             "url": "http://v9j.net/?url="
         },
         {
-            "name": "推荐",
-            "type": 1,
-            "url": "http://niiuma.qi-simple.top//nn.php?url=",
-            "ext": {
-                "flag": [
-                    "qq",
-                    "腾讯",
-                    "qiyi",
-                    "爱奇艺",
-                    "奇艺",
-                    "youku",
-                    "优酷",
-                    "sohu",
-                    "搜狐",
-                    "letv",
-                    "乐视",
-                    "mgtv",
-                    "芒果",
-                    "tnmb",
-                    "seven",
-                    "bilibili",
-                    "1905"
-                ],
-                "header": {
-                    "User-Agent": "okhttp/4.9.1"
-                }
-            }
-        },
-        {
             "name": "解析1080p",
             "type": 0,
             "url": "https://t2.qlplayer.cyou/player/analysis.php?v="
@@ -28937,6 +28908,64 @@
             "type": "1"
         },
         {
+            "name": "云解析",
+            "type": 0,
+            "url": "https://yparse.ik9.cc/index.php?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "mgtv",
+                    "芒果",
+                    "letv",
+                    "乐视",
+                    "pptv",
+                    "PPTV",
+                    "sohu",
+                    "bilibili",
+                    "哔哩哔哩",
+                    "哔哩"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.1.0"
+                }
+            }
+        },
+        {
+            "name": "HLS解析",
+            "type": 0,
+            "url": "https://jx.hls.one/?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "mgtv",
+                    "芒果",
+                    "letv",
+                    "乐视",
+                    "pptv",
+                    "PPTV",
+                    "sohu",
+                    "bilibili",
+                    "哔哩哔哩",
+                    "哔哩"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.1.0"
+                }
+            }
+        },
+        {
             "name": "WZBXCZ",
             "type": 1,
             "url": "https://mfjx.iwsyy.xyz/?url="
@@ -28955,11 +28984,6 @@
             "name": "-关注小橙子1-",
             "type": 0,
             "url": "https://cdn.zyc888.top/?url="
-        },
-        {
-            "name": "-红狐-",
-            "type": 0,
-            "url": "https://yparse.ik9.cc/index.php?url="
         },
         {
             "name": "小橙子jx",
