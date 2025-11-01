@@ -2113,21 +2113,6 @@
             }
         },
         {
-            "key": "白蛇",
-            "name": "🐍白蛇影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "",
-                "site": "http://tengxunyunaliyun.oss-cn-shanghai.aliyuncs.com/tengxunyun.txt",
-                "dataKey": "n3l2tx5jdkp9s2c8",
-                "dataIv": "n3l2tx5jdkp9s2c8",
-                "deviceId": "",
-                "version": "361"
-            }
-        },
-        {
             "key": "huomaoys",
             "name": "🐱火猫1080P",
             "type": 3,
