@@ -27961,7 +27961,7 @@
                 "编码": "UTF-8",
                 "主页url": "http://www.7hutv.com/",
                 "二次截取": "",
-                "数组": "li_all&&</div",
+                "数组": "li_all&&</li>",
                 "标题": "title=\"&&\"",
                 "图片": "src=\"&&\"",
                 "副标题": "<span class=\"rgba1\">&&</span>",
