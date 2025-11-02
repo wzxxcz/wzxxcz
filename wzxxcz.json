@@ -28030,7 +28030,7 @@
         },
         {
             "key": "秋霞电影网",
-            "name": "💧秋霞电影网",
+            "name": "🍊秋霞电影网",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
@@ -28039,7 +28039,7 @@
                 "主页url": "https://www.yingyin9.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.yingyin9.com/news/R-{cateId}-{catePg}/area/{area}/year/{year}/",
-                "分类": "电影$movie#连续剧$tv#综艺$varietyshow#动漫$cartoon#短剧$skits#"
+                "分类": "电影$R-movie#连续剧$R-tv#综艺$R-varietyshow#动漫$R-cartoon#短剧$R-skits#"
             }
         },
         {
