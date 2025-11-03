@@ -28105,18 +28105,18 @@
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4"
             }
         },
-        {
-            "key": "555电影网",
-            "name": "🍊555电影网",
+         {
+            "key": "好看影视",
+            "name": "🍊好看影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "http://nbysjx.com/",
+                "主页url": "https://www.ypjiang.com/",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "http://nbysjx.com/nb/{cateId}-{catePg}.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#电影解说$40#短剧$41#"
+                "分类url": "https://www.ypjiang.com/vod/10{cateId}-{catePg}/",
+                "分类": "电影$dyp#连续剧$lxj#综艺$zyp#动漫$dmp#短剧$dj#体育赛事$tyss#"
             }
         },
         {
