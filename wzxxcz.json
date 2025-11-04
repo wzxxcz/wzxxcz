@@ -28328,6 +28328,12 @@
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "https://www.haihaimi.com/",
+                "二次截取": "",
+                "数组": "lazyload&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"vtitle text-right\">&&</span>",
+                "链接": "href=\"&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.haihaimi.com/video/{cateId}/page/{catePg}/year/{year}/",
                 "分类": "电影$dianying#连续剧$lianxuju#综艺$zongyi#动漫$dongman#短剧$shuangwenduanju#"
