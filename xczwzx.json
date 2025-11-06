@@ -1613,12 +1613,6 @@
             "filterable": 1
         },
         {
-            "key": "饺子影视",
-            "name": "🥟饺子影视",
-            "type": 3,
-            "api": "csp_Jiaozi"
-        },
-        {
             "key": "低端影视",
             "name": "🥃低端影视",
             "type": 3,
