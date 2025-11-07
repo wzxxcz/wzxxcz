@@ -2478,16 +2478,6 @@
             "ext": "./XBPQ/xbpq_555App.json"
         },
         {
-            "key": "旋风视频",
-            "name": "🎞️旋风影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XBPQ/旋风视频.json"
-        },
-        {
             "key": "天启影院",
             "name": "🌤️天启影院",
             "type": 3,
