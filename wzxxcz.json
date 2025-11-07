@@ -1282,9 +1282,9 @@
             "key": "私人",
             "name": "🍊私人影视",
             "type": 3,
-            "changeable": 0,
+            "changeable": 1,
             "api": "csp_AppYsV2",
-            "ext": "https://v.catcs.cc//api.php/v1.vod"
+            "ext": "https://v.catcs.cc/api.php/v1.vod"
         },
         {
             "key": "冷心",
