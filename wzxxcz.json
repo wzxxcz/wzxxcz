@@ -2239,17 +2239,6 @@
             "ext": "./XBPQ/糯米影视.json"
         },
         {
-            "key": "光速",
-            "name": "💡光速影视",
-            "type": 3,
-            "api": "./py/py_光速.py",
-            "searchable": 1,
-            "quickSearch": 1,
-            "changeable": 1,
-            "filterable": 1,
-            "timeout": 60
-        },
-        {
             "key": "好好看",
             "name": "⛲好好看",
             "type": 3,
