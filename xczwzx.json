@@ -2950,9 +2950,9 @@
             "filterable": 1,
             "timeout": 120,
             "ext": {
-                "作者": "🍊小橙子/251010",
+                "作者": "🍊小橙子/251108",
                 "站名": "麦田影院2",
-                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=co16b7i9t0u4rb0ec7b5pb0e8q；； server_name_session=86696de80fc59fea9606ac15c11424aa；； SITE_TOTAL_ID=d50ae49c52a01997c06584dcd9d7fbdf；； Hm_tf_wau1y1a5u38=1760063530；； Hm_lvt_wau1y1a5u38=1760063530；； 9ee7a1a3a7ecc759348be5fe993bea15=061d3fc0fc6fa3ded4c95c06ba905252；； Hm_lpvt_wau1y1a5u38=1760064609&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@server_name_session=3e4e1ded9cae44e5dbbb41a5c8a18202；； SITE_TOTAL_ID=e3756c0d9a133163c70006c3e3a963bd；； Hm_tf_wau1y1a5u38=1762570059；； Hm_lvt_wau1y1a5u38=1762570059；； 71c651e2b5dced3ba665e1162fe05f3f=ef63b0632589604632e0564774e86f0f；； Hm_lpvt_wau1y1a5u38=1762571521&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "图片代理": "0",
                 "直接播放": "0",
