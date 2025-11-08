@@ -5300,7 +5300,7 @@
                 "线路数组": "tab_con_playlist&&</li>",
                 "线路标题": "<a*>&&<",
                 "播放二次截取": "",
-                "播放数组": "group-switch play-list-group-switch&&</div>",
+                "播放数组": "con_c2_list&&</ul>",
                 "倒序": "0",
                 "播放列表": "<a&&</a>",
                 "播放标题": ">&&<",
