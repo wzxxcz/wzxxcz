@@ -29200,7 +29200,7 @@
                 "播放数组": "id=\"panel1&&</div>",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
-                "播放标题": "<span>&&</span>",
+                "播放标题": ">&&</",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://www.yingshi.dog/vodshow/id/{cateId}/page/{catePg}/year/{year}.html",
                 "分类": "电影$1#剧集$2#综艺$3#动漫$4#纪录$5#短剧$47#"
