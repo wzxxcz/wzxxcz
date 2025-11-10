@@ -1013,7 +1013,7 @@
         },
         {
             "key": "阿里盘搜",
-            "name": "🍊阿里搜索",
+            "name": "🍊阿里盘搜",
             "type": 3,
             "api": "csp_PanSou",
             "searchable": 1,
@@ -1025,7 +1025,7 @@
         },
         {
             "key": "夸克盘搜",
-            "name": "🍊夸克搜索",
+            "name": "🍊夸克盘搜",
             "type": 3,
             "api": "csp_PanSou",
             "searchable": 1,
@@ -1037,7 +1037,7 @@
         },
         {
             "key": "UC盘搜",
-            "name": "🍊UC搜索",
+            "name": "🍊UC盘搜",
             "type": 3,
             "api": "csp_PanSou",
             "searchable": 1,
@@ -1049,7 +1049,7 @@
         },
         {
             "key": "天翼盘搜",
-            "name": "🍊天翼搜索",
+            "name": "🍊天翼盘搜",
             "type": 3,
             "api": "csp_PanSou",
             "searchable": 1,
@@ -1061,7 +1061,7 @@
         },
         {
             "key": "123盘搜",
-            "name": "🍊123搜索",
+            "name": "🍊123盘搜",
             "type": 3,
             "api": "csp_PanSou",
             "searchable": 1,
@@ -1073,7 +1073,7 @@
         },
         {
             "key": "百度盘搜",
-            "name": "🍊百度搜索",
+            "name": "🍊百度盘搜",
             "type": 3,
             "api": "csp_PanSou",
             "searchable": 1,
@@ -10045,6 +10045,13 @@
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
             }
+        },
+        {
+            "key": "莫小影视",
+            "name": "🍊莫小影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": "./XBPQ/莫小影视.json"
         },
         {
             "key": "面包影视",
@@ -29875,17 +29882,6 @@
             "name": "🥯甜圈短剧",
             "type": 3,
             "api": "./py/甜圈短剧.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
-        {
-            "key": "锦鲤短剧",
-            "name": "🐉锦鲤短剧",
-            "type": 3,
-            "api": "./py/锦鲤短剧.py",
             "searchable": 1,
             "changeable": 1,
             "quickSearch": 1,
