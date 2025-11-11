@@ -912,7 +912,7 @@
                 "type": "list",
                 "ratio": 1.433
             },
-            "ext": "./json/lj.json"
+            "ext": "./json/雷鲸.json"
         },
         {
             "key": "海绵",
@@ -1287,16 +1287,6 @@
             "ext": "https://v.catcs.cc/api.php/v1.vod"
         },
         {
-            "key": "冷心",
-            "name": "🍊冷心影视",
-            "type": 3,
-            "api": "csp_AppMuou",
-            "ext": {
-                "url": "http://app.789dd.cn",
-                "name": "火猫影视"
-            }
-        },
-        {
             "key": "优势",
             "name": "🍊优势影视",
             "type": 3,
@@ -1309,15 +1299,15 @@
             }
         },
         {
-            "key": "爱影",
-            "name": "🍊爱影影视",
+            "key": "一一",
+            "name": "🍊一一影视",
             "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppQi",
+            "api": "csp_AppMuou",
+            "searchable": 1,
+            "changeable": 1,
             "ext": {
-                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/qj2.txt",
-                "dataKey": "sada21321sdq231d",
-                "dataIv": "sada21321sdq231d"
+                "url": "http://app.yiyi521.top",
+                "name": "YIYI影视"
             }
         },
         {
@@ -2079,27 +2069,13 @@
             }
         },
         {
-            "key": "huomaoys",
+            "key": "火猫",
             "name": "🐱火猫1080P",
             "type": 3,
-            "searchable": 1,
-            "quickSearch": 0,
-            "api": "csp_Muou",
-            "jar": "https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/714c5f6aa89af46f/071.png;md5;9cf0a6c1f62ad83e9dccc2b7dd683a10",
-            "playerType": 2,
-            "ext": "7lj763gg0939790i413gi484k8058896highi4414h68l7g6hk8qiaojig9k2k289l9ik807i213k5j602"
-        },
-        {
-            "key": "若雪",
-            "name": "☃️若雪影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppQi",
+            "api": "csp_AppMuou",
             "ext": {
-                "url": "https://appcms.rx4k.top",
-                "dataKey": "ZX10ysTYZWtIJCTU",
-                "dataIv": "ZX10ysTYZWtIJCTU",
-                "version": "120"
+                "url": "http://app.789dd.cn",
+                "name": "火猫影视"
             }
         },
         {
