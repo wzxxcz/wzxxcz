@@ -29247,6 +29247,26 @@
             "ext": "https://tvbox.catvod.com/js/mgtv.js"
         },
         {
+            "key": "星辰影院1",
+            "name": "🌠星辰影院1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.xcys.me/",
+                "二次截取": "",
+                "数组": "/voddetail/&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<div class=\"module-item-note\">&&</div>",
+                "链接": "/voddetail/+&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.xcys.me/vodshow/{cateId}-{area}-----{catePg}-{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$4#动漫$5#短剧$3#体育$6#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
@@ -29562,20 +29582,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
-            }
-        },
-        {
-            "key": "星辰影院1",
-            "name": "🌠星辰影院1",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.xcys.me/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.xcys.me/vodshow/{cateId}-{area}-----{catePg}-{year}.html",
-                "分类": "电影$1#电视剧$2#综艺$4#动漫$5#短剧$3#体育$6#动漫$7#"
             }
         },
         {
