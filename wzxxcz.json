@@ -2097,6 +2097,14 @@
             }
         },
         {
+      "key": "bili",
+      "name": "✒️bili",
+      "type": 3,
+      "playerType": "2",
+      "api": "https://tvbox.catvod.com/js/drpy2.min.js",
+      "ext": "https://tvbox.catvod.com/js/bili.js"
+    },
+        {
             "key": "QD4K",
             "name": "🐷猪猪4K",
             "type": 3,
