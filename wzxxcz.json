@@ -930,23 +930,6 @@
             "ext": "./json/海绵.json"
         },
         {
-            "key": "趣盘",
-            "name": "🍊趣盘4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebQu",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "style": {
-                "type": "list",
-                "ratio": 1.433
-            },
-            "ext": {
-                "url": "https://www.qupanshe.com"
-            }
-        },
-        {
             "key": "夸父",
             "name": "🍊夸父4K弹幕",
             "type": 3,
@@ -1285,6 +1268,18 @@
             "changeable": 1,
             "api": "csp_AppYsV2",
             "ext": "https://v.catcs.cc/api.php/v1.vod"
+        },
+        {
+            "key": "瑞奇影视",
+            "name": "🍊瑞奇影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://rqxk.gdata.fun",
+                "dataKey": "yangruiqiYsapp00",
+                "dataIv": "yangruiqiYsapp00"
+            }
         },
         {
             "key": "优势",
