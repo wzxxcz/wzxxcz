@@ -745,6 +745,18 @@
             "ext": "https://v.catcs.cc/api.php/v1.vod"
         },
         {
+            "key": "瑞奇影视",
+            "name": "🍊瑞奇影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://rqxk.gdata.fun",
+                "dataKey": "yangruiqiYsapp00",
+                "dataIv": "yangruiqiYsapp00"
+            }
+        },
+        {
             "key": "优势",
             "name": "🍊优势影视",
             "type": 3,
