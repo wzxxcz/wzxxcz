@@ -7748,7 +7748,7 @@
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"pic-text text-right\">&&</span>",
-                "链接": "https://www.quyingshi.com/vodplay/+/voddetail/&&/+-1-1/",
+                "链接": "href=\"&&\"",
                 "影片年代": "年份：&&</p>",
                 "影片地区": "地区：&&</p>",
                 "影片类型": "类型：&&</p>",
