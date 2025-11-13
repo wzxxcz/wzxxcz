@@ -29791,6 +29791,34 @@
             }
         },
         {
+            "key": "搜TV啦",
+            "name": "🍊搜TV啦",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.sotvla.cc/?search=%E8%B5%98%E5%A9%BF",
+                "分类url": "https://www.sotvla.cc/?search={cateId}&page={catePg}",
+                "分类": "电影&电视剧&综艺&动漫&短剧",
+                "分类值": "*",
+                "数组": "picwidth\">&&/span>",
+                "标题": "name\">&&<",
+                "图片": "src=\"&&\"",
+                "副标题": "",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+简介：&&<!",
+                "线路数组": "data-source&&</div>",
+                "线路标题": ">&&<",
+                "播放数组": "episode-grid&&<button",
+                "倒序": "0",
+                "播放列表": "<div&&/div>",
+                "播放标题": ">&&<",
+                "播放链接": "data-play=\"&&\"+.html",
+                "播放链接前缀": "https://www.sotvla.cc/play/"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
