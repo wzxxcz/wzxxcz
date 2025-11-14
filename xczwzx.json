@@ -1199,6 +1199,30 @@
             }
         },
         {
+            "key": "茉莉",
+            "name": "🌸茉莉影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "site": "https://gitee.com/wmmoliill/wimg/raw/master/img/bk/9.txt",
+                "dataKey": "88689667dce61725",
+                "dataIv": "88689667dce61725"
+            }
+        },
+        {
+            "key": "坚果",
+            "name": "🍊坚果影视",
+            "type": 3,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "site": "https://qiliniao-1331306839.cos.ap-chengdu.myqcloud.com/jg.txt",
+                "dataKey": "2015692015692015",
+                "dataIv": "2015692015692015"
+            }
+        },
+        {
             "key": "星空",
             "name": "🍊星空影视",
             "type": 3,
