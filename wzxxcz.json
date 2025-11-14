@@ -30178,6 +30178,20 @@
             }
         },
         {
+            "key": "奈飞中文站",
+            "name": "🍊奈飞中文站",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.alexft.com/",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.alexft.com/Movie/show/{cateId}HHHL--------{catePg}---/",
+                "分类": "电影$LH#电视剧$TH#综艺$uH#动漫$sH#短剧$CH#纪录片$cH#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
