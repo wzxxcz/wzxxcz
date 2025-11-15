@@ -30186,6 +30186,12 @@
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "http://www.tdys.cc/",
+                "二次截取": "",
+                "数组": "/vod-detail/&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<div class=\"module-item-note\">&&</div>",
+                "链接": "/vod-detail/+&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://www.tdys.cc/show/{cateId}--------{catePg}---.html",
                 "分类": "电影$dianying#剧集$juji#综艺$zongyi#动漫$dongman#"
