@@ -10252,7 +10252,7 @@
                 "二次截取": "",
                 "数组": "/detail/&&</a>",
                 "标题": "<div class=\"v-item-title\">&&</div>",
-                "图片": "https://vres.mgdnka.cn/+src=\"/&&\"",
+                "图片": "https://vres.mgdnka.cn/+data-original=\"/&&\"",
                 "副标题": "<span>&&</span>",
                 "链接": "/detail/+&&\"",
                 "影片年代": "年份：&&</div>",
