@@ -10249,6 +10249,12 @@
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
                 "主页url": "https://www.kkys04.com/",
+                "二次截取": "",
+                "数组": "/detail/&&</a>",
+                "标题": "<div class=\"v-item-title\">&&</div>",
+                "图片": "https://vres.mgdnka.cn/+src=\"/&&\"",
+                "副标题": "<span>&&</span>",
+                "链接": "/detail/+&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.kkys04.com/show/{cateId}--{area}--{year}-3-{catePg}.html",
                 "分类": "电影$1#连续剧$2#动漫$3#综艺纪录$4#短剧$6#"
