@@ -11602,16 +11602,6 @@
             }
         },
         {
-            "key": "奈飞影视",
-            "name": "🕊️奈飞影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
-            "ext": {
-                "分类url": "https://www.naifei.wiki/"
-            }
-        },
-        {
             "key": "飘零影院",
             "name": "🍃飘零影院",
             "type": 3,
