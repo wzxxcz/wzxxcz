@@ -30390,7 +30390,7 @@
                 "副标题": "<span class=\"state\">&&</span>",
                 "链接": "/vod/+&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.tianqitv.net/vodlist/2?catid={cateId}&type=&area=&year={year}&page={catePg}",
+                "分类url": "https://www.tianqitv.net/vodlist/{cateId}?catid=15&type=&area=&year={year}&page={catePg}",
                 "分类": "电影$1#电视剧$2#综艺$4#动漫$3#短剧$5#"
             }
         },
