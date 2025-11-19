@@ -30452,7 +30452,13 @@
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"state\">&&</span>",
                 "链接": "/vod/+&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "影片年代": "年份：&&</p>",
+                "影片地区": "地区：&&</p>",
+                "影片类型": "类型：&&</p>",
+                "状态": "状态：&&</p>",
+                "导演": "导演：&&</p>",
+                "主演": "主演：&&</p>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text-indent: 28px;margin-top: 10px;\">&&</div>"
                 "分类url": "https://www.tianqitv.net/vodlist/{cateId}&type=&area=&year={year}&page={catePg}",
                 "分类": "电影$1?catid=6#电视剧$2?catid=15#动漫$3?catid=0#综艺$4?catid=23#短剧$5?catid=0#"
             }
