@@ -3541,8 +3541,8 @@
             "ext": "./XBPQ/xbpq_555App.json"
         },
         {
-            "key": "天启影院",
-            "name": "🌤️天启影院",
+            "key": "影院",
+            "name": "🌤️影院",
             "type": 3,
             "api": "csp_XBPQ",
             "searchable": 1,
@@ -3552,7 +3552,7 @@
             "timeout": 120,
             "ext": {
                 "作者": "🍊小橙子/250930",
-                "站名": "天启影院",
+                "站名": "影院",
                 "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=jblhg702mrkjghm1cffia4h7pa；； _ym_uid=1759217720606258750；； _ym_d=1759217720；； _ym_isad=2&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "图片代理": "0",
@@ -30443,7 +30443,7 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "主页url": "https://www.tianqitv.net/",
                 "二次截取": "",
@@ -30458,7 +30458,16 @@
                 "状态": "状态：&&</p>",
                 "导演": "导演：&&</p>",
                 "主演": "主演：&&</p>",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text-indent: 28px;margin-top: 10px;\">&&</div>"
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text-indent: 28px;margin-top: 10px;\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "<li&&/li>",
+                "线路标题": "javascript:;\">&&<",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"episodes-list clearfix&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&</a>",
+                "播放链接": "href=\"&&\"",
                 "分类url": "https://www.tianqitv.net/vodlist/{cateId}&type=&area=&year={year}&page={catePg}",
                 "分类": "电影$1?catid=6#电视剧$2?catid=15#动漫$3?catid=0#综艺$4?catid=23#短剧$5?catid=0#"
             }
