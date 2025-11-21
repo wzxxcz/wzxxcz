@@ -12623,21 +12623,16 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "数组": "class=\"video-pic\"&&</a",
+                "主页url": "https://www.huolitu.com/",
+                "二次截取": "",
+                "数组": "/A99lPyC/&&</li>",
                 "标题": "title=\"&&\"",
-                "副标题": "<span class=\"note text-bg-r\">&&</span>",
-                "图片": "data-original=\"&&\"",
-                "链接": "href=\"&&\"",
-                "线路数组": "#con_playlist&&</a",
-                "线路标题": "tab\">&&</a",
-                "播放数组": "id=\"con_playlist&&</ul>",
-                "播放列表": "<a&&/a>",
-                "播放标题": ">&&<",
-                "播放链接": "href=\"&&\"",
-                "跳转播放链接": "var player_*\"url\":\"&&\"",
-                "分类url": "https://www.xmyxjx.com/vodshow/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
-                "简介": "🍊小橙子为您介绍剧情👉+vod-content\">&&</div>"
+                "图片": "data-original=\"&&\"]",
+                "副标题": "<p class=\"item-status text-overflow\">&&</p>",
+                "链接": "/A99lPyC/+&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.huolitu.com/QGKp0hZ/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$44#"
             }
         },
         {
