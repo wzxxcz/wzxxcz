@@ -577,7 +577,7 @@
             "name": "⚔️荐片磁力",
             "api": "csp_Jianpian",
             "type": 3,
-            "ext": "https://api.ztcgi.com"
+            "ext": "https://ev5356.970xw.com"
         },
         {
             "key": "修罗",
@@ -683,17 +683,6 @@
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1
-        },
-        {
-            "key": "移动",
-            "name": "💡移动影视",
-            "type": 3,
-            "api": "csp_YD",
-            "searchable": 1,
-            "quickSearch": 1,
-            "style": {
-                "type": "list"
-            }
         },
         {
             "key": "极兔",
