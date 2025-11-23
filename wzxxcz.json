@@ -955,6 +955,21 @@
             "ext": "./json/xm.json"
         },
         {
+            "key": "清影",
+            "name": "🍊清影4K",
+            "type": 3,
+            "api": "csp_PanWebShareCloudQY",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": [
+                    "http://www.revohd.com"
+                ]
+            }
+        },
+        {
             "key": "雷鲸",
             "name": "🍊雷鲸4K弹幕",
             "type": 3,
