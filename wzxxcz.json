@@ -12932,21 +12932,16 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "数组": "<li class=\"col-lg-2 col-sm-3 col-xs-4&&</li>",
-                "标题": "title=\"&&\"",
-                "副标题": "<span class=\"note text-bg-r\">&&</span>",
+                "主页url": "https://www.scwzzz.com/",
+                "二次截取": "",
+                "数组": "/detail/&&</a>",
+                "标题": "alt=\"&&\"",
                 "图片": "data-original=\"&&\"",
-                "链接": "href=\"&&\"",
-                "线路数组": "<a class=\"gico wolong&&/a>",
-                "线路标题": ">&&</a",
-                "播放数组": "<ul class=\"clearfix fade&&</ul>",
-                "播放列表": "<li&&</li>",
-                "播放标题": ">&&</a>",
-                "播放链接": "href=\"&&\"",
-                "跳转播放链接": "var player_*\"url\":\"&&\"",
-                "分类url": "https://www.heitujc.com/screen/{cateId}-{area}-------{catePg}---.html",
-                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#",
-                "简介": "🍊小橙子为您介绍剧情👉+vod-content\">&&</div>"
+                "副标题": "<em class=\"label littplus\">&&</em>",
+                "链接": "/detail/+&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.scwzzz.com/class/{cateId}-{catePg}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$33#"
             }
         },
         {
