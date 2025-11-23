@@ -1305,17 +1305,6 @@
             "filterable": 1
         },
         {
-            "key": "移动",
-            "name": "💡移动影视",
-            "type": 3,
-            "api": "csp_YD",
-            "searchable": 1,
-            "quickSearch": 1,
-            "style": {
-                "type": "list"
-            }
-        },
-        {
             "key": "极兔",
             "name": "🐇极兔影视",
             "type": 3,
