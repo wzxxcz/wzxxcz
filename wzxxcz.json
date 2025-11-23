@@ -1169,13 +1169,6 @@
             "name": "⚔️荐片磁力",
             "api": "csp_Jianpian",
             "type": 3,
-            "ext": "https://api.ztcgi.com"
-        },
-        {
-            "key": "荐片2",
-            "name": "⚔️荐片磁力备",
-            "api": "csp_Jianpian",
-            "type": 3,
             "ext": "https://ev5356.970xw.com"
         },
         {
