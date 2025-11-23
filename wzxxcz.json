@@ -1041,6 +1041,18 @@
             }
         },
         {
+            "key": "移动盘搜",
+            "name": "🍊移动盘搜",
+            "type": 3,
+            "api": "csp_PanSou139",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": {
+                "cloudDrives": "mobile"
+            }
+        },
+        {
             "key": "糖果",
             "name": "🍊糖果搜索",
             "type": 3,
@@ -1158,6 +1170,13 @@
             "api": "csp_Jianpian",
             "type": 3,
             "ext": "https://api.ztcgi.com"
+        },
+        {
+            "key": "荐片2",
+            "name": "⚔️荐片磁力备",
+            "api": "csp_Jianpian",
+            "type": 3,
+            "ext": "https://ev5356.970xw.com"
         },
         {
             "key": "修罗",
