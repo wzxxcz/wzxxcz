@@ -31597,6 +31597,26 @@
             }
         },
         {
+            "key": "神马影院2",
+            "name": "🐎神马影院2",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.aism.cc/",
+                "二次截取": "",
+                "数组": "vod-item-img&&</div>",
+                "标题": "<a*>&&</a>",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"text-row-1\">&&</span>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.aism.cc/smvideoshow/{cateId}-----{year}---{catePg}/",
+                "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyijiemu#动漫$dongman#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
