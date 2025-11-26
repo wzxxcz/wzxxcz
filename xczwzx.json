@@ -785,6 +785,30 @@
             }
         },
         {
+            "key": "鹤雪",
+            "name": "🦢鹤雪影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://hxys.07hx.shop",
+                "dataKey": "hex200762200762.",
+                "dataIv": "hex200762200762."
+            }
+        },
+        {
+            "key": "新剧",
+            "name": "🍊新剧影视",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://211.154.24.56:8369",
+                "dataKey": "685bf108bc47b67d",
+                "dataIv": "685bf108bc47b67d"
+            }
+        },
+        {
             "key": "魔方",
             "name": "🧿魔方影视",
             "type": 3,
