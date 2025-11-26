@@ -1731,6 +1731,17 @@
             }
         },
         {
+            "key": "冷心",
+            "name": "🍊冷心影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://dy.58ys.vip",
+                "dataKey": "JEWibY1AgWF0V1xx",
+                "dataIv": "JEWibY1AgWF0V1xx"
+            }
+        },
+        {
             "key": "火猫",
             "name": "🐱火猫1080P",
             "type": 3,
