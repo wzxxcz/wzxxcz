@@ -32162,6 +32162,26 @@
             }
         },
         {
+            "key": "蛙视界",
+            "name": "🐸蛙视界",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.wasvod.com/",
+                "二次截取": "",
+                "数组": "col-xs-4 col-md-3 col-lg-2&&</li>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<p class=\"item-status text-overflow\">&&</p>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.wasvod.com/vodshow/{cateId}/page/{catePg}/year/{year}.html",
+                "分类": "电影$20#电视剧$21#综艺$22#动漫$23#纪录片$24#逆袭短剧$134#强者短剧$133#重生短剧$136#甜宠短剧$139#复仇短剧$137#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
