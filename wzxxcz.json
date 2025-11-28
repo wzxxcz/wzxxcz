@@ -32268,7 +32268,7 @@
                 "线路数组": "more text-muted pull-right&&</div>",
                 "线路标题": "title\">&&</h3",
                 "播放二次截取": "",
-                "播放数组": "<ul class=\"stui-content__playlist clearfix&&</ul>",
+                "播放数组": "<ul class=\"stui-content__playlist&&</ul>",
                 "倒序": "0",
                 "播放列表": "<a&&</a>",
                 "播放标题": ">&&</a>",
