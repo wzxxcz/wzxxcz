@@ -957,17 +957,6 @@
             }
         },
         {
-            "key": "小米",
-            "name": "❤小米4K弹幕",
-            "type": 3,
-            "api": "csp_PanWebShare",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
-            "ext": "./json/xm.json"
-        },
-        {
             "key": "清影",
             "name": "🍊清影4K",
             "type": 3,
