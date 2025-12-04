@@ -1302,7 +1302,7 @@
       "name": "👑下饭弹幕",
       "type": 3,
       "changeable": 0,
-      "api": "https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/py/AppV2.py",
+      "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/py/AppV2.py",
       "ext": {
         "api": "http://yjer.jumianfei.com/api.php/v1.vod",
         "datasignkey": "6QQNUsP3PkD2ajJCPCY8",
