@@ -813,8 +813,6 @@
             "changeable": 1,
             "ext": {
                 "site": [
-                    "https://www.wogg.lol",
-                    "https://wogg.xxooo.cf",
                     "https://www.wogg.one",
                     "https://wogg.333232.xyz",
                     "https://woggpan.888484.xyz"
@@ -1387,18 +1385,6 @@
             "playerType": 2
         },
         {
-            "key": "羊羊",
-            "name": "🐏羊羊影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppMuou",
-            "ext": {
-                "url": "https://ht.zhenxun.love",
-                "name": "羊羊学院"
-            }
-        },
-        {
             "key": "吉米",
             "name": "🎸吉米影视",
             "type": 3,
@@ -1408,34 +1394,12 @@
             }
         },
         {
-            "key": "思念",
-            "name": "🍨思念影视",
-            "type": 3,
-            "api": "csp_AppFox",
-            "ext": {
-                "host": "https://snys2.xyz",
-                "timeout": 15,
-                "ver": 2
-            }
-        },
-        {
             "key": "星空",
             "name": "🛸星空APP",
             "type": 3,
             "api": "csp_AppFox",
             "ext": {
                 "host": "http://fox.qwqfun.com"
-            }
-        },
-        {
-            "key": "鹤雪",
-            "name": "🦢鹤雪影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://hxys.07hx.shop",
-                "dataKey": "hex200762200762.",
-                "dataIv": "hex200762200762."
             }
         },
         {
@@ -1835,18 +1799,6 @@
             }
         },
         {
-            "key": "狂人",
-            "name": "🦸狂人影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://www.zjkrmv.vip",
-                "dataKey": "vXeyuJFqTKqWUtWU",
-                "dataIv": "vXeyuJFqTKqWUtWU"
-            }
-        },
-        {
             "key": "莱米",
             "name": "🍙莱米影视",
             "type": 3,
@@ -2085,18 +2037,6 @@
                 "url": "https://ios.hgyx.vip",
                 "dataKey": "062dec75d039980e",
                 "dataIv": "062dec75d039980e"
-            }
-        },
-        {
-            "key": "爱看",
-            "name": "⛲爱看影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://www.appdm.akandm.com",
-                "dataKey": "uI1TkPJC8B46AyN3",
-                "dataIv": "uI1TkPJC8B46AyN3"
             }
         },
         {
@@ -33293,19 +33233,7 @@
             }
         },
         {
-            "key": "派对动漫",
-            "name": "🤣派对动漫",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://qjappcms.acg.party",
-                "dataKey": "AmtMYFCJDPoTlK7z",
-                "dataIv": "AmtMYFCJDPoTlK7z"
-            }
-        },
-        {
-            "key": "丫丫",
+            "key": "丫丫动漫",
             "name": "🤣丫丫动漫",
             "type": 3,
             "quickSearch": 1,
@@ -33317,7 +33245,7 @@
             }
         },
         {
-            "key": "米饭",
+            "key": "米饭动漫",
             "name": "🍛米饭动漫",
             "type": 3,
             "quickSearch": 1,
@@ -33362,13 +33290,6 @@
             "type": 3,
             "api": "./js/drpy2.min.js",
             "ext": "./js/路漫漫.js"
-        },
-        {
-            "key": "动漫岛",
-            "name": "🛸动漫岛动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/动漫岛.js"
         },
         {
             "key": "去看吧",
