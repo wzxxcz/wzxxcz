@@ -32942,6 +32942,26 @@
             }
         },
         {
+            "key": "97影院1",
+            "name": "🍊97影院1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://yiq.point4.cn/",
+                "二次截取": "",
+                "数组": "col-xs-4 col-sm-3 col-md-2&&</div>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<p class=\"wpyzgtui-vidactors wpyzgtui-txtmuteds wpyzgtui-teoverflw\">&&</p>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://yiq.point4.cn/vshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$106#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
