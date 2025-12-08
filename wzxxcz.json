@@ -33700,6 +33700,27 @@
             "ext": "./js/异世界.js"
         },
         {
+            "key": "伊人短剧",
+            "name": "🍊伊人短剧",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.tgtm.net/list/26.html",
+                "二次截取": "",
+                "数组": "/post/&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"state\">&&</span>",
+                "链接": "/post/+&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://www.tgtm.net/list/{cateId}-{catePg}.html",
+                "分类": "重生&穿越&现代&反转&都市&古装&闪婚&悬疑&男频&逆袭&",
+                "分类值": "*"
+            }
+        },
+        {
             "key": "笒鬼短剧",
             "name": "🍊笒鬼短剧",
             "type": 3,
