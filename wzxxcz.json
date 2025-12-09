@@ -33497,6 +33497,26 @@
             }
         },
         {
+            "key": "奴娜TV",
+            "name": "🍊奴娜TV",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://nntv.in/",
+                "二次截取": "",
+                "数组": "public-list-exp&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-src=\"&&\"",
+                "副标题": "<span class=\"public-list-prb hide ft2\">&&</span>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://nntv.in/index.php/vod/show/class/{class}/id/{cateId}/page/{catePg}/year/{year}.html",
+                "分类": "日韩剧$3#内地剧$2#港台泰$4#综艺$20#短剧$24#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
