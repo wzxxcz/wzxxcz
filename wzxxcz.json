@@ -1192,6 +1192,25 @@
             "api": "csp_GuiGui"
         },
         {
+            "key": "趣盘",
+            "name": "🍊趣盘搜索",
+            "type": 3,
+            "api": "csp_QuPanSo"
+        },
+        {
+            "key": "AList",
+            "name": "🍊AList合集",
+            "type": 3,
+            "api": "csp_Alist",
+            "searchable": 1,
+            "filterable": 1,
+            "changeable": 0,
+            "style": {
+                "type": "list"
+            },
+            "ext": "./json/alist.json"
+        },
+        {
             "key": "荐片1",
             "name": "🐭荐片P2P",
             "api": "csp_Jianpian",
@@ -1387,6 +1406,15 @@
             "ext": {
                 "host": "https://173220859-1333208043.cos.ap-shanghai.myqcloud.com/1.json",
                 "ver": 2
+            }
+        },
+        {
+            "key": "木瓜",
+            "name": "🍈木瓜影视",
+            "type": 3,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "http://www.yezitv.top"
             }
         },
         {
@@ -2320,6 +2348,19 @@
                 "字母值": "*",
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
+            }
+        },
+        {
+            "key": "椰子",
+            "name": "🍊椰子影视",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://103.109.20.117:6699",
+                "dataKey": "xxm9N4P9rS2zjdyz",
+                "dataIv": "xxm9N4P9rS2zjdyz"
             }
         },
         {
