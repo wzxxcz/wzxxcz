@@ -767,6 +767,15 @@
             }
         },
         {
+            "key": "木瓜",
+            "name": "🍈木瓜影视",
+            "type": 3,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "http://www.yezitv.top"
+            }
+        },
+        {
             "key": "猎手影视",
             "name": "🦁猎手影院",
             "type": 3,
@@ -1697,6 +1706,19 @@
                 "字母值": "*",
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
+            }
+        },
+        {
+            "key": "椰子",
+            "name": "🍊椰子影视",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://103.109.20.117:6699",
+                "dataKey": "xxm9N4P9rS2zjdyz",
+                "dataIv": "xxm9N4P9rS2zjdyz"
             }
         },
         {
