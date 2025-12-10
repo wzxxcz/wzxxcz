@@ -33179,6 +33179,26 @@
             }
         },
         {
+            "key": "苦瓜电影网",
+            "name": "🥒苦瓜电影网",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://m.kicn.com.cn/",
+                "二次截取": "",
+                "数组": "<li class=\"col-md-2 col-sm-3 col-xs-4&&</li>",
+                "标题": "alt=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<span class=\"continu\">&&</span>",
+                "链接": "href=\"&&\"",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://m.kicn.com.cn/list-select-id-{cateId}-type--area--year--star--state--order-hits-p-{catePg}.html",
+                "分类": "电影$1#电视剧$2#综艺$4#动漫$3#短剧$21#"
+            }
+        },
+        {
             "key": "量子",
             "name": "⚗量子秒播",
             "type": 1,
@@ -33494,20 +33514,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
-            }
-        },
-        {
-            "key": "苦瓜电影网",
-            "name": "🥒苦瓜电影网",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://m.kicn.com.cn/",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://m.kicn.com.cn/list-select-id-{cateId}-type--area--year--star--state--order-hits-p-{catePg}.html",
-                "分类": "电影$1#电视剧$2#综艺$4#动漫$3#短剧$21#"
             }
         },
         {
