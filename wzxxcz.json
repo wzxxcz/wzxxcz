@@ -1064,21 +1064,20 @@
             "key": "双星",
             "name": "🍊双星4K",
             "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/双星.js",
+            "api": "csp_ShuangXing",
             "style": {
                 "type": "list"
             }
         },
         {
-            "key": "人人电影网",
+            "key": "人人",
             "name": "🧑人人4K",
             "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/人人电影网.js",
-            "style": {
-                "type": "list"
-            }
+            "api": "csp_RenRen",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1
         },
         {
             "key": "移动盘搜",
