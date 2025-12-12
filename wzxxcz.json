@@ -33692,7 +33692,7 @@
         },
         {
             "key": "清风影视",
-            "name": "🪶清风影视",
+            "name": "🍊清风影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
@@ -33700,7 +33700,7 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.tuozhuhao.com/",
                 "二次截取": "",
-                "数组": "mo-situ-pics mo-situ-lazy mo-lazy-color mo-bord-round mo-cols-rows mo-lazy-highs mo-byxs-2by3&&</a>",
+                "数组": "mo-paxs-5px mo-pamd-10px mo-cols-info mo-cols-xs4 mo-cols-sm3 mo-cols-lg2&&</li>",
                 "标题": "<a*>&&</a>",
                 "图片": "background-image: url('&&');",
                 "副标题": "<span class=\"mo-situ-rema mo-part-ramp mo-fsxs-12px mo-text-white mo-coxs-center\">&&</span>",
