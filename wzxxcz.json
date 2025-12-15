@@ -34252,11 +34252,11 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.03yy.live/",
                 "二次截取": "",
-                "数组": "/voddetail/&&</a>",
+                "数组": "/movie/&&</a>",
                 "标题": "title=\"&&\"",
                 "图片": "img src=\"&&\"",
                 "副标题": "<span>&&</span>",
-                "链接": "/voddetail/+&&\"",
+                "链接": "/movie/+&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.03yy.live/type/index{cateId}-{catePg}.html",
                 "分类": "电影$movies#电视剧$tv#综艺$zongyi#动漫$dongman#"
