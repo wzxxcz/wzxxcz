@@ -4153,6 +4153,41 @@
             }
         },
         {
+            "key": "voflix HD",
+            "name": "🍊voflix HD",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://www.voflix.fun/",
+                "二次截取": "",
+                "数组": "/voddetail/&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "data-original=\"&&\"",
+                "副标题": "<div class=\"module-item-note\">&&</div>",
+                "链接": "/voddetail/+&&\"",
+                "影片年代": "年份：&&</div>",
+                "影片地区": "地区：&&</div>",
+                "影片类型": "类型：&&</div>",
+                "状态": "状态：&&</div>",
+                "导演": "导演：&&</div>",
+                "主演": "主演：&&</div>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+module-info-introduction-content\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "data-dropdown-value&&</div>",
+                "线路标题": "<span>&&</span>",
+                "播放二次截取": "",
+                "播放数组": "id=\"panel1&&</div>",
+                "倒序": "0",
+                "播放列表": "<a&&/a>",
+                "播放标题": "<span>&&</span>",
+                "播放链接": "href=\"&&\"",
+                "分类url": "https://www.voflix.fun/vodshow/{cateId}--------{catePg}---.html",
+                "分类": "电影$1#剧集$2#综艺$3#动漫$4#国产剧$13#日韩剧$15#欧美剧$16#"
+            }
+        },
+        {
             "key": "天空影视",
             "name": "☀️天空影视",
             "type": 3,
@@ -34156,26 +34191,6 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "http://vedio.kundihulan.com/vodshow/{cateId}--------{catePg}---{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#"
-            }
-        },
-        {
-            "key": "voflix HD",
-            "name": "🍊voflix HD",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.voflix.fun/",
-                "二次截取": "",
-                "数组": "/voddetail/&&</a>",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "<div class=\"module-item-note\">&&</div>",
-                "链接": "/voddetail/+&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.voflix.fun/vodshow/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#剧集$2#综艺$3#动漫$4#国产剧$13#日韩剧$15#欧美剧$16#"
             }
         },
         {
