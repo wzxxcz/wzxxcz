@@ -34641,7 +34641,7 @@
                 "播放数组": "play_li fn-clear&&</div>",
                 "播放链接": "href=\"&&\"",
                 "播放标题": "✨+>&&</",
-                "分类url": "https://www.ksksn.com/show/tv/area/{area}/page/{catePg}/year/{year}.html",
+                "分类url": "https://www.ksksn.com/vod/tv/area/{area}/page/{catePg}/year/{year}.html",
                 "分类": "电影$dy#电视剧$tv#综艺$zy#动漫$dm#短剧$jl#"
             }
         },
