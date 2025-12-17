@@ -34621,23 +34621,32 @@
             }
         },
         {
-            "key": "看了么电影网",
-            "name": "🍊看了么电影网",
+            "key": "KLM影视",
+            "name": "✨看了么✨乐哥甄选✨",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://www.ksksn.com/",
-                "二次截取": "",
-                "数组": "<li class=\"dx-vod&&</li>",
-                "标题": "title=\"&&\"",
+                "二次截取": "<ul class=\"dx-list\">&&</ul>",
+                "数组": "vod_remarks&&</a >",
                 "图片": "data-original=\"&&\"",
-                "副标题": "<span class=\"vod_remarks\">&&</span>",
+                "标题": "title=\"&&\"",
                 "链接": "href=\"&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.ksksn.com/show/tv/area/{area}/page/{catePg}/year/{year}.html",
-                "分类": "电影$dy#电视剧$tv#综艺$zy#动漫$dm#短剧$jl#"
+                "副标题": "✨+\">&&</span>",
+                "线路数组": "player_info&&</span>",
+                "线路标题": "✨乐哥推荐✨+<h2>&&</h2>",
+                "播放数组": "play_li fn-clear&&</div>",
+                "播放链接": "href=\"&&\"",
+                "播放标题": "✨+>&&</",
+                "简介": "✨指尖的黑客为您介绍剧情✨+剧情介绍：&&>",
+                "搜索url": "https://www.ksksn.com/ch/page/{pg}/wd/{wd}.html",
+                "搜索数组": "img lazy&&</a >",
+                "搜索图片": "data-original=\"&&\"",
+                "搜索标题": "title=\"&&\"",
+                "搜索链接": "href=\"&&\"",
+                "分类url": "https://www.ksksn.com/vod/{cateId}/area/{area}/page/{catePg}/year/{year}.html",
+                "分类": "电影$dy#电视剧$tv#综艺$zy#动漫$dm#短剧$jl"
             }
         },
         {
