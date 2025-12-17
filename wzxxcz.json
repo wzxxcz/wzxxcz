@@ -34645,8 +34645,8 @@
                 "搜索图片": "data-original=\"&&\"",
                 "搜索标题": "title=\"&&\"",
                 "搜索链接": "href=\"&&\"",
-                "分类url": "https://www.ksksn.com/vod/{cateId}/area/{area}/page/{catePg}/year/{year}.html",
-                "分类": "电影$dy#电视剧$tv#综艺$zy#动漫$dm#短剧$jl"
+                "分类url": "https://www.ksksn.com/show/tv/area/{area}/page/{catePg}/year/{year}.html",
+                "分类": "电影$dy#电视剧$tv#综艺$zy#动漫$dm#短剧$jl#"
             }
         },
         {
