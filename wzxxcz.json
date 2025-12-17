@@ -4330,7 +4330,7 @@
                 "主页url": "https://www.ksksn.com/",
                 "首页": "120",
                 "起始页": "1",
-                "分类url": "https://www.ksksn.com/show/{cateId}/area/{area}/page/{catePg}/year/{year}.html",
+                "分类url": "https://www.ksksn.com/vod/{cateId}/area/{area}/page/{catePg}/year/{year}.html",
                 "分类": "电影$dy#电视剧$tv#综艺$zy#动漫$dm#短剧$jl#",
                 "二次截取": "<ul class=\"dx-list\">&&</ul>",
                 "数组": "vod_remarks&&</a>",
