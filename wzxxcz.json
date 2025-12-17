@@ -34698,6 +34698,26 @@
             }
         },
         {
+            "key": "旺旺影视",
+            "name": "🍊旺旺影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "https://vip.wwgz.cn:5200/",
+                "二次截取": "",
+                "数组": "/vod-detail&&</a>",
+                "标题": "title=\"&&\"",
+                "图片": "img src=\"&&\"",
+                "副标题": "<span class=\"sBottom\">&&</span>",
+                "链接": "https://vip.wwgz.cn:5200/vod-detail-id+id&&",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
+                "分类url": "https://vip.wwgz.cn:5200/vod-list-id-{cateId}-pg-{catePg}-order--by-time-class-0-year-0-letter--area--lang-.html",
+                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$26#"
+            }
+        },
+        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
