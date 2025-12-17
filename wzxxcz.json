@@ -34724,10 +34724,10 @@
                 "线路标题": "javascript:;\">&&<",
                 "播放二次截取": "",
                 "播放数组": "numList&&</div>",
-                "倒序": "0",
+                "倒序": "1",
                 "播放列表": "<a&&</a>",
                 "播放标题": ">&&</a>",
-                "播放链接": "href=\"&&\"",
+                "播放链接": "https://vip.wwgz.cn:5200+href=\"&&\"",
                 "分类url": "https://vip.wwgz.cn:5200/vod-list-id-{cateId}-pg-{catePg}-order--by-time-class-0-year-0-letter--area--lang-.html",
                 "分类": "电影$1#连续剧$2#综艺$3#动漫$4#短剧$26#"
             }
