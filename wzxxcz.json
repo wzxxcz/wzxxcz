@@ -4261,7 +4261,7 @@
                 "播放标题": ">&&</a>",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://www.chinatownfilm.com/vodshow/{cateId}--------{catePg}---{year}.html",
-                "分类": "电影$movie#剧集$tv-series#综艺$show#动漫$animation#"
+                "分类": "电影$movie#剧集$tv#综艺$show#动漫$animation#"
             }
         },
         {
