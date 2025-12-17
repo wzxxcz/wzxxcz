@@ -34630,11 +34630,11 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.ksksn.com/",
                 "二次截取": "",
-                "数组": "cover-area img lazy&&</span>",
+                "数组": "/voddetail/&&</li>",
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"vod_remarks\">&&</span>",
-                "链接": "href=\"&&\"",
+                "链接": "/voddetail/+&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
                 "分类url": "https://www.ksksn.com/show/tv/area/{area}/page/{catePg}/year/{year}.html",
                 "分类": "电影$dy#电视剧$tv#综艺$zy#动漫$dm#短剧$jl#"
