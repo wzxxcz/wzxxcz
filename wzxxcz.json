@@ -34874,7 +34874,7 @@
                 "副标题": "<div class=\"module-item-note\">&&</div>",
                 "链接": "/index.php/vod/play/id/+/id/&&\"",
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.movie1080.xyz/index.php/vod/show/id/13/page/{catePg}.html",
+                "分类url": "https://www.movie1080.xyz/index.php/vod/show/id/{cateId}/page/{catePg}.html",
                 "分类": "电影$20#连续剧$37#综艺$45#动漫$43#B站$47#"
             }
         },
