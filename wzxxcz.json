@@ -34859,26 +34859,6 @@
             }
         },
         {
-            "key": "影巢movie",
-            "name": "🍊影巢movie",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.movie1080.xyz/",
-                "二次截取": "",
-                "数组": "/vod/play&&</a>",
-                "标题": "title=\"&&\"",
-                "图片": "data-original=\"&&\"",
-                "副标题": "<div class=\"module-item-note\">&&</div>",
-                "链接": "/index.php/vod/play/id/+/id/&&\"",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+text hidden-xs\">&&</div>",
-                "分类url": "https://www.movie1080.xyz/index.php/vod/show/id/{cateId}/page/{catePg}.html",
-                "分类": "电影$20#连续剧$37#综艺$45#动漫$43#B站$47#"
-            }
-        },
-        {
             "key": "风车动漫",
             "name": "🤣风车动漫",
             "type": 3,
