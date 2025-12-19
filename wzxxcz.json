@@ -2498,19 +2498,6 @@
             }
         },
         {
-            "key": "星空1",
-            "name": "🛸星空APP1",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://43.154.4.75",
-                "dataKey": "HDk-7CnlK8SQUGLg",
-                "dataIv": "HDk-7CnlK8SQUGLg"
-            }
-        },
-        {
             "key": "冷心",
             "name": "🍊冷心影视",
             "type": 3,
