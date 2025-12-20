@@ -958,6 +958,21 @@
             }
         },
         {
+            "key": "夸克",
+            "name": "🍊夸克4K",
+            "type": 3,
+            "api": "csp_PanWebShareCloudKK",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": [
+                    "https://www.quarktv.cc"
+                ]
+            }
+        },
+        {
             "key": "清影",
             "name": "🍊清影4K",
             "type": 3,
@@ -1391,6 +1406,16 @@
             "api": "csp_AppFox",
             "ext": {
                 "host": "https://173220859-1333208043.cos.ap-shanghai.myqcloud.com/1.json",
+                "ver": 2
+            }
+        },
+        {
+            "key": "麒麟",
+            "name": "🐲麒麟影院",
+            "type": 3,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "https://www.70yyw.cc",
                 "ver": 2
             }
         },
