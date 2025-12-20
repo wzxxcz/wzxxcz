@@ -749,6 +749,16 @@
             }
         },
         {
+            "key": "麒麟",
+            "name": "🐲麒麟影院",
+            "type": 3,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "https://www.70yyw.cc",
+                "ver": 2
+            }
+        },
+        {
             "key": "木瓜",
             "name": "🍈木瓜影视",
             "type": 3,
