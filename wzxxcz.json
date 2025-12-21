@@ -1391,7 +1391,7 @@
                 "播放标题": "<span>&&</span>",
                 "播放链接": "href=\"&&\"",
                 "解析": "",
-                "跳转播放链接": " id=\"bfurl\"*\"&&\"",
+                "跳转播放链接": "id=\"bfurl\"*\"&&\"",
                 "跳转解析": "",
                 "搜索请求头": "User-Agent$MOBILE_UA",
                 "搜索url": "https://www.dmdh.cc/vodsearch/{wd}----------{pg}---.html",
