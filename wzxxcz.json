@@ -23063,6 +23063,12 @@
             "ext": {
                 "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I003DD Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@Hm_lvt_e311730b05aaa06e56bff0e525eb1f24=1766365534；； HMACCOUNT=17BED804ED862610；； closeclick=closeclick；； XSRF-TOKEN=eyJpdiI6IlJBSmdQRytHWUc2V0RZOHNuVnJvWVE9PSIsInZhbHVlIjoiNXlhRnZpaXRLM2tJcjh3c1lpVVg3a1VJTHliaGdhMllCSzdXTGZ6bTNxcE90MlwvRGIyaVhROEt0SjB0TktmQ2siLCJtYWMiOiIyMDMxMDEyNTFlM2E1NzEyYWI5ZjI1Mzg5MTczOTNiNTYxOGZmZjcxZjI1MTNkMGJjNzQyOWMwYTRiMjQ0Yjc4In0%3D；； hant_session=eyJpdiI6InVPS01KNmRyVW5wcTNNbU5hK2pIcWc9PSIsInZhbHVlIjoiK2NtXC9zeHdFTGJWNkZodXl3NXc4K1dwWXJOZFRJakJVU25SekpLMXFDaGRzaFZTYjV6OWkwdmhDMHZtQWV1WkNnTFpZTU55SEROaUl6MkZMS05uTXJrSjF6ZVRsXC9IWmJiZm5tWmNhSUNjdFR2dEFsNWpDXC9wWDlVcDB1N3ZXTkkiLCJtYWMiOiI4NjYxYzk4ZGZmOGE0N2ViYmMyZmE0MDJhYTU1NGYzZjA0MTUyYzUyMDE0MzY2MzE3MGZiYzhhYmIwNmFjMDhlIn0%3D；； Hm_lpvt_e311730b05aaa06e56bff0e525eb1f24=1766365560&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
+                "图片代理": "0",
+                "直接播放": "0",
+                "播放请求头": "",
+                "嗅探词": ".mp4#.m3u8#.flv#hcts-m3u8#index.m3u8",
+                "免嗅": "1",
+                "过滤词": "",
                 "主页url": "https://www.hant.cc/",
                 "二次截取": "module-items\"&&id=\"page[替换:module-footer>>module-item]",
                 "数组": "module-item-pic&&module-item\"",
