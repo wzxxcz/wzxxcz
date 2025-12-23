@@ -2387,13 +2387,6 @@
             }
         },
         {
-        "key": "网飞猫",
-            "name": "🐈网飞猫",
-		"type": 3,
-		"api": "./js/drpy2.min.js",
-        "ext": "./js/NCAT影视.js"
-    },	
-        {
             "key": "猴哥影院",
             "name": "🐒猴哥影院",
             "type": 3,
