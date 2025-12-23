@@ -4730,7 +4730,7 @@
                 "apisignkey": "lvdoutv-1.0.0"
             }
         },
-        {"key":"py_天峰影视","name":" ⛰天峰(GET)","type":3,"api":"./Py/app/getapp.py","searchable":1,"quickSearch":1,"filterable":1,"ext":{"host":"http://zxy-ys.810211.dpdns.org","api":"/api.php/getappapi","datakey":"1234567890123456","dataiv":"1234567890123456"}},
+        {"key":"py_天峰影视","name":" ⛰天峰影视","type":3,"api":"./py/getapp.py","searchable":1,"quickSearch":1,"filterable":1,"ext":{"host":"http://zxy-ys.810211.dpdns.org","api":"/api.php/getappapi","datakey":"1234567890123456","dataiv":"1234567890123456"}},
         {
             "key": "巧技",
             "name": "🚗聚搜搜索4K",
