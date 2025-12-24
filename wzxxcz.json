@@ -2287,6 +2287,32 @@
             }
         },
         {
+            "key": "白鸽",
+            "name": "🕊️白鸽影视",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://cy.baige.asia",
+                "dataKey": "599D0FE5178642FD",
+                "dataIv": "599D0FE5178642FD"
+            }
+        },
+        {
+            "key": "奇奇",
+            "name": "🍊奇奇影视",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://103.236.61.192:8006",
+                "dataKey": "123456789abcdefg",
+                "dataIv": "123456789abcdefg"
+            }
+        },
+        {
             "key": "火花",
             "name": "🔥火花影视",
             "type": 3,
@@ -35131,6 +35157,19 @@
                 "url": "https://www.gugu3.com",
                 "dataKey": "nKfZ8KX6JTNWRzTD",
                 "dataIv": "nKfZ8KX6JTNWRzTD"
+            }
+        },
+        {
+            "key": "卡卡",
+            "name": "🤣卡卡动漫",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://154.201.90.53:8002",
+                "dataKey": "123456789abcdefg",
+                "dataIv": "123456789abcdefg"
             }
         },
         {
