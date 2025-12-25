@@ -4619,6 +4619,16 @@
             }
         },
         {
+            "key": "py_可可",
+            "name": "🍊可可影视",
+            "type": 3,
+            "changeable": 1,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "api": "./py/可可.py"
+        },
+        {
             "key": "巧技",
             "name": "🚗聚搜搜索4K",
             "type": 3,
