@@ -35008,13 +35008,18 @@
             ]
         },
         {
-            "key": "无尽资源",
+            "key": "无尽资源网",
             "name": "🌀无尽资源",
             "type": 1,
-            "api": "https://api.wujinapi.me/api.php/provide/vod",
-            "playerType": 1,
+            "api": "https://api.wujinapi.net/api.php/provide/vod/",
+            "quickSearch": 1,
             "searchable": 1,
-            "changeable": 1
+            "changeable": 1,
+            "categories": [
+                "国产动漫",
+                "日韩动漫",
+                "国产剧"
+            ]
         },
         {
             "key": "星辰影视",
