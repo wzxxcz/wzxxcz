@@ -35181,7 +35181,7 @@
                 "线路数组": "fed-drop-btns fed-padding\">&&/ul>",
                 "线路标题": "<li*>&&<",
                 "播放二次截取": "",
-                "播放数组": "<ul class=\"fed-part-rows&&</ul>",
+                "播放数组": "fed-play-item fed-drop-item&&</div>",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
                 "播放标题": ">&&<",
