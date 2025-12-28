@@ -1325,6 +1325,19 @@
             }
         },
         {
+            "key": "老鸭",
+            "name": "🍞老鸭影视",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "api": "https://by1.430520.xyz/wb/down.php/c971b46d3dedf50d9cb99ae963206db6.js",
+            "ext": {
+                "host": "http://103.109.20.117:550/"
+            }
+        },
+        {
             "key": "瓜子影视",
             "name": "🍉瓜子影视",
             "type": 3,
