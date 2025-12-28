@@ -887,6 +887,19 @@
             }
         },
         {
+            "key": "老鸭",
+            "name": "🍞老鸭影视",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "api": "./js/lyys1.js",
+            "ext": {
+                "host": "http://103.109.20.117:550/"
+            }
+        },
+        {
             "key": "瓜子影视",
             "name": "🍉瓜子影视",
             "type": 3,
