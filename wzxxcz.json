@@ -1332,7 +1332,7 @@
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 1,
-            "api": "https://by1.430520.xyz/wb/down.php/c971b46d3dedf50d9cb99ae963206db6.js",
+            "api": "./js/lyys1.js",
             "ext": {
                 "host": "http://103.109.20.117:550/"
             }
