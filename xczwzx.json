@@ -863,6 +863,19 @@
             "ext": "http://101.35.85.16:5555"
         },
         {
+            "key": "老丫",
+            "name": "🍞老雅影视",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "api": "./js/lyys.js",
+            "ext": {
+                "host": "https://app2512.ystva.com"
+            }
+        },
+        {
             "key": "瓜子影视",
             "name": "🍉瓜子影视",
             "type": 3,
