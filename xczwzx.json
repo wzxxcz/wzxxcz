@@ -35353,316 +35353,14 @@
             }
         },
         {
-            "key": "学堂",
-            "name": "🅰️学堂教育",
+            "key": "88看球",
+            "name": "⚽88看球",
             "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/学堂教育.json"
-        },
-        {
-            "key": "少儿",
-            "name": "🅰️少儿合集",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/少儿合集.json"
-        },
-        {
-            "key": "小学课堂",
-            "name": "🅰️小学课堂",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小学课堂.json"
-        },
-        {
-            "key": "初中课堂",
-            "name": "🅰️初中课堂",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/初中课堂.json"
-        },
-        {
-            "key": "高中课堂",
-            "name": "🅰️高中课堂",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/高中课堂.json"
-        },
-        {
-            "key": "儿童口才",
-            "name": " 🧒口才儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童口才.json"
-        },
-        {
-            "key": "儿童拼音",
-            "name": " 🧒拼音儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童拼音.json"
-        },
-        {
-            "key": "儿童识字",
-            "name": " 🧒识字儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童识字.json"
-        },
-        {
-            "key": "儿童思维",
-            "name": " 🧒思维儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童思维.json"
-        },
-        {
-            "key": "儿童英语",
-            "name": " 🧒英语儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童英语.json"
-        },
-        {
-            "key": "儿童硬笔",
-            "name": " 🧒硬笔儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童硬笔.json"
-        },
-        {
-            "key": "儿童编程",
-            "name": " 🧒编程儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童编程.json"
-        },
-        {
-            "key": "儿童武术",
-            "name": " 🧒武术儿童",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/儿童武术.json"
-        },
-        {
-            "key": "csp_BBB",
-            "name": "🅱️套餐哔哩",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/哔哩套餐1.json"
-        },
-        {
-            "key": "Bili",
-            "name": "🅱️套餐2哔哩",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bil/哔哩套餐2.json"
-        },
-        {
-            "key": "软件",
-            "name": "🅰️软件教程",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/软件教程.json"
-        },
-        {
-            "key": "演唱会",
-            "name": "🅰️演唱会哔哩",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/演唱会.json"
-        },
-        {
-            "key": "戏曲",
-            "name": "🅰️戏曲合集",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/戏曲合集.json"
-        },
-        {
-            "key": "哔哩哔哩听书",
-            "name": "🅰听书哔哩",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小说.json"
-        },
-        {
-            "key": "MV",
-            "name": "🌈歌曲哔哩",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/歌曲MV.json"
-        },
-        {
-            "key": "美食",
-            "name": "🌈美食哔哩",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/美食.json"
-        },
-        {
-            "key": "球类",
-            "name": "⚽️球类合集",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/球类合集.json"
-        },
-        {
-            "key": "球星",
-            "name": "⚽️球星合集",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/球星合集.json"
-        },
-        {
-            "key": "影视影视",
-            "name": "🅰影视哔哩",
-            "type": 3,
-            "api": "csp_Bili",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 0,
-            "ext": {
-                "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt",
-                "json": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bil/合集.json"
-            },
-            "style": {
-                "type": "rect",
-                "ratio": 1.597
-            }
-        },
-        {
-            "key": "虎牙直播js",
-            "name": "🐯虎牙直播",
-            "type": 3,
-            "api": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/drpy2.js",
-            "ext": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/huya2.js",
-            "style": {
-                "type": "rect",
-                "ratio": 1.755
-            },
-            "timeout": 10,
-            "playerType": "2",
-            "searchable": 0,
-            "quickSearch": 0,
-            "changeable": 0
-        },
-        {
-            "key": "斗鱼js",
-            "name": "🐟斗鱼直播",
-            "type": 3,
-            "api": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/drpy2.min.js",
-            "ext": "https://gh-proxy.net/https://raw.githubusercontent.com/fantaiying7/EXT/refs/heads/main/斗鱼直播.js",
-            "style": {
-                "type": "rect",
-                "ratio": 1.755
-            },
-            "timeout": 10,
-            "playerType": "2",
-            "searchable": 0,
-            "quickSearch": 0,
-            "changeable": 0
-        },
-        {
-            "key": "88看球1",
-            "name": "⚽88看球全",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
+            "api": "csp_Kanqiu",
+            "gridview": 3,
             "style": {
                 "type": "list"
-            },
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/88看球.js"
+            }
         },
         {
             "key": "哔哩直播",
@@ -35706,7 +35404,7 @@
             }
         },
         {
-            "key": "哔哩哔哩听书1",
+            "key": "哔哩哔哩听书",
             "name": "🍊哔哩听书",
             "type": 3,
             "api": "csp_Bili",
@@ -35772,6 +35470,20 @@
                 "type": "rect",
                 "ratio": 1.597
             }
+        },
+        {
+            "key": "阿里云盘",
+            "name": "🍊我的阿里",
+            "type": 3,
+            "api": "csp_PanAli",
+            "searchable": 0,
+            "filterable": 0,
+            "changeable": 0,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            },
+            "ext": "./json/aliShare.json"
         },
         {
             "key": "夸克云盘",
