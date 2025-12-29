@@ -35791,38 +35791,22 @@
             }
         },
         {
-            "key": "学堂",
-            "name": "🅰️学堂教育",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/%E6%88%91%E7%9A%84%E5%93%94%E5%93%A9.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/学堂教育.json"
-        },
-        {
-            "key": "少儿",
-            "name": "🅰️少儿合集",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/少儿合集.json"
-        },
-        {
-            "key": "小学课堂",
-            "name": "🅰️小学课堂",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/drpy2.min.js",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 1,
-            "order_num": 142,
-            "ext": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/js/我的哔哩.js?type=url&params=https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/Bilibili/小学课堂.json"
-        },
+      "key": "️小学",
+      "name": "🅰️小学哔哩",
+      "type": 3,
+      "api": "csp_Bili",
+      "searchable": 0,
+      "quickSearch": 0,
+      "filterable": 0,
+      "ext": {
+        "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt",
+        "json": "https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/Bil/小学课堂.json"
+      },
+      "style": {
+        "type": "rect",
+        "ratio": 1.597
+      }
+    },
         {
             "key": "初中课堂",
             "name": "🅰️初中课堂",
