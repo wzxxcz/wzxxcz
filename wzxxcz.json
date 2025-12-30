@@ -34935,7 +34935,7 @@
                 "主页url": "https://www.wanmeikankan.net/",
                 "二次截取": "",
                 "数组": "li_li clearfix&&</div>",
-                "标题": "<a*>&&</a>",
+                "标题": "title=\"&&\"",
                 "图片": "src=\"&&\"",
                 "副标题": "<span class=\"rgba1\">&&</span>",
                 "链接": "href=\"&&\"",
