@@ -34956,7 +34956,7 @@
                 "播放标题": ">&&</a>",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://www.wanmeikankan.net/{cateId}-ye{catePg}.html",
-                "分类": "电影$1#电视剧$2#综艺$4#动漫$3#"
+                "分类": "电影$mulu1#电视剧$mulu2#综艺$mulu4#动漫$mulu3#"
             }
         },
         {
