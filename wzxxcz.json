@@ -4671,7 +4671,7 @@
             "name": "🧿全看影视",
             "type": 3,
             "api": "csp_XBPQ",
-            "jar": "https://ncstatic-file.clewm.net/rsrc/2025/0916/11/1275b576ff8340d0f20930745d5ac59c.jpg;md5;4d860d06ec233dbcb891b76055f099d5",
+            "jar": "./XBPQ/xcznz.jpg",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
@@ -4690,7 +4690,7 @@
             "name": "🧿韩国影视",
             "type": 3,
             "api": "csp_XBPQ",
-            "jar": "https://ncstatic-file.clewm.net/rsrc/2025/0916/11/1275b576ff8340d0f20930745d5ac59c.jpg;md5;4d860d06ec233dbcb891b76055f099d5",
+            "jar": "./XBPQ/xcznz.jpg",
             "ext": "./XBPQ/韩剧看看.json"
         },
         {
@@ -37298,3 +37298,4 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
+
