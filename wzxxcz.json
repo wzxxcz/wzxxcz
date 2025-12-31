@@ -1019,6 +1019,15 @@
             }
         },
         {
+            "key": "柠檬",
+            "name": "🍋柠檬影视",
+            "type": 3,
+            "api": "csp_Nmvod",
+            "playerType": 2,
+            "jar": "https://ncstatic.clewm.net/rsrc/2025/0915/15/e210975c2c794cbc8bb1839b54ac213e.png;md5;939FFBC2941A28CA533F2653FA4B449E",
+            "ext": "7lj763gg402i7942503g839jg74h8h88highi40799jh6i6k454419l0l5184k0g549h0kg2i01i838i2h42g891lgg1"
+        },
+        {
             "key": "和友",
             "name": "🍊和友影视",
             "type": 3,
