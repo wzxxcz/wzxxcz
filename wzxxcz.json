@@ -2411,6 +2411,7 @@
             "name": "🍊追剧狂人",
             "type": 3,
             "api": "csp_XBPQ",
+            "jar": "./XBPQ/xcznz.jpg",
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
