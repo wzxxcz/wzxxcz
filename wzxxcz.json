@@ -942,6 +942,21 @@
             }
         },
         {
+            "key": "py_肥猫_APP",
+            "name": " 🐱肥猫影视",
+            "type": 3,
+            "api": "./py/肥猫.py",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": {
+                "host": "http://103.236.61.192:8006",
+                "api": "/api.php/getappapi",
+                "datakey": "123456789abcdefg",
+                "dataiv": "123456789abcdefg"
+            }
+        },
+        {
             "key": "猎手影视",
             "name": "🦁猎手影院",
             "type": 3,
