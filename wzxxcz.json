@@ -506,8 +506,8 @@
             "type": 3,
             "api": "csp_PanSou",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
+            "quickSearch": 0,
+            "filterable": 0
         },
         {
             "key": "糖果",
@@ -515,8 +515,8 @@
             "type": 3,
             "api": "csp_TGSou",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
+            "quickSearch": 0,
+            "filterable": 0
         },
         {
             "key": "百酷",
