@@ -31,7 +31,7 @@
             "url": "https://sub.ottiptv.cc/huyayqk.m3u",
             "playerType": 2,
             "timeout": 10,
-            "ua": "okHttp/Mod-1.4.0.0"
+            "ua": "okHttp/Mod-1.5.0.0"
         },
         {
             "name": "斗鱼一起看",
@@ -39,7 +39,7 @@
             "url": "https://sub.ottiptv.cc/douyuyqk.m3u",
             "playerType": 2,
             "timeout": 10,
-            "ua": "okHttp/Mod-1.4.0.0"
+            "ua": "okHttp/Mod-1.5.0.0"
         },
         {
             "name": "B站直播",
@@ -47,7 +47,7 @@
             "url": "https://sub.ottiptv.cc/bililive.m3u",
             "playerType": 2,
             "timeout": 10,
-            "ua": "okHttp/Mod-1.4.0.0"
+            "ua": "okHttp/Mod-1.5.0.0"
         },
         {
             "name": "YY轮播",
@@ -55,7 +55,7 @@
             "url": "https://sub.ottiptv.cc/yylunbo.m3u",
             "playerType": 2,
             "timeout": 10,
-            "ua": "okHttp/Mod-1.4.0.0"
+            "ua": "okHttp/Mod-1.5.0.0"
         }
     ],
     "sites": [
