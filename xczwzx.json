@@ -1348,6 +1348,28 @@
             }
         },
         {
+            "key": "气球",
+            "name": "🍊气球影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://vv.229d.cn",
+                "dataKey": "8888888888888888",
+                "dataIv": "8888888888888888"
+            }
+        },
+        {
+            "key": "随看",
+            "name": "🍊随看影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://suikan.tpmbt.cn",
+                "dataKey": "pHQsm6wjYaCuSPEz",
+                "dataIv": "pHQsm6wjYaCuSPEz"
+            }
+        },
+        {
             "key": "茉莉",
             "name": "🌸茉莉影视",
             "type": 3,
