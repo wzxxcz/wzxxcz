@@ -641,7 +641,8 @@
             "changeable": 0,
             "api": "csp_AppFox",
             "ext": {
-                "host": "http://103.109.20.117:550"
+                "host": "https://yzysap.oss-cn-hangzhou.aliyuncs.com/yzysapp.json",
+                "ver": 2
             }
         },
         {
