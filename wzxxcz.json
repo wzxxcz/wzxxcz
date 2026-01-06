@@ -1029,6 +1029,17 @@
             }
         },
         {
+            "key": "花柳",
+            "name": "🌸花柳影视",
+            "type": 3,
+            "changeable": 0,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "http://nico.oiio.fun",
+                "ver": 2
+            }
+        },
+        {
             "key": "恋鱼",
             "name": "🦈恋鱼影视",
             "type": 3,
