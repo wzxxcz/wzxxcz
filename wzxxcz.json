@@ -35350,6 +35350,12 @@
             "ext": "./js/去看吧.js"
         },
         {
+            "key": "T4-xingzhige",
+            "name": "🍊影视短剧",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/xingzhige.php"
+        },
+        {
             "key": "伊人短剧",
             "name": "🍊伊人短剧",
             "type": 3,
