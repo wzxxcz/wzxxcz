@@ -711,6 +711,12 @@
             "api": "https://catbox.n13.club/t9/huaxiaozhu.php"
         },
         {
+            "key": "T4-jimi",
+            "name": "🎸吉米影视",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/jimi.php"
+        },
+        {
             "key": "大米影视",
             "name": "🍚大米影视",
             "type": 3,
