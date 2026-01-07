@@ -20,12 +20,6 @@
             "logo": "http://diyp2.112114.xyz/logo/{name}.png"
         },
         {
-            "name": "范明明（需开启V6网络）",
-            "type": 0,
-            "url": "https://nos.netease.com/ysf/3d75a78a0fc7ede372c03598d6d10367.m3u",
-            "playerType": 2
-        },
-        {
             "name": "虎牙一起看",
             "type": 0,
             "url": "https://sub.ottiptv.cc/huyayqk.m3u",
