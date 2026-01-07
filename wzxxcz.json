@@ -693,6 +693,12 @@
             "api": "https://catbox.n13.club/t9/mengtaiqi.php"
         },
         {
+            "key": "T4-fenxiang",
+            "name": "🐘粉象影视",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/fenxiang.php"
+        },
+        {
             "key": "大米影视",
             "name": "🍚大米影视",
             "type": 3,
