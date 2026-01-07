@@ -687,6 +687,12 @@
             "filterable": 1
         },
         {
+      "key": "T4-mengtaiqi",
+      "name": "影视-蒙太奇(T4)",
+      "type": 4,
+      "api": "https://catbox.n13.club/t9/mengtaiqi.php"
+    },
+        {
             "key": "大米影视",
             "name": "🍚大米影视",
             "type": 3,
