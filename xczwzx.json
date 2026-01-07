@@ -303,6 +303,36 @@
             "filterable": 1
         },
         {
+            "key": "T4-mengtaiqi",
+            "name": "🐂蒙太奇",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/mengtaiqi.php"
+        },
+        {
+            "key": "T4-fenxiang",
+            "name": "🐘粉象影视",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/fenxiang.php"
+        },
+        {
+            "key": "T4-jumeng",
+            "name": "🍊聚梦影视",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/jumeng.php"
+        },
+        {
+            "key": "T4-huaxiaozhu111",
+            "name": "🐖花小猪",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/huaxiaozhu.php"
+        },
+        {
+            "key": "T4-jimi",
+            "name": "🎸吉米影视",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/jimi.php"
+        },
+        {
             "key": "大米影视",
             "name": "🍚大米影视",
             "type": 3,
@@ -34958,6 +34988,12 @@
             "type": 3,
             "api": "./js/drpy2.min.js",
             "ext": "./js/去看吧.js"
+        },
+        {
+            "key": "T4-xingzhige",
+            "name": "🍊影视短剧",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/xingzhige.php"
         },
         {
             "key": "伊人短剧",
