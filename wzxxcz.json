@@ -125,6 +125,17 @@
             "api": "./py/WLZB.py"
         },
         {
+            "key": "央视片库",
+            "name": "🇨🇳分享央视",
+            "type": 3,
+            "api": "./py/分享央视.py",
+            "searchable": 1,
+            "quickSearch": 1,
+            "changeable": 1,
+            "filterable": 1,
+            "timeout": 60
+        },
+        {
             "key": "六月听书",
             "name": "🎵六月听书",
             "type": 3,
