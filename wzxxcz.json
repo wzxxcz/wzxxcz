@@ -1022,6 +1022,16 @@
             "ext": "http://m51.gotto.top/api.php/v1.vod"
         },
         {
+            "key": "山有木兮",
+            "name": "🏞️山有木兮",
+            "type": 3,
+            "api": "./py/山有木兮.py",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
+            "changeable": 0
+        },
+        {
             "key": "鬼片",
             "name": "🥇鬼片影视",
             "type": 3,
