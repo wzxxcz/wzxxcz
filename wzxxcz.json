@@ -1073,19 +1073,6 @@
             "ext": "https://hnytxj.com,https://y2s52n7.com,https://m.hkybqufgh.com,https://m.sizhengxt.com,https://m.9zhoukj.com,https://m.sizhengxt.com,https://m.jiabaide.cn"
         },
         {
-            "key": "金牌",
-            "name": "🏅金牌影视备",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppQi",
-            "ext": {
-                "site": "https://dtqj1.gg1080.com:443/dtjp.txt",
-                "dataKey": "kecbio48dsq131ed",
-                "dataIv": "kecbio48dsq131ed"
-            }
-        },
-        {
             "key": "柠檬",
             "name": "🍋柠檬影院",
             "type": 3,
@@ -1093,17 +1080,6 @@
             "playerType": 2,
             "jar": "https://ncstatic.clewm.net/rsrc/2025/0915/15/e210975c2c794cbc8bb1839b54ac213e.png;md5;939FFBC2941A28CA533F2653FA4B449E",
             "ext": "7lj763gg402i7942503g839jg74h8h88highi40799jh6i6k454419l0l5184k0g549h0kg2i01i838i2h42g891lgg1"
-        },
-        {
-            "key": "椰子",
-            "name": "🍊椰子影视",
-            "type": 3,
-            "changeable": 0,
-            "api": "csp_AppFox",
-            "ext": {
-                "host": "https://yzysap.oss-cn-hangzhou.aliyuncs.com/yzysapp.json",
-                "ver": 2
-            }
         },
         {
             "key": "花柳",
@@ -1190,19 +1166,6 @@
             }
         },
         {
-            "key": "小猫",
-            "name": "🐈小猫影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "site": "http://xywlkj.oss-cn-beijing.aliyuncs.com/wp-content/uploads/2024/12/1.txt",
-                "dataKey": "xmyxmyxywlkjxywl",
-                "dataIv": "xmyxmyxywlkjxywl"
-            }
-        },
-        {
             "key": "瑞奇",
             "name": "🍊瑞奇影视",
             "type": 3,
@@ -1212,18 +1175,6 @@
                 "url": "http://rqxk.gdata.fun",
                 "dataKey": "yangruiqiYsapp00",
                 "dataIv": "yangruiqiYsapp00"
-            }
-        },
-        {
-            "key": "优势",
-            "name": "🍊优势影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://zxy-ys.810211.dpdns.org",
-                "dataKey": "1234567890123456",
-                "dataIv": "1234567890123456"
             }
         },
         {
@@ -1855,19 +1806,6 @@
             }
         },
         {
-            "key": "火锅",
-            "name": "🍊火锅影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://ios.hgyx.vip",
-                "dataKey": "062dec75d039980e",
-                "dataIv": "062dec75d039980e",
-                "ua": "Dart/3.5 (dart:io)"
-            }
-        },
-        {
             "key": "八天",
             "name": "🍵八天影视",
             "type": 3,
@@ -1969,19 +1907,6 @@
             }
         },
         {
-            "key": "布雷",
-            "name": "🌩️布雷影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppQi",
-            "ext": {
-                "site": "https://ceshi307386.oss-cn-beijing.aliyuncs.com/blurl.txt",
-                "dataKey": "5f2b7ed203a3a581",
-                "dataIv": "5f2b7ed203a3a581",
-                "version": "120"
-            }
-        },
-        {
             "key": "仓鼠",
             "name": "🐹仓鼠影视",
             "type": 3,
@@ -2019,17 +1944,6 @@
             }
         },
         {
-            "key": "雨滴",
-            "name": "💧雨滴影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "ext": {
-                "site": "https://appto2-1316376600.cos.ap-beijing.myqcloud.com/gap.txt",
-                "dataKey": "685bf108bc47b67d",
-                "dataIv": "685bf108bc47b67d"
-            }
-        },
-        {
             "key": "白鸽",
             "name": "🕊️白鸽影视",
             "type": 3,
@@ -2043,32 +1957,6 @@
             }
         },
         {
-            "key": "奇奇",
-            "name": "🍊奇奇影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://103.236.61.192:8006",
-                "dataKey": "123456789abcdefg",
-                "dataIv": "123456789abcdefg"
-            }
-        },
-        {
-            "key": "剧猫",
-            "name": "🐈剧猫影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "site": "https://zjm-1302383509.cos.ap-guangzhou.myqcloud.com/zjm.txt",
-                "dataKey": "zjmznbl2026zcxgb",
-                "dataIv": "zjmznbl2026zcxgb"
-            }
-        },
-        {
             "key": "剧梦",
             "name": "🍊剧梦影视",
             "type": 3,
@@ -2079,19 +1967,6 @@
                 "url": "https://www.jumengwu.com",
                 "dataKey": "1f0a873caf2550a5",
                 "dataIv": "1f0a873caf2550a5"
-            }
-        },
-        {
-            "key": "缘梦",
-            "name": "🍊缘梦影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://www.zipfve.cn",
-                "dataKey": "1234567890987654",
-                "dataIv": "1234567890987654"
             }
         },
         {
