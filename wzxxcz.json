@@ -984,11 +984,13 @@
             "ext": "http://118.89.203.120:8365/"
         },
         {
-            "key": "聚搜",
+            "key": "AI二",
             "name": "🐢聚搜影视",
             "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/py/AppToV5.py",
-            "ext": "http://101.35.85.16:5555"
+            "api": "csp_qiao2",
+            "playerType": 2,
+            "jar": "https://gh-proxy.com/https://raw.githubusercontent.com/maoystv/6/refs/heads/main/jar/fxz250711.jar",
+            "ext": "7lj763gg402i7942412h849jg1558j9jl8g19213il86316k465719lik158491h179312h4934183ig2l05g9"
         },
         {
             "key": "巧技2",
