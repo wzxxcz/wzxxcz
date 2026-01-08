@@ -2278,6 +2278,12 @@
             }
         },
         {
+            "key": "T4-bulei111",
+            "name": "🌩️布雷影视",
+            "type": 4,
+            "api": "https://catbox.n13.club/t9/bulei.php"
+        },
+        {
             "key": "大师兄影视2",
             "name": "🤡大师兄影视2",
             "type": 3,
