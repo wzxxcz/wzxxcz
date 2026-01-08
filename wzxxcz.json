@@ -126,7 +126,7 @@
         },
         {
             "key": "央视片库",
-            "name": "🇨🇳分享央视",
+            "name": "🇨🇳央视大全",
             "type": 3,
             "api": "./py/分享央视.py",
             "searchable": 1,
@@ -720,6 +720,17 @@
             "name": "🎸吉米影视",
             "type": 4,
             "api": "https://catbox.n13.club/t9/jimi.php"
+        },
+        {
+            "key": "py_xiongdi",
+            "name": "👨兄弟影视",
+            "type": 3,
+            "api": "./py/兄弟影视.py",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
+            "filterable": 0,
+            "timeout": 60
         },
         {
             "key": "大米影视",
