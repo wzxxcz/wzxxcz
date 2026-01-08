@@ -1013,6 +1013,15 @@
             "ext": "7lj763gg0939790i413gi486k509jgi3ggk6j244j6j36j76041707h0lk124l0l0h867j83h576h3j66h4lk89lh5lh1jl3l170647kj09lklji74j56lg673li1h16"
         },
         {
+            "key": "还行",
+            "name": "🍊小橙子自营",
+            "type": 3,
+            "api": "csp_AppYs",
+            "searchable": 1,
+            "quickSearch": 1,
+            "ext": "http://m51.gotto.top/api.php/v1.vod"
+        },
+        {
             "key": "鬼片",
             "name": "🥇鬼片影视",
             "type": 3,
