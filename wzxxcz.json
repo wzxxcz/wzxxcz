@@ -7801,7 +7801,7 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.honda-kyoka.com/",
                 "二次截取": "",
-                "数组": "pic&&</div>",
+                "数组": "<div class=\"a-con-inner\"&&</div>",
                 "标题": "title=\"&&\"",
                 "图片": "data-src=\"&&\"",
                 "副标题": "<span class=\"s4 text-left\">&&</span>",
