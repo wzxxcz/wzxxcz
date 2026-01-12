@@ -1818,6 +1818,18 @@
             }
         },
         {
+            "key": "星星",
+            "name": "🌠星星影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "ext": {
+                "site": "http://110.81.153.7:1963/get.txt",
+                "dataKey": "k7L9mQ2xR4pW8n88",
+                "dataIv": "k7L9mQ2xR4pW8n88",
+                "version": "305"
+            }
+        },
+        {
             "key": "气球",
             "name": "🍊气球影视",
             "type": 3,
