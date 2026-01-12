@@ -35465,6 +35465,16 @@
             }
         },
         {
+            "key": "甜圈短剧",
+            "name": "🍊甜圈短剧",
+            "type": 3,
+            "api": "csp_TianquanDJ",
+            "searchable": 1,
+            "changeable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
             "key": "锦鲤短剧",
             "name": "🍊锦鲤短剧",
             "type": 3,
