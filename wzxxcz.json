@@ -4983,6 +4983,18 @@
             }
         },
         {
+            "key": "py_木瓜_APP",
+            "name": "🍈木瓜影视",
+            "type": 3,
+            "api": "./py/木瓜.py",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": {
+                "host": "http://www.yezitv.top"
+            }
+        },
+        {
             "key": "py_可可",
             "name": "🍊可可影视",
             "type": 3,
