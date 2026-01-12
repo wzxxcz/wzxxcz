@@ -1887,7 +1887,7 @@
                 "主页url": "https://xifanys.com/",
                 "首页": "120",
                 "起始页": "1",
-                "分类url": "https://xifanys.com/index.php/vod/show/id/{cateId}/page/{catePg}.html",
+                "分类url": "https://www.xifanys.com/index.php/vod/show/id/{cateId}/page/{catePg}.html",
                 "分类": "电影$1#剧集$2#综艺$3#动漫$4#短剧$5#",
                 "二次截取": "module-items\"&&id=\"page[替换:module-footer>>module-item]",
                 "数组": "module-item-pic&&module-item\"",
