@@ -2029,6 +2029,12 @@
             }
         },
         {
+            "key": "饺子影视",
+            "name": "🥟饺子影视",
+            "type": 3,
+            "api": "csp_Jiaozi"
+        },
+        {
             "key": "孜然影视",
             "name": "🍊孜然影视",
             "type": 3,
@@ -11673,13 +11679,6 @@
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1
-        },
-        {
-            "key": "莫小影视",
-            "name": "🍊莫小影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/莫小影视.json"
         },
         {
             "key": "面包影视",
