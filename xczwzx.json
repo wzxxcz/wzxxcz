@@ -1446,6 +1446,17 @@
             }
         },
         {
+            "key": "奇奇",
+            "name": "🐎奇奇影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "ext": {
+                "site": "https://yun-1316442804.cos.ap-guangzhou.myqcloud.com/a.txt",
+                "dataKey": "123456789abcdefg",
+                "dataIv": "123456789abcdefg"
+            }
+        },
+        {
             "key": "星星",
             "name": "🌠星星影视",
             "type": 3,
@@ -1643,6 +1654,12 @@
                 "dataKey": "1f0a873caf2550a5",
                 "dataIv": "1f0a873caf2550a5"
             }
+        },
+        {
+            "key": "饺子影视",
+            "name": "🥟饺子影视",
+            "type": 3,
+            "api": "csp_Jiaozi"
         },
         {
             "key": "孜然影视",
@@ -11289,13 +11306,6 @@
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1
-        },
-        {
-            "key": "莫小影视",
-            "name": "🍊莫小影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/莫小影视.json"
         },
         {
             "key": "面包影视",
