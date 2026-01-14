@@ -383,6 +383,21 @@
             }
         },
         {
+            "key": "闪电",
+            "name": "⚡闪电4K",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": [
+                    "https://sd.sduc.site"
+                ]
+            }
+        },
+        {
             "key": "夸克",
             "name": "🍊夸克4K",
             "type": 3,
@@ -1113,6 +1128,17 @@
             "playerType": 2,
             "jar": "https://ncstatic.clewm.net/rsrc/2025/0915/15/e210975c2c794cbc8bb1839b54ac213e.png;md5;939FFBC2941A28CA533F2653FA4B449E",
             "ext": "7lj763gg402i7942503g839jg74h8h88highi40799jh6i6k454419l0l5184k0g549h0kg2i01i838i2h42g891lgg1"
+        },
+        {
+            "key": "木瓜",
+            "name": "🍈木瓜影院",
+            "type": 3,
+            "changeable": 0,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "http://www.yezitv.top/dtym.json",
+                "ver": 2
+            }
         },
         {
             "key": "花柳",
