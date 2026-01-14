@@ -35948,9 +35948,34 @@
             "url": "https://jx.2s0.cn/player/?url="
         },
         {
-            "name": "🍊BBKDJ",
+            "name": "🪶淡若青风4k",
+            "type": 1,
+            "url": "http://121.40.174.45:299/api/?key=C929E46077B4A0H&url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                }
+            }
+        },
+        {
+            "name": "🛸极速",
             "type": 0,
-            "url": "https://jx.yparse.com/index.php?url="
+            "url": "https://jiexi.789jiexi.net:4433/?url=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                }
+            }
+        },
+        {
+            "name": "🏭大厂",
+            "type": 0,
+            "url": "https://t2.qlplayer.cyou/player/analysis.php?v=",
+            "ext": {
+                "header": {
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57"
+                }
+            }
         },
         {
             "name": "☁️云解析",
@@ -35968,27 +35993,22 @@
             "url": "http://103.163.47.120:7777/api/?key=yvgfYsmenad7cqm4b2&url="
         },
         {
-            "name": "🍊定制无限制",
-            "type": 1,
-            "url": "http://121.40.174.45:777/测试接口/4K解析.php?url="
-        },
-        {
-            "name": "🌃夏夜",
-            "type": 1,
-            "url": "http://8.155.50.80/xiayexk.php?url=",
-            "ext": {
-                "header": {
-                    "User-Agent": "okhttp/4.9.1"
-                }
-            }
-        },
-        {
             "name": "🍊HD3",
             "type": 0,
             "url": "https://jx.yparse.com/index.php?url=",
             "ext": {
                 "header": {
                     "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36"
+                }
+            }
+        },
+        {
+            "name": "🌃夏夜4k",
+            "type": 1,
+            "url": "http://8.155.50.80/xiayexk.php?url=",
+            "ext": {
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
                 }
             }
         },
