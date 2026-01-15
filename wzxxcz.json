@@ -35591,6 +35591,16 @@
             }
         },
         {
+            "key": "剧和短剧",
+            "name": "🌸聚合短剧",
+            "type": 3,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "api": "./js/短剧.js"
+        },
+        {
             "key": "甜圈短剧",
             "name": "🍊甜圈短剧",
             "type": 3,
