@@ -15283,32 +15283,6 @@
             }
         },
         {
-            "key": "两个BT",
-            "name": "💧两个BT",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
-                "编码": "UTF-8",
-                "主页url": "https://www.bttwo.me/",
-                "数组": "thumb lazy&&</li>",
-                "标题": "alt=\"&&\"",
-                "副标题": "<span>&&</span>",
-                "图片": "data-original=\"&&\"",
-                "链接": "href=\"&&\"",
-                "线路数组": "mi_paly_box\"&&</div>",
-                "线路标题": "<span>&&</",
-                "播放数组": "paly_list_btn\"&&</div>",
-                "播放列表": "<a&&/a>",
-                "播放标题": ">&&<",
-                "播放链接": "href=\"&&\"",
-                "搜索url": "https://www.bttwo.me/search.html?wd={wd}",
-                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+yp_context\">&&</div>",
-                "分类url": "https://www.bttwo.me/{cateId}/page/{catePg}",
-                "分类": "电影$new-movie#国产剧$zgjun#美剧$meiju#日韩剧$jpsrtv"
-            }
-        },
-        {
             "key": "多多影视",
             "name": " 🔮多多影视",
             "type": 3,
