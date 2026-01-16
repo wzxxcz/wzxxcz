@@ -27,8 +27,8 @@
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://ghfast.top/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/斯玛特直播源"
-       },
-       {
+        },
+        {
             "name": "斯玛特直播(免翻)",
             "type": 0,
             "ua": "okhttp/5.3.2",
@@ -36239,7 +36239,7 @@
             "url": "https://jx.2s0.cn/player/?url="
         },
         {
-            "name": "🍊淡若青风4k",
+            "name": "🍊淡若青风",
             "type": 1,
             "url": "http://121.40.174.45:299/api/?key=C929E46077B4A0H&url=",
             "ext": {
@@ -36287,6 +36287,21 @@
                     "user-agent": "Mozilla/5.0 (Linux; Android 13; V2049A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36"
                 }
             }
+        },
+        {
+            "name": "🍊默认1",
+            "type": 1,
+            "url": "https://jx.m3u8.tv/jiexi/?url="
+        },
+        {
+            "name": "🍊推荐2",
+            "type": 1,
+            "url": "https://www.1717yun.com/beiyongjiexi/?url="
+        },
+        {
+            "name": "🍊线路3",
+            "type": 1,
+            "url": "https://jx.nnxv.cn/tv.php?url="
         },
         {
             "name": "🦐虾米",
