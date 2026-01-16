@@ -35,6 +35,12 @@
             "url": "https://ghfast.top/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/斯瑪特直播源2"
         },
         {
+            "name": "央卫频道",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://tv1288.xyz/migu.php"
+        },
+        {
             "name": "港台频道",
             "type": 0,
             "ua": "okhttp/5.3.2",
