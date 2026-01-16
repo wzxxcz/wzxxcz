@@ -35,6 +35,12 @@
             "url": "https://ghfast.top/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/斯瑪特直播源2"
         },
         {
+            "name": "港台频道",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://ku9.fr.to/ku9/1768502278.txt"
+        },
+        {
             "name": "港台大陆频道",
             "type": 0,
             "ua": "okhttp/5.3.2",
