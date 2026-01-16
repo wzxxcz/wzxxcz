@@ -1176,6 +1176,28 @@
             }
         },
         {
+            "key": "麒麟",
+            "name": "🐲麒麟影院",
+            "type": 3,
+            "changeable": 0,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "https://qh.70qh.top",
+                "ver": 2
+            }
+        },
+        {
+            "key": "粉象",
+            "name": "🐘粉象影院",
+            "type": 3,
+            "changeable": 0,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "http://121.40.131.51:2556/host.json",
+                "ver": 2
+            }
+        },
+        {
             "key": "恋鱼",
             "name": "🦈恋鱼影视",
             "type": 3,
@@ -1266,7 +1288,7 @@
             "type": 3,
             "api": "csp_AppQi",
             "changeable": "1",
-            "quickSearch": 0,
+            "quickSearch": 1,
             "filterable": 1,
             "ext": {
                 "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxh.txt",
@@ -1283,7 +1305,7 @@
             "type": 3,
             "api": "csp_AppQi",
             "changeable": "1",
-            "quickSearch": 0,
+            "quickSearch": 1,
             "filterable": 1,
             "ext": {
                 "url": "https://juziapp.tpmbt.cn",
@@ -1299,7 +1321,7 @@
             "type": 3,
             "api": "csp_AppQi",
             "changeable": "1",
-            "quickSearch": 0,
+            "quickSearch": 1,
             "filterable": 1,
             "ext": {
                 "site": "https://rxysyyds.oss-cn-chengdu.aliyuncs.com/qiji.txt",
@@ -1315,7 +1337,7 @@
             "type": 3,
             "api": "csp_AppQi",
             "changeable": "1",
-            "quickSearch": 0,
+            "quickSearch": 1,
             "filterable": 1,
             "ext": {
                 "site": "https://guwozj-1319364746.cos.ap-guangzhou.myqcloud.com/guwo.txt",
@@ -1888,18 +1910,6 @@
                 "site": "https://yun-1316442804.cos.ap-guangzhou.myqcloud.com/a.txt",
                 "dataKey": "123456789abcdefg",
                 "dataIv": "123456789abcdefg"
-            }
-        },
-        {
-            "key": "星星",
-            "name": "🌠星星影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "ext": {
-                "site": "http://110.81.153.7:1963/get.txt",
-                "dataKey": "k7L9mQ2xR4pW8n88",
-                "dataIv": "k7L9mQ2xR4pW8n88",
-                "version": "305"
             }
         },
         {
@@ -5140,7 +5150,7 @@
         },
         {
             "key": "火锅",
-            "name": "🫕火锅影视",
+            "name": "🍊火锅影视",
             "type": 3,
             "api": "csp_AppGet",
             "ext": {
