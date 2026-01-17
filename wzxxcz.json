@@ -35,6 +35,12 @@
             "url": "https://ghfast.top/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/斯玛特直播源2"
         },
         {
+            "name": "litv直播",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://ghfast.top/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/litv直播"
+        },
+        {
             "name": "斯玛特直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
@@ -37145,4 +37151,3 @@
     ],
     "warningText": "🍊欢迎进入小橙子影视！🍊"
 }
-
