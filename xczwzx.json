@@ -52,13 +52,13 @@
             "name": "港台大陆频道",
             "type": 0,
             "ua": "okhttp/5.3.2",
-            "url": "https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/港台大陆"
+            "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/港台大陆"
         },
         {
             "name": "港台大陆频道无18",
             "type": 0,
             "ua": "okhttp/5.3.2",
-            "url": "https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/港台大陆无18内容"
+            "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/港台大陆无18内容"
         },
         {
             "name": "xxx视频资源",
