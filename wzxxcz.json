@@ -16722,7 +16722,7 @@
             "ext": {
                 "请求头": "User-Agent$MOBILE_UA",
                 "编码": "UTF-8",
-                "主页url": "https://dfcob.net/",
+                "主页url": "https://www.rebornmed.com/",
                 "二次截取": "",
                 "数组": "lazyload&&</a>",
                 "标题": "title=\"&&\"",
@@ -16740,13 +16740,13 @@
                 "线路数组": "data-toggle&&</a>",
                 "线路标题": "tab\">&&</a>",
                 "播放二次截取": "",
-                "播放数组": "stui-content__playlist clearfix&&</ul>",
+                "播放数组": "macplus-content__playlist&&</ul>",
                 "倒序": "0",
                 "播放列表": "<a&&</a>",
                 "播放标题": ">&&</a>",
                 "播放链接": "href=\"&&\"",
-                "分类url": "https://dfcob.net/type/{cateId}-{area}-time------{year}-{catePg}.html",
-                "分类": "电影$1#连续剧$2#综艺$4#动漫$3#短剧$5#"
+                "分类url": "https://www.rebornmed.com/vodshow/{cateId}--------{catePg}---{year}.html",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#动画片$35#短剧$36#"
             }
         },
         {
