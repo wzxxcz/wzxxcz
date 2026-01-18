@@ -35,12 +35,6 @@
             "url": "https://php.946985.filegear-sg.me/jackTV.m3u"
         },
         {
-            "name": "HKTV",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://gc.gt.tc/o/i/HKTV.txt"
-        },
-        {
             "name": "斯玛特直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
