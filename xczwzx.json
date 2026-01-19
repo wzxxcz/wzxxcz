@@ -895,22 +895,6 @@
             }
         },
         {
-            "key": "橘子",
-            "name": "🍊橘子影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "changeable": "1",
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": {
-                "url": "https://juziapp.tpmbt.cn",
-                "dataKey": "K3h6YvSU8BTUfEcb",
-                "dataIv": "K3h6YvSU8BTUfEcb",
-                "version": "305",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
             "key": "爱盈",
             "name": "🍊爱盈影视",
             "type": 3,
@@ -4741,6 +4725,42 @@
                 "api": "/api.php/getappapi",
                 "datakey": "1234567890123456",
                 "dataiv": "1234567890123456"
+            }
+        },
+        {
+            "key": "方圆",
+            "name": "👛方圆影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://fyys1.fytd.top",
+                "dataKey": "0ef6fc92a64b4ee7",
+                "dataIv": "0ef6fc92a64b4ee7"
+            }
+        },
+        {
+            "key": "看呗",
+            "name": "🍊看呗影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://www.winter1.fun",
+                "dataKey": "abcdefghigklmn11",
+                "dataIv": "abcdefghigklmn11"
+            }
+        },
+        {
+            "key": "小猫影视",
+            "name": "🐈小猫影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "site": "http://xywlkj.oss-cn-beijing.aliyuncs.com/wp-content/uploads/2024/12/1.txt",
+                "dataKey": "xmyxmyxywlkjxywl",
+                "dataIv": "xmyxmyxywlkjxywl"
             }
         },
         {
