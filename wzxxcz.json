@@ -2457,6 +2457,18 @@
             }
         },
         {
+			"key": "爱瓜TV",
+			"name": "🐬爱瓜TV",
+			"type": 4,
+			"api": "http://zhangqun1818.serv00.net/aigua1.php"
+		},
+        {
+			"api": "https://newtv.ggff.net/oule?token=P69Phb_y",
+			"key": "欧乐影院",
+			"name": "🐬欧乐影院",
+			"type": 4
+		}, 
+        {
             "key": "大师兄影视2",
             "name": "🤡大师兄影视2",
             "type": 3,
