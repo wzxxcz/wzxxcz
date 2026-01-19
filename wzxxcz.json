@@ -23,28 +23,22 @@
             "url": "http://ku9.fr.to/ku9/1768502278.txt"
         },
         {
-            "name": "jackTV",
+            "name": "jackTV(梯子)",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://php.946985.filegear-sg.me/jackTV.m3u"
         },
-        {
+         {
             "name": "地方港台",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/地方港台"
         }, 
         {
-            "name": "斯玛特直播(梯子)",
+            "name": "anboxtv(免翻)",
             "type": 0,
             "ua": "okhttp/5.3.2",
-            "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/斯玛特直播源666"
-        },
-        {
-            "name": "斯玛特直播(免翻)",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://live.catvod.com/tv.m3u"
+            "url": "https://tv.anboxtv.online/tv"
         },
         {
             "name": "litv直播(梯子)",
@@ -52,12 +46,12 @@
             "ua": "okhttp/5.3.2",
             "url": "http://ezc.xtvantsc.xyz/litv.php"
         },
-        {
+       {
             "name": "台湾TV(梯子)",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/台湾TV"
-        },
+        }, 
         {
             "name": "港台大陆频道",
             "type": 0,
@@ -2456,18 +2450,6 @@
                 "排序值": "time&hits&score"
             }
         },
-        {
-			"key": "爱瓜TV",
-			"name": "🐬爱瓜TV",
-			"type": 4,
-			"api": "http://zhangqun1818.serv00.net/aigua1.php"
-		},
-        {
-			"api": "https://newtv.ggff.net/oule?token=P69Phb_y",
-			"key": "欧乐影院",
-			"name": "🐬欧乐影院",
-			"type": 4
-		}, 
         {
             "key": "大师兄影视2",
             "name": "🤡大师兄影视2",
