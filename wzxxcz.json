@@ -5143,6 +5143,42 @@
             }
         },
         {
+            "key": "方圆",
+            "name": "👛方圆影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://fyys1.fytd.top",
+                "dataKey": "0ef6fc92a64b4ee7",
+                "dataIv": "0ef6fc92a64b4ee7"
+            }
+        },
+        {
+            "key": "看呗",
+            "name": "🍊看呗影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "http://www.winter1.fun",
+                "dataKey": "abcdefghigklmn11",
+                "dataIv": "abcdefghigklmn11"
+            }
+        },
+        {
+            "key": "小猫影视",
+            "name": "🐈小猫影视",
+            "type": 3,
+            "searchable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "site": "http://xywlkj.oss-cn-beijing.aliyuncs.com/wp-content/uploads/2024/12/1.txt",
+                "dataKey": "xmyxmyxywlkjxywl",
+                "dataIv": "xmyxmyxywlkjxywl"
+            }
+        },
+        {
             "key": "火锅",
             "name": "🍊火锅影视",
             "type": 3,
