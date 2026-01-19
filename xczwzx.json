@@ -23,7 +23,7 @@
             "url": "http://ku9.fr.to/ku9/1768502278.txt"
         },
         {
-            "name": "jackTV",
+            "name": "jackTV(梯子)",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://php.946985.filegear-sg.me/jackTV.m3u"
@@ -35,16 +35,10 @@
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/地方港台"
         }, 
         {
-            "name": "斯玛特直播(梯子)",
+            "name": "anboxtv(免翻)",
             "type": 0,
             "ua": "okhttp/5.3.2",
-            "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/斯玛特直播源666"
-        },
-        {
-            "name": "斯玛特直播(免翻)",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://live.catvod.com/tv.m3u"
+            "url": "https://tv.anboxtv.online/tv"
         },
         {
             "name": "litv直播(梯子)",
@@ -57,7 +51,7 @@
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FGBLH/FG/refs/heads/main/台湾TV"
-        },
+        }, 
         {
             "name": "港台大陆频道",
             "type": 0,
