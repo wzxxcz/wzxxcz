@@ -11,6 +11,12 @@
             "ua": "bingcha/1.1(mianfeifenxiang)"
         },
         {
+            "name": "咪咕",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://mg.pl10000.top"
+        },
+        {
             "name": "飞扬",
             "type": 0,
             "ua": "okhttp/5.3.2",
