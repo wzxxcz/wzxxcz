@@ -1303,22 +1303,6 @@
             }
         },
         {
-            "key": "顾我",
-            "name": "🍊顾我影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "changeable": "1",
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": {
-                "site": "https://guwozj-1319364746.cos.ap-guangzhou.myqcloud.com/guwo.txt",
-                "dataKey": "ca94b06ca3c7d80e",
-                "dataIv": "ca94b06ca3c7d80e",
-                "version": "305",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
             "key": "TVB云播",
             "name": "☁️TVB云播",
             "type": 3,
@@ -1860,19 +1844,6 @@
             }
         },
         {
-            "key": "云云",
-            "name": "☁️云云影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppQi",
-            "ext": {
-                "site": "https://staraugust123456.oss-cn-hangzhou.aliyuncs.com/2.txt",
-                "dataKey": "staraugust123456",
-                "dataIv": "staraugust123456",
-                "version": "120"
-            }
-        },
-        {
             "key": "奇奇",
             "name": "🐎奇奇影视",
             "type": 3,
@@ -1992,20 +1963,6 @@
                 "字母值": "*",
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
-            }
-        },
-        {
-            "key": "仓鼠",
-            "name": "🐹仓鼠影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppQi",
-            "ext": {
-                "url": "https://hk440cms.cs4k.top",
-                "dataKey": "fL7sY4zN4kB3pG4p",
-                "dataIv": "fL7sY4zN4kB3pG4p",
-                "init": "initV122",
-                "ua": "okhttp/3.10.0"
             }
         },
         {
@@ -5117,18 +5074,6 @@
                 "api": "/api.php/getappapi",
                 "datakey": "1234567890123456",
                 "dataiv": "1234567890123456"
-            }
-        },
-        {
-            "key": "方圆",
-            "name": "👛方圆影视",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://fyys1.fytd.top",
-                "dataKey": "0ef6fc92a64b4ee7",
-                "dataIv": "0ef6fc92a64b4ee7"
             }
         },
         {
@@ -35934,16 +35879,6 @@
             "name": "🍊锦鲤短剧",
             "type": 3,
             "api": "csp_JinliDJ",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
-            "key": "七猫短剧",
-            "name": "🐈七猫短剧",
-            "type": 3,
-            "api": "csp_QiMaoDJ",
             "searchable": 1,
             "changeable": 1,
             "quickSearch": 1,
