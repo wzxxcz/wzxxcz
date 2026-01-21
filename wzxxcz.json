@@ -22352,17 +22352,6 @@
             }
         },
         {
-            "key": "草民影院1",
-            "name": "🧑‍🌾草民影院1",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "https://xcz.iptv365.org/wzx.jar",
-            "ext": {
-                "分类url": "https://wylanhua.com.cn/vodshow/{cateId}--------{catePg}---.html",
-                "分类": "电影$1#连续剧$2#综艺$3#动漫$4#"
-            }
-        },
-        {
             "key": "落尘影院",
             "name": "🍊落尘影院",
             "type": 3,
