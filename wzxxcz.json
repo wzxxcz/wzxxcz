@@ -1185,16 +1185,6 @@
             }
         },
         {
-            "key": "恋鱼",
-            "name": "🦈恋鱼影视",
-            "type": 3,
-            "api": "csp_AppFox",
-            "ext": {
-                "host": "https://173220859-1333208043.cos.ap-shanghai.myqcloud.com/1.json",
-                "ver": 2
-            }
-        },
-        {
             "key": "py_肥猫_APP",
             "name": " 🐱肥猫影视",
             "type": 3,
@@ -1267,23 +1257,6 @@
                 "url": "http://rqxk.gdata.fun",
                 "dataKey": "yangruiqiYsapp00",
                 "dataIv": "yangruiqiYsapp00"
-            }
-        },
-        {
-            "key": "爆炸",
-            "name": "💣爆炸影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "changeable": "1",
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": {
-                "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxh.txt",
-                "dataKey": "37kj83zs1q16jk6t",
-                "dataIv": "37kj83zs1q16jk6t",
-                "search": "searchList4",
-                "init": "initV122",
-                "ua": "okhttp/3.10.0"
             }
         },
         {
