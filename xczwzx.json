@@ -10,6 +10,12 @@
             "url": "https://bc.188766.xyz/?url=https://live.188766.xyz&mishitong=true&mima=bingcha1130&huikan=en&json=true"
         },
         {
+            "name": "飞杨移动通",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://xcz.iptv365.org/fyyd.txt"
+        },
+        {
             "name": "飞扬",
             "type": 0,
             "ua": "okhttp/5.3.2",
