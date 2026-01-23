@@ -1194,7 +1194,7 @@
             "changeable": 0,
             "api": "csp_AppFox",
             "ext": {
-                "host": "http://121.40.131.51:2556/host.json",
+                "host": "http://host1.sopython.top/host.json",
                 "ver": 2
             }
         },
