@@ -754,7 +754,7 @@
             "name": "🏅金牌影视备",
             "type": 3,
             "api": "csp_AppQi",
-            "changeable": "1",
+            "changeable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "ext": {
@@ -825,6 +825,39 @@
             "ext": {
                 "host": "http://host1.sopython.top/host.json",
                 "ver": 2
+            }
+        },
+        {
+            "key": "搜搜",
+            "name": "🔎搜搜影视",
+            "type": 3,
+            "api": "csp_AppFox",
+            "ext": "https://www.zjcvod.com"
+        },
+        {
+            "key": "火花",
+            "name": "🔥火花影视",
+            "type": 3,
+            "changeable": 0,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "http://huohua.itcxo.cn"
+            }
+        },
+        {
+            "key": "顾我",
+            "name": "🐘顾我影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "changeable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": {
+                "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/pgqj.json",
+                "dataKey": "kj37zs29q22jk96t",
+                "dataIv": "kj37zs29q22jk96t",
+                "init": "initV122",
+                "ua": "okhttp/3.10.0"
             }
         },
         {
@@ -907,7 +940,7 @@
             "name": "🍊爱盈影视",
             "type": 3,
             "api": "csp_AppQi",
-            "changeable": "1",
+            "changeable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "ext": {
@@ -4690,6 +4723,17 @@
                 "api": "/api.php/getappapi",
                 "datakey": "1234567890123456",
                 "dataiv": "1234567890123456"
+            }
+        },
+        {
+            "key": "芬奇",
+            "name": "🐘芬奇影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "ext": {
+                "site": "https://wsapi.dafenqi.mom/yuming.txt",
+                "dataKey": "bH5mI8iK0tK7aQ5x",
+                "dataIv": "bH5mI8iK0tK7aQ5x"
             }
         },
         {
