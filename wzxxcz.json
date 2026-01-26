@@ -2066,14 +2066,14 @@
             }
         },
         {
-      "key": "麻雀",
-      "name": "🐦麻雀1080P",
-      "type": 3,
-      "quickSearch": 1,
-      "searchable": 1,
-      "api": "./js/麻雀视频.js",
-      "ext": ""
-    },
+            "key": "麻雀",
+            "name": "🐦麻雀1080P",
+            "type": 3,
+            "quickSearch": 1,
+            "searchable": 1,
+            "api": "./js/麻雀视频.js",
+            "ext": ""
+        },
         {
             "key": "饺子影视",
             "name": "🥟饺子影视",
