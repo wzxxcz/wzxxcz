@@ -1058,7 +1058,7 @@
             "changeable": 1,
             "api": "./js/fox.js",
             "ext": {
-                "host": "https://cms99api.ystva.com"
+                "host": "http://host1.sopython.top/host.json"
             }
         },
         {
