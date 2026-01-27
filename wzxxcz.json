@@ -301,6 +301,12 @@
             "filterable": 0
         },
         {
+            "key": "爱听音乐",
+            "name": "🎤爱听音乐",
+            "type": 3,
+            "api": "./py/爱听音乐.py"
+        },
+        {
             "key": "啊哈DJ网",
             "name": "🎵啊哈DJ音乐",
             "type": 3,
