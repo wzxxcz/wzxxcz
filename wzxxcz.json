@@ -28271,14 +28271,6 @@
             }
         },
         {
-            "key": "MGTV",
-            "name": "🍊MGTV",
-            "type": 3,
-            "playerType": "2",
-            "api": "https://tvbox.catvod.com/js/drpy2.min.js",
-            "ext": "https://tvbox.catvod.com/js/mgtv.js"
-        },
-        {
             "key": "星辰影院1",
             "name": "🌠星辰影院1",
             "type": 3,
