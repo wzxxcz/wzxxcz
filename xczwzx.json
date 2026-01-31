@@ -160,6 +160,12 @@
             "url": "https://chuxinya.top/f/2xLkt8/12.28飞扬直播.txt"
         },
         {
+            "name": "易佬直播源",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://gc.gt.tc/o/i/HKTV.txt"
+        }, 
+        {
             "name": "港台大陆频道",
             "type": 0,
             "ua": "okhttp/5.3.2",
