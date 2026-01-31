@@ -327,14 +327,10 @@
             }
         },
         {
-            "key": "酷狗音乐",
+            "key": "酷狗",
             "name": "🎤酷狗音乐",
             "type": 3,
-            "api": "csp_Kugou",
-            "jar": "https://xcz.iptv365.org/wzxwkx.jar",
-            "searchable": 0,
-            "quickSearch": 0,
-            "filterable": 0
+            "api": "csp_Kugou"
         },
         {
             "key": "爱听音乐",
