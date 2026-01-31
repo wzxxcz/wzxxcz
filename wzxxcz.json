@@ -35780,7 +35780,7 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@server_name_session=ffdce957f950c987e7b2a3f0c26bd195；； Hm_tf_2k6bdtu3ywn=1769848274；； Hm_lvt_2k6bdtu3ywn=1769848274；； Hm_tf_e6t582w8f8r=1769848275；； Hm_lvt_e6t582w8f8r=1769848275；； PHPSESSID=corgklcv69nfm2ugd61qpcs3li；； fed_record=%7Brecord%3A%5B%7B%22name%22%3A%22%u8001%u8205%22%7D%5D%7D；； fed_history=%7Bvideo%3A%5B%7B%22name%22%3A%22%u7B2C%u4E09%u8C03%u89E3%u5BA4%22%2C%22show%22%3A%22TT%u7EBF%u8DEF%22%2C%22link%22%3A%22https%3A//www.pskml.com/play/74/3/1.html%22%2C%22num%22%3A%222050803%u5FC3%u75C5%22%7D%2C%7B%22name%22%3A%22%u8001%u8205%22%2C%22show%22%3A%22TT%u7EBF%u8DEF%22%2C%22link%22%3A%22https%3A//www.pskml.com/play/164307/2/1.html%22%2C%22num%22%3A%22%u7B2C01%u96C6%22%7D%5D%7D；； Hm_lpvt_e6t582w8f8r=1769854193；； Hm_lpvt_2k6bdtu3ywn=1769854193&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "主页url": "https://www.pskml.com/",
                 "二次截取": "",
