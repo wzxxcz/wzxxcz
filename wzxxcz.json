@@ -35800,7 +35800,7 @@
                 "线路数组": "fed-drop-btns fed-padding fed-col-xs3 fed-col-md2\">&&/ul>",
                 "线路标题": "<li*>&&<",
                 "播放二次截取": "",
-                "播放数组": "fed-part-rows&&</ul>",
+                "播放数组": "fed-drop-head fed-padding fed-part-rows&&</ul>",
                 "倒序": "0",
                 "播放列表": "<a&&</a>",
                 "播放标题": ">&&</a>",
