@@ -35385,7 +35385,7 @@
                 "编码": "UTF-8",
                 "主页url": "https://liyimedia.cn/",
                 "二次截取": "",
-                "数组": "video-pic&&</a>",
+                "数组": "video-pic loading&&</a>",
                 "标题": "title=\"&&\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"note text-bg-r\">&&</span>",
@@ -35407,7 +35407,7 @@
                 "播放标题": ">&&</a>",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://liyimedia.cn/pd_tv/_{cateId}_{year}__{catePg}.html",
-                "分类": "电影$pd_dy#电视剧$pd_tv#综艺$pd_zyi#动漫$pd_dm#"
+                "分类": "电影$dy#电视剧$tv#综艺$zyi#动漫$dm#"
             }
         },
         {
