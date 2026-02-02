@@ -35407,7 +35407,7 @@
                 "播放标题": ">&&</a>",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://liyimedia.cn/pd_tv/_{cateId}_{year}__{catePg}.html",
-                "分类": "电影$dy#电视剧$tv#综艺$zyi#动漫$dm#"
+                "分类": "电影$pd_dy#电视剧$pd_tv#综艺$pd_zyi#动漫$pd_dm#"
             }
         },
         {
