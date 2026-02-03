@@ -1,5 +1,4 @@
-
-import {Crypto} from 'assets://js/lib/cat.js';
+import 'assets://js/lib/crypto-js.js';
 const UA = 'Mozilla/5.0 (Linux; Android 9; V2196A Build/PQ3A.190705.08211809; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36;webank/h5face;webank/1.0;netType:NETWORK_WIFI;appVersion:416;packageName:com.jp3.xg3';
 const aggConfig = {
   keys: 'd3dGiJc651gSQ8w1',
@@ -23,14 +22,12 @@ const aggConfig = {
     软鸭: { host: 'https://api.xingzhige.com', url1: '/API/playlet', search: '/API/playlet' },
     七猫: { host: 'https://api-store.qmplaylet.com', url1: '/api/v1/playlet/index', url2: 'https://api-read.qmplaylet.com/player/api/v1/playlet/info', search: '/api/v1/playlet/search' },
     围观: { host: 'https://api.drama.9ddm.com', url1: '/drama/home/shortVideoTags', url2: '/drama/home/shortVideoDetail', search: '/drama/home/search' },
-    碎片: { host: 'https://free-api.bighotwind.cc', url1: '/papaya/papaya-api/theater/tags', url2: '/papaya/papaya-api/videos/info', search: '/papaya/papaya-api/videos/page' },
     甜圈: { host: 'https://mov.cenguigui.cn', url1: '/duanju/api.php?classname', url2: '/duanju/api.php?book_id', search: '/duanju/api.php?name' }
   },
   platformList: [
     { name: '甜圈短剧', id: '甜圈' }, { name: '七猫短剧', id: '七猫' }, { name: '锦鲤短剧', id: '锦鲤' },
     { name: '番茄短剧', id: '番茄' }, { name: '星芽短剧', id: '星芽' }, { name: '西饭短剧', id: '西饭' },
-    { name: '软鸭短剧', id: '软鸭' }, /*{ name: '百度短剧', id: '百度' }, */{ name: '围观短剧', id: '围观' }
-   // { name: '碎片剧场', id: '碎片' }
+    { name: '软鸭短剧', id: '软鸭' }, { name: '百度短剧', id: '百度' }, { name: '围观短剧', id: '围观' }
   ],
   search: { limit: 30, timeout: 6000 }
 };
@@ -44,7 +41,6 @@ const ruleFilterDef = {
   软鸭: { area: '战神' },
   七猫: { area: '0' },
   围观: { area: '' },
-  碎片: { area: '' },
   甜圈: { area: '推荐榜' }
 };
 
@@ -52,10 +48,10 @@ const filterOptionsB64 = "eyLnlJzlnIgiOlt7ImtleSI6ImFyZWEiLCJuYW1lIjoi5Ymn5oOFIi
 
 let xingya_headers = {};
 function base64Encode(text) {
-  return Crypto.enc.Base64.stringify(Crypto.enc.Utf8.parse(text));
+  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text));
 }
 function base64Decode(text) {
-  return Crypto.enc.Utf8.stringify(Crypto.enc.Base64.parse(text));
+  return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(text));
 }
 async function request(url, options = {}) {
   const { method = 'GET', headers = {}, body, timeout = 5000 } = options;
@@ -71,7 +67,7 @@ async function request(url, options = {}) {
   }
 }
 async function md5(str) {
-  return Crypto.MD5(str).toString(Crypto.enc.Hex).toLowerCase();
+  return CryptoJS.MD5(str).toString(CryptoJS.enc.Hex).toLowerCase();
 }
 function guid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -239,25 +235,6 @@ async function category(tid, pg, filter, extend) {
       if (res?.data) videos.push(...res.data.map(i => ({
         vod_id: `围观@${i.oneId}`, vod_name: i.title, vod_pic: i.vertPoster, vod_remarks: `集数:${i.episodeCount} 播放:${i.viewCount}`
       })));
-    } else if (tid === '碎片') {
-      let openId = (await md5(guid())).substring(0, 16);
-      let body = JSON.stringify({ openId });
-      let key = Crypto.enc.Utf8.parse("p0sfjw@k&qmewu#w");
-      const encrypted = Crypto.AES.encrypt(body, key, { mode: Crypto.mode.ECB, padding: Crypto.pad.Pkcs7 }).ciphertext.toString(Crypto.enc.Hex);
-      const tokenRes = JSON.parse(await request("https://free-api.bighotwind.cc/papaya/papaya-api/oauth2/uuid", {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'key': encrypted }, body
-      }));
-      if (tokenRes?.data?.token) {
-        const headers = { ...aggConfig.headers.default, 'Authorization': tokenRes.data.token };
-        const url = `${plat.host}${plat.search}?type=5&tagId=&pageNum=${page}&pageSize=24`;
-        const res = JSON.parse(await request(url, { headers }));
-        if (res?.list) videos.push(...res.list.map(i => ({
-          vod_id: `碎片@${i.itemId}@${i.videoCode}`,
-          vod_name: i.title,
-          vod_pic: `https://speed.hiknz.com/papaya/papaya-file/files/download/${i.imageKey}/${i.imageName}`,
-          vod_remarks: `集数:${i.episodesMax} 播放:${i.hitShowNum}`
-        })));
-      }
     } else if (tid === '甜圈') {
       const url = `${plat.host}${plat.url1}=${encodeURIComponent(area)}&offset=${page}`;
       const res = JSON.parse(await request(url));
@@ -351,29 +328,8 @@ async function detail(id) {
         const d = res.data;
         vod = { ...vod, vod_name: d[0].title, vod_pic: d[0].vertPoster, vod_remarks: `共${d.length}集`, vod_play_from: '围观短剧', vod_play_url: d.map(e => `${e.title}第${e.playOrder}集$${e.playSetting}`).join('#') };
       }
-    } else if (platId === '碎片') {
-      const [itemId, videoCode] = did.split('@');
-      let openId = (await md5(guid())).substring(0, 16);
-      let body = JSON.stringify({ openId });
-      let key = Crypto.enc.Utf8.parse("p0sfjw@k&qmewu#w");
-      const encrypted = Crypto.AES.encrypt(body, key, { mode: Crypto.mode.ECB, padding: Crypto.pad.Pkcs7 }).ciphertext.toString(Crypto.enc.Hex);
-      const tokenRes = JSON.parse(await request("https://free-api.bighotwind.cc/papaya/papaya-api/oauth2/uuid", {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'key': encrypted }, body
-      }));
-      if (tokenRes?.data?.token) {
-        const headers = { ...aggConfig.headers.default, 'Authorization': tokenRes.data.token };
-        const res = JSON.parse(await request(`${plat.host}${plat.url2}?videoCode=${videoCode}&itemId=${itemId}`, { headers }));
-        if (res) {
-          const d = res.data || res;
-          const pic = `https://speed.hiknz.com/papaya/papaya-file/files/download/${d.imageKey}/${d.imageName}`;
-          const u = (d.episodesList || []).map(e => {
-            const best = e.resolutionList?.sort((a, b) => b.resolution - a.resolution)[0];
-            return best ? `第${e.episodes}集$https://speed.hiknz.com/papaya/papaya-file/files/download/${best.fileKey}/${best.fileName}` : null;
-          }).filter(Boolean).join('#');
-          vod = { ...vod, vod_name: d.title, vod_pic: pic, vod_remarks: `共${d.episodesMax || 0}集`, vod_play_from: '碎片剧场', vod_play_url: u };
-        }
-      }
     }
+
   } catch (e) { vod.vod_name = '加载失败'; }
   return JSON.stringify({ list: [vod] });
 }
@@ -455,7 +411,7 @@ async function search(wd, quick, pg) {
       }
     });
   } catch {}
-  const platforms = ['百度', '锦鲤', '番茄', '星芽', '西饭', '软鸭', '围观', '碎片', '甜圈'];
+  const platforms = ['百度', '锦鲤', '番茄', '星芽', '西饭', '软鸭', '围观', '甜圈'];
   for (const tid of platforms) {
     const plat = aggConfig.platform[tid];
     try {
@@ -493,25 +449,6 @@ async function search(wd, quick, pg) {
           body: JSON.stringify({ audience: "", page, pageSize: 30, searchWord: wd, subject: "" })
         });
         data = (JSON.parse(res)?.data || []).map(i => ({ vod_id: `围观@${i.oneId}`, vod_name: i.title, vod_pic: i.vertPoster, vod_remarks: `围观短剧｜集数:${i.episodeCount} 播放:${i.viewCount}` }));
-      } else if (tid === '碎片') {
-        let openId = (await md5(guid())).substring(0, 16);
-        let body = JSON.stringify({ openId });
-        let key = Crypto.enc.Utf8.parse("p0sfjw@k&qmewu#w");
-        const encrypted = Crypto.AES.encrypt(body, key, { mode: Crypto.mode.ECB, padding: Crypto.pad.Pkcs7 }).ciphertext.toString(Crypto.enc.Hex);
-        const tokenRes = JSON.parse(await request("https://free-api.bighotwind.cc/papaya/papaya-api/oauth2/uuid", {
-          method: 'POST', headers: { 'Content-Type': 'application/json', 'key': encrypted }, body, timeout: aggConfig.search.timeout
-        }));
-        if (tokenRes?.data?.token) {
-          const headers = { ...aggConfig.headers.default, 'Authorization': tokenRes.data.token };
-          const url = `${plat.host}${aggConfig.platform.碎片.search}?type=5&tagId=&pageNum=${page}&pageSize=30&title=${encodeURIComponent(wd)}`;
-          res = await request(url, { headers });
-          data = (JSON.parse(res)?.list || []).map(i => ({
-            vod_id: `碎片@${i.itemId}@${i.videoCode}`,
-            vod_name: i.title,
-            vod_pic: `https://speed.hiknz.com/papaya/papaya-file/files/download/${i.imageKey}/${i.imageName}`,
-            vod_remarks: `碎片剧场｜集数:${i.episodesMax} 播放:${i.hitShowNum}`
-          }));
-        }
       } else if (tid === '甜圈') {
         const url = `${plat.host}${plat.search}=${encodeURIComponent(wd)}&offset=${page}`;
         res = await request(url);
@@ -533,16 +470,6 @@ async function search(wd, quick, pg) {
     total: videos.length * (page + 1)
   });
 }
-
 export function __jsEvalReturn() {
-    return {
-        init,
-        home,
-        homeVod,
-        category,
-        search,
-        detail,
-        play,
-        proxy: null
-    };
+  return { init, home, homeVod, category, detail, play, proxy: null, search };
 }
