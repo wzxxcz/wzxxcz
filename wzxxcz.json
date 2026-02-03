@@ -16,6 +16,12 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/Jsnzkpg/Jsnzkpg/Jsnzkpg/Jsnzkpg1"
         },
         {
+            "name": "咪咕央卫体育",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://113.44.65.227:1234"
+        },
+        {
             "name": "地方直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
