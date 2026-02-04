@@ -46,6 +46,12 @@
             "url": "https://52xiaobai.cn/ceshi/zhibo.php"
         },
         {
+            "name": "壹米",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://gitee.com/yimi321/ymys/raw/master/lib/tv.png"
+        },
+        {
             "name": "地方直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
@@ -35597,38 +35603,6 @@
             ]
         },
         {
-            "key": "极速资源",
-            "name": "🏄极速采集",
-            "type": 1,
-            "api": "https://jszyapi.com/api.php/provide/vod/",
-            "searchable": 1,
-            "changeable": 1,
-            "categories": [
-                "日剧",
-                "马泰剧",
-                "内地剧",
-                "欧美剧",
-                "香港剧",
-                "韩剧",
-                "台湾剧",
-                "恐怖片",
-                "动画片",
-                "剧情片",
-                "战争片",
-                "动作片",
-                "记录片",
-                "爱情片",
-                "喜剧片",
-                "科幻片",
-                "灾难片",
-                "悬疑片",
-                "犯罪片",
-                "中国动漫",
-                "日本动漫",
-                "欧美动漫"
-            ]
-        },
-        {
             "key": "索尼资源",
             "name": "🛰索尼采集",
             "type": 1,
@@ -35793,20 +35767,6 @@
                 "脑洞悬疑",
                 "现代都市",
                 "体育赛事"
-            ]
-        },
-        {
-            "key": "天涯资源网",
-            "name": "🏝️天涯采集",
-            "type": 1,
-            "api": "https://tyyszyapi.com/api.php/provide/vod/",
-            "quickSearch": 1,
-            "searchable": 1,
-            "changeable": 1,
-            "categories": [
-                "国产动漫",
-                "日韩动漫",
-                "国产剧"
             ]
         },
         {
