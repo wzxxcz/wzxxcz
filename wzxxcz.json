@@ -809,6 +809,15 @@
             }
         },
         {
+            "key": "麻雀",
+            "name": "🐦麻雀1080P",
+            "type": 3,
+            "quickSearch": 1,
+            "searchable": 1,
+            "api": "./py/Applzxw.py",
+            "ext": "http://118.89.203.120:8365/"
+        },
+        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
@@ -2120,15 +2129,6 @@
                 "dataKey": "1f0a873caf2550a5",
                 "dataIv": "1f0a873caf2550a5"
             }
-        },
-        {
-            "key": "麻雀",
-            "name": "🐦麻雀1080P",
-            "type": 3,
-            "quickSearch": 1,
-            "searchable": 1,
-            "api": "./js/麻雀视频.js",
-            "ext": ""
         },
         {
             "key": "饺子影视",
