@@ -1437,17 +1437,6 @@
             "playerType": 2
         },
         {
-            "key": "猎手影视1",
-            "name": "🧡猎手PY影视",
-            "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/wzxxcz/tvbox@main/py/猎手影视.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
-        {
             "key": "新剧",
             "name": "🍊新剧影视",
             "type": 3,
