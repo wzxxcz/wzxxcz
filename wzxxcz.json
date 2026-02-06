@@ -1942,22 +1942,6 @@
             }
         },
         {
-            "key": "蔬菜",
-            "name": "🥦蔬菜影视",
-            "type": 3,
-            "quickSearch": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://huohu.yihn.cc",
-                "site": "",
-                "dataKey": "huohushipingetap",
-                "dataIv": "huohushipingetap",
-                "deviceId": "",
-                "version": "140",
-                "ua": ""
-            }
-        },
-        {
             "key": "酷影聚",
             "name": "🦘酷影聚",
             "type": 3,
