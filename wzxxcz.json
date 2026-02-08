@@ -255,6 +255,16 @@
             "searchable": 0
         },
         {
+      "key": "应用商店",
+      "name": "🍊应用商店",
+      "type": 3,
+      "api": "csp_Market",
+      "searchable": 0,
+      "changeable": 0,
+      "indexs": 0,
+      "ext": "./json/market.json"
+    },
+        {
             "key": "预告",
             "name": "🍊小橙子新片预告",
             "type": 3,
