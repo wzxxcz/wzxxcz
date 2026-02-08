@@ -87,13 +87,13 @@
         "name": "手机端",
         "url": "https://ghfile.geekertao.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/yscsg-3.2.7.1.apk",
         "icon": "./yysdok.png",
-        "version": "3.9.9"
+        "version": "3.2.7.1"
       },
       {
         "name": "电视端",
         "url": "https://ghfile.geekertao.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/yscds-6.1.8.apk",
         "icon": "./yysdok.png",
-        "version": "3.9.9"
+        "version": "6.1.8"
       }
     ]
   },
