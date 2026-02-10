@@ -94,12 +94,6 @@
             "url": "https://pan.ymxx.net/f/vBMSZ/临时测试.txt"
         },
         {
-            "name": "wy",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://43.251.226.89:8080/live.txt"
-        },
-        {
             "name": "蚂蚁",
             "type": 0,
             "ua": "okhttp/5.3.2",
