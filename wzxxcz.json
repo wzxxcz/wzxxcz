@@ -36020,7 +36020,7 @@
                 "主页url": "http://www.100bt4kyy.com/",
                 "二次截取": "",
                 "数组": "li_li clearfix&&</div>",
-                "标题": "<a*>&&</a>",
+                "标题": "title=\"&&\"",
                 "图片": "src=\"&&\"",
                 "副标题": "<span class=\"rgba1\">&&</span>",
                 "链接": "href=\"&&\"",
@@ -36039,7 +36039,7 @@
                 "倒序": "0",
                 "播放列表": "<a&&</a>",
                 "播放标题": ">&&</a>",
-                "播放链接": "href=\"&&\"",
+                "播放链接": "href='&&'",
                 "分类url": "http://www.100bt4kyy.com/search.php?page={catePg}&searchtype=5&tid={cateId}&jq={class}&year={year}",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#纪录片$29#"
             }
