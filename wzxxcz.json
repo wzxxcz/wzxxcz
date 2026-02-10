@@ -4539,16 +4539,6 @@
             }
         },
         {
-            "key": "3Q影视",
-            "name": "🍊3Q影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XBPQ/3Q影视.json"
-        },
-        {
             "key": "Vision TV+",
             "name": "🍊Vision TV+",
             "type": 3,
@@ -36018,6 +36008,41 @@
                 "日韩综艺",
                 "欧美综艺"
             ]
+        },
+        {
+            "key": "100BT4K影院",
+            "name": "🍊100BT4K影院",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "主页url": "http://www.100bt4kyy.com/",
+                "二次截取": "",
+                "数组": "li_li clearfix&&</div>",
+                "标题": "title=\"&&\"",
+                "图片": "src=\"&&\"",
+                "副标题": "<span class=\"rgba1\">&&</span>",
+                "链接": "href=\"&&\"",
+                "影片年代": "年份：&&</dd>",
+                "影片地区": "地区：&&</dd>",
+                "影片类型": "类型：&&</dd>",
+                "状态": "状态：&&</dd>",
+                "导演": "导演：&&</dd>",
+                "主演": "主演：&&</dd>",
+                "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+des_xy\">&&</div>",
+                "线路二次截取": "",
+                "线路数组": "ptit clearfix&&</div>",
+                "线路标题": ">&&<",
+                "播放二次截取": "",
+                "播放数组": "<ul class=\"ulli clearfix&&</ul>",
+                "倒序": "0",
+                "播放列表": "<a&&</a>",
+                "播放标题": ">&&</a>",
+                "播放链接": "href='&&'",
+                "分类url": "http://www.100bt4kyy.com/search.php?page={catePg}&searchtype=5&tid={cateId}&jq={class}&year={year}",
+                "分类": "电影$1#电视剧$2#综艺$3#动漫$4#纪录片$29#"
+            }
         },
         {
             "key": "风车动漫",
