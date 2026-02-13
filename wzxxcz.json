@@ -1476,6 +1476,24 @@
             "ext": "7lj763gg402i7942463j9j9jh8579590k3hjii5gi4i73l2k5l"
         },
         {
+            "key": "巧技二",
+            "name": "🔍搜搜影视",
+            "type": 3,
+            "api": "csp_qiao2",
+            "playerType": 2,
+            "jar": "https://ncstatic.clewm.net/rsrc/2025/0915/15/e210975c2c794cbc8bb1839b54ac213e.png;md5;939FFBC2941A28CA533F2653FA4B449E",
+            "ext": "7lj763gg402i7942412h849jg1558j9jl8g19213il86316k465719lik158491h179312h4934183ig2l05g9"
+        },
+        {
+            "key": "巧技五",
+            "name": "🔍艘艘影视",
+            "type": 3,
+            "api": "csp_qiao2",
+            "playerType": 2,
+            "jar": "https://ncstatic.clewm.net/rsrc/2025/0915/15/e210975c2c794cbc8bb1839b54ac213e.png;md5;939FFBC2941A28CA533F2653FA4B449E",
+            "ext": "7lj763gg402i7942412h849jg1558j9jl8g19213il86316k465719lik158491h179312hk935886ig2l05g9"
+        },
+        {
             "key": "韩圈",
             "name": "🥯韩圈影视",
             "type": 3,
