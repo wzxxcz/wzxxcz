@@ -1494,6 +1494,16 @@
             "ext": "7lj763gg402i7942412h849jg1558j9jl8g19213il86316k465719lik158491h179312hk935886ig2l05g9"
         },
         {
+            "key": "奴娜",
+            "name": "💡奴娜影视",
+            "type": 3,
+            "api": "csp_AppYsV2",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "https://www.nntv.in/api.php/v1.vod"
+        },
+        {
             "key": "韩圈",
             "name": "🥯韩圈影视",
             "type": 3,
