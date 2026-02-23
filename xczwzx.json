@@ -11219,6 +11219,14 @@
             "api": "./js/耐看.js"
         },
         {
+            "key": "久久影视",
+            "name": "🥇久久影视",
+            "type": 3,
+            "api": "csp_AppYsV2",
+            "playerType": 2,
+            "ext": "http://99cms.jj99.icu:8199/api.php/app/"
+        },
+        {
             "key": "小镇影视",
             "name": "🏙️小镇影视",
             "type": 3,
