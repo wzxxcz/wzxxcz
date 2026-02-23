@@ -4364,6 +4364,19 @@
             "ext": "./XBPQ/韩剧看看.json"
         },
         {
+            "key": "农民",
+            "name": "🧿农民影视",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "jar": "./XBPQ/xcznz.jpg",
+            "ext": {
+                "副标题": "小橙子专属",
+                "请求头": "User-Agent$MOBILE_UA",
+                "编码": "UTF-8",
+                "分类url": "https://vip.wwgz.cn:5200/;;!H"
+            }
+        },
+        {
             "key": "天空影视",
             "name": "☀️天空影视",
             "type": 3,
