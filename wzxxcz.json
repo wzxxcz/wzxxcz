@@ -5054,6 +5054,19 @@
             }
         },
         {
+            "key": "七壹",
+            "name": "💰七壹影视",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://qiyiys.cc",
+                "dataKey": "45452893929B40D9",
+                "dataIv": "45452893929B40D9"
+            }
+        },
+        {
             "key": "芬奇",
             "name": "🐘芬奇影视",
             "type": 3,
