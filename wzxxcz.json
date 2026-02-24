@@ -5054,6 +5054,20 @@
             }
         },
         {
+            "key": "爱影",
+            "name": "💰爱影影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/q16.txt",
+                "dataKey": "dj382hsyqp98kqn8",
+                "dataIv": "dj382hsyqp98kqn8",
+                "search": "mineInfo"
+            }
+        },
+        {
             "key": "七壹",
             "name": "💰七壹影视",
             "type": 3,
