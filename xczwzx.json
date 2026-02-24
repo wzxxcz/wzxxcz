@@ -35852,7 +35852,8 @@
             "searchable": 1,
             "changeable": 1,
             "quickSearch": 1,
-            "filterable": 1
+            "filterable": 1,
+            "类型": "短剧"
         },
         {
             "key": "锦鲤短剧",
@@ -35862,7 +35863,8 @@
             "searchable": 1,
             "changeable": 1,
             "quickSearch": 1,
-            "filterable": 1
+            "filterable": 1,
+            "类型": "短剧"
         },
         {
             "key": "星阁短剧",
@@ -35872,7 +35874,8 @@
             "searchable": 1,
             "changeable": 1,
             "quickSearch": 1,
-            "filterable": 1
+            "filterable": 1,
+            "类型": "短剧"
         },
         {
             "key": "星芽短剧",
