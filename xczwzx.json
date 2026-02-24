@@ -995,8 +995,8 @@
             "ext": "https://m.610pkea.com,https://y2s52n7.com,https://m.hkybqufgh.com,https://m.sizhengxt.com,https://m.9zhoukj.com,https://m.sizhengxt.com,https://m.jiabaide.cn"
         },
         {
-            "key": "金牌Fox",
-            "name": "🏅金牌Fox",
+            "key": "金牌Nox",
+            "name": "🏅金牌Nox",
             "type": 3,
             "api": "csp_AppNox",
             "ext": {
@@ -4615,6 +4615,33 @@
                 "dataIv": "AAdgrdghjfgsABC1",
                 "init": "initV122",
                 "ua": "okhttp/3.10.0"
+            }
+        },
+        {
+            "key": "爱影",
+            "name": "💰爱影影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/q16.txt",
+                "dataKey": "dj382hsyqp98kqn8",
+                "dataIv": "dj382hsyqp98kqn8",
+                "search": "mineInfo"
+            }
+        },
+        {
+            "key": "七壹",
+            "name": "💰七壹影视",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppGet",
+            "ext": {
+                "url": "https://qiyiys.cc",
+                "dataKey": "45452893929B40D9",
+                "dataIv": "45452893929B40D9"
             }
         },
         {
