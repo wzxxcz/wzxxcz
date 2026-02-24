@@ -28,6 +28,12 @@
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/wujiangliu/live-sources/refs/heads/main/电视家.m3u"
         },
         {
+            "name": "港台",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://feer-cdn-bp.xpnb.qzz.io/xnkl.txt"
+        },
+        {
             "name": "wangziduoqing",
             "type": 0,
             "ua": "okhttp/5.3.2",
