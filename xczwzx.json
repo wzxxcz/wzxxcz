@@ -1115,18 +1115,6 @@
             "ext": "https://fishapi.wya6.com/fish/fishhxq.php"
         },
         {
-            "key": "花柳",
-            "name": "🌸花柳影视",
-            "type": 3,
-            "api": "csp_AppFox",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "host": "http://nico.oiio.fun",
-                "ver": 2
-            }
-        },
-        {
             "key": "麒麟",
             "name": "🐲麒麟影院",
             "type": 3,
@@ -1139,6 +1127,18 @@
             }
         },
         {
+            "key": "咕噜",
+            "name": "🐨咕噜影视",
+            "type": 3,
+            "changeable": 0,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "http://www.yingsw.top",
+                "key": "guluyinghua_123",
+                "sign": "679543610991810f19698c187e5e106e"
+            }
+        },
+        {
             "key": "搜搜",
             "name": "🔎搜搜影视",
             "type": 3,
@@ -1146,17 +1146,6 @@
             "searchable": 1,
             "changeable": 1,
             "ext": "https://www.zjcvod.com"
-        },
-        {
-            "key": "火花",
-            "name": "🔥火花影视",
-            "type": 3,
-            "api": "csp_AppFox",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "host": "http://huohua.itcxo.cn"
-            }
         },
         {
             "key": "顾我",
@@ -2210,21 +2199,6 @@
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
             }
-        },
-        {
-            "key": "木兮影视",
-            "name": "🍊木兮影视",
-            "type": 3,
-            "api": "csp_Symx",
-            "ext": "https://film.symx.club"
-        },
-        {
-            "key": "零度影视1",
-            "name": "❄️零度影院",
-            "type": 3,
-            "api": "csp_Lingdu",
-            "searchable": 1,
-            "filterable": 1
         },
         {
             "key": "厂长影视",
@@ -4691,21 +4665,8 @@
             "ext": {
                 "site": "https://uututv-1319209748.cos.ap-shanghai.myqcloud.com/uutuv4.txt",
                 "dataKey": "UrWKPnmQWJA8AQzd",
-                "dataIv": "UrWKPnmQWJA8AQzd"
-            }
-        },
-        {
-            "key": "小鸟",
-            "name": "🦜小鸟影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://154.222.26.58:7788",
-                "dataKey": "guodan2004031600",
-                "dataIv": "guodan2004031600",
-                "token": "fd035ffa03d62775add295bfbb7d99c131e0bb49bb9451309b0ffc4df1631146"
+                "dataIv": "UrWKPnmQWJA8AQzd",
+                "ua": "okhttp/3.10.0"
             }
         },
         {
@@ -4743,18 +4704,6 @@
                 "site": "http://xywlkj.oss-cn-beijing.aliyuncs.com/wp-content/uploads/2024/12/1.txt",
                 "dataKey": "xmyxmyxywlkjxywl",
                 "dataIv": "xmyxmyxywlkjxywl"
-            }
-        },
-        {
-            "key": "小白",
-            "name": "🐩小白影视",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://uutu.efjhl.cn",
-                "dataKey": "uXVVRRuaPnjEfsX5",
-                "dataIv": "uXVVRRuaPnjEfsX5"
             }
         },
         {
