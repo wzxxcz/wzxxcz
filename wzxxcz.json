@@ -1591,9 +1591,10 @@
             "searchable": 1,
             "changeable": 1,
             "ext": {
-                "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/pgqj.json",
-                "dataKey": "kj37zs29q22jk96t",
-                "dataIv": "kj37zs29q22jk96t",
+                "url": "http://117.50.204.35:520",
+                "dataKey": "ca94b06ca3c7d80e",
+                "dataIv": "ca94b06ca3c7d80e",
+                "search": "gftvvvvklod",
                 "init": "initV122",
                 "ua": "okhttp/3.10.0"
             }
@@ -1641,9 +1642,9 @@
             "key": "魔方",
             "name": "🧿魔方影视",
             "type": 3,
+            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppGet",
             "ext": {
                 "url": "http://www.613mf4k12.top",
                 "dataKey": "1234567887654321",
@@ -2247,9 +2248,10 @@
             "searchable": 1,
             "changeable": 1,
             "ext": {
-                "site": "https://tiantangwulu.oss-cn-shanghai.aliyuncs.com/zhuzhuxia.txt",
-                "dataKey": "j8sr6d93yp49db3p",
-                "dataIv": "j8sr6d93yp49db3p",
+                "site": "https://tiantangyoulu.oss-cn-beijing.aliyuncs.com/aoteman.txt",
+                "dataKey": "lp3d4t53y9t5db8y",
+                "dataIv": "lp3d4t53y9t5db8y",
+                "search": "searchList9",
                 "init": "initV122",
                 "ua": "okhttp/3.10.0"
             }
@@ -2271,9 +2273,9 @@
             "key": "茉莉",
             "name": "🌸茉莉影视",
             "type": 3,
+            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppGet",
             "ext": {
                 "site": "https://gitee.com/wmmoliill/wimg/raw/master/img/bk/9.txt",
                 "dataKey": "88689667dce61725",
@@ -2284,9 +2286,9 @@
             "key": "驿站",
             "name": "🏩驿站影视",
             "type": 3,
+            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppGet",
             "ext": {
                 "site": "https://dyyztvappapigoodgx.68.gy:12689/ciwk28vu38io8/apiurl.txt",
                 "dataKey": "dyyztvapiappyyds",
@@ -2393,9 +2395,9 @@
             "key": "白鸽",
             "name": "🕊️白鸽影视",
             "type": 3,
+            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppGet",
             "ext": {
                 "url": "https://cy.baige.asia",
                 "dataKey": "599D0FE5178642FD",
@@ -5149,9 +5151,9 @@
             "key": "七壹",
             "name": "💰七壹影视",
             "type": 3,
+            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppGet",
             "ext": {
                 "url": "https://qiyiys.cc",
                 "dataKey": "45452893929B40D9",
@@ -5189,8 +5191,9 @@
             "key": "缘梦",
             "name": "🍊缘梦影视",
             "type": 3,
-            "searchable": 1,
             "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
             "ext": {
                 "url": "http://165.99.42.137:5432",
                 "dataKey": "1234567890987654",
@@ -5201,8 +5204,9 @@
             "key": "王子",
             "name": "🤴王子影视",
             "type": 3,
-            "searchable": 1,
             "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
             "ext": {
                 "url": "https://app.95112475.xyz",
                 "dataKey": "5a9w6x58dsq6z3a6",
