@@ -1551,18 +1551,6 @@
             "ext": "https://fishapi.wya6.com/fish/fishhxq.php"
         },
         {
-            "key": "花柳",
-            "name": "🌸花柳影视",
-            "type": 3,
-            "api": "csp_AppFox",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "host": "http://nico.oiio.fun",
-                "ver": 2
-            }
-        },
-        {
             "key": "麒麟",
             "name": "🐲麒麟影院",
             "type": 3,
