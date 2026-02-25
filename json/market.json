@@ -42,6 +42,18 @@
         "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.0.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0"
+      },
+      {
+        "name": "电视端(64位)",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.0_5.x.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "3.7.0(5.x)"
+      },
+      {
+        "name": "电视端(32位)",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.0_5.x.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "3.7.0(5.x)"
       }
     ]
   },
