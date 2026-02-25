@@ -2358,22 +2358,6 @@
             }
         },
         {
-            "key": "橘子",
-            "name": "🍊橘子影视",
-            "type": 3,
-            "api": "csp_AppNox",
-            "ext": {
-                "url": "https://nox.jm4k.top",
-                "header": {
-                    "content-type": "application/json",
-                    "x-app-signature": "6D:77:A5:59:EA:EA:2E:4E:CC:E3:FE:B9:5D:8D:B0:F0:12:17:11:AD:82:97:87:FA:F7:88:18:37:6A:63:4F:38",
-                    "x-app-package": "com.gnzhis.nru",
-                    "x-app-version-code": "2",
-                    "x-app-version-name": "2.4.1"
-                }
-            }
-        },
-        {
             "key": "星影",
             "name": "🌠星影影视",
             "type": 3,
