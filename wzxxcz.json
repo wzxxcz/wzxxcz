@@ -2648,21 +2648,6 @@
             }
         },
         {
-            "key": "木兮影视",
-            "name": "🍊木兮影视",
-            "type": 3,
-            "api": "csp_Symx",
-            "ext": "https://film.symx.club"
-        },
-        {
-            "key": "零度影视1",
-            "name": "❄️零度影院",
-            "type": 3,
-            "api": "csp_Lingdu",
-            "searchable": 1,
-            "filterable": 1
-        },
-        {
             "key": "厂长影视",
             "name": "🏭厂长影视",
             "type": 3,
@@ -5127,7 +5112,8 @@
             "ext": {
                 "site": "https://uututv-1319209748.cos.ap-shanghai.myqcloud.com/uutuv4.txt",
                 "dataKey": "UrWKPnmQWJA8AQzd",
-                "dataIv": "UrWKPnmQWJA8AQzd"
+                "dataIv": "UrWKPnmQWJA8AQzd",
+                "ua": "okhttp/3.10.0"
             }
         },
         {
@@ -5179,18 +5165,6 @@
                 "site": "http://xywlkj.oss-cn-beijing.aliyuncs.com/wp-content/uploads/2024/12/1.txt",
                 "dataKey": "xmyxmyxywlkjxywl",
                 "dataIv": "xmyxmyxywlkjxywl"
-            }
-        },
-        {
-            "key": "小白",
-            "name": "🐩小白影视",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://uutu.efjhl.cn",
-                "dataKey": "uXVVRRuaPnjEfsX5",
-                "dataIv": "uXVVRRuaPnjEfsX5"
             }
         },
         {
