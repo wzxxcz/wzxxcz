@@ -35659,7 +35659,7 @@
                 "主页url": "https://www.70ys.site/",
                 "二次截取": "",
                 "数组": "weui-media-box__hd&&</div>",
-                "标题": "<h4*>&&</h4>",
+                "标题": "weui-media-box__title\">&&<",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"remarks\">&&</span>",
                 "链接": "/index.php/vod/play/id/+/id/&&\"",
