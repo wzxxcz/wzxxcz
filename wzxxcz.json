@@ -35672,7 +35672,7 @@
                 "简介": "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！+weui-media-box__bd\">&&</div>",
                 "线路二次截取": "",
                 "线路数组": "tips pull-right&&</div>",
-                "线路标题": "<div class=\"weui-panel__hd\"><span class=\"tips pull-right\"></span>&&</div>",
+                "线路标题": "</span>&&</div>",
                 "播放二次截取": "",
                 "播放数组": "stui-playlist clearfix&&</ul>",
                 "倒序": "0",
