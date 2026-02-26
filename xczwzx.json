@@ -1130,8 +1130,9 @@
             "key": "咕噜",
             "name": "🐨咕噜影视",
             "type": 3,
-            "changeable": 0,
             "api": "csp_AppFox",
+            "searchable": 1,
+            "changeable": 1,
             "ext": {
                 "host": "http://www.yingsw.top",
                 "key": "guluyinghua_123",
@@ -1818,19 +1819,6 @@
                 "search": "searchList9",
                 "init": "initV122",
                 "ua": "okhttp/3.10.0"
-            }
-        },
-        {
-            "key": "气球",
-            "name": "🍊气球影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://vv.229d.cn",
-                "dataKey": "8888888888888888",
-                "dataIv": "8888888888888888"
             }
         },
         {
@@ -4781,9 +4769,9 @@
             "key": "小猫",
             "name": "🐈小猫影视",
             "type": 3,
+            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppGet",
             "ext": {
                 "site": "http://xywlkj.oss-cn-beijing.aliyuncs.com/wp-content/uploads/2024/12/1.txt",
                 "dataKey": "xmyxmyxywlkjxywl",
