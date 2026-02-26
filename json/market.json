@@ -15,43 +15,43 @@
     "list": [
       {
         "name": "手机端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-arm64_v8a-3.7.0.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-arm64_v8a-3.7.0.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0"
       },
       {
         "name": "手机端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-armeabi_v7a-3.7.0.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-armeabi_v7a-3.7.0.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0"
       },
       {
         "name": "电视端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.0.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.0.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.0.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.0.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0"
       },
       {
         "name": "电视端(海信)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.0.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.0.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0"
       },
       {
         "name": "电视端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.0_5.x.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.0_5.x.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0(5.x)"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.0_5.x.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.0_5.x.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.0(5.x)"
       }
@@ -62,31 +62,31 @@
     "list": [
       {
         "name": "手机端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-sjb-5.0.1.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-sjb-5.0.1.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "5.0.1"
       },
       {
         "name": "手机端(模拟器)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-sjb-5.0.1.-.mnq.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-sjb-5.0.1.-.mnq.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "5.0.1"
       },
       {
         "name": "电视端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-64w-5.0.1.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-64w-5.0.1.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "5.0.1"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-32w-5.0.1.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-32w-5.0.1.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "5.0.1"
       },
       {
         "name": "电视端(海信)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.0.apk",
+        "url": "https://gh-proxy.com/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.0.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "5.0.1"
       }
@@ -97,25 +97,25 @@
     "list": [
       {
         "name": "手机端(64位)",
-        "url": "https://gh.nxnow.top/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/mobile-arm64_v8a.apk",
+        "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/mobile-arm64_v8a.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "Fongmi"
       },
       {
         "name": "手机端(32位)",
-        "url": "https://gh.nxnow.top/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/mobile-armeabi_v7a.apk",
+        "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/mobile-armeabi_v7a.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "Fongmi"
       },
       {
         "name": "电视端(64位)",
-        "url": "https://gh.nxnow.top/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/leanback-arm64_v8a.apk",
+        "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/leanback-arm64_v8a.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "Fongmi"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://gh.nxnow.top/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/leanback-armeabi_v7a.apk",
+        "url": "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/Release/fongmi/apk/leanback-armeabi_v7a.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "Fongmi"
       }
