@@ -22,10 +22,22 @@
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt"
         },
         {
+            "name": "飞扬",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://cik07-cos.7moor-fs2.com/im/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/aa2ecd174df6786a/飞扬.txt"
+        },
+        {
             "name": "电视家",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/wujiangliu/live-sources/refs/heads/main/电视家.m3u"
+        },
+        {
+            "name": "sub",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://129.211.14.102:50085/sub?7pVBnFZv=txt"
         },
         {
             "name": "港台",
