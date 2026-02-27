@@ -34,6 +34,12 @@
             "url": "https://gh-proxy.com/https://raw.githubusercontent.com/wujiangliu/live-sources/refs/heads/main/电视家.m3u"
         },
         {
+            "name": "sub",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://129.211.14.102:50085/sub?7pVBnFZv=txt"
+        },
+        {
             "name": "港台",
             "type": 0,
             "ua": "okhttp/5.3.2",
