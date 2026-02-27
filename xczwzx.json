@@ -34,6 +34,12 @@
             "url": "https://feer-cdn-bp.xpnb.qzz.io/xnkl.txt"
         },
         {
+            "name": "港台1",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://ko.zoho.to/ii/09007.txt"
+        },
+        {
             "name": "港奥台国际",
             "type": 0,
             "ua": "okhttp/5.3.2",
@@ -50,12 +56,6 @@
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "http://wangziduoqing.com/yuan/zb.txt"
-        },
-        {
-            "name": "讴歌",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://xn--dkw0c.v.nxog.top/m/tv/?ou=df"
         },
         {
             "name": "咪咕央卫体育",
