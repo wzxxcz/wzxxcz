@@ -1167,6 +1167,35 @@
             "ext": "https://www.zjcvod.com"
         },
         {
+            "key": "奇奇",
+            "name": "🐎奇奇影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "http://110.42.67.221:8009",
+                "dataKey": "123456789abcdefg",
+                "dataIv": "123456789abcdefg",
+                "init": "initV122",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+        {
+            "key": "老鹰",
+            "name": "🦅老鹰影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": "https://maotouyinghubei.oss-cn-wuhan-lr.aliyuncs.com/maotouyinghb.txt",
+                "dataKey": "zxPtEUDGVllIUhDB",
+                "dataIv": "zxPtEUDGVllIUhDB",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+        {
             "key": "顾我",
             "name": "🐘顾我影视",
             "type": 3,
@@ -4743,10 +4772,9 @@
             "searchable": 1,
             "changeable": 1,
             "ext": {
-                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/q16.txt",
-                "dataKey": "dj382hsyqp98kqn8",
-                "dataIv": "dj382hsyqp98kqn8",
-                "search": "mineInfo"
+                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/q18.txt",
+                "dataKey": "fff32466kkf87666",
+                "dataIv": "fff32466kkf87666"
             }
         },
         {
@@ -35789,13 +35817,6 @@
             "ext": "./XBPQ/哆啦新番社.json"
         },
         {
-            "key": "NT动漫",
-            "name": "🤣NT动漫",
-            "type": 3,
-            "api": "./js/drpy2.min.js",
-            "ext": "./js/NT动漫.js"
-        },
-        {
             "key": "Anime1",
             "name": "🤣A1动漫",
             "type": 3,
@@ -35813,18 +35834,6 @@
                 "siteKey": "rectangleadsadxa",
                 "listKey": "aassddwwxxllsx1x",
                 "parsesKey": "aassddwwxxllsx1x"
-            }
-        },
-        {
-            "key": "冬日动漫",
-            "name": "⛄冬日动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://www.drdm.fun",
-                "dataKey": "qE2nD0rL1lH4uP9r",
-                "dataIv": "qE2nD0rL1lH4uP9r"
             }
         },
         {
@@ -35885,30 +35894,6 @@
                 "url": "https://www.gugu3.com",
                 "dataKey": "nKfZ8KX6JTNWRzTD",
                 "dataIv": "nKfZ8KX6JTNWRzTD"
-            }
-        },
-        {
-            "key": "云屋动漫",
-            "name": "🤣云屋动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://www.yunwuee.icu",
-                "dataKey": "ygcnb9bdcmb8aeiw",
-                "dataIv": "ygcnb9bdcmb8aeiw"
-            }
-        },
-        {
-            "key": "卡卡动漫",
-            "name": "🤣卡卡动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://154.201.90.53:8002",
-                "dataKey": "123456789abcdefg",
-                "dataIv": "123456789abcdefg"
             }
         },
         {
