@@ -15,45 +15,45 @@
     "list": [
       {
         "name": "手机端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-arm64_v8a-3.7.0.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-arm64_v8a-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.7.0"
+        "version": "3.7.2"
       },
       {
         "name": "手机端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-armeabi_v7a-3.7.0.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/mobile-armeabi_v7a-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.7.0"
+        "version": "3.7.2"
       },
       {
         "name": "电视端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.0.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.7.0"
+        "version": "3.7.2"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.0.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.7.0"
+        "version": "3.7.2"
       },
       {
         "name": "电视端(海信)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.0.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.7.0"
+        "version": "3.7.2"
       },
       {
         "name": "电视端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.0_5.x.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-arm64_v8a-3.7.2_5.x.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.7.0(5.x)"
+        "version": "3.7.2(5.x)"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.0_5.x.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/leanback-armeabi_v7a-3.7.2_5.x.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.7.0(5.x)"
+        "version": "3.7.2(5.x)"
       }
     ]
   },
@@ -62,33 +62,33 @@
     "list": [
       {
         "name": "手机端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-sjb-5.0.1.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-sjb-5.0.3.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.0.1"
+        "version": "5.0.3"
       },
       {
         "name": "手机端(模拟器)",
         "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-sjb-5.0.1.-.mnq.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.0.1"
+        "version": "5.0.3"
       },
       {
         "name": "电视端(64位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-64w-5.0.1.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-64w-5.0.3.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.0.1"
+        "version": "5.0.3"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-32w-5.0.1.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/OKysPro-dsb-32w-5.0.3.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.0.1"
+        "version": "5.0.3"
       },
       {
         "name": "电视端(海信)",
-        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.0.apk",
+        "url": "https://gh.nxnow.top/https://github.com/wzxxcz/OK-APP/releases/download/OK-APP/hxzb-OKys-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.0.1"
+        "version": "5.0.3"
       }
     ]
   },
