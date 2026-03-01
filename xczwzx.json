@@ -36392,7 +36392,7 @@
             "ext": "./json/quarkShare.json"
         },
         {
-            "key": "UC",
+            "key": "UC云盘",
             "name": "🍊我的UC",
             "type": 3,
             "api": "csp_PanUc",
