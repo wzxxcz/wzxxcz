@@ -11540,13 +11540,6 @@
             "ext": "./XBPQ/面包影视.json"
         },
         {
-            "key": "永乐影视",
-            "name": "🍹永乐影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/永乐影视.json"
-        },
-        {
             "key": "剧圈影视",
             "name": "🥯剧圈影视",
             "type": 3,
