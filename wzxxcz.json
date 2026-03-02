@@ -11540,13 +11540,6 @@
             "ext": "./XBPQ/面包影视.json"
         },
         {
-            "key": "来看影视",
-            "name": "🍳来看影视",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "ext": "./XYQHiker/来看影视.json"
-        },
-        {
             "key": "雪糕TV",
             "name": "🍨雪糕TV",
             "type": 3,
