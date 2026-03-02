@@ -11104,13 +11104,6 @@
             "ext": "./XBPQ/面包影视.json"
         },
         {
-            "key": "剧圈影视",
-            "name": "🥯剧圈影视",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "ext": "./XYQHiker/剧圈影视.json"
-        },
-        {
             "key": "来看影视",
             "name": "🍳来看影视",
             "type": 3,
