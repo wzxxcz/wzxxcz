@@ -36104,6 +36104,17 @@
             "类型": "短剧"
         },
         {
+            "key": "碎片",
+            "name": "🗞️碎片短剧",
+            "type": 3,
+            "api": "csp_SuipianDJ",
+            "searchable": 1,
+            "changeable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "genre": "shortdrama"
+        },
+        {
             "key": "星芽短剧",
             "name": "🌟星芽短剧",
             "type": 3,
@@ -36112,7 +36123,7 @@
             "changeable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "类型": "短剧"
+            "genre": "shortdrama"
         },
         {
             "key": "河马短剧",
@@ -36134,7 +36145,7 @@
             "changeable": 1,
             "quickSearch": 1,
             "filterable": 1,
-            "类型": "短剧"
+            "genre": "shortdrama"
         },
         {
             "key": "短剧场短剧",
