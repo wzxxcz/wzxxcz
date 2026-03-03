@@ -4889,19 +4889,6 @@
             }
         },
         {
-            "key": "气球",
-            "name": "🍊气球影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "url": "https://vv.229d.cn",
-                "dataKey": "8888888888888888",
-                "dataIv": "8888888888888888"
-            }
-        },
-        {
             "key": "py_可可",
             "name": "🍊可可影视",
             "type": 3,
