@@ -2304,22 +2304,6 @@
             }
         },
         {
-            "key": "粉象",
-            "name": "🐘粉象影视",
-            "type": 3,
-            "api": "csp_AppNox",
-            "ext": {
-                "url": "http://64.64.252.93:8080",
-                "header": {
-                    "content-type": "application/json",
-                    "x-app-signature": "DD:78:90:EA:BD:D3:C2:EA:A4:E1:42:2B:CF:3E:A2:9F:9C:0E:BF:94:1E:85:43:B5:3C:FE:4E:1B:51:39:22:98",
-                    "x-app-package": "com.fenxiang.make",
-                    "x-app-version-code": "1",
-                    "x-app-version-name": "1.0.0"
-                }
-            }
-        },
-        {
             "key": "片喵",
             "name": "🐈片喵影视",
             "type": 3,
