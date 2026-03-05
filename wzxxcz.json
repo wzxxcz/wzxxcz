@@ -35835,7 +35835,7 @@
         },
         {
             "key": "黄瓜影视",
-            "name": "🥒黄瓜影",
+            "name": "🥒黄瓜影视",
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
@@ -35843,11 +35843,11 @@
                 "编码": "UTF-8",
                 "主页url": "https://www.pjqdz.com/",
                 "二次截取": "",
-                "数组": "/voddetail/&&</a>",
+                "数组": "movie-list-item&&</a>",
                 "标题": "title=\"&&影片信息\"",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<div class=\"movie-title txtHide\">&&</div>",
-                "链接": "/voddetail/+&&\"",
+                "链接": "href=\"&&\"",
                 "影片年代": "年份：&&</p>",
                 "影片地区": "地区：&&</p>",
                 "影片类型": "类型：&&</p>",
