@@ -5271,19 +5271,6 @@
             }
         },
         {
-            "key": "芬奇",
-            "name": "🐘芬奇影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "site": "https://wsapi.dafenqi.mom/yuming.txt",
-                "dataKey": "bH5mI8iK0tK7aQ5x",
-                "dataIv": "bH5mI8iK0tK7aQ5x"
-            }
-        },
-        {
             "key": "橘子",
             "name": "🍊橘子影视",
             "type": 3,
