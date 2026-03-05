@@ -1832,6 +1832,20 @@
             }
         },
         {
+            "key": "爱影",
+            "name": "🍊爱影影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/q19.txt",
+                "dataKey": "fff32466kkfff616",
+                "dataIv": "fff32466kkfff616",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+        {
             "key": "小猪",
             "name": "🐗小猪影视",
             "type": 3,
