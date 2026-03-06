@@ -26,6 +26,24 @@
         "version": "3.7.3"
       },
       {
+        "name": "安卓4.x-OK影视-2.5.0-修复版",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az4.x-OKys-2.5.0-xfb.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "2.5.0"
+      },
+      {
+        "name": "安卓5专版-0K影视-32位-3.7.2",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az4.x-OKys-2.5.0-xfb.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "3.7.2"
+      },
+      {
+        "name": "安卓5专版-OK影视-64位-3.7.2",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az4.x-OKys-2.5.0-xfb.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "3.7.2"
+      },
+      {
         "name": "电视端(64位)",
         "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/leanback-arm64_v8a-3.7.3.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
