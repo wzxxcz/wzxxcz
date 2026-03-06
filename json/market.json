@@ -108,13 +108,19 @@
     "list": [
       {
         "name": "手机端",
-        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscsg-3.2.7.1.apk",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscsjb_3.2.8.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "3.2.7.1"
+        "version": "3.2.8"
+      },
+      {
+        "name": "电视端(安卓4)",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az4ysc3.0.6.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "3.0.6"
       },
       {
         "name": "电视端",
-        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscds_6.1.9_opt_sign.apk",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscdsb_6.1.9.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "6.1.9"
       },
