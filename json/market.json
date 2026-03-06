@@ -172,10 +172,16 @@
         "version": "1.09"
       },
       {
-        "name": "酷我音乐手机版(64位)",
-        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/kwyy-12.0.6.4-VIP-v8a.apk",
+        "name": "酷我音乐手机版",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/kwyy_12.0.8.5.12085.-bydm.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "12.0.6.4"
+        "version": "12.0.8.5"
+      },
+      {
+        "name": "酷我音乐车机版",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/kwyycjb.7.1.8.21hyb_dm.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "12.0.8.5"
       },
       {
         "name": "炫音KTV",
