@@ -26,20 +26,20 @@
         "version": "3.7.3"
       },
       {
-        "name": "安卓4专版",
+        "name": "安卓4电视端",
         "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az4.x-OKys-2.5.0-xfb.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "2.5.0"
       },
       {
-        "name": "安卓5专版",
-        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az4.x-OKys-2.5.0-xfb.apk",
+        "name": "安卓5电视端(32位)",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az5zb-OKys-32w-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.2"
       },
       {
-        "name": "安卓5专版",
-        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az4.x-OKys-2.5.0-xfb.apk",
+        "name": "安卓5电视端(64位)",
+        "url": "https://gh-proxy.org/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/az5zb-OKys-64w-3.7.2.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.7.2"
       },
