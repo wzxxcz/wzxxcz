@@ -106,12 +106,6 @@
             "url": "https://gitee.com/yimi321/tv/raw/master/tv.png"
         },
         {
-            "name": "CXS",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://16227.kstore.space/cxs.txt"
-        },
-        {
             "name": "guovin",
             "type": 0,
             "ua": "okhttp/5.3.2",
