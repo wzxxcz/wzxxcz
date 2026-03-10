@@ -40,6 +40,12 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/tushen6/Tomorrow/refs/heads/master/TV/lzxw.txt"
         },
         {
+            "name": "王子",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://wangziduoqing.com/yuan/zb.txt"
+        },
+        {
             "name": "光辉",
             "type": 0,
             "ua": "okhttp/5.3.2",
