@@ -35857,7 +35857,7 @@
                 "主页url": "https://www.jyhgdl.com/",
                 "二次截取": "",
                 "数组": "lazyload&&</p>",
-                "标题": "title=\"&&\"",
+                "标题": "<a*>&&</a>",
                 "图片": "data-original=\"&&\"",
                 "副标题": "<span class=\"video-title text-nowrap ml-xs-0 mr-xs-0\">&&</span>",
                 "链接": "href=\"&&\"",
