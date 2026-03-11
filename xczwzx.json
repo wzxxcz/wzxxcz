@@ -969,6 +969,22 @@
             "api": "csp_Gz360"
         },
         {
+            "key": "金牌",
+            "name": "🏅金牌",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://qj3.ggtvb.cc",
+                "dataKey": "eecbio48dsq13kkk",
+                "dataIv": "eecbio48dsq13kkk",
+                "search": "searchList4",
+                "init": "initV122",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+        {
             "key": "金牌影视",
             "name": "🏅金牌影视",
             "type": 3,
