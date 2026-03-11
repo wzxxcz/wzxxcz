@@ -130,19 +130,7 @@
             "url": "http://ko.zoho.to/ii/32799.txt"
         },
         {
-            "name": "sub",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://129.211.14.102:50085/sub?7pVBnFZv=txt"
-        },
-        {
             "name": "港台",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://feer-cdn-bp.xpnb.qzz.io/xnkl.txt"
-        },
-        {
-            "name": "港台1",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "http://ko.zoho.to/ii/09007.txt"
@@ -158,12 +146,6 @@
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://im5k.fun/vip.m3u"
-        },
-        {
-            "name": "wangziduoqing",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://wangziduoqing.com/yuan/zb.txt"
         },
         {
             "name": "咪咕央卫体育",
@@ -214,7 +196,7 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/q1017673817/iptvz/refs/heads/main/zubo_all.txt"
         },
         {
-            "name": "壹米",
+            "name": "米米",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gitee.com/yimi321/ymys/raw/master/lib/tv.png"
@@ -254,12 +236,6 @@
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gongdian.top/tv/iptv"
-        },
-        {
-            "name": "潇雨",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://ds65.tv1288.xyz"
         },
         {
             "name": "剧迷宝",
