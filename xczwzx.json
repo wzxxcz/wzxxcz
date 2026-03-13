@@ -483,6 +483,19 @@
             "api": "./js/荐片.js"
         },
         {
+            "key": "仓鼠",
+            "name": "🐹仓鼠影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://cs450appcms.cs4k.top",
+                "dataKey": "cD7wZ7iY6qN3sU1z",
+                "dataIv": "cD7wZ7iY6qN3sU1z"
+            }
+        },
+        {
             "key": "麻雀",
             "name": "🐦麻雀1080P",
             "type": 3,
