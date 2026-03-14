@@ -16278,7 +16278,7 @@
                 "播放二次截取": "",
                 "播放数组": "anthology-list-play size&&</ul>",
                 "倒序": "0",
-                "播放列表": "<a&&/a>",
+                "播放列表": "<li&&/li>",
                 "播放标题": ">&&<",
                 "播放链接": "href=\"&&\"",
                 "分类url": "https://www.yytvs.com/vshow/{cateId}--------{catePg}---{year}.html",
