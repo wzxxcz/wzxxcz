@@ -698,9 +698,8 @@
             "type": 3,
             "api": "csp_PanWebShareCloudLJ",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "style": {
                 "type": "list",
                 "ratio": 1.433
@@ -721,9 +720,8 @@
             "type": 3,
             "api": "csp_PanWebShareCloudHM",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "style": {
                 "type": "list",
                 "ratio": 1.433
@@ -743,9 +741,8 @@
             "type": 3,
             "api": "csp_PanWebShareCloudKF",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "style": {
                 "type": "list",
                 "ratio": 1.433
@@ -764,9 +761,8 @@
             "type": 3,
             "api": "csp_PanWebShareCloudPT",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "style": {
                 "type": "list"
             },
@@ -778,9 +774,8 @@
             "type": 3,
             "api": "csp_PanWebShareCloud123",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "style": {
                 "type": "list",
                 "ratio": 1.433
@@ -808,6 +803,9 @@
             "name": "🍊即刻4K",
             "type": 3,
             "api": "csp_Jike",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "style": {
                 "type": "list"
             },
@@ -818,6 +816,9 @@
             "name": "🍊双星4K",
             "type": 3,
             "api": "csp_ShuangXing",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "style": {
                 "type": "list"
             },
@@ -828,6 +829,9 @@
             "name": "🧑人人4K",
             "type": 3,
             "api": "csp_RenRen",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "timeout": 60
         },
         {
@@ -36353,7 +36357,7 @@
             "genre": "shortdrama"
         },
         {
-            "key": "碎片",
+            "key": "碎片短剧",
             "name": "🗞️碎片短剧",
             "type": 3,
             "api": "csp_SuipianDJ",
