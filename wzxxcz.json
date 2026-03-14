@@ -798,6 +798,9 @@
             "name": "🌾米搜4K4K弹幕",
             "type": 3,
             "api": "csp_MiSou",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "timeout": 60
         },
         {
@@ -852,6 +855,9 @@
             "name": "🍊百酷搜索",
             "type": 3,
             "api": "csp_Baiku",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
             "timeout": 60
         },
         {
