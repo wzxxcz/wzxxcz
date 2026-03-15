@@ -5310,6 +5310,16 @@
             "api": "./py/可可.py"
         },
         {
+            "key": "熊猫秒播",
+            "name": "🐼熊猫秒播",
+            "type": 3,
+            "changeable": 1,
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "api": "./py/熊猫秒播.py"
+        },
+        {
             "key": "黄瓜影视",
             "name": "🥒黄瓜影视",
             "type": 3,
