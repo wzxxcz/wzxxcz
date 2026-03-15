@@ -10,6 +10,12 @@
             "url": "https://gitee.com/jin-xueling/cinematography/raw/master/json.txt"
         },
         {
+            "name": "酒店",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://129.211.14.102:50085/sub?tv.sohu.blog=txt"
+        },
+        {
             "name": "壹米",
             "type": 0,
             "ua": "okhttp/5.3.2",
