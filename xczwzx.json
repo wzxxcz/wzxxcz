@@ -1011,22 +1011,6 @@
             "ext": "https://m.hkybqufgh.com,https://m.sizhengxt.com,https://m.9zhoukj.com,https://m.sizhengxt.com,https://m.jiabaide.cn"
         },
         {
-            "key": "金牌Nox",
-            "name": "🏅金牌Nox",
-            "type": 3,
-            "api": "csp_AppNox",
-            "ext": {
-                "url": "https://jp5.ggtvb.cc",
-                "header": {
-                    "content-type": "application/json",
-                    "x-app-signature": "11:05:5B:0E:DD:14:6A:96:38:28:CB:29:7D:5F:04:57:3F:D6:EC:6A:C4:54:4F:4D:44:72:0A:C1:8E:DD:A9:58",
-                    "x-app-package": "cc.xzsc.user",
-                    "x-app-version-code": "12",
-                    "x-app-version-name": "5.2"
-                }
-            }
-        },
-        {
             "key": "柠檬",
             "name": "🍋柠檬影院",
             "type": 3,
