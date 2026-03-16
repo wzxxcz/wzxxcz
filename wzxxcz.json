@@ -1076,6 +1076,15 @@
             "timeout": 60
         },
         {
+      "key": "至臻清风",
+      "name": "清风徐来",
+      "type": 4,
+      "api": "http://sspa8.top:8100/php/清风.php",
+      "searchable": 1,
+      "quickSearch": 1,
+      "changeable": 0
+    },
+        {
             "key": "大米影视",
             "name": "🍚大米影视",
             "type": 3,
