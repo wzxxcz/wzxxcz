@@ -1079,7 +1079,7 @@
       "key": "至臻清风",
       "name": "清风徐来",
       "type": 4,
-      "api": "./py/清风.php",
+      "api": "http://sspa8.top:8100/php/清风.php",
       "searchable": 1,
       "quickSearch": 1,
       "changeable": 0
