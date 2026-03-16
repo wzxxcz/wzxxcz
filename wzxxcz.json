@@ -1673,6 +1673,16 @@
             "changeable": 1
         },
         {
+            "key": "乌云影视",
+            "name": "☁️乌云影视",
+            "type": 4,
+            "api": "https://api.uumnet.com/tvbox/php/wooyun.php",
+            "playUrl": "",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
             "key": "py_肥猫_APP",
             "name": " 🐱肥猫影视",
             "type": 3,
