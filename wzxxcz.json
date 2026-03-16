@@ -1067,16 +1067,16 @@
             "timeout": 60
         },
         {
-      "key": "多多a",
-      "name": "🔮多多在线",
-      "type": 3,
-      "style": {
-        "type": "rect",
-        "ratio": 1.485
-      },
-      "api": "./py/AppToV5.py",
-      "ext": "http://107.151.246.141:8762"
-    },
+            "key": "多多a",
+            "name": "🔮多多在线",
+            "type": 3,
+            "style": {
+                "type": "rect",
+                "ratio": 1.485
+            },
+            "api": "./py/AppToV5.py",
+            "ext": "http://107.151.246.141:8762"
+        },
         {
             "key": "大米影视",
             "name": "🍚大米影视",
@@ -35522,7 +35522,7 @@
                 "线路数组": "module-tab-item tab-item&&/small>",
                 "线路标题": "<span>&&</span>",
                 "播放二次截取": "",
-                "播放数组": "module-play-list-content&&</div></div>", 
+                "播放数组": "module-play-list-content&&</div></div>",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
                 "播放标题": "<span>&&</span>",
