@@ -607,6 +607,32 @@
             "timeout": 60
         },
         {
+      "key": "csp_Netfixtv",
+      "name": "✨☁️至臻4K网盘",
+      "type": 3,
+      "changeable": "0",
+      "quickSearch": 1,
+      "timeout": 15,
+      "api": "csp_Duopan",
+      "filterable": 1,
+      "ext": {
+        "site_urls": [
+          "https://pan.mihdr.top",
+          "https://zhizhen1.top",
+          "https://mihdr.top",
+          "https://www.mihdr.top",
+          "https://www.miqk.cc",
+          "https://zhizhenpan.com",
+          "https://zhizhen8.click",
+          "https://www.zhizhen8.click"
+        ],
+        "url_key": "Netfixtv",
+        "token": "",
+        "ucCookie": "",
+        "quarkCookie": ""
+      }
+    },
+        {
             "key": "至臻",
             "name": "🏆️至臻4K4K",
             "type": 3,
