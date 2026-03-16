@@ -502,15 +502,6 @@
             }
         },
         {
-            "key": "麻雀",
-            "name": "🐦麻雀1080P",
-            "type": 3,
-            "quickSearch": 1,
-            "searchable": 1,
-            "api": "./py/Applzxw.py",
-            "ext": "http://118.89.203.120:8365/"
-        },
-        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
