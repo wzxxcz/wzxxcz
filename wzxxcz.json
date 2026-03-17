@@ -18014,6 +18014,8 @@
             "ext": {
                 "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=c29orjh5c2p0roeqocf6ah8s6c；； drop-history=%7Blog%3A%5B%7B%22name%22%3A%22%u8001%u8205%22%2C%22link%22%3A%22/vod/play/id/187855/sid/1/nid/1.html%22%2C%22part%22%3A%22%u7B2C01%u96C6%22%7D%5D%7D；； undefined=%5B%7B%22name%22%3A%22%u8001%u8205%22%2C%22pic%22%3A%22https%3A//img.picbf.com/upload/vod/20251215-1/84f9fd8b46afd5382c6d7c40559f3e60.jpg%22%2C%22link%22%3A%22/vod/play/id/187855/sid/1/nid/1.html%22%2C%22part%22%3A%22%u7B2C01%u96C6%22%2C%22vod%22%3A%22/vod/play/id/187855/sid/1/nid/1.html%22%7D%5D&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
+                "嗅探词": ".mp4#.m3u8#.flv#hcts-m3u8#index.m3u8",
+                "免嗅": "1",
                 "主页url": "https://www.qiju.cc/",
                 "二次截取": "",
                 "数组": "/vod/detail&&</a>",
