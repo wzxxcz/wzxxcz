@@ -11658,6 +11658,17 @@
             }
         },
         {
+            "key": "星辰影视1",
+            "name": "💧星辰影视1",
+            "type": 3,
+            "api": "csp_XBPQ",
+            "ext": {
+                "分类url": "https://www.sdconglin.com/show/{cateId}-{area}-{by}-{class}-{lang}-{letter}---{catePg}---{year}.html",
+                "分类": "电视剧$2#短剧$36#电影$1#综艺$3#动漫$4",
+                "简介": "display: none;\">&&<"
+            }
+        },
+        {
             "key": "采集之王",
             "name": "🐝采集合集",
             "type": 3,
