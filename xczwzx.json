@@ -4667,6 +4667,17 @@
             }
         },
         {
+            "key": "火猫",
+            "name": "🐈火猫影视",
+            "type": 3,
+            "searchable": 1,
+            "changeable": 1,
+            "api": "csp_AppFox",
+            "ext": {
+                "host": "https://cunchu8.obs.cn-north-4.myhuaweicloud.com/fox.json"
+            }
+        },
+        {
             "key": "爱影",
             "name": "💰爱影影视",
             "type": 3,
