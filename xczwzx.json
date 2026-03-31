@@ -955,22 +955,6 @@
             "api": "csp_Gz360"
         },
         {
-            "key": "爱影影院",
-            "name": "💰爱影影院",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/q20.txt",
-                "dataKey": "ada211sdfsff3261",
-                "dataIv": "ada211sdfsff3261",
-                "init": "initV122",
-                "search": "mineInfo",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
             "key": "金牌",
             "name": "🏅金牌",
             "type": 3,
