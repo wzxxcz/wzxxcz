@@ -422,10 +422,10 @@
             "timeout": 60
         },
         {
-            "key": "六月听书",
-            "name": "🎵六月听书",
+            "key": "世界听书",
+            "name": "🎵世界听书",
             "type": 3,
-            "api": "csp_TingBook",
+            "api": "csp_TingShijie",
             "style": {
                 "type": "list"
             }
