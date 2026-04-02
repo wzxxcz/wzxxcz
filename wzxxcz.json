@@ -5075,6 +5075,20 @@
             }
         },
         {
+            "key": "顾我",
+            "name": "🐘顾我影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "http://117.50.204.35:8090",
+                "dataKey": "ca94b06ca3c7d80e",
+                "dataIv": "ca94b06ca3c7d80e",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+        {
             "key": "爱影",
             "name": "💰爱影影视",
             "type": 3,
