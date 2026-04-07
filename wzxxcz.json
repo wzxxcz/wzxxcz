@@ -2068,9 +2068,9 @@
             "key": "云播1",
             "name": "☁️云播影视1",
             "type": 3,
+            "api": "csp_AppFox",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppFox",
             "ext": {
                 "host": "http://app.hktvyb.cc"
             }
