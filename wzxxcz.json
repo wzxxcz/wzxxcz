@@ -5128,19 +5128,6 @@
             }
         },
         {
-            "key": "驿站",
-            "name": "🍊驿站影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://dyyztvappapigoodgx.68.gy:12689/ciwk28vu38io8/apiurl.txt",
-                "dataKey": "dyyztvapiappyyds",
-                "dataIv": "dyyztvapiappyyds"
-            }
-        },
-        {
             "key": "缘梦",
             "name": "🍊缘梦影视",
             "type": 3,
@@ -5166,19 +5153,6 @@
             }
         },
         {
-            "key": "七壹",
-            "name": "💰七壹影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "url": "https://qiyiys.cc",
-                "dataKey": "45452893929B40D9",
-                "dataIv": "45452893929B40D9"
-            }
-        },
-        {
             "key": "优兔",
             "name": "🐇优兔影视",
             "type": 3,
@@ -5196,9 +5170,9 @@
             "key": "王子",
             "name": "🤴王子影视",
             "type": 3,
-            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
+            "api": "csp_AppGet",
             "ext": {
                 "url": "https://app.95112475.xyz",
                 "dataKey": "5a9w6x58dsq6z3a6",
@@ -36041,18 +36015,6 @@
             }
         },
         {
-            "key": "元咲动漫",
-            "name": "🤣元咲动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://cic.aicg.fun",
-                "dataKey": "2c4h36abd96se10u",
-                "dataIv": "2c4h36abd96se10u"
-            }
-        },
-        {
             "key": "番薯动漫",
             "name": "🥔番薯动漫",
             "type": 3,
@@ -36099,25 +36061,6 @@
                 "dataKey": "qkxnwkfjwpcnwycl",
                 "dataIv": "qkxnwkfjwpcnwycl"
             }
-        },
-        {
-            "key": "米饭动漫",
-            "name": "🍛米饭动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://get.mymifun.com",
-                "dataKey": "GETMIFUNGEIMIFUN",
-                "dataIv": "GETMIFUNGEIMIFUN"
-            }
-        },
-        {
-            "key": "樱花动漫",
-            "name": "🌸樱花动漫",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/樱花动漫.json"
         },
         {
             "key": "巴士动漫",
