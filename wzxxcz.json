@@ -36550,10 +36550,10 @@
             }
         },
         {
-            "key": "UC云盘",
+            "key": "UC网盘",
             "name": "🍊我的UC",
             "type": 3,
-            "api": "csp_PanUc",
+            "api": "csp_PanUC",
             "searchable": 0,
             "filterable": 0,
             "changeable": 0,
