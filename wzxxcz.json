@@ -2032,16 +2032,6 @@
             "ext": "http://101.201.171.207:802/api.php/app/"
         },
         {
-            "key": "晓米",
-            "name": "🍊晓米影视",
-            "type": 3,
-            "api": "csp_AppYsV2",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "http://111.170.58.23:802/api.php/app/"
-        },
-        {
             "key": "超前",
             "name": "🍊超前影视",
             "type": 3,
@@ -2051,18 +2041,6 @@
             "filterable": 1,
             "playerType": 2,
             "ext": "http://chaoqianys.top:91/api.php/app/"
-        },
-        {
-            "key": "恋鱼",
-            "name": "🦈恋鱼影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppFox",
-            "ext": {
-                "host": "http://103.117.137.33:2443",
-                "ver": 2
-            }
         },
         {
             "key": "云播1",
@@ -5016,17 +4994,6 @@
                 "api": "http://dmmax.kuailezhuiju2.com/icciu_api.php/v1.vod",
                 "datasignkey": "6QQNUsP3PkD2ajJCPCY8",
                 "apisignkey": "lvdoutv-1.0.0"
-            }
-        },
-        {
-            "key": "火猫",
-            "name": "🐈火猫影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppFox",
-            "ext": {
-                "host": "https://cunchu8.obs.cn-north-4.myhuaweicloud.com/fox.json"
             }
         },
         {
