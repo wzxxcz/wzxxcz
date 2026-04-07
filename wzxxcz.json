@@ -1504,7 +1504,7 @@
             "searchable": 1,
             "changeable": 1,
             "ext": {
-                "url": "http://110.42.67.221:8009",
+                "url": "http://110.42.67.221:8002",
                 "dataKey": "123456789abcdefg",
                 "dataIv": "123456789abcdefg",
                 "init": "initV122",
@@ -2241,20 +2241,6 @@
                 "字母值": "*",
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
-            }
-        },
-        {
-            "key": "花猪",
-            "name": "🐗花猪影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://tiantangwulu.oss-cn-shanghai.aliyuncs.com/axiba.txt",
-                "dataKey": "h5w3d6g1j9s2h3f6",
-                "dataIv": "h5w3d6g1j9s2h3f6",
-                "ua": "okhttp/3.10.0"
             }
         },
         {
