@@ -11746,6 +11746,14 @@
             "filterable": 0
         },
         {
+      "key": "移动",
+      "name": "💡移动影视",
+      "type": 3,
+      "api": "csp_YDjisu",
+      "searchable": 1,
+      "quickSearch": 1
+    },
+        {
             "key": "海底高清",
             "name": "🥌海底高清",
             "type": 3,
