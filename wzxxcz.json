@@ -891,19 +891,6 @@
             "timeout": 60
         },
         {
-            "key": "AList",
-            "name": "🍊AList合集",
-            "type": 3,
-            "api": "csp_Alist",
-            "searchable": 1,
-            "filterable": 1,
-            "changeable": 0,
-            "style": {
-                "type": "list"
-            },
-            "ext": "./json/alist.json"
-        },
-        {
             "key": "荐片",
             "name": "🐭荐片P2P",
             "api": "csp_JianPian",
@@ -36576,10 +36563,10 @@
             }
         },
         {
-            "key": "百度云盘",
+            "key": "百度网盘",
             "name": "🍊我的百度",
             "type": 3,
-            "api": "csp_PanBaiDu",
+            "api": "csp_PanBaidu",
             "searchable": 0,
             "filterable": 0,
             "changeable": 0,
