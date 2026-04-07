@@ -1072,7 +1072,7 @@
             "searchable": 1,
             "changeable": 1,
             "ext": {
-                "url": "http://110.42.67.221:8009",
+                "url": "http://110.42.67.221:8002",
                 "dataKey": "123456789abcdefg",
                 "dataIv": "123456789abcdefg",
                 "init": "initV122",
@@ -1600,16 +1600,6 @@
             "ext": "http://101.201.171.207:802/api.php/app/"
         },
         {
-            "key": "晓米",
-            "name": "🍊晓米影视",
-            "type": 3,
-            "api": "csp_AppYsV2",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "http://111.170.58.23:802/api.php/app/"
-        },
-        {
             "key": "超前",
             "name": "🍊超前影视",
             "type": 3,
@@ -1621,24 +1611,12 @@
             "ext": "http://chaoqianys.top:91/api.php/app/"
         },
         {
-            "key": "恋鱼",
-            "name": "🦈恋鱼影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppFox",
-            "ext": {
-                "host": "http://103.117.137.33:2443",
-                "ver": 2
-            }
-        },
-        {
             "key": "云播1",
             "name": "☁️云播影视1",
             "type": 3,
+            "api": "csp_AppFox",
             "searchable": 1,
             "changeable": 1,
-            "api": "csp_AppFox",
             "ext": {
                 "host": "http://app.hktvyb.cc"
             }
@@ -1809,20 +1787,6 @@
                 "字母值": "*",
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
-            }
-        },
-        {
-            "key": "花猪",
-            "name": "🐗花猪影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://tiantangwulu.oss-cn-shanghai.aliyuncs.com/axiba.txt",
-                "dataKey": "h5w3d6g1j9s2h3f6",
-                "dataIv": "h5w3d6g1j9s2h3f6",
-                "ua": "okhttp/3.10.0"
             }
         },
         {
@@ -4601,17 +4565,6 @@
             }
         },
         {
-            "key": "火猫",
-            "name": "🐈火猫影视",
-            "type": 3,
-            "searchable": 1,
-            "changeable": 1,
-            "api": "csp_AppFox",
-            "ext": {
-                "host": "https://cunchu8.obs.cn-north-4.myhuaweicloud.com/fox.json"
-            }
-        },
-        {
             "key": "顾我",
             "name": "🐘顾我影视",
             "type": 3,
@@ -4696,19 +4649,6 @@
             }
         },
         {
-            "key": "驿站",
-            "name": "🍊驿站影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://dyyztvappapigoodgx.68.gy:12689/ciwk28vu38io8/apiurl.txt",
-                "dataKey": "dyyztvapiappyyds",
-                "dataIv": "dyyztvapiappyyds"
-            }
-        },
-        {
             "key": "缘梦",
             "name": "🍊缘梦影视",
             "type": 3,
@@ -4734,19 +4674,6 @@
             }
         },
         {
-            "key": "七壹",
-            "name": "💰七壹影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "url": "https://qiyiys.cc",
-                "dataKey": "45452893929B40D9",
-                "dataIv": "45452893929B40D9"
-            }
-        },
-        {
             "key": "优兔",
             "name": "🐇优兔影视",
             "type": 3,
@@ -4764,9 +4691,9 @@
             "key": "王子",
             "name": "🤴王子影视",
             "type": 3,
-            "api": "csp_AppGet",
             "searchable": 1,
             "changeable": 1,
+            "api": "csp_AppGet",
             "ext": {
                 "url": "https://app.95112475.xyz",
                 "dataKey": "5a9w6x58dsq6z3a6",
@@ -35609,18 +35536,6 @@
             }
         },
         {
-            "key": "元咲动漫",
-            "name": "🤣元咲动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://cic.aicg.fun",
-                "dataKey": "2c4h36abd96se10u",
-                "dataIv": "2c4h36abd96se10u"
-            }
-        },
-        {
             "key": "番薯动漫",
             "name": "🥔番薯动漫",
             "type": 3,
@@ -35667,25 +35582,6 @@
                 "dataKey": "qkxnwkfjwpcnwycl",
                 "dataIv": "qkxnwkfjwpcnwycl"
             }
-        },
-        {
-            "key": "米饭动漫",
-            "name": "🍛米饭动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://get.mymifun.com",
-                "dataKey": "GETMIFUNGEIMIFUN",
-                "dataIv": "GETMIFUNGEIMIFUN"
-            }
-        },
-        {
-            "key": "樱花动漫",
-            "name": "🌸樱花动漫",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/樱花动漫.json"
         },
         {
             "key": "巴士动漫",
@@ -36102,11 +35998,10 @@
             "style": {
                 "type": "list",
                 "ratio": 1.433
-            },
-            "ext": "./json/aliShare.json"
+            }
         },
         {
-            "key": "夸克云盘",
+            "key": "夸克网盘",
             "name": "🍊我的夸克",
             "type": 3,
             "api": "csp_PanQuark",
@@ -36116,28 +36011,26 @@
             "style": {
                 "type": "list",
                 "ratio": 1.433
-            },
-            "ext": "./json/quarkShare.json"
+            }
         },
         {
-            "key": "UC云盘",
+            "key": "UC网盘",
             "name": "🍊我的UC",
             "type": 3,
-            "api": "csp_PanUc",
+            "api": "csp_PanUC",
             "searchable": 0,
             "filterable": 0,
             "changeable": 0,
             "style": {
                 "type": "list",
                 "ratio": 1.433
-            },
-            "ext": "./json/ucShare.json"
+            }
         },
         {
-            "key": "百度云盘",
+            "key": "百度网盘",
             "name": "🍊我的百度",
             "type": 3,
-            "api": "csp_PanBaiDu",
+            "api": "csp_PanBaidu",
             "searchable": 0,
             "filterable": 0,
             "changeable": 0,
