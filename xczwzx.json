@@ -471,6 +471,15 @@
             "api": "./js/荐片.js"
         },
         {
+            "key": "移动",
+            "name": "💡移动影视",
+            "type": 3,
+            "api": "csp_YDjisu",
+            "jar": "./jars/xczo.jar",
+            "searchable": 1,
+            "quickSearch": 1
+        },
+        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
@@ -978,15 +987,6 @@
             "ext": "7lj763gg402i7942463j9j9jh84l8798l8gli652828g332i"
         },
         {
-            "key": "优质",
-            "name": "💡优质影视",
-            "type": 3,
-            "api": "csp_Qiji",
-            "playerType": 2,
-            "jar": "https://ncstatic.clewm.net/rsrc/2025/0915/15/e210975c2c794cbc8bb1839b54ac213e.png;md5;939FFBC2941A28CA533F2653FA4B449E",
-            "ext": "7lj763gg402i7942433293i0g9458881hig7j94k818g326i51491kljlk134k401g9g54gk8j5i9097751kh28kh9kj11kjl92k6046l0gkj8l630892glj67g61h48g3kjiigkg0263k6h955430429ill43307gk8k0602hh09lh0j6jh7h"
-        },
-        {
             "key": "趣看",
             "name": "💡趣看影视",
             "type": 3,
@@ -1118,6 +1118,19 @@
                 "dataKey": "c60d88b2eep53za8",
                 "dataIv": "c60d88b2eep53za8",
                 "token": "4181e508e7a17657d6a6246e70b1b13553e5ae9d8d287dc47000fb2df638dffa"
+            }
+        },
+        {
+            "key": "七壹",
+            "name": "💶七壹影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://qiyiys.cc",
+                "dataKey": "45452893929B40D9",
+                "dataIv": "45452893929B40D9"
             }
         },
         {
@@ -4591,6 +4604,20 @@
                 "dataIv": "okkfKgnc9JIBISh1",
                 "init": "initV122",
                 "search": "mineInfo",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+        {
+            "key": "花猪",
+            "name": "🐗花猪影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": "https://tiantangwulu.oss-cn-shanghai.aliyuncs.com/axiba.txt",
+                "dataKey": "h5w3d6g1j9s2h3f6",
+                "dataIv": "h5w3d6g1j9s2h3f6",
                 "ua": "okhttp/3.10.0"
             }
         },
