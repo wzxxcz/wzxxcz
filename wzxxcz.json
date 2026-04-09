@@ -925,6 +925,7 @@
             "name": "💡移动影视",
             "type": 3,
             "api": "csp_YDjisu",
+            "jar": "./jars/xczo.jar",
             "searchable": 1,
             "quickSearch": 1
         },
