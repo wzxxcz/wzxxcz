@@ -1587,17 +1587,6 @@
             "filterable": 1
         },
         {
-            "key": "猎手影视",
-            "name": "🦁猎手影院",
-            "type": 3,
-            "api": "./py/猎手影视.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
-        {
             "key": "新剧",
             "name": "🍊新剧影视",
             "type": 3,
