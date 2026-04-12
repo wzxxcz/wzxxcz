@@ -10,6 +10,12 @@
             "url": "https://gitee.com/yimi321/tv/raw/master/tv.png"
         },
         {
+            "name": "蜻蜓",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/qingtingjjjjjjj/iptv-auto-update/main/my.txt"
+        },
+        {
             "name": "潇宇",
             "type": 0,
             "ua": "okhttp/5.3.2",
