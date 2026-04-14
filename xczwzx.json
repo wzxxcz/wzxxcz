@@ -541,6 +541,19 @@
             "ext": "http://cms1688.lyyytv.cn/api.php/app/"
         },
         {
+            "key": "行动",
+            "name": "🥥行动影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "http://165.99.42.137:5432",
+                "dataKey": "1234567890987654",
+                "dataIv": "1234567890987654"
+            }
+        },
+        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
