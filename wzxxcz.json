@@ -997,6 +997,19 @@
             }
         },
         {
+            "key": "咕噜画",
+            "name": "🌾咕噜影视",
+            "type": 3,
+            "changeable": 0,
+            "api": "./js/Appfox.min.js",
+            "ext": {
+                "host": "http://www.yingsw.top",
+                "timeout": 8,
+                "key": "guluyinghua_123",
+                "sign": "679543610991810f19698c187e5e106e"
+            }
+        },
+        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
