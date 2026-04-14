@@ -446,40 +446,6 @@
             }
         },
         {
-  "key": "music_5platform_native",
-  "name": "🎵 五平台原生音乐",
-  "type": 1,
-  "api": "https://api.music.100yyds.cn/v1/",
-  "searchable": 1,
-  "quickSearch": 1,
-  "filterable": 0,
-  "style": "music",
-  "headers": {
-    "User-Agent": "Mozilla/5.0 (Linux; Android 12; OKFilmPro/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36"
-  },
-  "music": {
-    "server": ["migu", "qq", "kugou", "netease"],
-    "searchUrl": "https://api.music.100yyds.cn/meting/api?server={server}&type=search&s={wd}&limit=50",
-    "playUrl": "https://api.music.100yyds.cn/meting/api?server={server}&type=url&id={id}&br=320000",
-    "playUrlFlac": "https://api.music.100yyds.cn/meting/api?server={server}&type=url&id={id}&br=999000",
-    "lyricUrl": "https://api.music.100yyds.cn/meting/api?server={server}&type=lrc&id={id}",
-    "parse": {
-      "list": "$.",
-      "id": "id",
-      "title": "name",
-      "artist": "artist",
-      "album": "album",
-      "pic": "pic",
-      "lrc": "lrc"
-    },
-    "quality": {
-      "128k": 128000,
-      "320k": 320000,
-      "flac": 999000
-    }
-  }
-},
-        {
             "key": "呦呦DJ",
             "name": "🎵呦呦DJ",
             "type": 3,
