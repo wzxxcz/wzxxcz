@@ -531,16 +531,6 @@
             "changeable": 0
         },
         {
-            "key": "csp_appys_臻彩",
-            "name": "😍猫盘4K",
-            "type": 3,
-            "api": "csp_AppYsV2",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "http://cms1688.lyyytv.cn/api.php/app/"
-        },
-        {
             "key": "行动",
             "name": "🥥行动影视",
             "type": 3,
@@ -551,6 +541,19 @@
                 "url": "http://165.99.42.137:5432",
                 "dataKey": "1234567890987654",
                 "dataIv": "1234567890987654"
+            }
+        },
+        {
+            "key": "咕噜画",
+            "name": "🌾咕噜影视",
+            "type": 3,
+            "changeable": 0,
+            "api": "./js/Appfox.min.js",
+            "ext": {
+                "host": "http://www.yingsw.top",
+                "timeout": 8,
+                "key": "guluyinghua_123",
+                "sign": "679543610991810f19698c187e5e106e"
             }
         },
         {
@@ -1111,19 +1114,6 @@
             "type": 3,
             "api": "csp_Hxq",
             "ext": "https://fishapi.wya6.com/fish/fishhxq.php"
-        },
-        {
-            "key": "咕噜",
-            "name": "🐨咕噜影视",
-            "type": 3,
-            "api": "csp_AppFox",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "host": "http://www.yingsw.top",
-                "key": "guluyinghua_123",
-                "sign": "679543610991810f19698c187e5e106e"
-            }
         },
         {
             "key": "奇奇",
@@ -36150,50 +36140,6 @@
             "name": "☯️自动解析聚合",
             "type": 3,
             "url": "Web"
-        },
-        {
-            "name": "👉网盘解析",
-            "type": "1",
-            "url": "http://1.94.244.214:8889/geturl?url=",
-            "ext": {
-                "flag": [
-                    "qq",
-                    "腾讯",
-                    "qiyi",
-                    "爱奇艺",
-                    "奇艺",
-                    "youku",
-                    "优酷",
-                    "sohu",
-                    "搜狐",
-                    "letv",
-                    "乐视",
-                    "mgtv",
-                    "芒果",
-                    "tnmb",
-                    "seven",
-                    "bilibili",
-                    "1905"
-                ],
-                "header": {
-                    "User-Agent": "okhttp/4.9.1"
-                }
-            }
-        },
-        {
-            "name": "👉测试解析",
-            "type": 1,
-            "url": "http://php.xuan666.icu/高兴/api8.php?url=",
-            "ext": {
-                "flag": [
-                    "味精4K",
-                    "mgtv",
-                    "qq"
-                ],
-                "header": {
-                    "User-Agent": "okhttp/4.9.1"
-                }
-            }
         },
         {
             "name": "🦐虾米解析",
