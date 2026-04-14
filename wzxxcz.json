@@ -446,11 +446,12 @@
             }
         },
         {
-  "key": "lx_music_multi_5",
-  "name": "🎵 五平台音乐",
-  "type": 3,
-  "api": "csp_XBPQ",
-  "ext": "./XBPQ/wpt.json"
+    "key": "lx_music_multi_5",
+    "name": "🎵 五平台音乐",
+    "type": 3,
+    "api": "csp_XBPQ",
+    "ext": "./XBPQ/wpt.json",
+    "style": "music"
 },
         {
             "key": "呦呦DJ",
