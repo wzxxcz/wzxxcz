@@ -36530,6 +36530,50 @@
             "url": "Web"
         },
         {
+            "name": "👉网盘解析",
+            "type": "1",
+            "url": "http://1.94.244.214:8889/geturl?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "👉测试解析",
+            "type": 1,
+            "url": "http://php.xuan666.icu/高兴/api8.php?url=",
+            "ext": {
+                "flag": [
+                    "味精4K",
+                    "mgtv",
+                    "qq"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
             "name": "🦐虾米解析",
             "type": 0,
             "url": "https://jx.xmflv.cc/?url="
