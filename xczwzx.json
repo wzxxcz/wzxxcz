@@ -522,6 +522,38 @@
             "quickSearch": 1
         },
         {
+            "key": "咪视界",
+            "name": "❄️咪视界4K",
+            "type": 4,
+            "api": "http://sspa8.top:8100/php/咪视界.php",
+            "searchable": 1,
+            "quickSearch": 1,
+            "changeable": 0
+        },
+        {
+            "key": "csp_appys_臻彩",
+            "name": "😍猫盘4K",
+            "type": 3,
+            "api": "csp_AppYsV2",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "http://cms1688.lyyytv.cn/api.php/app/"
+        },
+        {
+            "key": "行动",
+            "name": "🥥行动影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "http://165.99.42.137:5432",
+                "dataKey": "1234567890987654",
+                "dataIv": "1234567890987654"
+            }
+        },
+        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
@@ -36118,6 +36150,50 @@
             "name": "☯️自动解析聚合",
             "type": 3,
             "url": "Web"
+        },
+        {
+            "name": "👉网盘解析",
+            "type": "1",
+            "url": "http://1.94.244.214:8889/geturl?url=",
+            "ext": {
+                "flag": [
+                    "qq",
+                    "腾讯",
+                    "qiyi",
+                    "爱奇艺",
+                    "奇艺",
+                    "youku",
+                    "优酷",
+                    "sohu",
+                    "搜狐",
+                    "letv",
+                    "乐视",
+                    "mgtv",
+                    "芒果",
+                    "tnmb",
+                    "seven",
+                    "bilibili",
+                    "1905"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
+        },
+        {
+            "name": "👉测试解析",
+            "type": 1,
+            "url": "http://php.xuan666.icu/高兴/api8.php?url=",
+            "ext": {
+                "flag": [
+                    "味精4K",
+                    "mgtv",
+                    "qq"
+                ],
+                "header": {
+                    "User-Agent": "okhttp/4.9.1"
+                }
+            }
         },
         {
             "name": "🦐虾米解析",
