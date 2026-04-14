@@ -974,6 +974,16 @@
             "changeable": 0
         },
         {
+            "key": "csp_appys_臻彩",
+            "name": "😍猫盘4K",
+            "type": 3,
+            "api": "csp_AppYsV2",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": "http://cms1688.lyyytv.cn/api.php/app/"
+        },
+        {
             "key": "修罗",
             "name": "🍊修罗磁力",
             "api": "csp_Xlys",
