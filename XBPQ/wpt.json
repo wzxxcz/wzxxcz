@@ -1,8 +1,14 @@
 {
   "key": "lx_music_5platform",
-  "name": "🎵 洛雪同源·五平台三备超强防失效",
+  "name": "🎵 五平台音乐",
   "type": "music",
+  "style": "music",
   "server": ["migu", "kugou", "kuwo", "qq", "netease"],
+  "class": [
+    {"type": "music", "id": "0", "name": "音乐"},
+    {"type": "rank", "id": "1", "name": "排行榜"},
+    {"type": "hot", "id": "2", "name": "热门歌单"}
+  ],
   "searchUrl": "https://api.injahow.cn/meting/api?server={server}&type=search&s={wd}&limit=50",
   "searchUrlBack": "https://api.lololi.app/meting/api?server={server}&type=search&s={wd}&limit=50",
   "searchUrlBack2": "https://api.xiaoheiio.com/meting/api?server={server}&type=search&s={wd}&limit=50",
