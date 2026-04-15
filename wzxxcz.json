@@ -28496,7 +28496,7 @@
                 "主页url": "https://www.mayi520.tv/",
                 "首页": "120",
                 "起始页": "1",
-                "分类url": "https://www.mayi520.tv/vodshow/{cateId}---{class}-----{catePg}---{year}.html",
+                "分类url": "https://www.mayi520.tv/vodshow/{cateId}-{area}-------{catePg}---{year}.html",
                 "分类": "电影$1#连续剧$2#综艺$3#动漫$4#",
                 "二次截取": "",
                 "数组": "lazyload&&</a>",
