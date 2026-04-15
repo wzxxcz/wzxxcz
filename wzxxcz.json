@@ -5078,6 +5078,19 @@
             }
         },
         {
+            "key": "猎豹",
+            "name": "🐆猎豹影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://444421.xyz",
+                "dataKey": "#getapp@TMD@2025",
+                "dataIv": "#getapp@TMD@2025"
+            }
+        },
+        {
             "key": "王子",
             "name": "🤴王子影视",
             "type": 3,
