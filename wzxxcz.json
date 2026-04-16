@@ -190,12 +190,6 @@
             "url": "http://ibox.x10.mx/555.txt"
         },
         {
-            "name": "体育",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://www.52top.com.cn:678/list.php?fileid=ty.php"
-        },
-        {
             "name": "vBMSZ",
             "type": 0,
             "ua": "okhttp/5.3.2",
