@@ -34,12 +34,6 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/zilong7728/Collect-IPTV/refs/heads/main/best_sorted.m3u"
         },
         {
-            "name": "catvod",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://live.catvod.com/?tk=ae81eee930cceef4b2413f000795885b"
-        },
-        {
             "name": "zoto",
             "type": 0,
             "ua": "okhttp/5.3.2",
