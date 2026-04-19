@@ -31375,7 +31375,7 @@
             "type": 3,
             "api": "csp_XBPQ",
             "ext": {
-                "请求头": "User-Agent$MOBILE_UA",
+                "请求头": "User-Agent@Mozilla/5.0 (Linux；； Android 9；； ASUS_I005DA Build/PI；； wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.70 Mobile Safari/537.36&&Cookie@PHPSESSID=a9m2fetaj63cn2tpd28u27dctu；； _clck=1tbqo5b%5E2%5Eg5c%5E0%5E2300；； _clsk=1sbe1yl%5E1776579062975%5E3%5E1%5Ee.clarity.ms%2Fcollect&&Accept@text/html,application/xhtml+xml,application/xml；；q=0.9,image/avif,image/webp,image/apng,*/*；；q=0.8,application/signed-exchange；；v=b3；；q=0.7&&Accept-Language@zh-CN,zh；；q=0.9",
                 "编码": "UTF-8",
                 "主页url": "https://www.tvme.xyz/",
                 "二次截取": "",
