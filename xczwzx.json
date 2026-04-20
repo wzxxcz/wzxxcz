@@ -1198,6 +1198,27 @@
             }
         },
         {
+            "key": "薯条",
+            "name": "🥔薯条影视",
+            "type": 3,
+            "api": "csp_AppDrama",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": {
+                "appName": "薯条影视",
+                "publicKey": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCduNEnfxGaLuQRk5ABzXHhPV43zi00sCHjLo8BYc+Wi6xXm2b4v0i28Sq4WlNCKhseft9fz8kO/qLr6/022o1RcuOU7e4GFL3U9WnNODwRBYSYWd+K8nqpI/tAUDmZEBGRWqjrc7x6aMl3A+xpnWkLbPCLsuhbuuUE3tv09oeOpwIDAQAB",
+                "publicIv": "ed5fdsgucxumegqa",
+                "dataKey": "A1VACZJWDKRZY1P3MFV0DDRAZ3F3PT0=",
+                "dataIv": "OC1A06E197EF10CF3F6058CA7A803B5E",
+                "pkg": "com.st.standroid",
+                "host": "",
+                "site": "https://dyttandroid-1372779881.cos.ap-guangzhou.myqcloud.com/app_dyttandroid.txt",
+                "version": "5.0.0.1",
+                "decrypt": "0"
+            }
+        },
+        {
             "key": "久久",
             "name": "🍊久久影视1",
             "type": 3,
