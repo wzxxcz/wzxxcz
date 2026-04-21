@@ -1054,11 +1054,9 @@
             "name": "🌾青禾影视",
             "type": 3,
             "api": "./py/青禾影视.py",
+            "ext": "{\"url\":\"https://www.bestqh.com\"}",
             "searchable": 1,
-            "quickSearch": 0,
-            "changeable": 0,
-            "filterable": 0,
-            "timeout": 60
+            "quickSearch": 1
         },
         {
             "key": "大米影视",
