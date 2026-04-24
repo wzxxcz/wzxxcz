@@ -7625,8 +7625,8 @@
             "key": "腾讯视频",
             "name": "🐚腾讯视频",
             "type": 3,
-            "api": "https://raw.giteeusercontent.com/wzbdyr/hqds/raw/master/js/drpy2.min.js?metadata=eyJyIjoibWFzdGVyIiwiZnAiOiJqcy9kcnB5Mi5taW4uanMiLCJ1aWQiOjEzNTkyOTE4LCJwaWQiOjM5MjYxMjk0LCJzdG8iOiJnaXQtc2hhcmRpbmctc3RvLTEwdC0wMTQiLCJycCI6InJlcG9zLzg2L2I2Lzg2YjY0NGM2YzhlY2M3MDY4YjA5YTFkYWIzNzE4NThmMjRiNjU4NjljZjQ3YjVkNTcyNGFiNjJmNjcyNmMwMmEuZ2l0IiwiaXNwIjp0cnVlLCJleHBpcmVfYXQiOjE3NzcwMTk0MDB9&signature=5rZS-gSyHmtyYA0xx4rukcCpPtLFZQZ5G3QA-qDxSXM",
-            "ext": "https://raw.giteeusercontent.com/wzbdyr/hqds/raw/master/js/%E8%85%BE%E8%AE%AF%E8%A7%86%E9%A2%91.js?metadata=eyJyIjoibWFzdGVyIiwiZnAiOiJqcy_ohb7orq_op4bpopEuanMiLCJ1aWQiOjEzNTkyOTE4LCJwaWQiOjM5MjYxMjk0LCJzdG8iOiJnaXQtc2hhcmRpbmctc3RvLTEwdC0wMTQiLCJycCI6InJlcG9zLzg2L2I2Lzg2YjY0NGM2YzhlY2M3MDY4YjA5YTFkYWIzNzE4NThmMjRiNjU4NjljZjQ3YjVkNTcyNGFiNjJmNjcyNmMwMmEuZ2l0IiwiaXNwIjp0cnVlLCJleHBpcmVfYXQiOjE3NzcwMTk0MDB9&signature=nfDXani7Q7l_tz8BZDjglcgvzo-O4FBpurg2KIxMLeQ"
+            "api": "https://raw.giteeusercontent.com/wzbdyr/hqds/raw/master/js/drpy2.min.js",
+            "ext": "https://raw.giteeusercontent.com/wzbdyr/hqds/raw/master/js/%E8%85%BE%E8%AE%AF%E8%A7%86%E9%A2%91.js"
         },
         {
             "key": "优酷视频",
