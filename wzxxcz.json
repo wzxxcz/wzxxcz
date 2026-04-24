@@ -7625,8 +7625,8 @@
             "key": "腾讯视频",
             "name": "🐚腾讯视频",
             "type": 3,
-            "api": "https://git.acwing.com/xcz/wzxxcz/-/raw/maing/js/drpy2.min.js",
-            "ext": "https://git.acwing.com/xcz/wzxxcz/-/raw/maing/js/%E8%85%BE%E8%AE%AF%E8%A7%86%E9%A2%91.js"
+            "api": "https://raw.giteeusercontent.com/wzbdyr/hqds/raw/master/js/drpy2.min.js",
+            "ext": "https://raw.giteeusercontent.com/wzbdyr/hqds/raw/master/js/%E8%85%BE%E8%AE%AF%E8%A7%86%E9%A2%91.js"
         },
         {
             "key": "优酷视频",
