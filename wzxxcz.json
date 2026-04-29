@@ -1051,17 +1051,6 @@
             "timeout": 60
         },
         {
-            "key": "py_bestqh",
-            "name": "💥百思超清",
-            "type": 3,
-            "api": "./py/bestqh.py",
-            "searchable": 1,
-            "quickSearch": 0,
-            "changeable": 0,
-            "filterable": 0,
-            "timeout": 60
-        },
-        {
             "key": "大米影视",
             "name": "🍚大米影视",
             "type": 3,
