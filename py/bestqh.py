@@ -1,195 +1,169 @@
-# coding=utf-8
-# !/usr/bin/python
-# by嗷呜
+# ==============================================
+# TVBox 影视爬虫 通用强化版（支持过验证）
+# ==============================================
+CONFIG = {
+    "HOST": "https://www.bestqh.com",
+    "NAME": "🍊支持验证的源",
+
+    # 分类可自由增删
+    "CATEGORIES": [
+        {"type_id": "1", "type_name": "电影"},
+        {"type_id": "2", "type_name": "电视剧"},
+        {"type_id": "3", "type_name": "综艺"},
+        {"type_id": "4", "type_name": "动漫"},
+        {"type_id": "6", "type_name": "短剧"},
+    ],
+
+    # ----------------------
+    # 验证配置（有就填，没有留空）
+    # ----------------------
+    "COOKIE": "",  # 登录后的Cookie
+    "USER_AGENT": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+    "REFERER": "https://www.bestqh.com",
+    "ENABLE_TIMEOUT": True,  # 开启防封延时
+    "TIMEOUT": 15,
+}
+
+# ===================== 核心引擎（不用动） =====================
+import requests
 import re
-import sys
-from urllib.parse import quote
-
-from Crypto.Hash import MD5
-
-sys.path.append("..")
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
-from base64 import b64encode, b64decode
 import json
 import time
-from base.spider import Spider
+import random
+from urllib.parse import urljoin
 
+HOST = CONFIG["HOST"]
 
-class Spider(Spider):
+def get_headers():
+    h = {
+        "User-Agent": CONFIG["USER_AGENT"],
+        "Referer": CONFIG["REFERER"],
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1"
+    }
+    if CONFIG["COOKIE"]:
+        h["Cookie"] = CONFIG["COOKIE"]
+    return h
 
-    def getName(self):
-        return "光速"
+def sleep():
+    if CONFIG["ENABLE_TIMEOUT"]:
+        time.sleep(random.uniform(0.4, 0.9))
 
-    def init(self, extend=""):
-        self.host = self.gethost()
-        pass
+def get_html(url):
+    sleep()
+    try:
+        r = requests.get(
+            url,
+            headers=get_headers(),
+            timeout=CONFIG["TIMEOUT"],
+            verify=False
+        )
+        r.encoding = "utf-8"
+        return r.text
+    except Exception as e:
+        return ""
 
-    def isVideoFormat(self, url):
-        pass
+# 分类
+def get_class():
+    return CONFIG["CATEGORIES"]
 
-    def manualVideoCheck(self):
-        pass
+# 首页
+def get_home():
+    html = get_html(HOST)
+    rule = r'<li class="video-item">.*?<a href="([^"]+)".*?data-original="([^"]+)".*?<h3><a[^>]+>([^<]+)</a>'
+    items = re.findall(rule, html, re.S)
+    res = []
+    for href, img, title in items:
+        res.append({
+            "vod_id": href,
+            "vod_name": title.strip(),
+            "vod_pic": img
+        })
+    return res[:30]
 
-    def action(self, action):
-        pass
+# 列表
+def get_list(tid, pg=1):
+    url = f"{HOST}/type/{tid}/{pg}.html"
+    html = get_html(url)
+    rule = r'<li class="video-item">.*?<a href="([^"]+)".*?data-original="([^"]+)".*?<h3><a[^>]+>([^<]+)</a>'
+    items = re.findall(rule, html, re.S)
+    res = []
+    for href, img, title in items:
+        res.append({
+            "vod_id": href,
+            "vod_name": title.strip(),
+            "vod_pic": img
+        })
+    return res
 
-    def destroy(self):
-        pass
+# 搜索
+def get_search(wd, pg=1):
+    url = f"{HOST}/search/{wd}/{pg}.html"
+    html = get_html(url)
+    rule = r'<li class="video-item">.*?<a href="([^"]+)".*?data-original="([^"]+)".*?<h3><a[^>]+>([^<]+)</a>'
+    items = re.findall(rule, html, re.S)
+    res = []
+    for href, img, title in items:
+        res.append({
+            "vod_id": href,
+            "vod_name": title.strip(),
+            "vod_pic": img
+        })
+    return res
 
-    def homeContent(self, filter):
-        data = self.getdata("/api.php/getappapi.index/initV119")
-        dy = {"class": "类型", "area": "地区", "lang": "语言", "year": "年份", "letter": "字母", "by": "排序",
-              "sort": "排序", }
-        filters = {}
-        classes = []
-        json_data = data["type_list"]
-        homedata = data["banner_list"]
-        for item in json_data:
-            if item["type_name"] == "全部":
-                continue
-            has_non_empty_field = False
-            jsontype_extend = json.loads(item["type_extend"])
-            homedata.extend(item["recommend_list"])
-            jsontype_extend["sort"] = "最新,最热,最赞"
-            classes.append({"type_name": item["type_name"], "type_id": item["type_id"]})
-            for key in dy:
-                if key in jsontype_extend and jsontype_extend[key].strip() != "":
-                    has_non_empty_field = True
-                    break
-            if has_non_empty_field:
-                filters[str(item["type_id"])] = []
-                for dkey in jsontype_extend:
-                    if dkey in dy and jsontype_extend[dkey].strip() != "":
-                        values = jsontype_extend[dkey].split(",")
-                        value_array = [{"n": value.strip(), "v": value.strip()} for value in values if
-                                       value.strip() != ""]
-                        filters[str(item["type_id"])].append({"key": dkey, "name": dy[dkey], "value": value_array})
-        result = {}
-        result["class"] = classes
-        result["filters"] = filters
-        result["list"] = homedata
-        return result
+# 详情
+def get_detail(did):
+    url = HOST + did
+    html = get_html(url)
 
-    def homeVideoContent(self):
-        pass
+    title = re.search(r'<div class="video-info">.*?<h2>([^<]+)</h2>', html, re.S)
+    title = title.group(1).strip() if title else "未知"
 
-    def categoryContent(self, tid, pg, filter, extend):
-        body = {"area": extend.get('area', '全部'), "year": extend.get('year', '全部'), "type_id": tid, "page": pg,
-                "sort": extend.get('sort', '最新'), "lang": extend.get('lang', '全部'),
-                "class": extend.get('class', '全部')}
-        result = {}
-        data = self.getdata("/api.php/getappapi.index/typeFilterVodList", body)
-        result["list"] = data["recommend_list"]
-        result["page"] = pg
-        result["pagecount"] = 9999
-        result["limit"] = 90
-        result["total"] = 999999
-        return result
+    pic = re.search(r'data-original="([^"]+)"', html)
+    pic = pic.group(1) if pic else ""
 
-    def detailContent(self, ids):
-        body = f"vod_id={ids[0]}"
-        data = self.getdata("/api.php/getappapi.index/vodDetail", body)
-        vod = data["vod"]
+    desc = re.search(r'<div class="video-desc">([^<]+)</div>', html)
+    desc = desc.group(1).strip() if desc else "暂无简介"
 
-        play = []
-        names = []
-        for itt in data["vod_play_list"]:
-            a = []
-            names.append(itt["player_info"]["show"])
-            parse = itt["player_info"]["parse"]
-            ua = ''
-            if itt["player_info"].get("user_agent", ''):
-                ua = b64encode(itt["player_info"]["user_agent"].encode('utf-8')).decode('utf-8')
-            for it in itt["urls"]:
-                url = it["url"]
-                if not re.search(r'\.m3u8|\.mp4', url):
-                    url = parse + '@@' + url
-                url = b64encode(url.encode('utf-8')).decode('utf-8')
-                a.append(f"{it['name']}${url}|||{ua}|||{it['token']}")
-            play.append("#".join(a))
-        vod["vod_play_from"] = "$$$".join(names)
-        vod["vod_play_url"] = "$$$".join(play)
-        result = {"list": [vod]}
-        return result
+    line_names = []
+    lines = re.findall(r'<div class="play-nav">.*?<ul.*?>(.*?)</ul>', html, re.S)
+    if lines:
+        line_names = re.findall(r'<li>([^<]+)</li>', lines[0])
 
-    def searchContent(self, key, quick, pg="1"):
-        body = f"keywords={key}&type_id=0&page={pg}"
-        data = self.getdata("/api.php/getappapi.index/searchList", body)
-        result = {"list": data["search_list"], "page": pg}
-        return result
+    play_urls = []
+    boxes = re.findall(r'<div class="play-box">.*?</div>', html, re.S)
+    for box in boxes:
+        eps = re.findall(r'<a href="([^"]+)">([^<]+)</a>', box)
+        tmp = [f"{n.strip()}${urljoin(HOST, u)}" for u, n in eps]
+        play_urls.append("$$$".join(tmp))
 
-    phend = {
-        'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; M2012K10C Build/RP1A.200720.011)'}
+    return {
+        "vod_name": title,
+        "vod_pic": pic,
+        "vod_content": desc,
+        "vod_play_from": "$$$".join(line_names),
+        "vod_play_url": "$$$".join(play_urls)
+    }
 
-    def playerContent(self, flag, id, vipFlags):
-        ids = id.split("|||")
-        if ids[1]: self.phend['User-Agent'] = b64decode(ids[1]).decode('utf-8')
-        url = b64decode(ids[0]).decode('utf-8')
-        if not re.search(r'\.m3u8|\.mp4', url):
-            a = url.split("@@")
-            body = f"parse_api={a[0]}&url={quote(self.aes('encrypt', a[1]))}&token={ids[-1]}"
-            jd = self.getdata("/api.php/getappapi.index/vodParse", body)['json']
-            url = json.loads(jd)['url']
-            # if '.mp4' not in url:
-            #     l=self.fetch(url, headers=self.phend,allow_redirects=False)
-            #     if l.status_code == 200 and l.headers.get('Location',''):
-            #         url=l.headers['Location']
-        if '.jpg' in url or '.png' in url or '.jpeg' in url:
-            url = self.getProxyUrl() + "&url=" + b64encode(url.encode('utf-8')).decode('utf-8') + "&type=m3u8"
-        result = {}
-        result["parse"] = 0
-        result["url"] = url
-        result["header"] = self.phend
-        return result
-
-    def localProxy(self, param):
-        url = b64decode(param["url"]).decode('utf-8')
-        durl = url[:url.rfind('/')]
-        data = self.fetch(url, headers=self.phend).content.decode("utf-8")
-        inde = None
-        pd = True
-        lines = data.strip().split('\n')
-        for index, string in enumerate(lines):
-            # if '#EXT-X-DISCONTINUITY' in string and pd:
-            #     pd = False
-            #     inde = index
-            if '#EXT' not in string and 'http' not in string:
-                lines[index] = durl + ('' if string.startswith('/') else '/') + string
-        if inde:
-            del lines[inde:inde + 4]
-        data = '\n'.join(lines)
-        return [200, "application/vnd.apple.mpegur", data]
-
-    def gethost(self):
-        host = self.fetch('https://jingyu-1312635929.cos.ap-nanjing.myqcloud.com/1.json').text.strip()
-        return host
-
-    def aes(self, operation, text):
-        key = "4d83b87c4c5ea111".encode("utf-8")
-        iv = key
-        if operation == "encrypt":
-            cipher = AES.new(key, AES.MODE_CBC, iv)
-            ct_bytes = cipher.encrypt(pad(text.encode("utf-8"), AES.block_size))
-            ct = b64encode(ct_bytes).decode("utf-8")
-            return ct
-        elif operation == "decrypt":
-            cipher = AES.new(key, AES.MODE_CBC, iv)
-            pt = unpad(cipher.decrypt(b64decode(text)), AES.block_size)
-            return pt.decode("utf-8")
-
-    def header(self):
-        t = str(int(time.time()))
-        md5_hash = MD5.new()
-        md5_hash.update(t.encode('utf-8'))
-        signature_md5 = md5_hash.hexdigest()
-        header = {"User-Agent": "okhttp/3.14.9", "app-version-code": "300", "app-ui-mode": "light",
-                  "app-user-device-id": signature_md5, "app-api-verify-time": t,
-                  "app-api-verify-sign": self.aes("encrypt", t), "Content-Type": "application/x-www-form-urlencoded"}
-        return header
-
-    def getdata(self, path, data=None):
-        # data = self.post(self.host + path, headers=self.header(), data=data).text
-        data = self.post(self.host + path, headers=self.header(), data=data, verify=False).json()["data"]
-        data1 = self.aes("decrypt", data)
-        return json.loads(data1)
+# 输出
+if __name__ == "__main__":
+    import sys
+    argv = sys.argv
+    if len(argv) < 2:
+        print(json.dumps(get_class(), ensure_ascii=False))
+    elif argv[1] == "home":
+        print(json.dumps(get_home(), ensure_ascii=False))
+    elif argv[1] == "list":
+        tid = argv[2] if len(argv) > 2 else "1"
+        pg = int(argv[3]) if len(argv) > 3 else 1
+        print(json.dumps(get_list(tid, pg), ensure_ascii=False))
+    elif argv[1] == "search":
+        wd = argv[2] if len(argv) > 2 else ""
+        pg = int(argv[3]) if len(argv) > 3 else 1
+        print(json.dumps(get_search(wd, pg), ensure_ascii=False))
+    elif argv[1] == "detail":
+        did = argv[2] if len(argv) > 2 else ""
+        print(json.dumps(get_detail(did), ensure_ascii=False))
