@@ -2065,22 +2065,8 @@
             "changeable": 1
         },
         {
-            "key": "奇奇",
-            "name": "🥇奇奇影视",
-            "type": 3,
-            "api": "./js/get.js",
-            "searchable": 1,
-            "ext": {
-                "host": "http://110.42.67.221:8003/",
-                "key": "123456789abcdefg",
-                "init": "V122",
-                "api": 2,
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
             "key": "py_文才",
-            "name": "🥇文才｜影视",
+            "name": "🥇文才影视",
             "type": 3,
             "api": "./py/文才影视.py",
             "searchable": 1,
