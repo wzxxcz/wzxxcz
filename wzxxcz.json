@@ -33144,7 +33144,7 @@
                 "主页url": "https://www.xfdy6.com/",
                 "首页": "120",
                 "起始页": "1",
-                "分类url": "http://www.xfdy6.com/guocanju/liebiao/{cateId}/{catePg}.html",
+                "分类url": "https://www.xfdy6.com/{cateId}/liebiao/2/{catePg}.html",
                 "分类": "电影$dianying#电视剧$dianshiju#综艺$zongyi#动漫$dongman#",
                 "二次截取": "",
                 "数组": "vod-item-img shining&&</h3>",
