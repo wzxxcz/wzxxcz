@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="jars">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/jars/csp_AppRR.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/csp_Jpys.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/csp_UC.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/config.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/xczo.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/csp_FeiMaoUC.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/UC.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/NEWXBPQXYQ.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/xczlg.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/alllive.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/csp_JPYY.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/NEWXBPQ.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/csp_欧歌G.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/玩偶.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/人人.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

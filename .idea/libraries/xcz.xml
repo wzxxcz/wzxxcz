@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="xcz">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/xcz.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
