@@ -126,6 +126,24 @@
     "list": [
       {
         "name": "手机端",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscsj.3.3.6.64w.pdx.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "3.3.6"
+      },
+      {
+        "name": "电视端(64w位)",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscds.6.2.6.64w.pdx.apK",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "6.2.6"
+      },
+      {
+        "name": "电视端",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscds6.2.6.32w.pdx.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "6.2.6"
+      },
+      {
+        "name": "手机端",
         "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscsjb_3.2.8.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
         "version": "3.2.8"
