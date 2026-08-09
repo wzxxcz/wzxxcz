@@ -35,6 +35,12 @@
             "ua": "okhttp",
             "url": "https://live.445569.xyz/live.m3u"
         },
+		{
+            "name": "飞扬",
+            "type": 0,
+            "ua": "okhttp",
+            "url": "https://www.985pan.com/down.php/bf5e9607ff407fcdd71f63928ea5bc79.txt"
+        },
         {
             "name": "直播源合集（密码1111）",
             "type": 0,
