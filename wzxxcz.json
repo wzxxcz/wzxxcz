@@ -222,12 +222,6 @@
             "url": "https://gitee.com/szwxk/watch-television/raw/master/wxk1.m3u"
         },
         {
-            "name": "52xiaobai",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://52xiaobai.cn/ceshi/zb.php"
-        },
-        {
             "name": "澜露",
             "type": 0,
             "ua": "okhttp/5.3.2",
