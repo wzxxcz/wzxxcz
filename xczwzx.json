@@ -222,12 +222,6 @@
             "url": "https://gitee.com/szwxk/watch-television/raw/master/wxk1.m3u"
         },
         {
-            "name": "澜露",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://cloud.7so.top/f/Bgw1H8/%E5%A4%A7%E6%94%B9.txt"
-        },
-        {
             "name": "港台大陆频道",
             "type": 0,
             "ua": "okhttp/5.3.2",
