@@ -88,12 +88,6 @@
             "url": "https://d.kstore.dev/download/11344/yunduan.txt"
         },
         {
-            "name": "风云",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://iptv.4666888.xyz/FYTV.txt"
-        },
-        {
             "name": "TNT",
             "type": 0,
             "ua": "okhttp/5.3.2",
