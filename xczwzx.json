@@ -76,12 +76,6 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt"
         },
         {
-            "name": "DSJ",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://dsj-1312694395.cos.ap-guangzhou.myqcloud.com/dsj10.1.txt"
-        },
-        {
             "name": "天浪",
             "type": 0,
             "ua": "okhttp/5.3.2",
