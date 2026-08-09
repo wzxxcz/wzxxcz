@@ -64,12 +64,6 @@
             "url": "http://210.245.166.84:1299/live/live.txt"
         },
         {
-            "name": "夜空",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://pan.szfx.top/down.php/4f5dad27633e1293d7ef2317ee9c801e.txt"
-        },
-        {
             "name": "Guovin",
             "type": 0,
             "ua": "okhttp/5.3.2",
