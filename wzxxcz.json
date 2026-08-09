@@ -180,12 +180,6 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/q1017673817/iptvz/refs/heads/main/zubo_all.txt"
         },
         {
-            "name": "米米",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://gitee.com/yimi321/ymys/raw/master/lib/tv.png"
-        },
-        {
             "name": "卡卡西",
             "type": 0,
             "ua": "okhttp/5.3.2",
