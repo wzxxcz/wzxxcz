@@ -29,6 +29,12 @@
             "ua": "okhttp",
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/xJEYDAin/iptv/main/output/all_merged.m3u"
         },
+		{
+            "name": "live",
+            "type": 0,
+            "ua": "okhttp",
+            "url": "https://live.445569.xyz/live.m3u"
+        },
         {
             "name": "直播源合集（密码1111）",
             "type": 0,
