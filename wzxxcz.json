@@ -222,12 +222,6 @@
             "url": "https://gitee.com/szwxk/watch-television/raw/master/wxk1.m3u"
         },
         {
-            "name": "娱乐",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://m.iill.top/Live.m3u"
-        },
-        {
             "name": "虎牙一起看",
             "type": 0,
             "ua": "okhttp/5.3.2",
