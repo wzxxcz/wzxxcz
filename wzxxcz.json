@@ -34,12 +34,6 @@
             "url": "http://ys.my.to/?v=zoto"
         },
         {
-            "name": "烈烈",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://ys.my.to/?v=咪咕"
-        },
-        {
             "name": "sylu",
             "type": 0,
             "ua": "okhttp/5.3.2",
