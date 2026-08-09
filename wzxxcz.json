@@ -4,6 +4,13 @@
     "logo": "./logo.php",
     "lives": [
         {
+            "name": "MIT",
+            "type": 0,
+            "playerType": 2,
+            "ua": "okhttp",
+			"url": "https://gh-proxy.org/https://raw.githubusercontent.com/fleung49/star/refs/heads/main/mit"
+        },
+        {
             "name": "直播源合集（密码1111）",
             "type": 0,
             "ua": "okhttp/5.3.2",
