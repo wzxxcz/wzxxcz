@@ -34,12 +34,6 @@
             "url": "http://ys.my.to/?v=zoto"
         },
         {
-            "name": "sylu",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://xclasvgas.sylu.net:8080/smt.php"
-        },
-        {
             "name": "migu",
             "type": 0,
             "ua": "okhttp/5.3.2",
