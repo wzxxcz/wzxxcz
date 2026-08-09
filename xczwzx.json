@@ -174,12 +174,6 @@
             "url": "http://1.94.31.214/live/live9/dgtv.txt"
         },
         {
-            "name": "蜂巢",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://ibox.x10.mx/555.txt"
-        },
-        {
             "name": "vBMSZ",
             "type": 0,
             "ua": "okhttp/5.3.2",
