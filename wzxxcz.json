@@ -35722,37 +35722,25 @@
             "type": 3,
             "api": "./js/聚合短剧.js"
         },
-        {
+		{
             "key": "围观短剧",
             "name": "🍊围观短剧",
             "type": 3,
             "api": "csp_WeiguanDJ",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
             "genre": "shortdrama"
         },
-        {
-            "key": "甜圈短剧",
-            "name": "🍊甜圈短剧",
+		{
+            "key": "好看短剧",
+            "name": "🍊好看短剧",
             "type": 3,
-            "api": "csp_TianquanDJ",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
+            "api": "csp_HaokanDJ",
             "genre": "shortdrama"
         },
-        {
+		{
             "key": "星芽短剧",
             "name": "🌟星芽短剧",
             "type": 3,
-            "api": "./py/星芽短剧.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
+            "api": "csp_XingyaDJ",
             "genre": "shortdrama"
         },
 		{
@@ -35767,16 +35755,19 @@
                 "分类url": "https://www.mochadj.com/i/{cateId}-{catePg}.html"
             }
         },
-        {
+		{
+            "key": "七猫短剧",
+            "name": "🐈七猫短剧",
+            "type": 3,
+            "api": "csp_QimaoDJ",
+            "genre": "shortdrama"
+        },
+		{
             "key": "河马短剧",
             "name": "🦛河马短剧",
             "type": 3,
-            "api": "./py/河马短剧.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
+            "api": "csp_HemaDJ",
+            "genre": "shortdrama"
         },
         {
             "key": "短剧场短剧",
