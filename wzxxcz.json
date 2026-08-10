@@ -11394,6 +11394,13 @@
             "api": "csp_Wwys",
             "ext": "https://vip.wwgz.cn:5200"
         },
+		{
+            "key": "枫叶影视",
+            "name": "🍁枫叶影视",
+            "type": 3,
+            "api": "csp_FengYe",
+            "ext": "https://www.vip1949.com/"
+        },
         {
             "key": "1905",
             "name": "🎞️1905影视",
