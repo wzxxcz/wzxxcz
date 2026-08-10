@@ -35473,8 +35473,10 @@
             "key": "养生堂",
             "name": "🐦‍🔥养生知识",
             "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/养生堂.json",
+            "api": "csp_YST",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "rect",
                 "ratio": 1.597
