@@ -822,26 +822,6 @@
             "timeout": 60
         },
         {
-            "key": "混合",
-            "name": "🍊混合搜索",
-            "type": 3,
-            "api": "csp_HunHePan",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "timeout": 60
-        },
-        {
-            "key": "天翼",
-            "name": "🍊天翼搜索",
-            "type": 3,
-            "api": "csp_TianYiSou",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "timeout": 60
-        },
-        {
             "key": "趣盘",
             "name": "🍊趣盘搜索",
             "type": 3,
