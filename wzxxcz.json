@@ -839,14 +839,15 @@
             "type": 3,
             "api": "./js/荐片.js"
         },
-        {
+		{
             "key": "移动",
             "name": "💡移动影视",
             "type": 3,
-            "api": "csp_YDjisu",
-            "jar": "./jars/xczo.jar",
+            "api": "csp_Yidong4K",
             "searchable": 1,
-            "quickSearch": 1
+            "quickSearch": 1,
+            "filterable": 1,
+            "timeout": 60
         },
         {
             "key": "行动",
