@@ -636,18 +636,21 @@
             },
             "timeout": 60
         },
-        {
-            "key": "清影",
-            "name": "🍊清影4K",
+		{
+            "key": "种子",
+            "name": "🍊种子4K",
             "type": 3,
-            "api": "csp_PanWebShareQY",
+            "api": "csp_SeedHub",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
             "changeable": 1,
             "ext": {
                 "site": [
-                    "http://www.revohd.com"
+                    "https://sidhub.cc",
+                    "https://seeduck.cc",
+                    "https://hubdog.cc",
+                    "http://104.243.25.80"
                 ]
             },
             "timeout": 60
