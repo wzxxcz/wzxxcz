@@ -557,7 +557,7 @@
             },
             "timeout": 60
         },
-        {
+		{
             "key": "至臻",
             "name": "🏆️至臻4K4K",
             "type": 3,
@@ -570,10 +570,7 @@
                 "site": [
                     "https://mihdr.top",
                     "https://www.miqk.cc",
-                    "https://xiaomiai.site",
-                    "https://xiaomi666.fun",
-                    "https://www.mihdr.top",
-                    "https://www.zhizhenpan.fun"
+                    "https://www.mihdr.top"
                 ]
             },
             "timeout": 60
