@@ -412,7 +412,7 @@
             "type": 3,
             "api": "./py/网易云音乐.py"
         },
-        {
+		{
             "key": "玩偶",
             "name": "🐲小橙子智能4K弹幕",
             "type": 3,
@@ -423,11 +423,9 @@
             "changeable": 1,
             "ext": {
                 "site": [
+                    "https://www.wogg.net",
                     "https://wogg.xxooo.cf",
-                    "https://woggpan.888484.xyz",
-                    "https://wogg.333232.xyz",
-                    "http://woggpan.xxooo.cf",
-                    "https://www.wogg.one"
+                    "https://woggpan.xxooo.cf"
                 ]
             },
             "timeout": 60
