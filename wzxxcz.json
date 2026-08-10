@@ -705,7 +705,7 @@
             },
             "timeout": 60
         },
-        {
+		{
             "key": "米搜",
             "name": "🌾米搜4K4K弹幕",
             "type": 3,
@@ -713,6 +713,12 @@
             "searchable": 1,
             "quickSearch": 0,
             "filterable": 0,
+            "ext": {
+                "site": [
+                    "https://misoso.shop",
+                    "http://www.misoso.shop"
+                ]
+            },
             "timeout": 60
         },
         {
