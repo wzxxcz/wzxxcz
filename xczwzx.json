@@ -35483,20 +35483,6 @@
             }
         },
         {
-            "key": "dr_兔小贝",
-            "name": "📚儿童启蒙",
-            "type": 3,
-            "api": "https://git.yylx.win/https://github.com/wzxxcz/EXT/raw/refs/heads/main/drpy2.min.js",
-            "ext": "https://git.yylx.win/https://github.com/wzxxcz/EXT/raw/refs/heads/main/%E5%85%94%E5%B0%8F%E8%B4%9D.js",
-            "style": {
-                "type": "rect",
-                "ratio": 1.597
-            },
-            "searchable": 0,
-            "quickSearch": 0,
-            "changeable": 0
-        },
-        {
             "key": "88看球",
             "name": "⚽88看球",
             "type": 3,
@@ -35637,6 +35623,16 @@
                 "n": "哔哩戏曲",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
             },
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            }
+        },
+		{
+            "key": "兔小贝",
+            "name": "🐰兔小贝儿童",
+            "type": 3,
+            "api": "csp_TuXiaoBei",
             "style": {
                 "type": "rect",
                 "ratio": 1.597
