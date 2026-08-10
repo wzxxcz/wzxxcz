@@ -35600,14 +35600,14 @@
             "api": "./js/drpy2.min.js",
             "ext": "./js/Anime1.js"
         },
-        {
+		{
             "key": "漫国动漫",
             "name": "🤣漫国动漫",
             "type": 3,
             "searchable": 1,
             "api": "csp_AppSy",
             "ext": {
-                "site": "https://dm-1255775577.cos.ap-guangzhou.myqcloud.com/dmg/api.txt",
+                "url": "http://114.66.27.208:806",
                 "siteKey": "rectangleadsadxa",
                 "listKey": "aassddwwxxllsx1x",
                 "parsesKey": "aassddwwxxllsx1x"
@@ -35623,18 +35623,6 @@
                 "url": "https://www.cyfz.top",
                 "dataKey": "e72cdfd629e8895d",
                 "dataIv": "e72cdfd629e8895d"
-            }
-        },
-        {
-            "key": "番薯动漫",
-            "name": "🥔番薯动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "https://new.app.bytegooty.com",
-                "dataKey": "N4yj7l7xKxHF4*gz",
-                "dataIv": "N4yj7l7xKxHF4*gz"
             }
         },
         {
@@ -35659,18 +35647,6 @@
                 "url": "https://www.gugu3.com",
                 "dataKey": "nKfZ8KX6JTNWRzTD",
                 "dataIv": "nKfZ8KX6JTNWRzTD"
-            }
-        },
-        {
-            "key": "丫丫动漫",
-            "name": "🤣丫丫动漫",
-            "type": 3,
-            "searchable": 1,
-            "api": "csp_AppGet",
-            "ext": {
-                "url": "http://tv.yy-fun.cc",
-                "dataKey": "qkxnwkfjwpcnwycl",
-                "dataIv": "qkxnwkfjwpcnwycl"
             }
         },
         {
