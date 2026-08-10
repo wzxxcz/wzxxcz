@@ -2303,6 +2303,18 @@
                 "排序值": "time&hits&score"
             }
         },
+		 {
+            "key": "山楂影视",
+            "name": "🍊山楂影视",
+            "type": 3,
+            "api": "csp_PianKu8"
+        },
+        {
+            "key": "飞娱影视",
+            "name": "🍊飞娱影视",
+            "type": 3,
+            "api": "csp_Feiyu"
+        },
         {
             "key": "独播影视",
             "name": "🍊独播影视",
@@ -35753,17 +35765,6 @@
             "quickSearch": 1,
             "filterable": 1,
             "playerType": 2
-        },
-        {
-            "key": "剧王短剧",
-            "name": "🍊剧王短剧",
-            "type": 3,
-            "api": "./py/剧王短剧.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "genre": "shortdrama"
         },
         {
             "key": "短剧场短剧",
