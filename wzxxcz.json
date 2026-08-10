@@ -767,6 +767,16 @@
             "filterable": 1,
             "timeout": 60
         },
+		{
+            "key": "聚合",
+            "name": "🍊聚合搜索",
+            "type": 3,
+            "api": "csp_JuheSo",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
+            "timeout": 60
+        },
         {
             "key": "盘搜",
             "name": "🍊盘搜搜索",
