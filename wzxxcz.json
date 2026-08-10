@@ -652,7 +652,7 @@
             },
             "timeout": 60
         },
-        {
+		{
             "key": "夸父",
             "name": "🍊夸父4K弹幕",
             "type": 3,
@@ -666,9 +666,9 @@
             },
             "ext": {
                 "site": [
-                    "https://www.kfzys.net"
+                    "https://www.kfzy.net"
                 ],
-                "cookie": "bbs_sid=p5mugcm9r147o1d3qpi0su1ucm; bbs_token=gDMAOehNUQetTJv9Lnet0J_2FGJmgdvnx90iTZqzU_2FnO0_3D"
+                "cookie": "bbs_sid=qovfaruectri75sqq38blhqt7o; bbs_token=Bvf498_2FJNbnAe_2Fse39EweDe_2BlQnFYo4s_2FpFtyHueqcGKOssB"
             },
             "timeout": 60
         },
