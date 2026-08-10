@@ -36013,7 +36013,7 @@
                 "ratio": 1.597
             }
         },
-        {
+		{
             "key": "哔哩哔哩听书",
             "name": "🍊哔哩听书",
             "type": 3,
@@ -36022,7 +36022,7 @@
             "quickSearch": 0,
             "filterable": 0,
             "ext": {
-                "json": "./json/哔哩哔哩听书.json",
+                "n": "哔哩听书",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
             },
             "style": {
