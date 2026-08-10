@@ -36047,7 +36047,7 @@
                 "ratio": 1.597
             }
         },
-        {
+		{
             "key": "哔哩哔哩小品",
             "name": "🍊哔哩小品",
             "type": 3,
@@ -36056,7 +36056,7 @@
             "quickSearch": 0,
             "filterable": 0,
             "ext": {
-                "json": "./json/哔哩哔哩小品.json",
+                "n": "哔哩小品",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
             },
             "style": {
