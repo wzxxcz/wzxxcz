@@ -778,36 +778,6 @@
             "timeout": 60
         },
         {
-            "key": "糖果",
-            "name": "🍊糖果搜索",
-            "type": 3,
-            "api": "csp_TGSou",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "timeout": 60
-        },
-        {
-            "key": "兄弟",
-            "name": "🍊兄弟搜索",
-            "type": 3,
-            "api": "csp_XiongdiPan",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "timeout": 60
-        },
-        {
-            "key": "九七",
-            "name": "🍊九七搜索",
-            "type": 3,
-            "api": "csp_97Sou",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "timeout": 60
-        },
-        {
             "key": "百酷",
             "name": "🍊百酷搜索",
             "type": 3,
