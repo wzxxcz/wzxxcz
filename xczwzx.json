@@ -35642,6 +35642,16 @@
                 "ratio": 1.597
             }
         },
+		{
+            "key": "贝乐虎",
+            "name": "🐅贝乐虎儿童",
+            "type": 3,
+            "api": "csp_BeiLeHu",
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            }
+        },
         {
             "key": "少儿教育",
             "name": "📚少儿教育",
