@@ -603,7 +603,7 @@
             },
             "timeout": 60
         },
-        {
+		{
             "key": "闪电",
             "name": "⚡闪电4K",
             "type": 3,
@@ -614,8 +614,7 @@
             "changeable": 1,
             "ext": {
                 "site": [
-                    "https://shandian.blog",
-                    "https://sd.sduc.site"
+                    "http://shandian.blog"
                 ]
             },
             "timeout": 60
