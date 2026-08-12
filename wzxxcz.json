@@ -1524,12 +1524,12 @@
                 "decrypt": "0"
             }
         },
-        {
+		{
             "key": "韩圈",
             "name": "🥯韩圈影视",
             "type": 3,
             "api": "csp_Hxq",
-            "ext": "https://fishapi.wya6.com/fish/fishhxq.php"
+            "ext": "http://www.小不点.com/api/2026/fishhxq.php"
         },
         {
             "key": "七壹",
