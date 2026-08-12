@@ -4711,6 +4711,21 @@
             }
         },
 		{
+            "key": "爱影",
+            "name": "🎞️爱影影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": "https://aysappto.oss-cn-chengdu.aliyuncs.com/q26.txt",
+                "dataKey": "0UKM8jkasM8tdzgW",
+                "dataIv": "0UKM8jkasM8tdzgW",
+                "init": "initV122",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+		{
             "key": "怀桑",
             "name": "🌱怀桑影视",
             "type": 3,
