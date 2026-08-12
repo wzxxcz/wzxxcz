@@ -892,6 +892,12 @@
             "type": 3,
             "api": "./py/瓜子APP.py"
         },
+		{
+            "key": "FreeOK",
+            "name": "🌱FreeOK",
+            "type": 3,
+            "api": "./py/FreeOK.py"
+        },
         {
             "key": "金牌",
             "name": "🏅金牌",
