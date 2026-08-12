@@ -4740,19 +4740,6 @@
             }
         },
         {
-            "key": "灵虎",
-            "name": "🐅灵虎影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://bind.315999.xyz/89.txt",
-                "dataKey": "#getapp@TMD@2025",
-                "dataIv": "#getapp@TMD@2025"
-            }
-        },
-        {
             "key": "缘梦",
             "name": "🍊缘梦影视",
             "type": 3,
@@ -35887,7 +35874,7 @@
             "type": 3,
             "api": "./py/哔哩直播.py"
         },
-        {
+		{
             "key": "哔哩合集",
             "name": "🍊哔哩合集",
             "type": 3,
@@ -35901,7 +35888,7 @@
                 "ratio": 1.433
             },
             "ext": {
-                "json": "./json/哔哩合集.json",
+                "n": "哔哩合集",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
             }
         },
