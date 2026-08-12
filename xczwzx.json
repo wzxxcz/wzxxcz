@@ -35494,7 +35494,7 @@
                 "ratio": 1.433
             },
             "ext": {
-                "json": "./json/哔哩合集.json",
+                "n": "哔哩合集",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
             }
         },
