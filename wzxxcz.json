@@ -1525,6 +1525,22 @@
             }
         },
 		{
+            "key": "马猴影视",
+            "name": "🐒马猴影视",
+            "type": 3,
+            "api": "csp_App3Q",
+            "ext": {
+                "host": "https://45.150.167.18:8000",
+                "finger": "SF-A962FEC75DA28D7514F2A16580334272A78AC0A8429F10C94F47C1BAFC876E3F",
+                "updateId": "43c1ef69-3748-aaeb-317f-c621c77653ee",
+                "deviceBrand": "vivo",
+                "deviceModel": "V2309A",
+                "pkg": "com.damahou.tv",
+                "sk": "SK-woniu-thanks",
+                "ver": "1"
+            }
+        },
+		{
             "key": "云朵影视",
             "name": "🌥️云朵影视",
             "type": 3,
