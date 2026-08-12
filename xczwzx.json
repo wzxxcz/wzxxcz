@@ -4304,6 +4304,21 @@
             }
         },
 		{
+            "key": "怀桑",
+            "name": "🌱怀桑影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": "https://daen-1256234123.cos.ap-shanghai.myqcloud.com/MuQi/mqxhqj.txt",
+                "dataKey": "kj37zs29q22jk96t",
+                "dataIv": "kj37zs29q22jk96t",
+                "init": "initV122",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+		{
             "key": "不戳",
             "name": "💉不戳影视",
             "type": 3,
