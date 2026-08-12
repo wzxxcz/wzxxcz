@@ -1404,6 +1404,15 @@
             "ext": "7lj763gg402i7942412h849jg1558j9jl8g19213il86316k465719lik158491h179312hk935886ig2l05g9"
         },
 		{
+            "key": "一起影视",
+            "name": "🍊一起影视",
+            "type": 3,
+            "api": "csp_AppYQK",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 0
+        },
+		{
             "key": "三秋影视",
             "name": "🍊三秋影视",
             "type": 3,
