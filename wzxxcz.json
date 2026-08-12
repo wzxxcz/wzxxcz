@@ -1557,20 +1557,6 @@
             "ext": "https://fishapi.wya6.com/fish/fishhxq.php"
         },
         {
-            "key": "老鹰",
-            "name": "🦅老鹰影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://maotouyinghubei.oss-cn-wuhan-lr.aliyuncs.com/maotouyinghb.txt",
-                "dataKey": "zxPtEUDGVllIUhDB",
-                "dataIv": "zxPtEUDGVllIUhDB",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
             "key": "七壹",
             "name": "💶七壹影视",
             "type": 3,
@@ -4707,21 +4693,6 @@
                 "site": "https://tiantangwulu.oss-cn-shanghai.aliyuncs.com/axiba.txt",
                 "dataKey": "h5w3d6g1j9s2h3f6",
                 "dataIv": "h5w3d6g1j9s2h3f6",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
-            "key": "蓝鹰",
-            "name": "🦅蓝鹰影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://xinlanyinghb.oss-cn-wuhan-lr.aliyuncs.com/xly.txt",
-                "dataKey": "ca94b06ca359d80e",
-                "dataIv": "ca94b06ca359d80e",
-                "init": "initV120",
                 "ua": "okhttp/3.10.0"
             }
         },
