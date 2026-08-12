@@ -1150,20 +1150,6 @@
             "ext": "https://fishapi.wya6.com/fish/fishhxq.php"
         },
         {
-            "key": "老鹰",
-            "name": "🦅老鹰影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://maotouyinghubei.oss-cn-wuhan-lr.aliyuncs.com/maotouyinghb.txt",
-                "dataKey": "zxPtEUDGVllIUhDB",
-                "dataIv": "zxPtEUDGVllIUhDB",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
             "key": "七壹",
             "name": "💶七壹影视",
             "type": 3,
@@ -4304,21 +4290,6 @@
             }
         },
         {
-            "key": "蓝鹰",
-            "name": "🦅蓝鹰影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://xinlanyinghb.oss-cn-wuhan-lr.aliyuncs.com/xly.txt",
-                "dataKey": "ca94b06ca359d80e",
-                "dataIv": "ca94b06ca359d80e",
-                "init": "initV120",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
             "key": "缘梦",
             "name": "🍊缘梦影视",
             "type": 3,
@@ -4330,6 +4301,32 @@
                 "dataKey": "1234567890987654",
                 "dataIv": "1234567890987654",
                 "ua": "okhttp/3.10.0"
+            }
+        },
+		{
+            "key": "不戳",
+            "name": "💉不戳影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://appcmszbc.zbc4k.app",
+                "dataKey": "pYrEkiWRYhBLTUTC",
+                "dataIv": "pYrEkiWRYhBLTUTC"
+            }
+        },
+		{
+            "key": "魔方",
+            "name": "🧿魔方影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://www.douy32mf.top",
+                "dataKey": "1234567887654321",
+                "dataIv": "1234567887654321"
             }
         },
         {
