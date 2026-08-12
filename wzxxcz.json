@@ -4739,6 +4739,19 @@
                 "ua": "okhttp/3.10.0"
             }
         },
+		{
+            "key": "魔方",
+            "name": "🧿魔方影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://www.douy32mf.top",
+                "dataKey": "1234567887654321",
+                "dataIv": "1234567887654321"
+            }
+        },
         {
             "key": "王子",
             "name": "🤴王子影视",
