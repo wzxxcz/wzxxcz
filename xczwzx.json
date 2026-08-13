@@ -84,12 +84,6 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/Supprise0901/TVBox_live/main/live.txt"
         },
         {
-            "name": "龙壹",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://210.245.166.84:1299/live/live.txt"
-        },
-        {
             "name": "Guovin",
             "type": 0,
             "ua": "okhttp/5.3.2",
