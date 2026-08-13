@@ -1390,6 +1390,12 @@
             "type": 3,
             "api": "./py/华数TV.py"
         },
+		{
+            "key": "dttv",
+            "name": "🎂蛋挞影视",
+            "type": 3,
+            "api": "./py/蛋挞TV.py"
+        },
         {
             "key": "金牌",
             "name": "🏅金牌",
