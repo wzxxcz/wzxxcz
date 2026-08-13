@@ -72,12 +72,6 @@
             "url": "http://www.52top.com.cn:678/downloads/migu.txt"
         },
         {
-            "name": "DS9",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://d.kstore.dev/download/12441/ds9.txt"
-        },
-        {
             "name": "易发",
             "type": 0,
             "ua": "okhttp/5.3.2",
