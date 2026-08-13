@@ -4,6 +4,18 @@
     "logo": "./logo.php",
     "lives": [
         {
+            "name": "酒店",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/adminouyang/231006/refs/heads/main/py/Hotel/hotel.txt"
+        },
+		{
+            "name": "优质",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/adminouyang/231006/refs/heads/main/py/%E4%BC%98%E8%B4%A8%E6%BA%90/output/ipv4/result.txt"
+        },
+		{
             "name": "MIT",
             "type": 0,
             "playerType": 2,
