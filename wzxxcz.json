@@ -1396,6 +1396,12 @@
             "type": 3,
             "api": "./py/蛋挞TV.py"
         },
+		{
+            "key": "wstv",
+            "name": "🍵威视影视",
+            "type": 3,
+            "api": "./py/威视TV.py"
+        },
         {
             "key": "金牌",
             "name": "🏅金牌",
