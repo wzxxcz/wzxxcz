@@ -959,6 +959,48 @@
             "type": 3,
             "api": "./py/哇哇APP.py"
         },
+		{
+            "key": "58vy",
+            "name": "💵58影视",
+            "type": 3,
+            "api": "./py/58影视.py"
+        },
+		{
+            "key": "jgvy",
+            "name": "🍊追光影视",
+            "type": 3,
+            "api": "./py/追光影视.py"
+        },
+		{
+            "key": "qmvm",
+            "name": "🐈七猫影视",
+            "type": 3,
+            "api": "./py/七猫影视.py"
+        },
+		{
+            "key": "hstv",
+            "name": "💶华数影视",
+            "type": 3,
+            "api": "./py/华数TV.py"
+        },
+		{
+            "key": "dttv",
+            "name": "🎂蛋挞影视",
+            "type": 3,
+            "api": "./py/蛋挞TV.py"
+        },
+		{
+            "key": "wstv",
+            "name": "🍵威视影视",
+            "type": 3,
+            "api": "./py/威视TV.py"
+        },
+		{
+            "key": "dsys",
+            "name": "🐍毒舌影视",
+            "type": 3,
+            "api": "./py/毒舌影视.py"
+        },
         {
             "key": "金牌",
             "name": "🏅金牌",
