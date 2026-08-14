@@ -378,10 +378,13 @@
                 "type": "list"
             }
         },
-        {
+		{
             "key": "爱听音乐",
             "name": "🎤爱听音乐",
             "type": 3,
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "api": "./py/爱听音乐.py"
         },
         {
