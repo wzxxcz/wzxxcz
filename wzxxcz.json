@@ -270,7 +270,6 @@
             "name": "🍊配置中心",
             "type": 3,
             "api": "csp_Config",
-			"jar": "./wzx.jar",
             "searchable": 0,
             "changeable": 0,
             "indexs": 0,
