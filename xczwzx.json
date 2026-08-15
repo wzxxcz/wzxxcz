@@ -434,12 +434,6 @@
             "api": "./py/枫叶音乐.py"
         },
         {
-            "key": "网易云音乐",
-            "name": "🎵网易云音乐",
-            "type": 3,
-            "api": "./py/网易云音乐.py"
-        },
-        {
             "key": "荐片",
             "name": "🐭荐片P2P",
             "api": "csp_JianPian",
