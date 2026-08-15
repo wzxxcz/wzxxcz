@@ -387,6 +387,9 @@
             "name": "🎵呦呦DJ",
             "type": 3,
             "api": "csp_Djuu",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
