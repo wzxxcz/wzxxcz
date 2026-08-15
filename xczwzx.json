@@ -35448,14 +35448,14 @@
             "key": "七猫短剧",
             "name": "🐈七猫短剧",
             "type": 3,
-            "api": "csp_QimaoDJ",
+            "api": "csp_ShortQimao",
             "genre": "shortdrama"
         },
-		{
+        {
             "key": "河马短剧",
             "name": "🦛河马短剧",
             "type": 3,
-            "api": "csp_HemaDJ",
+            "api": "csp_ShortHema",
             "genre": "shortdrama"
         },
         {
