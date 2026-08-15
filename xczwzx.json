@@ -35582,8 +35582,10 @@
             "key": "88看球",
             "name": "⚽88看球",
             "type": 3,
-            "api": "csp_Kanqiu",
-            "gridview": 3,
+            "api": "csp_Sports88",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
