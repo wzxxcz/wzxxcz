@@ -346,6 +346,18 @@
             }
         },
 		{
+            "key": "博看听书",
+            "name": "🎵博看听书",
+            "type": 3,
+            "api": "csp_TingBokan",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
+            "style": {
+                "type": "list"
+            }
+        },
+		{
             "key": "kwms",
             "name": "🎵酷我音乐",
             "type": 3,
@@ -374,6 +386,9 @@
             "name": "📺戏曲多多",
             "type": 3,
             "api": "csp_AppLY",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
