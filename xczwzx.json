@@ -35694,10 +35694,26 @@
             }
         },
 		{
+            "key": "童趣",
+            "name": "📚童趣儿童",
+            "type": 3,
+            "api": "csp_TongQu",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            }
+        },
+		{
             "key": "兔小贝",
             "name": "🐰兔小贝儿童",
             "type": 3,
             "api": "csp_TuXiaoBei",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "rect",
                 "ratio": 1.597
