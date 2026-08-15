@@ -1674,26 +1674,6 @@
                 "decrypt": "0"
             }
         },
-        {
-            "key": "薯条",
-            "name": "🥔薯条影视",
-            "type": 3,
-            "api": "csp_AppDrama",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": {
-                "appName": "薯条影视",
-                "publicKey": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCduNEnfxGaLuQRk5ABzXHhPV43zi00sCHjLo8BYc+Wi6xXm2b4v0i28Sq4WlNCKhseft9fz8kO/qLr6/022o1RcuOU7e4GFL3U9WnNODwRBYSYWd+K8nqpI/tAUDmZEBGRWqjrc7x6aMl3A+xpnWkLbPCLsuhbuuUE3tv09oeOpwIDAQAB",
-                "dataKey": "A1VACZJWDKRZY1P3MFV0DDRAZ3F3PT0=",
-                "dataIv": "OC1A06E197EF10CF3F6058CA7A803B5E",
-                "pkg": "com.st.standroid",
-                "host": "",
-                "site": "https://dyttandroid-1372779881.cos.ap-guangzhou.myqcloud.com/app_dyttandroid.txt",
-                "version": "5.0.0.1",
-                "decrypt": "0"
-            }
-        },
 		{
             "key": "马猴影视",
             "name": "🐒马猴影视",
@@ -4809,16 +4789,6 @@
             "ext": "https://tvbox.catvod.com/js/bili.js"
         },
         {
-            "key": "飞飞",
-            "name": "🕊️飞飞影视2",
-            "type": 3,
-            "api": "csp_AppYsV2",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "https://qpcj.69mini.com/api.php/app/"
-        },
-        {
             "key": "花猪",
             "name": "🐗花猪影视",
             "type": 3,
@@ -4843,6 +4813,21 @@
                 "url": "http://165.99.42.137:5432",
                 "dataKey": "1234567890987654",
                 "dataIv": "1234567890987654",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+		{
+            "key": "蓝鹰",
+            "name": "🦅蓝鹰影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "http://103.217.190.91:5566",
+                "dataKey": "hagYExMdMkeWfemK",
+                "dataIv": "hagYExMdMkeWfemK",
+                "init": "initV122",
                 "ua": "okhttp/3.10.0"
             }
         },
