@@ -35422,14 +35422,14 @@
             "key": "好看短剧",
             "name": "🍊好看短剧",
             "type": 3,
-            "api": "csp_HaokanDJ",
+            "api": "csp_ShortHaokan",
             "genre": "shortdrama"
         },
-		{
+        {
             "key": "星芽短剧",
             "name": "🌟星芽短剧",
             "type": 3,
-            "api": "csp_XingyaDJ",
+            "api": "csp_ShortXingya",
             "genre": "shortdrama"
         },
 		{
