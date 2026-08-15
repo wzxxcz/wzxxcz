@@ -36004,11 +36004,14 @@
                 "type": "list"
             }
         },
-        {
+		{
             "key": "瓜子体育",
             "name": "⚽瓜子体育",
             "type": 3,
-            "api": "csp_GuaziTY",
+            "api": "csp_SportsGuazi",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
