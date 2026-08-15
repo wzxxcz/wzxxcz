@@ -35995,11 +35995,14 @@
                 "type": "list"
             }
         },
-        {
+		{
             "key": "球通体育",
             "name": "⚽球通体育",
             "type": 3,
-            "api": "csp_QiutongTY",
+            "api": "csp_SportsQiutong",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
