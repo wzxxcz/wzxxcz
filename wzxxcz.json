@@ -2459,16 +2459,6 @@
             "type": 3,
             "api": "csp_Duboku"
         },
-		{
-            "key": "厂长影视",
-            "name": "🏭厂长影视",
-            "type": 3,
-            "api": "csp_Czsapp",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "https://cz01.vip"
-        },
         {
             "key": "扁豆影院",
             "name": "🍊扁豆影院",
