@@ -35415,7 +35415,7 @@
             "key": "围观短剧",
             "name": "🍊围观短剧",
             "type": 3,
-            "api": "csp_WeiguanDJ",
+            "api": "csp_ShortWeiguan",
             "genre": "shortdrama"
         },
 		{
