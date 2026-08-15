@@ -428,16 +428,6 @@
             "api": "./py/爱听音乐.py"
         },
         {
-            "key": "啊哈DJ网",
-            "name": "🎵啊哈DJ音乐",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./json/闪闪音乐网.json"
-        },
-        {
             "key": "枫叶音乐",
             "name": "🎵枫叶音乐",
             "type": 3,
