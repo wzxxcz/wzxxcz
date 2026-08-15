@@ -34,7 +34,7 @@
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/wujiangliu/live-sources/refs/heads/main/bhmb.m3u"
-        }, 
+        },
 		{
             "name": "国际TV",
             "type": 0,
@@ -318,7 +318,7 @@
         },
         {
             "key": "央视片库",
-            "name": "🇨🇳央视大全",
+            "name": "🇨🇳央视大全","key": "呦呦DJ",
             "type": 3,
             "api": "./py/分享央视.py",
             "searchable": 1,
@@ -35747,7 +35747,7 @@
                 "ratio": 1.597
             }
         },
-        {
+		{
             "key": "初中课堂",
             "name": "📚初中课堂",
             "type": 3,
@@ -35772,6 +35772,23 @@
             "searchable": 0,
             "quickSearch": 0,
             "changeable": 0,
+            "ext": {
+                "json": "./json/高中课堂.json",
+                "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
+            },
+            "style": {
+                "type": "rect",
+                "ratio": 1.597
+            }
+        },
+        {
+            "key": "高中课堂",
+            "name": "📚高中课堂",
+            "type": 3,
+            "api": "csp_Bili",
+            "searchable": 0,
+            "quickSearch": 0,
+            "filterable": 1,
             "ext": {
                 "json": "./json/高中课堂.json",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
