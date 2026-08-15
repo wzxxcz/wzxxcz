@@ -369,11 +369,14 @@
                 "type": "list"
             }
         },
-        {
+		{
             "key": "戏曲多多",
             "name": "📺戏曲多多",
             "type": 3,
             "api": "csp_AppLY",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
