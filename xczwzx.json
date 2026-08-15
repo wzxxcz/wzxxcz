@@ -341,6 +341,22 @@
             "name": "🎵世界听书",
             "type": 3,
             "api": "csp_TingShijie",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
+            "style": {
+                "type": "list"
+            }
+        },
+		{
+            "key": "堇夏听书",
+            "name": "🎵堇夏听书",
+            "type": 3,
+            "api": "csp_TingJinxia",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
+            "ext": "https://m.ting15.com",
             "style": {
                 "type": "list"
             }
