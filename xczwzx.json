@@ -35610,16 +35610,10 @@
             "key": "咖啡体育",
             "name": "⚽咖啡体育",
             "type": 3,
-            "api": "csp_KafeiTY",
-            "style": {
-                "type": "list"
-            }
-        },
-        {
-            "key": "919体育",
-            "name": "⚽919体育",
-            "type": 3,
-            "api": "csp_919TY",
+            "api": "csp_SportsKafei",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
