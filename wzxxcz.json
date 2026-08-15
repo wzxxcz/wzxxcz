@@ -336,11 +336,14 @@
                 "type": "list"
             }
         },
-        {
+		{
             "key": "世界听书",
             "name": "🎵世界听书",
             "type": 3,
             "api": "csp_TingShijie",
+            "searchable": 1,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
