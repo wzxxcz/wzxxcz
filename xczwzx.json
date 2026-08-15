@@ -456,19 +456,6 @@
             "timeout": 60
         },
         {
-            "key": "行动",
-            "name": "🥥行动影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "url": "http://165.99.42.137:5432",
-                "dataKey": "1234567890987654",
-                "dataIv": "1234567890987654"
-            }
-        },
-        {
             "key": "咕噜画",
             "name": "🌾咕噜影视",
             "type": 3,
