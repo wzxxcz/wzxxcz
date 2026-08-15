@@ -327,11 +327,14 @@
             "filterable": 1,
             "timeout": 60
         },
-        {
+		{
             "key": "蜻蜓FM",
             "name": "🦟蜻蜓FM",
             "type": 3,
             "api": "csp_QingtingFM",
+            "searchable": 0,
+            "quickSearch": 0,
+            "changeable": 0,
             "style": {
                 "type": "list"
             }
