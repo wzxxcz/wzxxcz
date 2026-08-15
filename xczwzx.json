@@ -1468,17 +1468,6 @@
             }
         },
         {
-            "key": "云播1",
-            "name": "☁️云播影视1",
-            "type": 3,
-            "api": "csp_AppFox",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "host": "http://app.hktvyb.cc"
-            }
-        },
-        {
             "key": "秒看1",
             "name": "🍊秒看影视",
             "type": 3,
@@ -11116,13 +11105,6 @@
                 "排序": "时间&人气&评分",
                 "排序值": "time&hits&score"
             }
-        },
-        {
-            "key": "云播影视",
-            "name": "☁️云播影视",
-            "type": 3,
-            "api": "csp_Tvyb",
-            "ext": "http://www.tvyb03.com"
         },
         {
             "key": "追剧网",
