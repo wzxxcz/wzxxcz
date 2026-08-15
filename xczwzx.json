@@ -35720,7 +35720,7 @@
             "api": "csp_Bili",
             "searchable": 0,
             "quickSearch": 0,
-            "filterable": 1,
+            "changeable": 0,
             "ext": {
                 "json": "./json/少儿教育.json",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
@@ -35737,7 +35737,7 @@
             "api": "csp_Bili",
             "searchable": 0,
             "quickSearch": 0,
-            "filterable": 1,
+            "changeable": 0,
             "ext": {
                 "json": "./json/小学课堂.json",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
@@ -35754,7 +35754,7 @@
             "api": "csp_Bili",
             "searchable": 0,
             "quickSearch": 0,
-            "filterable": 1,
+            "changeable": 0,
             "ext": {
                 "json": "./json/初中课堂.json",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
@@ -35771,7 +35771,7 @@
             "api": "csp_Bili",
             "searchable": 0,
             "quickSearch": 0,
-            "filterable": 1,
+            "changeable": 0,
             "ext": {
                 "json": "./json/高中课堂.json",
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
