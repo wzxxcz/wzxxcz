@@ -1033,6 +1033,12 @@
             "type": 3,
             "api": "./py/vidhub🍀TG @hshsjk9.py"
         },
+		{
+            "key": "网飞影视",
+            "name": "🕊️网飞影视",
+            "type": 3,
+            "api": "./py/网飞TV.py"
+        },
         {
             "key": "金牌",
             "name": "🏅金牌",
