@@ -1027,6 +1027,12 @@
             "type": 3,
             "api": "./py/高清点播🍀TG @hshsjk9.py"
         },
+		{
+            "key": "vidhub视频库",
+            "name": "🍊vidhub视频库",
+            "type": 3,
+            "api": "./py/vidhub🍀TG @hshsjk9.py"
+        },
         {
             "key": "金牌",
             "name": "🏅金牌",
