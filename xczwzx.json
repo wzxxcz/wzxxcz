@@ -1021,6 +1021,12 @@
             "type": 3,
             "api": "./py/看剧AI🍀TG @hshsjk9.py"
         },
+		{
+            "key": "高清点播1",
+            "name": "🍊高清点播1",
+            "type": 3,
+            "api": "./py/高清点播🍀TG @hshsjk9.py"
+        },
         {
             "key": "金牌",
             "name": "🏅金牌",
