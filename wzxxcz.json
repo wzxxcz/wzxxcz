@@ -1395,12 +1395,6 @@
             "api": "./py/华数TV.py"
         },
 		{
-            "key": "dttv",
-            "name": "🎂蛋挞影视",
-            "type": 3,
-            "api": "./py/蛋挞TV.py"
-        },
-		{
             "key": "wstv",
             "name": "🍵威视影视",
             "type": 3,
