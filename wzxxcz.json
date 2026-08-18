@@ -1148,17 +1148,6 @@
             }
         },
         {
-            "key": "巧技2",
-            "name": "🔍搜艘影视",
-            "type": 3,
-            "searchable": 1,
-            "quickSearch": 1,
-            "api": "csp_qiao2",
-            "playerType": 2,
-            "jar": "https://ncstatic-file.clewm.net/rsrc/2025/1212/12/8bee5a479d0ee7996e58a4043085b8b8.png;md5;9cf0a6c1f62ad83e9dccc2b7dd683a10",
-            "ext": "7lj763gg402i7942412h849jg1558j9jl8g19213il86316k465719lik158491h179312h4934183ig2l05g9"
-        },
-        {
             "key": "嘟嘟影院",
             "name": "🐷嘟嘟影院",
             "type": 3,
