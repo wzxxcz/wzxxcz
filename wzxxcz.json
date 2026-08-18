@@ -4856,6 +4856,19 @@
             }
         },
 		{
+            "key": "世界",
+            "name": "🗺️世界影视",
+            "type": 3,
+            "api": "csp_AppGet",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "https://appcms.4ksj.app",
+                "dataKey": "O3K6rYx75Q4xtiIE",
+                "dataIv": "O3K6rYx75Q4xtiIE"
+            }
+        },
+		{
             "key": "不戳",
             "name": "💉不戳影视",
             "type": 3,
