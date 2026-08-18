@@ -519,7 +519,7 @@
             },
             "timeout": 60
         },
-        {
+		{
             "key": "二小",
             "name": "🐂二小4K弹幕",
             "type": 3,
@@ -530,11 +530,9 @@
             "changeable": 1,
             "ext": {
                 "site": [
-                    "https://www.2xiaopan.top",
-                    "https://2xiaopan.top",
-                    "https://www.erxiaozhan.top",
-                    "https://www.2xiaozhan.top",
-                    "https://wexwp.cc"
+                    "http://www.wexwp.cc",
+                    "https://www.2xiaopan.one",
+                    "https://www.wexwp.cc"
                 ]
             },
             "timeout": 60
