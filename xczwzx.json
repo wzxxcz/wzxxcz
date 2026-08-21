@@ -998,6 +998,12 @@
             "api": "./py/飞快TV🍀TG @hshsjk9.py"
         },
 		{
+            "key": "Auete影视",
+            "name": "🍊Auete影视",
+            "type": 3,
+            "api": "./py/Auete影视🍀TG @hshsjk9.py"
+        },
+		{
             "key": "看剧AI",
             "name": "🍊看剧影视",
             "type": 3,
