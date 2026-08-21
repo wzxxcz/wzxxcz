@@ -435,7 +435,7 @@
         },
 		{
             "key": "Nostr",
-            "name": "Nostr推荐",
+            "name": "🍊Nostr推荐",
             "type": 3,
             "api": "csp_Nostr",
 			"homePage": "https://nostrtv.aws.dpdns.org/"
