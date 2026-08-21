@@ -1010,6 +1010,12 @@
             "api": "./py/大马猴🍀TG @hshsjk9.py"
         },
 		{
+            "key": "pomo影视",
+            "name": "🍊pomo影视",
+            "type": 3,
+            "api": "./py/pomo🍀TG @hshsjk9.py"
+        },
+		{
             "key": "看剧AI",
             "name": "🍊看剧影视",
             "type": 3,
