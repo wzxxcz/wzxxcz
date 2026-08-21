@@ -1022,6 +1022,12 @@
             "api": "./py/枫叶影院🍀TG @hshsjk9.py"
         },
 		{
+            "key": "泡泡影院1",
+            "name": "🐳泡泡影院1",
+            "type": 3,
+            "api": "./py/泡泡影院🍀TG @hshsjk9.py"
+        },
+		{
             "key": "看剧AI",
             "name": "🍊看剧影视",
             "type": 3,
