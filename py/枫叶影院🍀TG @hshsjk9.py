@@ -170,6 +170,8 @@ class Spider(Spider):
         for sid, fname in froms:
             if sid not in groups or not groups[sid] or sid not in PLAYABLE:
                 continue
+            # ===== 关键修改：按集数编号正序排列 =====
+            groups[sid].sort(key=lambda x: int(x[0]) if x[0].isdigit() else 0)
             fname = re.sub(r'\(\d+\)$', '', re.sub(r'\s+', '', re.sub(r'<[^>]+>', '', fname).replace('&nbsp;', ' ')).strip())
             pf.append(fname or ("线路%s" % sid))
             pu.append("#".join("%s$%s" % (e, u) for n, e, u in groups[sid]))
