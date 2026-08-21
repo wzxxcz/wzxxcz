@@ -434,6 +434,13 @@
             "api": "./py/枫叶音乐.py"
         },
 		{
+            "key": "Nostr",
+            "name": "Nostr推荐",
+            "type": 3,
+            "api": "csp_Nostr",
+			"homePage": "https://nostrtv.aws.dpdns.org/"
+        },
+		{
             "key": "玩偶",
             "name": "🐲小橙子智能4K弹幕",
             "type": 3,
