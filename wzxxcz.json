@@ -1614,7 +1614,7 @@
         },
         {
             "key": "苹果",
-            "name": "🍎苹果影视1",
+            "name": "🍎苹果影视",
             "type": 3,
             "api": "csp_AppDrama",
             "searchable": 1,
