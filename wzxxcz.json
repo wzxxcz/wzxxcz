@@ -1380,6 +1380,12 @@
             "api": "./py/采集聚合.py"
         },
 		{
+            "key": "飞快TV1",
+            "name": "🕊️飞快TV1",
+            "type": 3,
+            "api": "./py/飞快TV🍀TG @hshsjk9.py"
+        },
+		{
             "key": "看剧AI",
             "name": "🍊看剧影视",
             "type": 3,
