@@ -242,16 +242,6 @@
             "api": "csp_Douban",
             "searchable": 0
         },
-		{
-            "key": "webhome",
-            "name": "🏠WebHome",
-            "type": 3,
-            "api": "csp_Nostr",
-			"jar": "./jars/aidaox.jar",
-			"searchable": 0,
-			"changeable": 0,
-            "ext": "{\"homePage\":\"http://rihou.cc:88/html/wo.html\"}"
-        },
         {
             "key": "应用商店",
             "name": "🍊应用商店",
