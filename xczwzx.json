@@ -962,12 +962,6 @@
             "api": "./py/追光影视.py"
         },
 		{
-            "key": "qmvm",
-            "name": "🐈七猫影视",
-            "type": 3,
-            "api": "./py/七猫影视.py"
-        },
-		{
             "key": "hstv",
             "name": "💶华数影视",
             "type": 3,
