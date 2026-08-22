@@ -974,12 +974,6 @@
             "api": "./py/威视TV.py"
         },
 		{
-            "key": "dsys",
-            "name": "🐍毒舌影视",
-            "type": 3,
-            "api": "./py/毒舌影视.py"
-        },
-		{
             "key": "8tdy",
             "name": "🌤️八天电影",
             "type": 3,
