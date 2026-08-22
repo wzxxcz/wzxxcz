@@ -1404,6 +1404,12 @@
             "api": "./py/看戏影视🍀TG @hshsjk9.py"
         },
 		{
+            "key": "VIP兔影视",
+            "name": "🍊VIP兔影视",
+            "type": 3,
+            "api": "./py/VIP兔🍀TG @hshsjk9.py"
+        },
+		{
             "key": "飞快TV1",
             "name": "🕊️飞快TV1",
             "type": 3,
