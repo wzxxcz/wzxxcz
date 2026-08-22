@@ -1010,6 +1010,12 @@
             "api": "./py/一起影视🍀TG @hshsjk9.py"
         },
 		{
+            "key": "看戏影视1",
+            "name": "🍊看戏影视1",
+            "type": 3,
+            "api": "./py/看戏影视🍀TG @hshsjk9.py"
+        },
+		{
             "key": "飞快TV1",
             "name": "🕊️飞快TV1",
             "type": 3,
