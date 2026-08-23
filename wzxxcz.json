@@ -1551,6 +1551,12 @@
             "type": 3,
             "api": "./js/永乐视频.js"
         },
+		{
+            "key": "独播库1",
+            "name": "💡播库影视",
+            "type": 3,
+            "api": "./js/VmOlRys8_vip.js"
+        },
         {
             "key": "巧技二",
             "name": "🔍搜搜影视",
