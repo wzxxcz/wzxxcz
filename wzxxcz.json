@@ -1476,7 +1476,7 @@
             "api": "./py/厂长影视.py"
         },
         {
-            "key": "金牌",
+            "key": "JP",
             "name": "🏅金牌",
             "type": 3,
             "api": "./py/金牌APP.py"
