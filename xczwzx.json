@@ -871,6 +871,12 @@
             "api": "./py/瓜子APP.py"
         },
 		{
+            "key": "瓜子1影视",
+            "name": "🍉瓜子影视备",
+            "type": 3,
+            "api": "csp_Gz360"
+        },
+		{
             "key": "FreeOK",
             "name": "🌱FreeOK",
             "type": 3,
