@@ -389,7 +389,7 @@ class Spider(Spider):
                     'vod_actor': data['vodActor'],
                     'vod_director': data['vodDirector'],
                     'vod_content': data['vodContent'],
-                    'vod_play_from': '老僧酿酒',
+                    'vod_play_from': '小橙子金牌',
                     'vod_play_url': '#'.join(vod_play_url)
 
                 }
