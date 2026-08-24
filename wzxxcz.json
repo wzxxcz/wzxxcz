@@ -489,6 +489,13 @@
             "homePage": "https://nostr.aws.dpdns.org/"
         },
 		{
+            "key": "Nostrtv",
+            "name": "🐲Nostrtv推荐",
+            "type": 3,
+			"api": "csp_Nostr",
+            "homePage": "https://nostrtv.aws.dpdns.org/"
+        },
+		{
             "key": "玩偶",
             "name": "🐲小橙子智能4K弹幕",
             "type": 3,
