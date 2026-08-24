@@ -1590,6 +1590,15 @@
             "type": 3,
             "api": "./py/泥巴影视.py"
         },
+		{
+            "key": "爬虫影视",
+            "name": "🐛爬虫影视",
+            "type": 1,
+            "api": "https://dy.7772888.xyz/api.php/tvbox",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
         {
             "key": "柠檬",
             "name": "🍋柠檬影院",
