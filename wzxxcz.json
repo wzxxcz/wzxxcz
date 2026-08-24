@@ -1565,6 +1565,19 @@
             "type": 3,
             "api": "./py/6080影视.py"
         },
+		{
+            "key": "葫芦影视",
+            "name": "💡葫芦影视",
+            "type": 3,
+            "api": "./js/葫芦影视.js",
+            "ext": {
+                "host": "./JS/maccos_config.txt",
+                "key": "8R33VQSxzmCaHpEX",
+                "init": "V122",
+                "api": 2,
+                "ua": "okhttp/3.10.0"
+            }
+        },
         {
             "key": "柠檬",
             "name": "🍋柠檬影院",
