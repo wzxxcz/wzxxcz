@@ -1579,10 +1579,21 @@
             }
         },
 		{
+            "key": "人人影视",
+            "name": "💡人人影视",
+            "type": 3,
+            "api": "https://gh-proxy.com/https://raw.githubusercontent.com/maoystv/api/refs/heads/main/JS/drpy2.min.js",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "order_num": 0,
+            "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/maoystv/6/refs/heads/main/JS/分享双人.js"
+        },
+        {
             "key": "V5影视",
             "name": "💡V5影视",
             "type": 3,
-            "api": "./V5影视.py",
+            "api": "https://dogpan.com/f/98X1c2/V5影视.py",
             "ext": "http://43.248.117.123:4680"
         },
         {
