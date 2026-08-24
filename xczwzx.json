@@ -1693,6 +1693,17 @@
                 "site": "https://www.hkybqufgh.com,https://www.sizhengxt.com,https://www.tjrongze.com,https://www.jiabaide.cn"
             }
         },
+		{
+            "key": "cat_剧迷网",
+            "name": "🥇剧迷影视",
+            "type": 3,
+            "api": "./js/高清剧迷.js",
+            "style": {
+                "type": "rect",
+                "ratio": 1
+            },
+            "changeable": 1
+        },
         {
             "key": "片喵",
             "name": "🐈片喵影视",
