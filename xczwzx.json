@@ -1211,6 +1211,12 @@
             "type": 3,
             "api": "./js/VmOlRys8_vip.js"
         },
+		{
+            "key": "猎手",
+            "name": "💡猎手影视",
+            "type": 3,
+            "api": "./py/猎手.py"
+        },
         {
             "key": "巧技二",
             "name": "🔍搜搜影视",
