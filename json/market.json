@@ -154,6 +154,24 @@
     "name": "影视仓",
     "list": [
       {
+        "name": "手机平板",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/ysc_3.3.7_sjpb.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "3.3.7"
+      },
+      {
+        "name": "电视端(32位)",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/ysc_6.2.7_32wds.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "6.2.7"
+      },
+      {
+        "name": "电视端(64位)",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/ysc_6.2.7_64wdsb.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "6.2.7"
+      },
+      {
         "name": "手机端",
         "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/yscsjb_3.2.8.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
