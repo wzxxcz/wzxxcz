@@ -11,31 +11,31 @@
     ]
   },
   {
-    "name": "OK影视Pro",
+    "name": "自用影视",
     "list": [
       {
+        "name": "手机端(32位)",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/ZYmobile-armeabi_v7a.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "2.8.2"
+      },
+      {
         "name": "手机端(64位)",
-        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/OKysPro-sjb-5.2.1.apk",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/ZYmobile-arm64_v8a.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.2.1"
-      },
-      {
-        "name": "手机端(模拟器)",
-        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/OKysPro-sjb-5.2.1.-.mnq.apk",
-        "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.2.1"
-      },
-      {
-        "name": "电视端(64位)",
-        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/OKysPro-dsb-64w-5.2.1.apk",
-        "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.2.1"
+        "version": "2.8.2"
       },
       {
         "name": "电视端(32位)",
-        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/OKysPro-dsb-32w-5.2.1.apk",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/ZYleanback-armeabi_v7a.apk",
         "icon": "https://xcz.iptv365.org/yysdok.png",
-        "version": "5.2.1"
+        "version": "2.8.2"
+      },
+      {
+        "name": "电视端(64位)",
+        "url": "https://github.dpik.top/https://github.com/wzxxcz/OK-APP/releases/download/OK%E5%BD%B1%E8%A7%86/ZYleanback-arm64_v8a.apk",
+        "icon": "https://xcz.iptv365.org/yysdok.png",
+        "version": "2.8.2"
       }
     ]
   },
