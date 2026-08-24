@@ -2073,7 +2073,7 @@
             "key": "py_文才",
             "name": "🥇文才影视",
             "type": 3,
-            "api": "https://cdn.jsdmirror.com/gh/ouhaibo1980/tvbox@main/py/文才影视.py",
+            "api": "./py/文才影视.py",
             "searchable": 1,
             "quickSearch": 1,
             "filterable": 1,
