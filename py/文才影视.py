@@ -34,7 +34,7 @@ class Spider(Spider):
         pass
 
     def getName(self):
-        pass
+        return "文才影视"
 
     def isVideoFormat(self, url):
         pass
@@ -122,9 +122,20 @@ class Spider(Spider):
         data=self.fetch(f"{self.host}/api/mw-movie/anonymous/video/detail?id={ids[0]}",headers=self.getheaders({'id':ids[0]})).json()
         vod=self.getvod([data['data']])[0]
         vod['vod_play_from']='小橙子有文才'
-        vod['vod_play_url'] = '#'.join(
-            f"{i['name'] if len(vod['episodelist']) > 1 else vod['vod_name']}${ids[0]}@@{i['nid']}" for i in
-            vod['episodelist'])
+        
+        # ============================================================
+        # 修复：检查 episodelist 是否存在且不为空
+        # ============================================================
+        episodelist = vod.get('episodelist', [])
+        if episodelist and len(episodelist) > 0:
+            vod['vod_play_url'] = '#'.join(
+                f"{i['name'] if len(episodelist) > 1 else vod.get('vod_name', '')}${ids[0]}@@{i['nid']}" for i in
+                episodelist)
+        else:
+            # 如果没有剧集列表，尝试从其他字段获取播放地址
+            # 或者返回一个占位，让用户知道没有播放源
+            vod['vod_play_url'] = f"{vod.get('vod_name', '')}${ids[0]}@@0"
+        
         vod.pop('episodelist', None)
         return {'list':[vod]}
 
@@ -150,10 +161,51 @@ class Spider(Spider):
             'Referer': f'{self.host}/'
         }
         ids=id.split('@@')
-        pdata = self.fetch(f"{self.host}/api/mw-movie/anonymous/v2/video/episode/url?clientType=1&id={ids[0]}&nid={ids[1]}",headers=self.getheaders({'clientType':'1','id': ids[0], 'nid': ids[1]})).json()
-        vlist=[]
-        for i in pdata['data']['list']:vlist.extend([i['resolutionName'],i['url']])
-        return {'parse':0,'url':vlist,'header':self.header}
+        
+        # ============================================================
+        # 修复：增强播放地址获取的健壮性
+        # ============================================================
+        try:
+            pdata = self.fetch(
+                f"{self.host}/api/mw-movie/anonymous/v2/video/episode/url?clientType=1&id={ids[0]}&nid={ids[1]}",
+                headers=self.getheaders({'clientType':'1','id': ids[0], 'nid': ids[1]})
+            ).json()
+            
+            # 检查返回数据是否有效
+            if pdata and 'data' in pdata and 'list' in pdata['data'] and pdata['data']['list']:
+                vlist=[]
+                for i in pdata['data']['list']:
+                    # 只添加有效的播放地址
+                    url = i.get('url', '')
+                    if url and url.startswith('http'):
+                        vlist.extend([i.get('resolutionName', '默认'), url])
+                
+                # 如果有有效的播放地址，返回
+                if vlist:
+                    return {'parse': 0, 'url': vlist, 'header': self.header}
+            
+            # 如果上面的逻辑没有返回有效的播放地址，尝试备用方案
+            # 方案1：尝试 v1 接口
+            pdata_v1 = self.fetch(
+                f"{self.host}/api/mw-movie/anonymous/v1/video/episode/url?clientType=1&id={ids[0]}&nid={ids[1]}",
+                headers=self.getheaders({'clientType':'1','id': ids[0], 'nid': ids[1]})
+            ).json()
+            
+            if pdata_v1 and 'data' in pdata_v1 and 'list' in pdata_v1['data'] and pdata_v1['data']['list']:
+                vlist=[]
+                for i in pdata_v1['data']['list']:
+                    url = i.get('url', '')
+                    if url and url.startswith('http'):
+                        vlist.extend([i.get('resolutionName', '默认'), url])
+                if vlist:
+                    return {'parse': 0, 'url': vlist, 'header': self.header}
+            
+            # 如果所有方案都失败，返回空播放地址（让前端显示"无播放源"）
+            return {'parse': 0, 'url': [], 'header': self.header}
+            
+        except Exception as e:
+            # 发生异常时返回空播放地址
+            return {'parse': 0, 'url': [], 'header': self.header}
 
     def localProxy(self, param):
         pass
@@ -172,18 +224,27 @@ class Spider(Spider):
         def test_host(url):
             try:
                 start_time = time.time()
-                response = requests.head(url, timeout=1.0, allow_redirects=False)
+                # 修复：增加超时时间，避免所有域名都超时
+                response = requests.head(url, timeout=3.0, allow_redirects=False)
                 delay = (time.time() - start_time) * 1000
                 results[url] = delay
             except Exception as e:
+                # 如果请求失败，记录一个较大的延迟值
                 results[url] = float('inf')
+                
         for url in urls:
             t = threading.Thread(target=test_host, args=(url,))
             threads.append(t)
             t.start()
         for t in threads:
             t.join()
-        return min(results.items(), key=lambda x: x[1])[0]
+        
+        # 修复：如果所有域名都失败，返回第一个域名（至少有一个可用的）
+        min_url = min(results.items(), key=lambda x: x[1])[0]
+        # 如果最小延迟是 inf，说明所有域名都失败了，返回第一个
+        if results[min_url] == float('inf'):
+            return urls[0] if urls else ''
+        return min_url
 
     def md5(self, sign_key):
         md5_hash = MD5.new()
