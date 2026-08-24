@@ -1578,6 +1578,17 @@
                 "ua": "okhttp/3.10.0"
             }
         },
+		{
+            "key": "人人影视",
+            "name": "💡人人影视",
+            "type": 3,
+            "api": "./JS/drpy2.min.js",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "order_num": 0,
+            "ext": "./JS/分享双人.js"
+        },
         {
             "key": "柠檬",
             "name": "🍋柠檬影院",
