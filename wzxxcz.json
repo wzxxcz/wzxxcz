@@ -695,9 +695,7 @@
             "type": 3,
             "api": "csp_SeedHub",
             "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "changeable": 1,
+            "quickSearch": 0,
             "ext": {
                 "site": [
                     "https://sidhub.cc",
