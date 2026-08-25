@@ -1971,6 +1971,7 @@
         {
             "key": "爱看影视1",
             "name": "🧿爱看影视1",
+            "type": 3,
             "api": "csp_XBPQ",
             "searchable": 1,
             "quickSearch": 1,
