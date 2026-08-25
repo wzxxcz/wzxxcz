@@ -1144,6 +1144,18 @@
             "type": 3,
             "api": "./py/厂长影视.py"
         },
+		{
+            "key": "厂长资源",
+            "name": "🍊厂长资源",
+            "type": 3,
+            "api": "./py/厂长资源🍀TG @hshsjk9.py"
+        },
+        {
+            "key": "多多影视1",
+            "name": "💵多多影视1",
+            "type": 3,
+            "api": "./py/多多影视🍀TG @hshsjk9.py"
+        },
         {
             "key": "JP",
             "name": "🏅金牌",
