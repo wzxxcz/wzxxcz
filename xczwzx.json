@@ -4520,19 +4520,6 @@
             }
         },
 		{
-            "key": "不戳",
-            "name": "💉不戳影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "url": "https://appcmszbc.zbc4k.app",
-                "dataKey": "pYrEkiWRYhBLTUTC",
-                "dataIv": "pYrEkiWRYhBLTUTC"
-            }
-        },
-		{
             "key": "魔方",
             "name": "🧿魔方影视",
             "type": 3,
