@@ -195,7 +195,7 @@ async function detail(id) {
             }]
         });
     }
-    vod.vod_play_from = '装歌APP';
+    vod.vod_play_from = '小橙子影视';
     if (vod.episodelist?.length) {
         vod.vod_play_url = vod.episodelist
             .map(ep => `${ep.name.padStart(2, '0')}$${id}-${ep.nid}`)
