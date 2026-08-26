@@ -1684,6 +1684,19 @@
             "api": "./py/猎手.py"
         },
 		{
+            "key": "星河",
+            "name": "🌌星河影视",
+            "type": 3,
+            "api": "./js/get.js",
+            "ext": {
+                "host": "http://110.42.67.130:1226",
+                "key": "kj37zs29q22jk96t",
+                "init": "V122",
+                "api": 2,
+                "ua": "okhttp/3.10.0"
+            }
+        },
+		{
             "key": "戒",
             "name": "💡视界影视",
             "type": 3,
