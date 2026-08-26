@@ -1684,6 +1684,16 @@
             "api": "./py/猎手.py"
         },
 		{
+            "key": "戒",
+            "name": "💡视界影视",
+            "type": 3,
+            "api": "./js/jys.js",
+            "searchable": 1,
+            "quickSearch": 0,
+            "filterable": 0,
+            "changeable": 0
+        },
+		{
             "key": "剧圈99",
             "name": "🥨剧圈影视",
             "type": 3,
