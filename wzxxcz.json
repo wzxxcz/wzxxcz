@@ -2346,7 +2346,7 @@
                 "搜索数组": "<a class=\"detail-img-link&&</a>",
                 "搜索标题": "title=\"&&\"",
                 "搜索图片": "data-original=\"&&\"",
-                "搜索副标题": "",
+                "搜索副标题": "<h2 class=\"media-title text-row-2\">&&</h2>",
                 "搜索链接": "href=\"&&\"",
                 "筛选": "1",
                 "类型": "",
