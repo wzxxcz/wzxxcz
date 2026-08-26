@@ -1558,6 +1558,12 @@
             "type": 3,
             "api": "./py/多多影视🍀TG @hshsjk9.py"
         },
+		{
+            "key": "VS影院2",
+            "name": "🍊VS影院2",
+            "type": 3,
+            "api": "./py/VS影院🍀TG @hshsjk9.py"
+        },
         {
             "key": "JP",
             "name": "🏅金牌",
