@@ -35379,6 +35379,15 @@
                 "type": "list"
             }
         },
+		{
+            "key": "魔都资源",
+            "name": "🤣魔都动漫",
+            "type": 1,
+            "api": "https://caiji.moduapi.cc/api.php/provide/vod/?ac=list",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
         {
             "key": "Anime1",
             "name": "🤣A1动漫",
