@@ -2178,7 +2178,7 @@
                 "线路数组": "data-dropdown-value&&</div>",
                 "线路标题": "<span>&&</span>",
                 "播放二次截取": "",
-                "播放数组": "id=\"panel1&&</div>",
+                "播放数组": "module-play-list-content&&</div>",
                 "倒序": "0",
                 "播放列表": "<a&&/a>",
                 "播放标题": "<span>&&</span>",
