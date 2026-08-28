@@ -4643,14 +4643,6 @@
             }
         },
         {
-            "key": "韩国",
-            "name": "🧿韩国影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "jar": "./XBPQ/xcznz.jpg",
-            "ext": "./XBPQ/韩剧看看.json"
-        },
-        {
             "key": "农民",
             "name": "🧿农民影视",
             "type": 3,
