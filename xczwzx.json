@@ -4462,6 +4462,21 @@
             }
         },
 		{
+            "key": "怀桑",
+            "name": "🌱怀桑影视",
+            "type": 3,
+            "api": "csp_AppQi",
+            "searchable": 1,
+            "changeable": 1,
+            "ext": {
+                "url": "http://110.42.67.130:1226",
+                "dataKey": "kj37zs29q22jk96t",
+                "dataIv": "kj37zs29q22jk96t",
+                "init": "initV122",
+                "ua": "okhttp/3.10.0"
+            }
+        },
+		{
             "key": "蓝鹰",
             "name": "🦅蓝鹰影视",
             "type": 3,
