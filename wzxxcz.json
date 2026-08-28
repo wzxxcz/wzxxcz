@@ -4826,42 +4826,6 @@
                 "cookie": "http://127.0.0.1:9978/file/TVBox/bili_cookie.txt"
             }
         },
-        {
-            "key": "bili",
-            "name": "✒️bili",
-            "type": 3,
-            "playerType": "2",
-            "api": "https://tvbox.catvod.com/js/drpy2.min.js",
-            "ext": "https://tvbox.catvod.com/js/bili.js"
-        },
-        {
-            "key": "花猪",
-            "name": "🐗花猪影视",
-            "type": 3,
-            "api": "csp_AppQi",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "site": "https://tiantangwulu.oss-cn-shanghai.aliyuncs.com/axiba.txt",
-                "dataKey": "h5w3d6g1j9s2h3f6",
-                "dataIv": "h5w3d6g1j9s2h3f6",
-                "ua": "okhttp/3.10.0"
-            }
-        },
-        {
-            "key": "缘梦",
-            "name": "🍊缘梦影视",
-            "type": 3,
-            "api": "csp_AppGet",
-            "searchable": 1,
-            "changeable": 1,
-            "ext": {
-                "url": "http://165.99.42.137:5432",
-                "dataKey": "1234567890987654",
-                "dataIv": "1234567890987654",
-                "ua": "okhttp/3.10.0"
-            }
-        },
 		{
             "key": "怀桑",
             "name": "🌱怀桑影视",
