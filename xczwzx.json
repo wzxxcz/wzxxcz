@@ -16,6 +16,12 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/adminouyang/231006/refs/heads/main/py/%E4%BC%98%E8%B4%A8%E6%BA%90/output/ipv4/result.txt"
         },
 		{
+            "name": "北京全网通",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://129.211.14.102:27777/api.php?token=79b8cf3f98f4531c1a52137e121d2993"
+        },
+		{
             "name": "裤佬IPTV直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
