@@ -1261,6 +1261,12 @@
             "api": "./py/草莓影视🍀TG @hshsjk9.py"
         },
 		{
+            "key": "八戒影视1",
+            "name": "🐷八戒影视1",
+            "type": 3,
+            "api": "./py/八戒影视🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
