@@ -1237,6 +1237,12 @@
             "api": "./py/兔岛影院🍀TG @hshsjk9.py"
         },
 		{
+            "key": "青牛影视",
+            "name": "🐂青牛影视",
+            "type": 3,
+            "api": "./py/青牛影视🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
