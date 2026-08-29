@@ -1634,6 +1634,12 @@
             "api": "./py/剧下饭4K🍀TG @hshsjk9.py"
         },
 		{
+            "key": "兔岛影院",
+            "name": "🐇兔岛影院",
+            "type": 3,
+            "api": "./py/兔岛影院🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
