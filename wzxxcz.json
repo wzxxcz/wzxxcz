@@ -1622,6 +1622,12 @@
             "api": "./py/电影侠🍀TG @hshsjk9.py"
         },
 		{
+            "key": "首映网",
+            "name": "💡首映网",
+            "type": 3,
+            "api": "./py/首映网🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
