@@ -1261,6 +1261,12 @@
             "api": "./py/八戒影视🍀TG @hshsjk9.py"
         },
 		{
+            "key": "qlys",
+            "name": "🐲麒麟影视2",
+            "type": 3,
+            "api": "./py/麒麟影视.py"
+        },
+		{
             "key": "开心影院",
             "name": "💵开心影院",
             "type": 3,
