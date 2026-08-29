@@ -1225,6 +1225,12 @@
             "api": "./py/首映网🍀TG @hshsjk9.py"
         },
 		{
+            "key": "剧下饭4K",
+            "name": "🍗剧下饭4K",
+            "type": 3,
+            "api": "./py/剧下饭4K🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
