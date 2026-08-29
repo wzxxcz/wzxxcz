@@ -1646,6 +1646,12 @@
             "api": "./py/青牛影视🍀TG @hshsjk9.py"
         },
 		{
+            "key": "搜剧AI",
+            "name": "🔍搜剧AI",
+            "type": 3,
+            "api": "./py/搜剧AI🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
