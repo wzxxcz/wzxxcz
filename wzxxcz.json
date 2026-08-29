@@ -1658,6 +1658,12 @@
             "api": "./py/楓林網🍀TG @hshsjk9.py"
         },
 		{
+            "key": "草莓影视",
+            "name": "🍓草莓影视",
+            "type": 3,
+            "api": "./py/草莓影视🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
