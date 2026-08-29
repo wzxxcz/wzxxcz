@@ -1282,6 +1282,12 @@
             "changeable": 0
         },
 		{
+            "key": "dnyy",
+            "name": "💡多瑙影院",
+            "type": 3,
+            "api": "./py/多瑙影院.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
