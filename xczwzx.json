@@ -1004,12 +1004,6 @@
             "api": "./py/韩小圈.py"
         },
 		{
-            "key": "ww",
-            "name": "🐸哇哇影视",
-            "type": 3,
-            "api": "./py/哇哇APP.py"
-        },
-		{
             "key": "jgvy",
             "name": "🍊追光影视",
             "type": 3,
