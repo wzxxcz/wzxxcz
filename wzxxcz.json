@@ -1652,6 +1652,12 @@
             "api": "./py/搜剧AI🍀TG @hshsjk9.py"
         },
 		{
+            "key": "EcoHub影视",
+            "name": "💡EcoHub影视",
+            "type": 3,
+            "api": "./py/EcoHub影视🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
