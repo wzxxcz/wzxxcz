@@ -1243,6 +1243,12 @@
             "api": "./py/搜剧AI🍀TG @hshsjk9.py"
         },
 		{
+            "key": "66大片网",
+            "name": "💡66大片网",
+            "type": 3,
+            "api": "./py/66大片网🍀TG @hshsjk9.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
