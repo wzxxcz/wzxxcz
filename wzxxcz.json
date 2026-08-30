@@ -5198,7 +5198,7 @@
 				"首页": "120",
                 "起始页": "1",
 				"分类url": "https://www.bikeframer.com/tv/{cateId}/page/{catePg}/year/{year}.html",
-                "分类": "电影$1#电视剧$2#综艺$5#动漫$4#短剧$3#"
+                "分类": "电影$1#电视剧$2#综艺$5#动漫$4#短剧$3#",
 				"二次截取": "",
                 "数组": "public-list-div public-list-bj&&/div></div>",
                 "标题": "title=\"&&\"",
