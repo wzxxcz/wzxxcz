@@ -52,6 +52,12 @@
             "url": "https://445569.pages.dev/https://raw.githubusercontent.com/swhtv/111/refs/heads/main/华视box华视大全swtv"
         },
 		{
+            "name": "潇雨TV直播",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://0701.tv1288.xyz/m3u"
+        },
+		{
             "name": "台湾4GTV直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
