@@ -2542,6 +2542,24 @@
             }
         },
 		{
+            "key": "世界影视1",
+            "name": "🗺️世界影视1",
+            "type": 3,
+            "api": "csp_HkybSpider",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+        {
+            "key": "壹壹影视",
+            "name": "💵壹壹影视",
+            "type": 3,
+            "api": "csp_YiYs",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1
+        },
+		{
             "key": "山楂影视",
             "name": "🍊山楂影视",
             "type": 3,
