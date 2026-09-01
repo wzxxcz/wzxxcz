@@ -35978,7 +35978,8 @@
                 "编码": "UTF-8",
                 "分类": "重生$1#穿越$2#爽剧$3#言情$4#都市$5#古装$6#悬疑$7#剧情$8",
                 "分类url": "https://www.mochadj.com/i/{cateId}-{catePg}.html"
-            }
+            },
+            "genre": "shortdrama"
         },
 		{
             "key": "七猫短剧",
