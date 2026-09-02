@@ -27705,7 +27705,7 @@
                 "主页url": "https://www.naifeite.com/",
                 "首页": "120",
                 "起始页": "1",
-                "分类url": "https://www.naifeite.com/vodshow/id/{cateId}/page/{catePg}.html",
+                "分类url": "https://www.naifeite.com/vodshow/id/{cateId}/page/{catePg}/year/{year}.html",
                 "分类": "电影$1#电视剧$2#综艺$3#动漫$4#短剧$5#",
                 "二次截取": "",
                 "数组": "lazyload&&</a>",
