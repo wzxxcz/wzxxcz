@@ -4,6 +4,12 @@
     "logo": "./logo.php",
     "lives": [
         {
+            "name": "央卫港台",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://210.16.166.24:5555/getRss/dc2c0c88f3ce3c0d74a8e586746e83d1/paylist.m3u"
+        },
+		{
             "name": "酒店",
             "type": 0,
             "ua": "okhttp/5.3.2",
