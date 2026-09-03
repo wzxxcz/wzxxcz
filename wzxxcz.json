@@ -10,12 +10,6 @@
             "url": "http://210.16.166.24:5555/getRss/dc2c0c88f3ce3c0d74a8e586746e83d1/paylist.m3u"
         },
 		{
-            "name": "webview",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/dyr1980/webSourceM3U8/refs/heads/main/webview.txt"
-        },
-		{
             "name": "酒店",
             "type": 0,
             "ua": "okhttp/5.3.2",
