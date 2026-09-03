@@ -843,6 +843,58 @@
             "timeout": 60
         },
 		{
+            "key": "迅雷云盘",
+            "name": "🍊迅雷云盘",
+            "type": 3,
+            "api": "csp_PanXunlei",
+            "searchable": 0,
+            "filterable": 0,
+            "changeable": 0,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            }
+        },
+        {
+            "key": "光鸭网盘",
+            "name": "🦆光鸭网盘",
+            "type": 3,
+            "api": "csp_PanGuangya",
+            "searchable": 0,
+            "filterable": 0,
+            "changeable": 0,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            }
+        },
+        {
+            "key": "天翼云盘",
+            "name": "🍊天翼云盘",
+            "type": 3,
+            "api": "csp_PanTianyi",
+            "searchable": 0,
+            "filterable": 0,
+            "changeable": 0,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            }
+        },
+        {
+            "key": "123云盘",
+            "name": "🍊123云盘",
+            "type": 3,
+            "api": "csp_Pan123",
+            "searchable": 0,
+            "filterable": 0,
+            "changeable": 0,
+            "style": {
+                "type": "list",
+                "ratio": 1.433
+            }
+        },
+		{
             "key": "聚合",
             "name": "🍊聚合搜索",
             "type": 3,
