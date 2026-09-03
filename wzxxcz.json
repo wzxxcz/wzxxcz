@@ -6063,16 +6063,6 @@
             }
         },
         {
-            "key": "555影视",
-            "name": "🎞️555影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XBPQ/xbpq_555App.json"
-        },
-        {
             "key": "影院",
             "name": "🌤️影院",
             "type": 3,
