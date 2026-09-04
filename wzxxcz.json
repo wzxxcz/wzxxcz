@@ -6807,7 +6807,7 @@
                 "跳转播放链接": "var player_*\"url\":\"&&\"",
                 "跳转解析": "",
                 "搜索请求头": "User-Agent$MOBILE_UA",
-                "搜索url": "https://saohuody.com/search/{wd}----------{pg}---.html",
+                "搜索url": "https://www.rdzjax.cn/search/{wd}--{pg}-----------.html",
                 "搜索模式": "1",
                 "搜索后缀": "",
                 "搜索二次截取": "",
