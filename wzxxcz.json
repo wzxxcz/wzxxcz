@@ -1791,12 +1791,6 @@
             "api": "./py/CNFLIX.py"
         },
 		{
-            "key": "风尚影视",
-            "name": "🍊风尚影视",
-            "type": 3,
-            "api": "https://ghfast.top/https://raw.githubusercontent.com/phu889/kjh998/refs/heads/main/py/风尚影视.py"
-        },
-		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
