@@ -335,7 +335,11 @@ class Spider(Spider):
             tree = etree.HTML(html or "")
             if tree is None:
                 continue
+
+            # ---- 标题 ----
             name = self._title_from_detail(html, tree, vid)
+
+            # ---- 封面 ----
             pic_nodes = tree.xpath(
                 '//*[contains(@class,"detail") or contains(@class,"vod")]'
                 '//*[contains(@class,"lazy")]/@data-original | '
@@ -343,8 +347,71 @@ class Spider(Spider):
                 '//*[contains(@class,"detail") or contains(@class,"vod")]//img/@src'
             )
             pic = self._fix(pic_nodes[0]) if pic_nodes else ""
+
+            # ---- 简介 ----
             desc_nodes = tree.xpath('//*[contains(@class,"details-content") or contains(@class,"sketch") or contains(@class,"content")]')
             desc = self._clean_text(self._text(desc_nodes[0]) if desc_nodes else "")
+
+            # ===== 提取详细信息 =====
+            info_nodes = tree.xpath('//div[contains(@class,"details")]//ul[contains(@class,"info")]/li')
+            if not info_nodes:
+                info_nodes = tree.xpath('//ul[contains(@class,"info")]/li')
+            if not info_nodes:
+                info_nodes = tree.xpath('//div[contains(@class,"vod-info")]//li')
+
+            vod_actor = ""
+            vod_director = ""
+            vod_year = ""
+            vod_area = ""
+            vod_class = ""
+
+            for li in info_nodes:
+                text = self._clean_text(self._text(li))
+                label = li.xpath('.//span[contains(@class,"label") or contains(@class,"title")]//text()')
+                label_text = self._clean_text("".join(label)) if label else ""
+
+                if not label_text:
+                    for tag in ["导演", "主演", "类型", "地区", "年代", "年份", "上映", "分类"]:
+                        if text.startswith(tag):
+                            label_text = tag
+                            break
+
+                value = text
+                if label_text:
+                    value = re.sub(r'^[^\w\u4e00-\u9fff]*' + re.escape(label_text) + r'\s*[:：]\s*', '', text).strip()
+                    if not value:
+                        value = text.replace(label_text, "").replace("：", "").replace(":", "").strip()
+
+                if not value:
+                    continue
+
+                if "导演" in label_text:
+                    vod_director = value
+                elif "主演" in label_text or "演员" in label_text:
+                    vod_actor = value
+                elif "类型" in label_text or "分类" in label_text:
+                    vod_class = value
+                elif "地区" in label_text or "国家" in label_text:
+                    vod_area = value
+                elif "年代" in label_text or "年份" in label_text or "上映" in label_text:
+                    year_match = re.search(r'(\d{4})', value)
+                    vod_year = year_match.group(1) if year_match else value
+
+            if not vod_year:
+                year_nodes = tree.xpath('//*[contains(@class,"year") or contains(@class,"date")]//text()')
+                for node in year_nodes:
+                    text = self._clean_text(node)
+                    year_match = re.search(r'(\d{4})', text)
+                    if year_match:
+                        vod_year = year_match.group(1)
+                        break
+
+            if not desc:
+                meta_desc = tree.xpath('//meta[@name="description"]/@content')
+                if meta_desc:
+                    desc = self._clean_text(meta_desc[0])
+
+            # ===== 播放列表 =====
             tabs = tree.xpath('//div[contains(@class,"anthology-tab")]//a[contains(@class,"vod-playerUrl")]')
             boxes = tree.xpath('//div[contains(@class,"anthology-list-box")]')
             play_from = []
@@ -370,15 +437,22 @@ class Spider(Spider):
                     source = "线路" + str(len(play_from) + 1)
                 play_from.append(source)
                 play_url.append("#".join(links))
+
             vod = {
                 "vod_id": vid,
                 "vod_name": name,
                 "vod_pic": pic,
+                "vod_actor": vod_actor,
+                "vod_director": vod_director,
+                "vod_year": vod_year,
+                "vod_area": vod_area,
+                "vod_class": vod_class,
                 "vod_content": desc,
                 "vod_play_from": "$$$".join(play_from),
                 "vod_play_url": "$$$".join(play_url),
             }
             out.append(vod)
+
         return {"list": out}
 
     def searchContent(self, key, quick, pg="1"):
