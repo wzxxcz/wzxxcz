@@ -1330,6 +1330,12 @@
             "api": "./py/迷你影视.py"
         },
 		{
+            "key": "CNFLIX",
+            "name": "🍊CNFLIX影视",
+            "type": 3,
+            "api": "./py/CNFLIX.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
