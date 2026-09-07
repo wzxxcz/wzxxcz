@@ -1,7 +1,28 @@
 # -*- coding: utf-8 -*-
 """
 第九短剧网 (www.gzsns.com) Python Spider — 兼容 FongMi/TV (T3) 与 WebHomeTV/PeekPro (T4)
-【定制版 v11】苹果CMS10 + vfed 模板 — 补全导演/演员等信息解析
+【定制版 v10】苹果CMS10 + vfed 模板，基于真实 HTML 结构逐页实测
+
+本次修订(基于线上抓包实测):
+  1) 分类筛选面板重做:  类型 / 地区 / 年份 / 排序  四组下拉全部内置
+     - 真实筛选路由:  /show/{id}/area/{值}.html    地区
+                      /show/{id}/year/{值}.html     年份(年代)
+                      /show/{id}/by/{time|hits|score}.html  排序
+     - 二级分类(总裁短剧等)本身就是独立分类路由 /show/{subid}.html,
+       在 filter 中作为“类型”维度, 选定后 id 切到子分类, 可与地区/年份/排序叠加。
+     - 各筛选段可任意组合, 服务端会自行规范化顺序。
+  2) 分页路由修正(实测): 统一为  {当前筛选URL去掉.html}/page/{n}.html
+       例: 无筛选   /show/3/page/2.html
+           带筛选   /show/3/area/大陆/page/2.html
+  3) 搜索修复(实测): 本网站 /search.html?wd= 后端已失效——任意关键词都 302 跳到某部
+     无关详情页, 其页面正文是“猜你喜欢”推荐(与关键词无关)。
+     v9 曾把这份无关推荐当搜索结果返回, 造成“搜索内容不对”。
+     现改为: 跟随 302 → 解析详情主片 → 仅当主片标题确实包含关键词才作为单条结果返回,
+     否则判定站点无该词结果并返回空, 不再把无关推荐塞给用户。
+  4) 加载/图片速度:
+     - 首页首屏由多个分类并发抓取聚合, 显著缩短首屏等待。
+     - 图片直给 CDN 原址(https://img.shyleps.com/...), 不二次加工。
+     - 网络超时全面收紧, 失败快速降级, 避免整页卡顿。
 """
 
 import sys
@@ -227,175 +248,28 @@ class Spider(Spider):
                     names[idx] = t[:10]
         return names
 
-    # ===== 【新增】解析详情页中的元数据项（导演、演员、类型、地区、年份等） =====
-    def _parse_meta_items(self, html):
-        """
-        从 vfed 详情页解析各类元数据。
-        返回 dict，包含 director, actor, type_name, area, year, language, update_time 等。
-        """
-        result = {
-            "director": "",
-            "actor": "",
-            "type_name": "",
-            "area": "",
-            "year": "",
-            "language": "",
-            "update_time": "",
-            "vod_content": "",
-        }
-        # 常见 vfed 元数据容器：class="fed-part-info" 或 class="fed-deta-info"
-        # 也可能在 class="fed-deta-content" 中
-        meta_block = self._match(
-            r'<div\s+class="[^"]*fed-part-info[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</div>)',
-            html, re.S)
-        if not meta_block:
-            meta_block = self._match(
-                r'<div\s+class="[^"]*fed-deta-info[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</div>)',
-                html, re.S)
-        if not meta_block:
-            # 更宽松的匹配：找包含 "导演" 或 "主演" 的 dl/dt/dd 结构
-            meta_block = self._match(
-                r'(<dl\s+class="[^"]*fed-deta-info[^"]*"[^>]*>.*?</dl>)',
-                html, re.S)
-        if not meta_block:
-            # 再尝试匹配简化的 li 结构
-            meta_block = self._match(
-                r'<ul\s+class="[^"]*fed-part-info[^"]*"[^>]*>(.*?)</ul>',
-                html, re.S)
-
-        if meta_block:
-            # 尝试多种模式提取
-            # 导演
-            director = self._match(
-                r'导演[：:]\s*</span>\s*<[^>]+>(.*?)</a>', meta_block, re.S)
-            if not director:
-                director = self._match(
-                    r'导演[：:]\s*</span>\s*<span[^>]*>(.*?)</span>', meta_block, re.S)
-            if not director:
-                director = self._match(
-                    r'<span[^>]*>导演[：:]</span>\s*<a[^>]*>(.*?)</a>', meta_block, re.S)
-            if director:
-                result["director"] = self._strip_tags(director).strip()
-
-            # 演员/主演
-            actor = self._match(
-                r'主演[：:]\s*</span>\s*<[^>]+>(.*?)</a>', meta_block, re.S)
-            if not actor:
-                actor = self._match(
-                    r'主演[：:]\s*</span>\s*<span[^>]*>(.*?)</span>', meta_block, re.S)
-            if not actor:
-                actor = self._match(
-                    r'<span[^>]*>主演[：:]</span>\s*<a[^>]*>(.*?)</a>', meta_block, re.S)
-            if actor:
-                result["actor"] = self._strip_tags(actor).strip()
-
-            # 类型
-            type_name = self._match(
-                r'类型[：:]\s*</span>\s*<[^>]+>(.*?)</a>', meta_block, re.S)
-            if not type_name:
-                type_name = self._match(
-                    r'类型[：:]\s*</span>\s*<span[^>]*>(.*?)</span>', meta_block, re.S)
-            if type_name:
-                result["type_name"] = self._strip_tags(type_name).strip()
-
-            # 地区
-            area = self._match(
-                r'地区[：:]\s*</span>\s*<[^>]+>(.*?)</a>', meta_block, re.S)
-            if not area:
-                area = self._match(
-                    r'地区[：:]\s*</span>\s*<span[^>]*>(.*?)</span>', meta_block, re.S)
-            if area:
-                result["area"] = self._strip_tags(area).strip()
-
-            # 年份
-            year = self._match(
-                r'年份[：:]\s*</span>\s*<[^>]+>(.*?)</a>', meta_block, re.S)
-            if not year:
-                year = self._match(
-                    r'年份[：:]\s*</span>\s*<span[^>]*>(.*?)</span>', meta_block, re.S)
-            if year:
-                result["year"] = self._strip_tags(year).strip()
-
-            # 语言
-            language = self._match(
-                r'语言[：:]\s*</span>\s*<[^>]+>(.*?)</a>', meta_block, re.S)
-            if not language:
-                language = self._match(
-                    r'语言[：:]\s*</span>\s*<span[^>]*>(.*?)</span>', meta_block, re.S)
-            if language:
-                result["language"] = self._strip_tags(language).strip()
-
-            # 更新日期（综艺/剧集常用）
-            update_time = self._match(
-                r'更新[：:]\s*</span>\s*<[^>]+>(.*?)</span>', meta_block, re.S)
-            if not update_time:
-                update_time = self._match(
-                    r'更新日期[：:]\s*</span>\s*<[^>]+>(.*?)</span>', meta_block, re.S)
-            if update_time:
-                result["update_time"] = self._strip_tags(update_time).strip()
-
-        # 如果元数据块没解析到，尝试直接从整个 HTML 中提取（备选）
-        if not result["director"]:
-            result["director"] = self._match(
-                r'<span[^>]*>导演[：:]</span>\s*<a[^>]*>([^<]+)</a>', html, re.S)
-            result["director"] = result["director"] or self._match(
-                r'导演[：:]\s*([^<]+?)(?:<|$)', html, re.S)
-        if not result["actor"]:
-            result["actor"] = self._match(
-                r'<span[^>]*>主演[：:]</span>\s*<a[^>]*>([^<]+)</a>', html, re.S)
-            result["actor"] = result["actor"] or self._match(
-                r'主演[：:]\s*([^<]+?)(?:<|$)', html, re.S)
-
-        return result
-
     def _parse_detail_main(self, html, vid):
-        """解析一个详情页的“主影片”字段，包含导演/演员等完整信息。"""
+        """解析一个详情页的“主影片”字段；解析不到主标题返回 None。"""
         title = self._strip_tags(self._match(r'<h1[^>]*>(.*?)</h1>', html, re.S))[:60]
         if not title:
             title = self._match(r'<meta[^>]+property="og:title"[^>]+content="([^"]+)"', html)
             title = (title or "").strip()[:60]
         if not title:
             return None
-
         pic = self._match(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', html)
         if not pic:
             pic = self._match(r'data-original="(https?://[^"]+)"', html)
         if pic and pic.startswith('//'):
             pic = "https:" + pic
-
-        # 简介
         content = self._match(r'<meta[^>]+name="description"[^>]+content="([^"]*)"', html)
-        if not content:
-            # 尝试从 .fed-deta-content 中提取简介
-            content = self._match(
-                r'<div\s+class="[^"]*fed-deta-content[^"]*"[^>]*>(.*?)</div>', html, re.S)
-            if content:
-                content = self._strip_tags(content)
-            else:
-                content = ""
-
-        # 备注（状态）
         remarks = self._strip_tags(self._match(
             r'<span class="fed-list-remarks[^"]*"[^>]*>(.*?)</span>', html, re.S))[:20]
-
-        # ===== 【新增】解析导演/演员等元数据 =====
-        meta = self._parse_meta_items(html)
-
-        # 构建完整返回
         return {
             "vod_id": vid,
             "vod_name": title,
             "vod_pic": pic or "",
             "vod_remarks": remarks or "",
             "vod_content": (content or "")[:800],
-            # ===== 新增字段 =====
-            "vod_director": meta.get("director", ""),
-            "vod_actor": meta.get("actor", ""),
-            "vod_type": meta.get("type_name", ""),
-            "vod_area": meta.get("area", ""),
-            "vod_year": meta.get("year", ""),
-            "vod_language": meta.get("language", ""),
-            "vod_update_time": meta.get("update_time", ""),
         }
 
     # ============================================================
@@ -433,6 +307,7 @@ class Spider(Spider):
 
         videos = []
         have = set()
+        # 聚合顺序：首页 > 各分类，去重
         for u in targets:
             for card in result.get(u, []):
                 if card["vod_id"] not in have:
@@ -460,6 +335,7 @@ class Spider(Spider):
                 ext = json.loads(extend)
             except Exception:
                 ext = {}
+        # 类型(二级子分类)决定基础分类 id
         base = tid
         sub = str(ext.get("sub", "") or "")
         if sub.isdigit():
@@ -490,6 +366,7 @@ class Spider(Spider):
             seg = html[i:i + 4000]
         for m in re.finditer(r'href="[^"]*/(\d+)\.html"[^>]*>\s*(\d+)\s*</a>', seg):
             best = max(best, int(m.group(2)))
+        # 兜底：识别 “1/2173” 形式
         mm = re.search(r'1/(\d+)', seg)
         if mm:
             best = max(best, int(mm.group(1)))
@@ -503,6 +380,7 @@ class Spider(Spider):
             key = "%s|%s|%d" % (tid, extend, 1)
             base_url = self._base_list_url(str(tid), extend)
 
+            # 构造带分页的 URL：统一把 .html 替换成 /page/{n}.html
             if page <= 1:
                 url = base_url
             else:
@@ -633,31 +511,44 @@ class Spider(Spider):
     def searchContent(self, key, quick, pg="1"):
         try:
             kw = quote(key)
+            # 1) 若已有可用路由，先试一次
             if self._search_tpl:
                 return self._search_via(HOST + (self._search_tpl % kw), key)
+            # 2) 按序尝试各候选
             for tpl in SEARCH_TPLS:
                 res = self._search_via(HOST + (tpl % kw), key)
                 if res["list"]:
                     self._search_tpl = tpl
                     return res
+            # 3) 最终尝试首页真实搜索入口
             res = self._search_via(HOST + "/search.html?wd=" + kw, key)
             return res
         except Exception:
             return {"list": []}
 
     def _search_via(self, url, key):
-        """请求一个搜索 URL 并做“关键词命中校验”。"""
+        """请求一个搜索 URL 并做“关键词命中校验”。
+
+        本网站 /search.html?wd= 会 302 到某部无关详情页（后端搜索已失效），
+        其正文是“猜你喜欢”推荐。为避免把无关推荐当结果：
+          - 若返回的是详情页且主片标题包含关键词 -> 返回该单条（真正命中的）；
+          - 否则视为无有效结果，返回空。
+        """
         try:
             html = self._fetch_text(url, timeout=(2.5, 4.5), retries=0)
             if not html:
                 return {"list": []}
+            # 情况 A：站点把搜索词解析后仍落在列表/标签结果页（含多张卡片）
             if html.count('<li class="fed-list-item') >= 2:
                 cards = self._parse_cards(html)
                 if cards:
+                    # 若这是“结果列表”，卡片标题应普遍含关键词才有意义；
+                    # 但 vfed 详情页底部“猜你喜欢”也有卡片，故按主标题是否含词过滤
                     hit = [c for c in cards if self._title_hit(c["vod_name"], key)]
                     if hit:
                         return {"list": hit}
                     return {"list": []}
+            # 情况 B：被 302 落到了某个详情页 -> 校验该详情主片是否含关键词
             if html.count('<li class="fed-list-item') < 2 or '/detail/' in html:
                 vid = self._match(r'/detail/(\d+)\.html', html)
                 main = self._parse_detail_main(html, vid or "0")
@@ -669,19 +560,21 @@ class Spider(Spider):
 
     @staticmethod
     def _title_hit(title, key):
+        """标题与关键词命中判断（宽松：标题含关键词任一字词即算）。"""
         if not title or not key:
             return False
         t = title.lower()
         k = key.lower()
         if k in t:
             return True
+        # 多关键词（空格分隔）时要求至少一个命中
         for part in re.split(r'[\s,，]+', k):
             if part and len(part) >= 1 and part in t:
                 return True
         return False
 
     # ============================================================
-    # 播放
+    # 播放（v10：player_data 优先 + 多级嗅探 + 直链）
     # ============================================================
 
     def playerContent(self, flag, id, vipFlags):
@@ -692,17 +585,20 @@ class Spider(Spider):
             url = HOST + (url if url.startswith("/") else "/" + url)
         hdr = {"User-Agent": UA, "Referer": HOST + "/"}
 
+        # 直链直接播
         if self._is_direct_media(url):
             is_m3u8 = ".m3u8" in url.lower()
             fmt = "application/x-mpegURL" if is_m3u8 else ""
             return {"parse": 0, "playUrl": "", "url": url,
                     "header": hdr, "format": fmt, "contentType": fmt}
 
+        # 官源交给壳子
         low = url.lower()
         if any(k in low for k in ("mgtv.com", "youku.com", "iqiyi.com", "qiyi.com",
                                   "v.qq.com", "bilibili.com")):
             return {"parse": 1, "playUrl": "", "url": url, "header": hdr}
 
+        # 播放页深度嗅探
         html = self._fetch_text(url, timeout=(2, 3), retries=0)
         if html:
             pm = re.search(r'player_data\s*=\s*(\{.*?\})\s*;', html, re.S)
@@ -765,6 +661,7 @@ class Spider(Spider):
                         "format": "application/x-mpegURL",
                         "contentType": "application/x-mpegURL"}
 
+        # WebView 兜底
         return {"parse": 1, "playUrl": "", "url": url, "header": hdr}
 
     def _extract_origin(self, url):
