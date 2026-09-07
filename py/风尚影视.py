@@ -442,7 +442,8 @@ class Spider(Spider):
         for href, v_id, sid, nid, ep_name in all_links:
             if v_id == vid:
                 ep_clean = re.sub(r'<[^>]+>', '', ep_name).strip()
-                if ep_clean:
+                # 过滤掉 "立即播放" 这个条目
+                if ep_clean and ep_clean not in ["立即播放"]:
                     sid_eps[sid].append(f"{ep_clean}${href}")
 
         for sid in sorted(sid_eps.keys(), key=lambda x: int(x)):
@@ -452,7 +453,6 @@ class Spider(Spider):
                 play_from.append(line_name)
                 play_url.append("#".join(ep_list))
 
-        # 移除立即播放相关代码
         if not play_url:
             play_from = ["默认线路"]
             play_url = [f"播放${vid}"]
