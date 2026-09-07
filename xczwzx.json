@@ -2270,12 +2270,6 @@
             "quickSearch": 1,
             "filterable": 1
         },
-		{
-            "key": "山楂影视",
-            "name": "🍊山楂影视",
-            "type": 3,
-            "api": "csp_PianKu8"
-        },
         {
             "key": "飞娱影视",
             "name": "🍊飞娱影视",
