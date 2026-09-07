@@ -376,17 +376,6 @@
             "filterable": 0,
             "ext": "https://gitee.com/wzbdyr/hqds/raw/master/lib/live.json"
         },
-		{
-            "key": "我看电视",
-            "name": "📺我看电视",
-            "type": 3,
-            "api": "./py/我看电视，我作主.py",
-            "searchable": 1,
-            "changeable": 1,
-			"quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
-        },
         {
             "key": "网络直播",
             "name": "📺网络直播",
