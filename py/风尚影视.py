@@ -452,12 +452,7 @@ class Spider(Spider):
                 play_from.append(line_name)
                 play_url.append("#".join(ep_list))
 
-        if not play_url:
-            immediate = re.search(r'href="(/play/\d+/\d+/1\.html)"[^>]*>.*立即播放', html)
-            if immediate:
-                play_from = ["默认线路"]
-                play_url = [f"立即播放${immediate.group(1)}"]
-
+        # 移除立即播放相关代码
         if not play_url:
             play_from = ["默认线路"]
             play_url = [f"播放${vid}"]
