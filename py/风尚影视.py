@@ -5,6 +5,7 @@
   - 精选页增加到36个视频
   - AI漫剧分类(tid=47)不过滤，正常显示全部内容
   - 电影分类过滤后追补5页，避免空页
+  - 移除播放列表中的"立即播放"条目
 """
 import re
 import sys
@@ -442,8 +443,8 @@ class Spider(Spider):
         for href, v_id, sid, nid, ep_name in all_links:
             if v_id == vid:
                 ep_clean = re.sub(r'<[^>]+>', '', ep_name).strip()
-                # 过滤掉 "立即播放" 这个条目
-                if ep_clean and ep_clean not in ["立即播放"]:
+                # 过滤掉 "立即播放" 这个条目（包括各种可能的变体）
+                if ep_clean and ep_clean not in ["立即播放", "立即播放", "播放"] and not ep_clean.startswith("立即播放"):
                     sid_eps[sid].append(f"{ep_clean}${href}")
 
         for sid in sorted(sid_eps.keys(), key=lambda x: int(x)):
