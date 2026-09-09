@@ -64,6 +64,12 @@
             "url": "https://0701.tv1288.xyz/m3u"
         },
 		{
+            "name": "美家经典TV",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://yun.7so.top/f/gpQKsG/JDTV1.1.txt"
+        },
+		{
             "name": "HZXS",
             "type": 0,
             "ua": "okhttp/5.3.2",
