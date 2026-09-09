@@ -64,6 +64,12 @@
             "url": "https://0701.tv1288.xyz/m3u"
         },
 		{
+            "name": "HZXS",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://gitee.com/hzxs800274/iptv/raw/master/live/TV"
+        },
+		{
             "name": "卡卡西IPTV",
             "type": 0,
             "ua": "okhttp/5.3.2",
