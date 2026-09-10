@@ -35676,10 +35676,10 @@
             "ext": "./js/去看吧.js"
         },
         {
-            "key": "T4-xingzhige",
-            "name": "🍊影视短剧",
-            "type": 4,
-            "api": "https://catbox.n13.club/t9/xingzhige.php"
+            "key": "红果短剧",
+            "name": "🍎红果短剧",
+            "type": 3,
+            "api": "./py/红果短剧.py"
         },
         {
             "key": "剧和短剧",
