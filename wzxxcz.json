@@ -979,6 +979,12 @@
             "api": "./js/荐片.js"
         },
 		{
+            "key": "洛雪音乐",
+            "name": "🥇洛雪音乐",
+            "type": 3,
+            "api": "https://ghproxy.net/raw.githubusercontent.com/pdone/lx-music-source/main/sixyin/latest.js"
+        },
+		{
             "key": "移动",
             "name": "💡移动影视",
             "type": 3,
