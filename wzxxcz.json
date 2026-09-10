@@ -36130,6 +36130,12 @@
             "api": "./js/drpy2.min.js",
             "ext": "./js/去看吧.js"
         },
+		{
+            "key": "红果短剧",
+            "name": "🍎红果短剧",
+            "type": 3,
+            "api": "./py/红果短剧.py"
+        },
         {
             "key": "T4-xingzhige",
             "name": "🍊影视短剧",
