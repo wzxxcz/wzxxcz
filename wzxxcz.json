@@ -374,12 +374,6 @@
                 "ratio": 1.618
             }
         },
-		{
-            "key": "1",
-            "name": "🍊小橙子IPTV",
-            "type": 3,
-            "api": "./js/xcz.js"
-        },
         {
             "key": "hipy_js_好趣网",
             "name": "🍊小橙子电视",
