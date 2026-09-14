@@ -11,39 +11,39 @@ var processedHosts = new Set();
 
 var LIVS_SOURCES = [
   {
-    "name": "👖裤佬TV直播",
+    "name": "小橙子TV直播",
     "url": "https://gh-proxy.org/https://raw.githubusercontent.com/pyapk/1/refs/heads/main/zby"
   },
   {
-    "name": "👖潇雨TV直播",
+    "name": "潇雨TV直播",
     "url": "https://0701.tv1288.xyz/m3u"
   },
   {
-    "name": "👖日后TV直播",
+    "name": "日后TV直播",
     "url": "https://jsnzkpg4.pages.dev/http://rihou.cc:555/gggg.nzk"
   },
   {
-    "name": "👖涛涛TV直播",
+    "name": "涛涛TV直播",
     "url": "https://445569.pages.dev/https://raw.githubusercontent.com/taoBox2620/taoBox2620/refs/heads/main/logo1.png"
   },
   {
-    "name": "👖华视TV直播",
+    "name": "华视TV直播",
     "url": "https://445569.pages.dev/https://raw.githubusercontent.com/swhtv/111/refs/heads/main/华视box华视大全swtv"
   },
   {
-    "name": "👖易发TV直播",
+    "name": "易发TV直播",
     "url": "https://445569.pages.dev/https://raw.githubusercontent.com/fafa002/yf2025/refs/heads/main/yiyifafa.txt"
   },
   {
-    "name": "👖土耳其TV直播",
+    "name": "土耳其TV直播",
     "url": "https://445569.pages.dev/https://raw.githubusercontent.com/nigelhayes11/temp/refs/heads/main/MAN%20NORMAL%20TV%202025.m3u"
   },
   {
-    "name": "👖俄罗斯TV直播",
+    "name": "俄罗斯TV直播",
     "url": "https://ilook.epg.one/5CM5SY98BF24PL/2"
   },
   {
-    "name": "👖全球TV直播",
+    "name": "全球TV直播",
     "url": "https://seep.eu.org/iptv-org.github.io/iptv/index.m3u"
   }
 ];
