@@ -35795,6 +35795,12 @@
             "api": "csp_ShortHema",
             "genre": "shortdrama"
         },
+		{
+            "key": "在线短剧",
+            "name": "🍊在线短剧",
+            "type": 3,
+            "api": "./py/在线短剧.py"
+        },
         {
             "key": "短剧场短剧",
             "name": "🍊短剧场短剧",
