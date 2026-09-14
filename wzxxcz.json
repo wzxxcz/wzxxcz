@@ -36118,6 +36118,12 @@
             "api": "./py/黑猫动漫.py"
         },
 		{
+            "key": "MiFun",
+            "name": "🍚MiFun动漫",
+            "type": 3,
+            "api": "./py/MiFun动漫.py"
+        },
+		{
             "key": "红果短剧",
             "name": "🍎红果短剧",
             "type": 3,
