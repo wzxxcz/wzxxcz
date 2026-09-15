@@ -58,6 +58,18 @@
             "url": "https://445569.pages.dev/https://raw.githubusercontent.com/swhtv/111/refs/heads/main/华视box华视大全swtv"
         },
 		{
+            "name": "易发TV直播",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://445569.pages.dev/https://raw.githubusercontent.com/fafa002/yf2025/refs/heads/main/yiyifafa.txt"
+        },
+		{
+            "name": "日后TV直播",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://jsnzkpg4.pages.dev/http://rihou.cc:555/gggg.nzk"
+        },
+		{
             "name": "潇雨TV直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
