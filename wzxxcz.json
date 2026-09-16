@@ -1043,16 +1043,6 @@
             "ext": "https://xunlei8.me"
         },
         {
-            "key": "电影港",
-            "name": "🍊电影港磁力",
-            "type": 3,
-            "api": "csp_XYQHiker",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "./XYQHiker/电影港.json"
-        },
-        {
             "key": "py_xiongdi",
             "name": "👨兄弟影视",
             "type": 3,
