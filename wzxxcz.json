@@ -1003,16 +1003,6 @@
                 "sign": "679543610991810f19698c187e5e106e"
             }
         },
-		{
-            "key": "七味",
-            "name": "🍢七味磁力",
-            "type": 3,
-            "api": "csp_QnMp4",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "ext": "https://www.qwshow.com,https://www.qwmkv.com,https://www.qwfilm.com,https://www.qwfun.com,https://www.qnnull.com,https://www.qnnull.com"
-        },
         {
             "key": "New6v",
             "name": "🍊New6V磁力",
