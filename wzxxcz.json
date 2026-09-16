@@ -35949,7 +35949,6 @@
             "ext": {
                 "host": "http://111.180.139.119:19987/app/bn",
                 "LoginPath": "/app/log",
-                "appkey": "f66f65db127e48449f073c2c6eb0f993",
                 "versionName": "6.4.9",
                 "name": "双子星动漫",
                 "package": "com.haiwang.liangxia.my.ym",
