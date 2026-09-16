@@ -1688,8 +1688,7 @@
             "key": "韩圈",
             "name": "🥯韩圈影视",
             "type": 3,
-            "api": "csp_Hxq",
-            "ext": "http://www.小不点.com/api/2026/fishhxq.php"
+            "api": "csp_Hxq"
         },
         {
             "key": "乌云影视",
