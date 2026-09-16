@@ -810,22 +810,6 @@
             },
             "timeout": 60
         },
-		{
-            "key": "米搜",
-            "name": "🌾米搜4K4K弹幕",
-            "type": 3,
-            "api": "csp_MiSou",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "ext": {
-                "site": [
-                    "http://gesoso.fun",
-                    "http://www.misoso.shop"
-                ]
-            },
-            "timeout": 60
-        },
         {
             "key": "即刻",
             "name": "🍊即刻4K",
