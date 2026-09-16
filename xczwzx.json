@@ -551,6 +551,16 @@
             "filterable": 1,
             "timeout": 60
         },
+		{
+            "key": "爱盼",
+            "name": "💡爱盼4K",
+            "type": 3,
+            "api": "csp_AiPan",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "timeout": 60
+        },
         {
             "key": "咕噜画",
             "name": "🌾咕噜影视",
