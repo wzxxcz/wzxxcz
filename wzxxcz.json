@@ -419,12 +419,6 @@
             "ext": "https://gitee.com/wzbdyr/hqds/raw/master/lib/live.json"
         },
         {
-            "key": "网络直播",
-            "name": "📺网络直播",
-            "type": 3,
-            "api": "./py/网络直播.py"
-        },
-        {
             "key": "央视片库",
             "name": "🇨🇳央视大全",
             "type": 3,
