@@ -1442,6 +1442,12 @@
             "api": "./py/饭搭子影视.py"
         },
 		{
+            "key": "10",
+            "name": "🍊T4影视",
+            "type": 4,
+            "api": "https://banyeomni.780420.xyz:17777/api/tvbox/source/2097848348508688384?token=banye666"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
