@@ -1829,6 +1829,12 @@
             "api": "https://banyeomni.780420.xyz:17777/api/tvbox/source/2097848348508688384?token=banye666"
         },
 		{
+            "key": "山楂影视",
+            "name": "🍊山楂影视",
+            "type": 3,
+            "api": "./py/山楂影视.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
