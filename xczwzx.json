@@ -530,6 +530,13 @@
             "api": "./py/千千音乐.py"
         },
 		{
+            "key": "酷我音乐在线",
+            "name": "🎵酷我音乐在线",
+            "type": 3,
+			"api": "csp_Nostr",
+            "homePage": "https://xcz.iptv365.org/酷我音乐.html"
+        },
+		{
             "key": "5",
             "name": "🍊小橙子影视",
             "type": 3,
