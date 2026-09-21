@@ -876,10 +876,10 @@
             }
         },
 		{
-            "key": "聚合",
-            "name": "🍊聚合搜索",
+            "key": "觅盘",
+            "name": "🍊觅盘搜索",
             "type": 3,
-            "api": "csp_JuheSo",
+            "api": "csp_MiPan",
             "searchable": 1,
             "quickSearch": 0,
             "filterable": 0,
