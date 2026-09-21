@@ -88,6 +88,18 @@
             "url": "https://yun.7so.top/f/gpQKsG/JDTV1.1.txt"
         },
 		{
+            "name": "Supprise0901",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/Supprise0901/TVBox_live/refs/heads/main/live.txt"
+        },
+		{
+            "name": "best-fan",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/best-fan/iptv-sources/refs/heads/main/cn_all.m3u8"
+        },
+		{
             "name": "HZXS",
             "type": 0,
             "ua": "okhttp/5.3.2",
