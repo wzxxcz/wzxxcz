@@ -1570,7 +1570,7 @@
             "key": "看剧AI",
             "name": "🍊看剧影视",
             "type": 3,
-            "api": "./py/看剧AI19.py"
+            "api": "./py/看剧AI🍀TG @hshsjk9.py"
         },
 		{
             "key": "高清点播1",
@@ -1882,6 +1882,12 @@
             "name": "🍊T4影视",
             "type": 4,
             "api": "https://banyeomni.780420.xyz:17777/api/tvbox/source/2097848348508688384?token=banye666"
+        },
+		{
+            "key": "1234影视",
+            "name": "🍊1234影视",
+            "type": 3,
+            "api": "./py/1234影视.py"
         },
 		{
             "key": "爬虫影视",
