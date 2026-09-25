@@ -392,6 +392,14 @@
                 "ratio": 1.618
             }
         },
+		{
+            "key": "央视网页",
+            "name": "🍊小橙子央卫直播",
+            "type": 3,
+            "jar": "./jars/WvSpider.jar",
+            "api": "csp_WvSpider",
+            "ext": "./js/央视直播.js"
+        },
         {
             "key": "hipy_js_好趣网",
             "name": "🍊小橙子电视",
