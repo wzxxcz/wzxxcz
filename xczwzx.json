@@ -1523,6 +1523,12 @@
             "api": "./py/咸鱼影视.py"
         },
 		{
+            "key": "LIBVIO",
+            "name": "🍊LIBVIO影视",
+            "type": 3,
+            "api": "./py/LIBVIO.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
