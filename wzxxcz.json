@@ -396,9 +396,9 @@
             "key": "央视网页",
             "name": "🍊小橙子央卫直播",
             "type": 3,
-            "jar": "./jars/WvSpider.jar",
+            "jar": "https://xcz.iptv365.org/jars/WvSpider.jar",
             "api": "csp_WvSpider",
-            "ext": "./js/央视直播.js"
+            "ext": "https://xcz.iptv365.org/js/央视直播.js"
         },
         {
             "key": "hipy_js_好趣网",
