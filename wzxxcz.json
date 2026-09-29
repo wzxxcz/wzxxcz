@@ -559,13 +559,6 @@
             "homePage": "https://nostrtv.aws.dpdns.org/"
         },
 		{
-            "key": "Nostrxcz",
-            "name": "🐲Nostrxcz推荐",
-            "type": 3,
-			"api": "csp_Nostr",
-            "homePage": "https://www.252035.xyz/xs/tvbox/nostr.html"
-        },
-		{
             "key": "玩偶",
             "name": "🐲小橙子智能4K弹幕",
             "type": 3,
