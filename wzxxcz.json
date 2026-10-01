@@ -2057,12 +2057,6 @@
             "changeable": 0
         },
 		{
-            "key": "emby",
-            "name": "💡Emby影视",
-            "type": 3,
-            "api": "./js/Emby.js"
-        },
-		{
             "key": "剧圈99",
             "name": "🥨剧圈影视",
             "type": 3,
