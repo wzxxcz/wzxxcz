@@ -52,7 +52,7 @@ class Spider(BaseSpider):
     PLAY_UA = _JVyref(2)
 
     
-    DISCLAIMER = (_JVyref(70))
+    DISCLAIMER = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
     
     CLASSES = [
