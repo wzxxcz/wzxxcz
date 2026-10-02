@@ -235,7 +235,7 @@ class Spider(BaseSpider):
     SEARCH_SIZE = 20
 
     
-    DISCLAIMER = (_dk8('wKOzxqauy5eAxoCTxbutwKOyxb+Py5anxZmzxLeSwKOvxpOsy6Oiy7qtwKOuxqauy5eaxqulx5mIxbaXxLOlzJ+vx5imx524x5uJx5mZxo6Fx5qDwKOix5mHxZaix5utxZaoy4y2x56cxLeLzJ+vy4yUx5mtx56wyomvxrOtAxEXA8aTrMW0lcalpsarg8q6h8yfuMWqo8W/qsaeksuEpcalpsaNmsSqq8W+oMa+pMaescatvMSqq8W+oMW1msWqo8W/qsyfr8ebhsSFosS3i8eZrceYmMeetsa2pcebucS3i8qjt8yfr8aFocW/qsedlsW+oMuMlMayqcS8hsarg8q6h8CjoSkp'))
+    DISCLAIMER = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
     
     LINE_PRIORITY = (_dk8('xKqaxpyIx5my'), _dk8('xb2iyqO8x5my'), _dk8('xpyIxL+o'))
