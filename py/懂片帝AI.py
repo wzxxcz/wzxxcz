@@ -3,43 +3,6 @@
 懂片帝 TVBox Spider
 站点: https://dongpian20.com/ (懂片帝 / 懂片帝AI, React SPA)
 形态: API 站, 全部走 JSON 接口, 无需登录(匿名可调), 无需 Cookie
-
-接口(2026-10-02 实测):
-  分类   GET /v1/browse/catalog?kind={movie|series|short_drama|anime|variety|documentary}
-                           &page=&limit=&genre=&area=&year=&sort=[trending]
-                           -> {cards:[{title,poster_url,remarks,detail_url,year,area,genres}],pagination{total}}
-  详情   GET /v1/catalog/{id} -> {title,poster_url,description,year,area,genres,actors,
-                                 directors,remarks,total_episode_count}
-  选集   GET /v1/catalog/{id}/episodes -> {episodes:[{title,token}],episode_pagination}
-  解析   GET /v1/playback/resolve/{token}?view=compact
-                           -> {line_options:[{play_from,label,url,url_kind,resolved,
-                                              resolve_required}]}
-         直接 m3u8 线: url_kind=m3u8,resolved=true,url=http...m3u8 (交播放器直播)
-         解析票据线: url=resolve://<ticket>,resolve_required=true, 需登录
-                     POST /v1/playback/resolve-line?view=compact body{"ticket":...}
-                     匿名会话回 401 playback_user_session_required, 源内直接剔除该线路
-  搜索   GET /v1/suggest?q={kw}&limit= -> {suggestions:[{type:"title",
-                     label,subtitle,target:{variant_id}}]}, 再按 variant_id 取详情补封面
-
-二级分类(filters): 一级 kind × 类型genre / 地区area / 年份year / 排序sort(trending)
-  genre/area 选项值为站内真实标签(2026-10-02 按各 kind 采样 250 条 cards 去重取高频),
-  传给接口做精确匹配; 无结果时接口回空列表, 不报错。
-
-加密处理(已解密):
-  全站 /v1/* 接口需请求签名, 否则 401 invalid_request_signature。
-  签名 = HMAC-SHA256(key="8b9a908a05eac640e1ee06f52acaa741bfe4ba9e004eeffdbeb635e532e06666",
-                     msg="METHOD\\n/path?query\\n毫秒时间戳\\n32位hex随机数"), hex 小写。
-  请求头: x-ai-movie-timestamp / x-ai-movie-nonce / x-ai-movie-signature, 另带
-  x-ai-movie-client-name=movie-search-frontend, client-version=1.0.0,
-  build-version=dongpiandi-v2026.09.30.1-dbb1f9857565-web,
-  protocol-version=2026-07-05.library-v2.playback-v1。
-  (实现细节见 _sign(); 密钥与算法均取自站内 movie-card-runtime-*.js原文, 非猜测)
-  注意: 消息分隔符为换行符 \\n, 非空格(已用 Node WebCrypto 与 Python 双向对拍验证一致)。
-
-契约: class Spider 无继承 · 14 壳方法全实现 · 位置参数契约 · $/#/$$$ 分隔
-      playerContent header 为 dict · Python 层不调用 setCache/getCache
-      action 精确单参 · init/destroy 返回 None
-生成: 2026-10-02 · 接口经签名算法逆向 + curl 实测逐项核对
 """
 import re
 import json
@@ -55,9 +18,8 @@ import urllib.error
 
 
 class Spider:
-    # 封面总开关: App 端直连图床若出现 TLS 握手失败/裂图, 保持 False 走本地图片代理;
-    # 若壳不支持 localProxy 回调(封面全裂), 改为 True 回直链。
-    DIRECT_MODE = False
+    # 图片直连模式，避免本地代理卡死
+    DIRECT_MODE = True
 
     _BASE = 'https://dongpian20.com'
     _SIGN_SECRET = '8b9a908a05eac640e1ee06f52acaa741bfe4ba9e004eeffdbeb635e532e06666'
@@ -75,7 +37,6 @@ class Spider:
         ('series', '电视剧'), ('movie', '电影'), ('short_drama', '短剧'),
         ('anime', '动漫'), ('variety', '综艺'), ('documentary', '纪录片'),
     ]
-    # 二级筛选选项(站内真实标签采样, 高频优先)
     _GENRES = {
         'movie': ['剧情', '喜剧', '动作', '爱情', '科幻', '悬疑', '惊悚', '恐怖',
                   '犯罪', '奇幻', '冒险', '战争', '家庭', '古装', '武侠'],
@@ -132,7 +93,6 @@ class Spider:
             handlers.append(urllib.request.ProxyHandler(
                 {'http': self._proxy, 'https': self._proxy}))
         opener = urllib.request.build_opener(*handlers)
-        last = None
         for _ in range(2):
             try:
                 req = urllib.request.Request(self._BASE + path, data=data,
@@ -140,8 +100,8 @@ class Spider:
                 with opener.open(req, timeout=15) as resp:
                     raw = resp.read()
                 return json.loads(raw.decode('utf-8', 'ignore'))
-            except Exception as e:
-                last = e
+            except Exception:
+                pass
         return None
 
     def _get(self, path):
@@ -159,7 +119,6 @@ class Spider:
         return (s or '').replace('$', '').replace('#', '').strip()
 
     def _norm_id(self, ids):
-        """detailContent 的 ids 兼容 list/JSON字符串/纯字符串/dict 四形态。"""
         v = ids
         if isinstance(v, dict):
             v = v.get('id') or v.get('vid') or ''
@@ -216,8 +175,12 @@ class Spider:
             {'key': 'sort', 'name': '排序', 'value': _sorts()},
         ]
 
+    # ================= 播放线路解析（核心修复） =================
     def _resolve_lines(self, token):
-        """episode token -> 直接可播线路 [{name, url}]。剔除需登录的票据线。"""
+        """
+        解析 episode token，返回可直接播放的线路列表。
+        过滤掉需要登录的线路，只保留 resolved=true 且 url 可用的线路。
+        """
         if not token:
             return []
         path = '/v1/playback/resolve/{0}?view=compact'.format(
@@ -225,38 +188,44 @@ class Spider:
         d = self._get(path)
         if not isinstance(d, dict):
             return []
+
         out, seen = [], set()
         for l in d.get('line_options') or []:
             if not isinstance(l, dict):
                 continue
-            if l.get('resolve_required') or not l.get('resolved'):
+
+            # 跳过需要登录的线路
+            if l.get('resolve_required'):
                 continue
-            if l.get('url_kind') not in ('m3u8', 'mp4'):
+
+            # 跳过未成功解析的线路
+            if not l.get('resolved'):
                 continue
+
+            url_kind = l.get('url_kind') or ''
+            if url_kind not in ('m3u8', 'mp4'):
+                continue
+
             url = (l.get('url') or '').strip()
             if not url.startswith('http'):
                 continue
+
             name = self._safe_title(l.get('label') or l.get('play_from') or '线路')
             if not name or name in seen:
                 continue
+
             seen.add(name)
-            out.append({'name': name,
-                        'play_from': l.get('play_from') or '',
-                        'url': url})
+            out.append({
+                'name': name,
+                'play_from': l.get('play_from') or '',
+                'url': url,
+            })
         return out
 
-    # ================= 简介提取（重点：多字段兜底 + 强清洗） =================
+    # ================= 简介提取 =================
     def _extract_desc(self, d):
-        """
-        从详情接口返回的数据中提取完整简介。
-        - 多字段名兜底: description / desc / summary / intro / content / overview / plot / synopsis
-        - 清洗 HTML 标签与实体
-        - 强制切断可能混入的底部导航词
-        - 无简介时用 标题+年份+地区+类型 兜底拼接
-        """
         if not isinstance(d, dict):
             return ''
-
         raw = ''
         for key in ('description', 'desc', 'summary', 'intro',
                     'content', 'overview', 'plot', 'synopsis'):
@@ -264,8 +233,6 @@ class Spider:
             if isinstance(v, str) and v.strip():
                 raw = v.strip()
                 break
-
-        # 接口没给简介: 用元信息兜底
         if not raw:
             parts = []
             for k in ('title', 'year', 'area'):
@@ -276,13 +243,11 @@ class Spider:
             if isinstance(genres, list):
                 parts.append('/'.join(str(g) for g in genres if g))
             return ' '.join(parts).strip()
-
         text = _html.unescape(raw)
         text = re.sub(r'<[^>]+>', '', text)
         text = (text.replace('&nbsp;', ' ').replace('&amp;', '&')
                     .replace('&quot;', '"').replace('&#39;', "'")
                     .replace('&lt;', '<').replace('&gt;', '>'))
-        # 强制切断可能混入的导航/播放列表文本
         for sw in ['详情', '立即播放', '报错', '收藏', '扫一扫',
                    '排序', '播放地址', '第01集', '第1集']:
             if sw in text:
@@ -303,10 +268,12 @@ class Spider:
         return ''
 
     def _pic(self, url):
-        if not url or self.DIRECT_MODE:
-            return url or ''
+        if not url:
+            return ''
         if url.startswith('data:'):
             return ''
+        if self.DIRECT_MODE:
+            return url
         b64 = base64.urlsafe_b64encode(url.encode('utf-8')).decode().rstrip('=')
         base = self._proxy_base()
         if base:
@@ -355,9 +322,9 @@ class Spider:
 
     def _serve_image(self, url):
         try:
-            h = {'User-Agent': self._UA, 'Referer': self._BASE + '/'}
+            h = {'User-Agent': self._UA}
             req = urllib.request.Request(url, headers=h)
-            with urllib.request.urlopen(req, timeout=15) as r:
+            with urllib.request.urlopen(req, timeout=10) as r:
                 data = r.read()
                 ct = (r.headers.get('Content-Type') or 'image/jpeg').split(';')[0].strip()
             if data:
@@ -480,7 +447,6 @@ class Spider:
         if not isinstance(d, dict):
             return {'list': []}
 
-        # 选集(分页兜底)
         episodes = []
         if isinstance(d.get('episodes'), list):
             episodes = d['episodes']
@@ -499,7 +465,6 @@ class Spider:
                 offset += pag.get('returned_count') or len(eps) or 48
                 guard += 1
 
-        # 用首集 token 发现线路(各集线路基本一致)
         lines = []
         if episodes:
             tok = (episodes[0] or {}).get('token') or ''
@@ -514,9 +479,7 @@ class Spider:
             if t and tok:
                 ep_items.append('{0}${1}'.format(t, tok))
 
-        # ===================== 简介：多字段兜底 + 强清洗 =====================
         vod_content = self._extract_desc(d)
-        # =====================================================================
 
         vod = {
             'vod_id': vid,
@@ -529,7 +492,6 @@ class Spider:
             'vod_director': ' '.join(d.get('directors') or []),
             'vod_content': vod_content,
         }
-        # 类型也可作为 info 展示（部分壳会显示 type_name）
         genres = d.get('genres')
         if isinstance(genres, list) and genres:
             vod['type_name'] = '/'.join(str(g) for g in genres if g)
@@ -579,35 +541,61 @@ class Spider:
             })
         return {'list': items}
 
+    # ================= 播放解析（核心修复） =================
     def playerContent(self, flag, id, vipFlags):
         token = (id or '').strip()
-        header = {'User-Agent': self._UA, 'Referer': self._BASE + '/'}
+        header = {
+            'User-Agent': self._UA,
+            'Referer': self._BASE + '/',
+            'Origin': self._BASE,
+        }
 
         if not token:
             return {'parse': 0, 'playUrl': '', 'url': '',
                     'header': header, 'msg': '空 id'}
 
-        # 直链直通：如果传入的 id 本身就是 m3u8/mp4 直链
+        # 如果 id 本身就是直链
         if token.startswith('http') and ('.m3u8' in token or '.mp4' in token):
-            return {'parse': 0, 'playUrl': token, 'url': token, 'header': header}
+            return {'parse': 1, 'playUrl': token, 'url': token, 'header': header}
 
-        # 如果 id 是 "集名$token" 形式，取 $ 后面
+        # 剥离 "集名$token" 前缀
         if '$' in token:
             token = token.split('$')[-1]
 
+        # 解析线路
         lines = self._resolve_lines(token)
+        if not lines:
+            return {'parse': 1, 'playUrl': '', 'url': '',
+                    'header': header, 'msg': '未找到可播放线路'}
+
+        # 优先匹配当前 flag 对应的线路
         pick = None
         for l in lines:
             if l['name'] == flag or l['play_from'] == flag:
                 pick = l
                 break
-        if pick is None and lines:
-            pick = lines[0]
         if pick is None:
-            return {'parse': 0, 'playUrl': '', 'url': '',
-                    'header': header, 'msg': '未找到可播放线路'}
-        return {'parse': 0, 'playUrl': pick['url'], 'url': pick['url'],
-                'header': header}
+            pick = lines[0]
+
+        url = pick['url']
+
+        # 【关键修复】m3u8 可能带防盗链，用 parse=1 让壳走嗅探
+        # 如果 URL 本身不包含动态 token（非一次性），也可以用 parse=0
+        if '.m3u8' in url:
+            # 先尝试 HEAD 请求验证链接是否可直接访问
+            try:
+                req = urllib.request.Request(url, method='HEAD', headers=header)
+                with urllib.request.urlopen(req, timeout=8) as r:
+                    if r.status == 200:
+                        return {'parse': 0, 'playUrl': url, 'url': url,
+                                'header': header}
+            except Exception:
+                pass
+            # HEAD 失败，走嗅探模式
+            return {'parse': 1, 'playUrl': url, 'url': url, 'header': header}
+
+        # 非 m3u8 链接
+        return {'parse': 0, 'playUrl': url, 'url': url, 'header': header}
 
     def localProxy(self, param):
         kind, target = self._proxy_target(param)
