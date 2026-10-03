@@ -19,6 +19,14 @@
 #   ⑥ _flight 的 RSC 正则放宽: 兼容 self.__next_f.push([1, "..."]) 中
 #      "[1," 与 '"' 之间可能存在的空白, 且不强制结尾紧贴 </script>;
 #      匹配不到时回退原严格正则。修复"首页/分类列表啥也没有"的根因。
+#
+# 修复(2026-10-04 第四轮):
+#   ⑦ playerContent 强化:
+#      - 播放地址字段多尝试: url / playUrl / videoUrl / fileUrl / src; 兼容 data 直接是 URL 字符串;
+#      - 相对路径补全: //xxx -> https://xxx, /xxx -> host+/xxx;
+#      - Referer 改为详情页 URL(很多站按详情页做防盗链), UA 同步带上;
+#      - URL 明显不是视频文件时自动改为 parse:1, 交给 TVBox 嗅探;
+#      - 取不到 URL 时返回空串, 避免播放器一直转圈。
 from base.spider import Spider
 import requests
 import re
@@ -59,19 +67,16 @@ class Spider(Spider):
 
     def _flight(self, url, timeout=12):
         """抓取 Next.js RSC flight 数据, 返回 (html, blob)。
-        正则放宽: 兼容 push([1, "..."] ) 中 "[1," 与引号之间的空白,
-        且不强制结尾紧贴 </script>; 匹配不到时回退原严格正则。
+        正则放宽: 兼容 push([1, "..."]) 中 "[1," 与引号之间的空白, 不强制结尾紧贴 </script>。
         """
         if url in self._cache:
             return self._cache[url]
         html = self._get(url, timeout=timeout)
 
         blob = ""
-        # 宽松模式: self.__next_f.push([1,"..."])  —— 允许空白, 不强制结尾 </script>
         parts = re.findall(
             r'self\.__next_f\.push\(\s*\[\s*1\s*,\s*"((?:[^"\\]|\\.)*)"\s*\]\s*\)',
             html, re.S)
-        # 回退模式: 原严格形式
         if not parts:
             parts = re.findall(
                 r'self\.__next_f\.push\(\[1,"(.*?)"\]\)</script>', html, re.S)
@@ -317,24 +322,87 @@ class Spider(Spider):
         return {"list": [vod]}
 
     # ---------------- play ----------------
+    def _norm_url(self, u):
+        """相对地址补全为绝对地址"""
+        if not u:
+            return ""
+        u = str(u).strip()
+        if u.startswith("//"):
+            return "https:" + u
+        if u.startswith("/"):
+            return self.host + u
+        return u
+
     def playerContent(self, flag, id, vipFlags):
-        vid, nid = id.split("@")
+        """播放:
+        1) 从签名 API 拿清晰度列表, 按 flag(清晰度名) 匹配 URL;
+        2) 字段多尝试: url / playUrl / videoUrl / fileUrl / src;
+           兼容 data 直接就是 URL 字符串的情况;
+        3) 相对路径补全;
+        4) Referer 用详情页 URL(防盗链常按详情页校验), UA 同步;
+        5) URL 明显不是视频文件时, 自动改为 parse:1 交给 TVBox 嗅探;
+        6) 取不到 URL 时返回空串, 避免播放器一直转圈。
+        """
+        if "@" not in str(id or ""):
+            return {"parse": 0, "url": "", "header": {}}
+        vid, nid = str(id).split("@", 1)
+
+        # 用详情页做 Referer, 很多站点的防盗链认详情页
+        detail_url = "%s/detail/%s" % (self.host, vid)
+        header = {
+            "User-Agent": self.UA,
+            "Referer": detail_url,
+            "Origin": self.host,
+        }
+
         url = ""
         try:
             data = self._api("/anonymous/v2/video/episode/url",
                              {"clientType": "1", "id": vid, "nid": nid})
-            if isinstance(data, dict) and data.get("code") == 200:
-                lst = (data.get("data") or {}).get("list", [])
-                for it in lst:
-                    if it.get("resolutionName") == flag:
-                        url = it.get("url", "")
-                        break
-                if not url and lst:
-                    url = lst[0].get("url", "")
+            if isinstance(data, dict):
+                # 常规结构: {code:200, data:{list:[{resolutionName, url}, ...]}}
+                if data.get("code") == 200:
+                    d = data.get("data") or {}
+                    # data 直接是 URL 字符串
+                    if isinstance(d, str) and d.startswith("http"):
+                        url = d
+                    else:
+                        lst = d.get("list") or []
+                        if lst:
+                            # 先按清晰度名匹配
+                            for it in lst:
+                                if it.get("resolutionName") == flag:
+                                    url = (it.get("url") or it.get("playUrl")
+                                           or it.get("videoUrl") or it.get("fileUrl")
+                                           or it.get("src") or "")
+                                    if url:
+                                        break
+                            # 匹配不到就用第一条
+                            if not url:
+                                it = lst[0]
+                                url = (it.get("url") or it.get("playUrl")
+                                       or it.get("videoUrl") or it.get("fileUrl")
+                                       or it.get("src") or "")
+                        # data 里可能有顶层 url 字段
+                        if not url and isinstance(d, dict):
+                            url = (d.get("url") or d.get("playUrl")
+                                   or d.get("videoUrl") or d.get("fileUrl") or "")
+                # 兼容 code != 200 但返回了 url 的情况
+                if not url:
+                    url = data.get("url") or data.get("playUrl") or ""
         except Exception:
-            pass
-        return {"parse": 0, "url": url,
-                "header": {"User-Agent": self.UA, "Referer": self.host + "/"}}
+            url = ""
+
+        url = self._norm_url(url)
+
+        if not url:
+            return {"parse": 0, "url": "", "header": header}
+
+        # 明显不是视频文件时, 交给 TVBox 嗅探
+        u = url.lower()
+        is_direct = any(k in u for k in (".m3u8", ".mp4", ".flv", ".ts"))
+        parse = 0 if is_direct else 1
+        return {"parse": parse, "url": url, "header": header}
 
     # ---------------- search ----------------
     def searchContent(self, key, quick, pg="1"):
