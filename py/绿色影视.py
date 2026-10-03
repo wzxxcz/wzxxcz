@@ -3,31 +3,32 @@ import re
 import json
 import base64
 import gzip
-from urllib.parse import quote, unquote
+import zlib
+from urllib.parse import quote, unquote, parse_qs
 import urllib.request
 
 HOST = "https://www.lvsc168.com"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
 
 CATS = [
-{"type_id": "1", "type_name": "电影"},
-{"type_id": "2", "type_name": "电视剧"},
-{"type_id": "3", "type_name": "综艺"},
-{"type_id": "4", "type_name": "动漫"},
-{"type_id": "26", "type_name": "短剧"},
-{"type_id": "5", "type_name": "动作片"},
-{"type_id": "6", "type_name": "爱情片"},
-{"type_id": "7", "type_name": "科幻片"},
-{"type_id": "8", "type_name": "恐怖片"},
-{"type_id": "9", "type_name": "战争片"},
-{"type_id": "10", "type_name": "喜剧片"},
-{"type_id": "11", "type_name": "纪录片"},
-{"type_id": "12", "type_name": "剧情片"},
-{"type_id": "13", "type_name": "大陆剧"},
-{"type_id": "14", "type_name": "港台剧"},
-{"type_id": "15", "type_name": "欧美剧"},
-{"type_id": "16", "type_name": "日韩剧"},
-{"type_id": "27", "type_name": "泰剧"},
+    {"type_id": "1", "type_name": "电影"},
+    {"type_id": "2", "type_name": "电视剧"},
+    {"type_id": "3", "type_name": "综艺"},
+    {"type_id": "4", "type_name": "动漫"},
+    {"type_id": "26", "type_name": "短剧"},
+    {"type_id": "5", "type_name": "动作片"},
+    {"type_id": "6", "type_name": "爱情片"},
+    {"type_id": "7", "type_name": "科幻片"},
+    {"type_id": "8", "type_name": "恐怖片"},
+    {"type_id": "9", "type_name": "战争片"},
+    {"type_id": "10", "type_name": "喜剧片"},
+    {"type_id": "11", "type_name": "纪录片"},
+    {"type_id": "12", "type_name": "剧情片"},
+    {"type_id": "13", "type_name": "大陆剧"},
+    {"type_id": "14", "type_name": "港台剧"},
+    {"type_id": "15", "type_name": "欧美剧"},
+    {"type_id": "16", "type_name": "日韩剧"},
+    {"type_id": "27", "type_name": "泰剧"},
 ]
 
 def _mk_filters():
@@ -42,13 +43,30 @@ class Spider(Spider):
     def init(self, extend=""):
         pass
 
-    def _fetch(self, url):
-        req = urllib.request.Request(url, headers={"User-Agent": UA, "Referer": HOST + "/"})
+    def _fetch(self, url, referer=None):
+        if url.startswith("//"):
+            url = "https:" + url
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": UA,
+                "Referer": referer or (HOST + "/"),
+                "Accept": "*/*",
+                "Accept-Encoding": "gzip, deflate",
+            }
+        )
         raw = urllib.request.urlopen(req, timeout=15).read()
-        try:
+        # 处理压缩
+        if raw[:2] == b"\x1f\x8b":
             raw = gzip.decompress(raw)
-        except Exception:
-            pass
+        else:
+            try:
+                raw = zlib.decompress(raw)
+            except Exception:
+                try:
+                    raw = zlib.decompress(raw, -zlib.MAX_WBITS)
+                except Exception:
+                    pass
         return raw.decode("utf-8", "replace")
 
     def _parse_cards(self, html):
@@ -170,32 +188,98 @@ class Spider(Spider):
 
     def playerContent(self, flag, ids, vipFlags=None):
         play_url = ids[0] if isinstance(ids, list) else ids
-        html = self._fetch(play_url)
-        m = re.search(r'var now=base64decode\("([A-Za-z0-9+/=]+)"\)', html)
-        if not m:
-            return {"parse": 0, "url": play_url, "header": {"User-Agent": UA}}
-        parser_url = base64.b64decode(m.group(1)).decode("utf-8", "replace").strip()
-        try:
-            ph = self._fetch(parser_url)
-        except Exception:
-            return {"parse": 1, "url": parser_url, "header": {"User-Agent": UA}}
-        mm = re.search(r'(https?://[^\s"\'<>]+\.m3u8[^\s"\'<>]*)', ph)
-        if not mm:
-            mm = re.search(r'(https?://[^\s"\'<>]+\.mp4[^\s"\'<>]*)', ph)
-        if mm:
-            return {"parse": 0, "url": mm.group(1), "header": {"User-Agent": UA, "Referer": parser_url}}
-        return {"parse": 1, "url": parser_url, "header": {"User-Agent": UA}}
+        if isinstance(play_url, str) and "$" in play_url:
+            play_url = play_url.split("$")[-1]
+
+        html = self._fetch(play_url, referer=HOST + "/")
+
+        # 1. 优先解析苹果CMS标准 player_aaaa
+        m = re.search(r'var\s+player_aaaa\s*=\s*(\{.*?\})\s*;', html, re.S)
+        if m:
+            try:
+                data = json.loads(m.group(1))
+                url = data.get("url") or ""
+                if data.get("encrypt") == 1 and url:
+                    url = base64.b64decode(url + "=" * (-len(url) % 4)).decode("utf-8", "replace")
+                url = url.replace("\\/", "/")
+                if url.startswith("//"):
+                    url = "https:" + url
+
+                if url:
+                    if ".m3u8" in url or ".mp4" in url:
+                        return {
+                            "parse": 0,
+                            "url": url,
+                            "header": {"User-Agent": UA, "Referer": play_url}
+                        }
+
+                    # 如果不是直链，当解析接口再请求一次
+                    ph = self._fetch(url, referer=play_url)
+                    ph = ph.replace("\\/", "/")
+                    mm = re.search(r'(https?://[^\s"\'<>]+?\.(?:m3u8|mp4)[^\s"\'<>]*)', ph)
+                    if mm:
+                        return {
+                            "parse": 0,
+                            "url": mm.group(1),
+                            "header": {"User-Agent": UA, "Referer": url}
+                        }
+                    return {
+                        "parse": 1,
+                        "url": url,
+                        "header": {"User-Agent": UA, "Referer": play_url}
+                    }
+            except Exception:
+                pass
+
+        # 2. 再兼容原来的 var now=base64decode
+        m = re.search(r'base64decode\(["\']([^"\']+)["\']\)', html)
+        if m:
+            try:
+                b64 = m.group(1)
+                parser_url = base64.b64decode(b64 + "=" * (-len(b64) % 4)).decode("utf-8", "replace").strip()
+                parser_url = parser_url.replace("\\/", "/")
+                if parser_url.startswith("//"):
+                    parser_url = "https:" + parser_url
+
+                ph = self._fetch(parser_url, referer=play_url)
+                ph = ph.replace("\\/", "/")
+                mm = re.search(r'(https?://[^\s"\'<>]+?\.(?:m3u8|mp4)[^\s"\'<>]*)', ph)
+                if mm:
+                    return {
+                        "parse": 0,
+                        "url": mm.group(1),
+                        "header": {"User-Agent": UA, "Referer": parser_url}
+                    }
+                return {
+                    "parse": 1,
+                    "url": parser_url,
+                    "header": {"User-Agent": UA, "Referer": play_url}
+                }
+            except Exception:
+                pass
+
+        # 3. 兜底不要 parse=0 去播 HTML，交给壳嗅探
+        return {
+            "parse": 1,
+            "url": play_url,
+            "header": {"User-Agent": UA, "Referer": HOST + "/"}
+        }
 
     def localProxy(self, param):
         if isinstance(param, str):
             try:
                 param = json.loads(param)
             except Exception:
-                param = {}
-        if param.get("m") == "img":
+                q = parse_qs(param)
+                param = {k: v[0] for k, v in q.items() if v}
+
+        if isinstance(param, dict) and param.get("m") == "img":
             try:
                 url = base64.b64decode(param.get("u", "")).decode()
-                req = urllib.request.Request(url, headers={"User-Agent": UA, "Referer": HOST + "/"})
+                req = urllib.request.Request(
+                    url,
+                    headers={"User-Agent": UA, "Referer": HOST + "/"}
+                )
                 data = urllib.request.urlopen(req, timeout=15).read()
                 mime = "image/jpeg"
                 lu = url.lower()
@@ -205,7 +289,8 @@ class Spider(Spider):
                     mime = "image/png"
                 elif ".gif" in lu:
                     mime = "image/gif"
-                return [200, mime, data]
+                return [200, {"Content-Type": mime}, data]
             except Exception:
-                return [404, "text/plain", b""]
-        return [200, "text/plain", b""]
+                return [404, {"Content-Type": "text/plain"}, b""]
+
+        return [200, {"Content-Type": "text/plain"}, b""]
