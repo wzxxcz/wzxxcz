@@ -12,11 +12,10 @@
 契约: class Spider 无继承 · 14 壳方法全实现 · 位置参数契约 · $/#/$$$ 分隔
       playerContent.header 为 dict · Python 层不调用 setCache/getCache
 生成: 2026-10-01 · 结构经真实站点逐页核对(首页/分类/筛选/详情/播放/搜索)
-修订: 2026-10-03 · 补全简介提取(多模式+meta兜底) · 改进卡片/线路/分页解析 · gzip 支持
+修订: 2026-10-03 · 补全简介提取 · 改进卡片/线路/分页解析 · gzip 支持
       · 修复每分类第1、2项重复
       · 修复“点交锋详情变兰香如故”的标题/vid 串位
-        (以含 <img> 的 /detail/ 海报锚为唯一定位; 标题优先 alt,
-         其次按 vid 全局匹配文本锚; 不再依赖块内 class)
+      · 去掉标题末尾“封面图片”等 alt 后缀
 """
 import re
 import json
@@ -114,6 +113,18 @@ class Spider:
             return self.host + u
         return u
 
+    def _strip_title_suffix(self, t):
+        """去掉标题末尾的“封面图片/封面图/海报图/图片”等 alt 后缀"""
+        if not t:
+            return ''
+        t = t.strip()
+        for suf in ('封面图片', '封面图', '海报图片', '海报图',
+                    '封面', '海报', '图片', '封面照', '海报照',
+                    'poster', 'Poster', 'image', 'Image'):
+            if t.endswith(suf):
+                t = t[:-len(suf)].strip()
+        return t
+
     def _pick_img(self, chunk):
         for attr in ('data-src', 'data-original', 'data-echo', 'src'):
             pm = re.search(r'<img[^>]+' + attr + r'="([^"]+)"', chunk)
@@ -122,11 +133,11 @@ class Spider:
         return ''
 
     def _parse_cards(self, html):
-        """通用卡片解析 (v3):
+        """通用卡片解析 (v4):
         - 卡片唯一定位: 含 <img> 的 /detail/{id}.html 海报锚
-        - 标题优先级: img alt > 全局按 vid 匹配的文本锚 > 锚 title 属性
-        - 不再依赖块内 class, 避免相邻卡片串位
-        - (标题, 封面) 二次去重, 兜底干掉站点自身重复
+        - 标题优先级: img alt(去后缀) > 全局按 vid 匹配的文本锚 > 锚 title 属性
+        - 去掉末尾的“封面图片”等 alt 后缀
+        - (标题, 封面) 二次去重
         """
         items = []
         seen = set()
@@ -134,14 +145,15 @@ class Spider:
 
         # 全局标题映射: 每个 vid 第一次出现的非图片文本锚
         title_map = {}
-        generic_alt = {'封面', '图片', '海报', 'poster', 'image', 'picture', ''}
+        generic_alt = {'封面', '图片', '海报', '封面图片', '封面图', '海报图',
+                       'poster', 'image', 'picture', ''}
         for tm in re.finditer(
                 r'<a\b[^>]*href="/detail/(\d+)\.html"[^>]*>(.*?)</a>', html, re.S):
             v = tm.group(1)
             inner_txt = tm.group(2)
             if '<img' in inner_txt:
                 continue
-            t = self._clean(inner_txt)
+            t = self._strip_title_suffix(self._clean(inner_txt))
             if not t or t.isdigit() or t in generic_alt:
                 continue
             if v not in title_map:
@@ -168,7 +180,7 @@ class Spider:
             title = ''
             am = re.search(r'<img[^>]+alt="([^"]+)"', inner)
             if am:
-                alt = self._clean(am.group(1))
+                alt = self._strip_title_suffix(self._clean(am.group(1)))
                 if alt and alt not in generic_alt and not alt.isdigit():
                     title = alt
             if not title and vid in title_map:
@@ -176,7 +188,7 @@ class Spider:
             if not title:
                 tm = re.search(r'\btitle="([^"]+)"', anchor_full)
                 if tm:
-                    t = self._clean(tm.group(1))
+                    t = self._strip_title_suffix(self._clean(tm.group(1)))
                     if t and t not in generic_alt:
                         title = t
             if not title:
