@@ -134,7 +134,7 @@ class Spider(Spider):
         tm = re.search(r'<h1 class="title[^"]*">([^<]+)', html)
         title = tm.group(1).strip() if tm else vid
         
-        # 2. 图片 (保持并增加容错)
+        # 2. 图片
         pm = re.search(r'data-original="(/img\.php\?url=[^"]+)"', html)
         if not pm:
             pm = re.search(r'data-src="(/img\.php\?url=[^"]+)"', html)
@@ -148,13 +148,12 @@ class Spider(Spider):
         if pic:
             pic = self.getProxyUrl(local=True) + "&m=img&u=" + base64.b64encode(pic.encode()).decode()
             
-        # 3. 通用信息提取函数 (处理 <a> 标签和换行)
+        # 3. 通用信息提取函数
         def get_info(keyword):
-            # 匹配 关键词：</span><a>内容</a> 或 关键词：内容 <br> <p> 等
             pattern = r'{}[：:]\s*(?:</span>|</a>|<a[^>]*>)?\s*(.*?)(?:<br|<p|</div|</li|</span>|$)'.format(keyword)
             m = re.search(pattern, html, re.S)
             if m:
-                text = re.sub(r'<[^>]+>', '', m.group(1)) # 去除所有HTML标签
+                text = re.sub(r'<[^>]+>', '', m.group(1))
                 text = text.replace('&nbsp;', ' ').replace('&amp;', '&').replace('&quot;', '"').strip()
                 return text
             return ""
@@ -166,17 +165,28 @@ class Spider(Spider):
         lang = get_info("语言")
         type_name = get_info("类型")
         
-        # 4. 简介专门提取 (防止被 <p> 截断)
+        # 4. 简介精准提取与强力清洗
         desc = ""
-        dm = re.search(r'简介[：:]\s*(?:</span>)?\s*(.*?)(?:<div class="module-play-list|$)', html, re.S)
+        # 优先匹配苹果CMS常见简介容器
+        dm = re.search(r'<div class="module-info-item-content">(.*?)</div>', html, re.S)
         if not dm:
-            dm = re.search(r'class="desc"[^>]*>(.*?)</div>', html, re.S)
-        if dm:
-            desc = re.sub(r'<[^>]+>', '', dm.group(1))
-            desc = desc.replace('&nbsp;', ' ').replace('&amp;', '&').replace('&quot;', '"').strip()
-            desc = re.sub(r'\s+', ' ', desc) # 清理多余空白
+            dm = re.search(r'<div class="[^"]*(?:desc|content|detail)[^"]*">(.*?)</div>', html, re.S)
+        if not dm:
+            # 兜底：匹配“简介：”到“详情”或“立即播放”之间的部分
+            dm = re.search(r'简介[：:]\s*(?:</span>)?\s*(.*?)(?:<div|详情|立即播放|$)', html, re.S)
             
-        # 5. 播放列表提取 (保持原逻辑)
+        if dm:
+            desc = dm.group(1)
+            # 移除所有 HTML 标签
+            desc = re.sub(r'<[^>]+>', '', desc)
+            # 替换常见的HTML实体
+            desc = desc.replace('&nbsp;', ' ').replace('&amp;', '&').replace('&quot;', '"')
+            # 【核心修复】强制切掉误抓的底部导航和播放列表文本
+            desc = re.sub(r'(详情\s*立即播放|报错\s*收藏|扫一扫用手机观看|排序\s*播放地址|高速\s*高速2?|第\d+集).*$', '', desc, flags=re.S)
+            # 清理多余空白和换行
+            desc = re.sub(r'\s+', ' ', desc).strip()
+            
+        # 5. 播放列表提取
         plays = {}
         for pm in re.finditer(r'<div id="playlist(\d+)"[^>]*>.*?<p class="text-muted[^"]*">\s*([^<]+?)\s*</p>.*?<ul class="myui-content__list[^"]*"[^>]*>(.*?)</ul>', html, re.S):
             src_name = pm.group(2).strip()
@@ -204,18 +214,18 @@ class Spider(Spider):
             play_from.append(plays[fidx][0])
             play_urls.append("#".join(plays[fidx][1]))
             
-        # 6. 组装数据 (补齐所有标准字段)
+        # 6. 组装数据
         vod = {
             "vod_id": vid,
             "vod_name": title,
             "vod_pic": pic,
             "vod_actor": actor,
-            "vod_director": director,   # 导演
-            "vod_area": area,           # 地区
-            "vod_year": year,           # 年份
-            "vod_lang": lang,           # 语言
-            "type_name": type_name,     # 类型
-            "vod_content": desc,        # 简介
+            "vod_director": director,
+            "vod_area": area,
+            "vod_year": year,
+            "vod_lang": lang,
+            "type_name": type_name,
+            "vod_content": desc,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_urls)
         }
@@ -233,7 +243,6 @@ class Spider(Spider):
 
         html = self._fetch(play_url, referer=HOST + "/")
 
-        # 1. 优先解析苹果CMS标准 player_aaaa
         m = re.search(r'var\s+player_aaaa\s*=\s*(\{.*?\})\s*;', html, re.S)
         if m:
             try:
@@ -253,7 +262,6 @@ class Spider(Spider):
                             "header": {"User-Agent": UA, "Referer": play_url}
                         }
 
-                    # 如果不是直链，当解析接口再请求一次
                     ph = self._fetch(url, referer=play_url)
                     ph = ph.replace("\\/", "/")
                     mm = re.search(r'(https?://[^\s"\'<>]+?\.(?:m3u8|mp4)[^\s"\'<>]*)', ph)
@@ -271,7 +279,6 @@ class Spider(Spider):
             except Exception:
                 pass
 
-        # 2. 再兼容原来的 var now=base64decode
         m = re.search(r'base64decode\(["\']([^"\']+)["\']\)', html)
         if m:
             try:
@@ -298,7 +305,6 @@ class Spider(Spider):
             except Exception:
                 pass
 
-        # 3. 兜底不要 parse=0 去播 HTML，交给壳嗅探
         return {
             "parse": 1,
             "url": play_url,
