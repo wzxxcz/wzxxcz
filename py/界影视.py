@@ -1,32 +1,17 @@
 # -*- coding: utf-8 -*-
 # 站点: 界影视 https://yvyeigh.com/ (Next.js App Router 前端)
 # 列表/详情: 服务端渲染 RSC flight 数据, 直接解析 {"vodId":...} JSON
-# 播放: 签名 API /mw-movie/anonymous/v2/video/episode/url (签名算法由前端 JS 还原)
-# 二级分类: /vod/show/id/{tid} 页 filter-ul 行, 片段 /class/x/area/y/year/z/lang/w, 排序 sort/sortBy
+# 播放: 签名 API /mw-movie/anonymous/v2/video/episode/url
 #
-# 修复(2026-10-03 第二轮):
-#   根因: homeContent 里为了构建二级分类按钮, 对 6 个分类页【同步串行】各发一次 HTTP 抓取,
-#         TV 端在弱网/慢机上会整体超时, 首页/分类列表直接空 -> 表现为"首页/分类列表加载失败"。
-#   ① homeContent 不再串行阻塞: 用线程池并发抓各分类 filters, 且只抓一次后缓存;
-#         单个分类抓取失败只跳过该组按钮, 不影响首页主体列表与其它分类;
-#         抓 filters 期间首页主体(轮播/最新片)先返回, 不再被 6 次串行请求拖垮。
-#   ② 分类页每个请求独立 timeout(8s)+重试一次; 抓不到 filters 时该分类给个空过滤组占位, 不报错。
-#   ③ type 行取值从 href 提取数字 id(如 /2/type/14 取 14), 不用中文名, 避免筛选 URL 拼错。
-#   ④ localProxy 原来返回 list [200,"video/2",None,""] 与 base 契约不符, 改为安全 dict。
-#   ⑤ 分类/搜索空结果兜底: 抓取异常时返回空列表而非抛错, 避免整页白屏。
-#
-# 修复(2026-10-04 第三轮):
-#   ⑥ _flight 的 RSC 正则放宽: 兼容 self.__next_f.push([1, "..."]) 中
-#      "[1," 与 '"' 之间可能存在的空白, 且不强制结尾紧贴 </script>;
-#      匹配不到时回退原严格正则。修复"首页/分类列表啥也没有"的根因。
-#
-# 修复(2026-10-04 第四轮):
-#   ⑦ playerContent 强化:
-#      - 播放地址字段多尝试: url / playUrl / videoUrl / fileUrl / src; 兼容 data 直接是 URL 字符串;
-#      - 相对路径补全: //xxx -> https://xxx, /xxx -> host+/xxx;
-#      - Referer 改为详情页 URL(很多站按详情页做防盗链), UA 同步带上;
-#      - URL 明显不是视频文件时自动改为 parse:1, 交给 TVBox 嗅探;
-#      - 取不到 URL 时返回空串, 避免播放器一直转圈。
+# 修复历史:
+#   2026-10-03 第二轮: homeContent 并发抓 filters + 缓存; localProxy 返回 None;
+#                       type 用数字 id; 分类/搜索空结果兜底。
+#   2026-10-04 第三轮: _flight 正则放宽。
+#   2026-10-04 第四轮: playerContent 强化(字段多尝试 + Referer 用详情页 + parse 自适应)。
+#   2026-10-04 第五轮: detail 预取清晰度, player 按 flag 精准匹配。
+#   2026-10-04 第六轮: 修复播放失败的 2 个核心 bug:
+#       ① detail 里 id 去掉 "|res_name" 后缀(flag 本身就是清晰度名, 拼了反而让 nid 参数错);
+#       ② playerContent 里对 id 残留 "|" 做切分; 按 URL 后缀自适应 parse; 输出调试日志。
 from base.spider import Spider
 import requests
 import re
@@ -54,7 +39,7 @@ class Spider(Spider):
         self.signkey = "cb808529bae6b6be45ecfab29a4889bc"
         self.device_id = str(uuid.uuid4())
         self._cache = {}
-        self._filters_cache = None   # 二级分类按钮只构建一次, 避免每次进首页都串行抓 6 个分类页
+        self._filters_cache = None
 
     def getName(self):
         return "界影视"
@@ -66,13 +51,10 @@ class Spider(Spider):
         return r.text
 
     def _flight(self, url, timeout=12):
-        """抓取 Next.js RSC flight 数据, 返回 (html, blob)。
-        正则放宽: 兼容 push([1, "..."]) 中 "[1," 与引号之间的空白, 不强制结尾紧贴 </script>。
-        """
+        """抓取 Next.js RSC flight 数据, 返回 (html, blob)"""
         if url in self._cache:
             return self._cache[url]
         html = self._get(url, timeout=timeout)
-
         blob = ""
         parts = re.findall(
             r'self\.__next_f\.push\(\s*\[\s*1\s*,\s*"((?:[^"\\]|\\.)*)"\s*\]\s*\)',
@@ -85,23 +67,29 @@ class Spider(Spider):
                 blob += json.loads('"' + p + '"')
             except Exception:
                 blob += p
-
         self._cache[url] = (html, blob)
         return html, blob
 
     def _api(self, path, params):
         # 签名: sign=SHA1(MD5("k1=v1&k2=v2...(key 排序)&key=signkey&t=毫秒戳"))
         ts = str(int(time.time() * 1000))
-        q = "&".join("%s=%s" % (k, params[k]) for k in sorted(params))
+        sp = {k: str(v) for k, v in params.items()}
+        q = "&".join("%s=%s" % (k, sp[k]) for k in sorted(sp))
         h = "%s&key=%s&t=%s" % (q, self.signkey, ts)
         sign = hashlib.sha1(hashlib.md5(h.encode()).hexdigest().encode()).hexdigest()
-        qs = "&".join("%s=%s" % (k, quote(str(params[k]), safe="")) for k in params)
+        qs = "&".join("%s=%s" % (k, quote(sp[k], safe="")) for k in sp)
         url = self.host + "/mw-movie" + path + "?" + qs
         r = self.sess.get(url, headers={
             "sign": sign, "t": ts,
             "deviceId": self.device_id, "authorization": "",
         }, timeout=15)
-        return r.json()
+        try:
+            return r.json()
+        except Exception:
+            try:
+                return json.loads(r.text)
+            except Exception:
+                return {"code": -1, "raw": r.text[:500]}
 
     @staticmethod
     def _jstr(o, key):
@@ -162,8 +150,6 @@ class Spider(Spider):
                 n = (n or "").strip()
                 if not n or n == "全部":
                     continue
-                # 取该 key 对应的 href 段值:
-                #  type 是数字 id (如 /type/14), class/area/year/lang 是中文 (如 /class/古装)
                 vm = re.search(r'/id/\d+/%s/([^/"]+)' % key, u)
                 v = unquote(vm.group(1)).strip() if vm else n
                 if v and v not in have:
@@ -172,7 +158,6 @@ class Spider(Spider):
             if len(vals) >= 2:
                 flist.append({"key": key, "name": FILTER_LABEL[key], "value": vals})
         flist.sort(key=lambda x: FILTER_ORDER.index(x["key"]) if x["key"] in FILTER_ORDER else 99)
-        # 排序: 电影=上映时间, 其他=最近更新/添加时间
         if tid == "1":
             sorts = [{"n": "上映时间", "v": "1"}, {"n": "人气高低", "v": "3"}, {"n": "评分高低", "v": "4"}]
         else:
@@ -182,7 +167,6 @@ class Spider(Spider):
         return flist
 
     def _build_one_filter(self, tid):
-        """抓单个分类页的二级分类按钮; 失败返回空列表, 不影响其它分类。"""
         url = "%s/vod/show/id/%s" % (self.host, tid)
         fhtml = ""
         for _try in range(2):
@@ -216,7 +200,6 @@ class Spider(Spider):
                 classes.append({"type_id": tid, "type_name": name})
         result = {"class": classes, "list": self._parse_vods(blob)}
 
-        # 二级分类按钮: 并发构建 + 只构建一次。
         if self._filters_cache is None:
             filters = {}
             if classes:
@@ -245,7 +228,6 @@ class Spider(Spider):
         for k in FILTER_ORDER + ["sort", "sortBy"]:
             v = extend.get(k)
             if v:
-                # 先 unquote 再 quote：兼容客户端原文/预编码两种传参
                 v = quote(unquote(str(v).strip(), encoding="utf-8"), safe="~")
                 if v:
                     url += "/%s/%s" % (k, v)
@@ -284,25 +266,34 @@ class Spider(Spider):
         remarks = self._jstr(blob, "vodRemarks") or self._jstr(blob, "vodVersion")
         content = self._jstr(blob, "vodContent")
         content = re.sub(r'<[^>]+>', '', content).strip()
+
         eps = re.findall(r'\{"nid":(\d+),"name":"((?:[^"\\]|\\.)*)"', blob)
         eps = [(nid, n.replace("$", "").replace("#", "")) for nid, n in eps]
-        # 取第一集的清晰度列表作为播放源
+
+        # 预取清晰度列表(取第 1 集)
         res_list = []
         if eps:
             try:
                 data = self._api("/anonymous/v2/video/episode/url",
                                  {"clientType": "1", "id": vid, "nid": eps[0][0]})
                 if isinstance(data, dict) and data.get("code") == 200:
-                    res_list = (data.get("data") or {}).get("list", [])
+                    res_list = (data.get("data") or {}).get("list", []) or []
             except Exception:
                 pass
         if res_list:
             play_from = [it.get("resolutionName", "默认") for it in res_list]
         else:
             play_from = ["默认"]
+
+        # 每条线路都列出全部集数, id 只拼 "vid@nid", 清晰度靠 flag 区分
+        # (原来拼 "|res_name" 会让 playerContent 拿到脏 nid 导致 API 请求失败)
         urls = []
-        for _r in play_from:
-            urls.append(["%s$%s@%s" % (n, vid, nid) for nid, n in eps])
+        for _res in play_from:
+            ep_line = []
+            for nid, n in eps:
+                ep_line.append("%s$%s@%s" % (n, vid, nid))
+            urls.append("#".join(ep_line))
+
         vod = {
             "vod_id": vid,
             "vod_name": name,
@@ -317,13 +308,12 @@ class Spider(Spider):
             "vod_remarks": remarks,
             "vod_content": content,
             "vod_play_from": "$$$".join(play_from),
-            "vod_play_url": "$$$".join(["#".join(u) for u in urls]),
+            "vod_play_url": "$$$".join(urls),
         }
         return {"list": [vod]}
 
     # ---------------- play ----------------
     def _norm_url(self, u):
-        """相对地址补全为绝对地址"""
         if not u:
             return ""
         u = str(u).strip()
@@ -334,75 +324,67 @@ class Spider(Spider):
         return u
 
     def playerContent(self, flag, id, vipFlags):
-        """播放:
-        1) 从签名 API 拿清晰度列表, 按 flag(清晰度名) 匹配 URL;
-        2) 字段多尝试: url / playUrl / videoUrl / fileUrl / src;
-           兼容 data 直接就是 URL 字符串的情况;
-        3) 相对路径补全;
-        4) Referer 用详情页 URL(防盗链常按详情页校验), UA 同步;
-        5) URL 明显不是视频文件时, 自动改为 parse:1 交给 TVBox 嗅探;
-        6) 取不到 URL 时返回空串, 避免播放器一直转圈。
-        """
-        if "@" not in str(id or ""):
-            return {"parse": 0, "url": "", "header": {}}
-        vid, nid = str(id).split("@", 1)
+        """按清晰度 flag 请求对应播放地址"""
+        header = {"User-Agent": self.UA, "Referer": self.host + "/", "Origin": self.host}
 
-        # 用详情页做 Referer, 很多站点的防盗链认详情页
-        detail_url = "%s/detail/%s" % (self.host, vid)
-        header = {
-            "User-Agent": self.UA,
-            "Referer": detail_url,
-            "Origin": self.host,
-        }
-
-        url = ""
-        try:
-            data = self._api("/anonymous/v2/video/episode/url",
-                             {"clientType": "1", "id": vid, "nid": nid})
-            if isinstance(data, dict):
-                # 常规结构: {code:200, data:{list:[{resolutionName, url}, ...]}}
-                if data.get("code") == 200:
-                    d = data.get("data") or {}
-                    # data 直接是 URL 字符串
-                    if isinstance(d, str) and d.startswith("http"):
-                        url = d
-                    else:
-                        lst = d.get("list") or []
-                        if lst:
-                            # 先按清晰度名匹配
-                            for it in lst:
-                                if it.get("resolutionName") == flag:
-                                    url = (it.get("url") or it.get("playUrl")
-                                           or it.get("videoUrl") or it.get("fileUrl")
-                                           or it.get("src") or "")
-                                    if url:
-                                        break
-                            # 匹配不到就用第一条
-                            if not url:
-                                it = lst[0]
-                                url = (it.get("url") or it.get("playUrl")
-                                       or it.get("videoUrl") or it.get("fileUrl")
-                                       or it.get("src") or "")
-                        # data 里可能有顶层 url 字段
-                        if not url and isinstance(d, dict):
-                            url = (d.get("url") or d.get("playUrl")
-                                   or d.get("videoUrl") or d.get("fileUrl") or "")
-                # 兼容 code != 200 但返回了 url 的情况
-                if not url:
-                    url = data.get("url") or data.get("playUrl") or ""
-        except Exception:
-            url = ""
-
-        url = self._norm_url(url)
-
-        if not url:
+        s = str(id or "")
+        # 兼容旧版 id 里残留的 "|清晰度" 后缀, 直接切掉
+        if "|" in s:
+            s = s.split("|", 1)[0]
+        if "@" not in s:
             return {"parse": 0, "url": "", "header": header}
 
-        # 明显不是视频文件时, 交给 TVBox 嗅探
-        u = url.lower()
-        is_direct = any(k in u for k in (".m3u8", ".mp4", ".flv", ".ts"))
-        parse = 0 if is_direct else 1
-        return {"parse": parse, "url": url, "header": header}
+        vid, nid = s.split("@", 1)
+        # nid 只保留数字, 防止脏字符进签名
+        m = re.search(r'\d+', nid)
+        nid = m.group(0) if m else nid
+
+        header["Referer"] = "%s/detail/%s" % (self.host, vid)
+
+        target_url = ""
+        try:
+            api_data = self._api("/anonymous/v2/video/episode/url",
+                                 {"clientType": "1", "id": vid, "nid": nid})
+            try:
+                print("[界影视] playerContent API: %s" %
+                      json.dumps(api_data, ensure_ascii=False)[:1500])
+            except Exception:
+                pass
+            if isinstance(api_data, dict) and api_data.get("code") == 200:
+                res_list = (api_data.get("data") or {}).get("list", []) or []
+                # 按 flag 匹配清晰度
+                for item in res_list:
+                    if item.get("resolutionName") == flag:
+                        target_url = (item.get("url") or item.get("playUrl")
+                                      or item.get("videoUrl") or item.get("fileUrl")
+                                      or item.get("src") or "")
+                        if target_url:
+                            break
+                # 匹配不到就取第一条
+                if not target_url and res_list:
+                    it = res_list[0]
+                    target_url = (it.get("url") or it.get("playUrl")
+                                  or it.get("videoUrl") or it.get("fileUrl")
+                                  or it.get("src") or "")
+        except Exception as e:
+            try:
+                print("[界影视] playerContent 异常: %r" % e)
+            except Exception:
+                pass
+
+        target_url = self._norm_url(target_url)
+        try:
+            print("[界影视] playerContent 选中 URL: %s" % target_url)
+        except Exception:
+            pass
+
+        if not target_url:
+            return {"parse": 0, "url": "", "header": header}
+
+        low = target_url.lower()
+        # 直链给 parse:0, 非直链交给 TVBox 嗅探
+        parse = 0 if any(k in low for k in ('.m3u8', '.mp4', '.flv', '.ts')) else 1
+        return {"parse": parse, "url": target_url, "header": header}
 
     # ---------------- search ----------------
     def searchContent(self, key, quick, pg="1"):
@@ -440,5 +422,4 @@ class Spider(Spider):
         return False
 
     def localProxy(self, param):
-        # 与 base.spider 契约一致: 无本地代理时返回 None
         return None
