@@ -9,9 +9,10 @@
 #   2026-10-04 第三轮: _flight 正则放宽。
 #   2026-10-04 第四轮: playerContent 强化(字段多尝试 + Referer 用详情页 + parse 自适应)。
 #   2026-10-04 第五轮: detail 预取清晰度, player 按 flag 精准匹配。
-#   2026-10-04 第六轮: 修复播放失败的 2 个核心 bug:
-#       ① detail 里 id 去掉 "|res_name" 后缀(flag 本身就是清晰度名, 拼了反而让 nid 参数错);
-#       ② playerContent 里对 id 残留 "|" 做切分; 按 URL 后缀自适应 parse; 输出调试日志。
+#   2026-10-04 第六轮: 修复 detail 里 id 带 "|res_name" 后缀导致 nid 脏;
+#                       playerContent 按 flag 匹配 + parse 自适应 + 调试日志。
+#   2026-10-04 第七轮【诊断版】: 把 API 原始返回 / 选集数 / 清晰度数 / 每个清晰度的 url
+#                       全部塞进详情页“简介”, 方便一眼定位播放失败原因。
 from base.spider import Spider
 import requests
 import re
@@ -51,7 +52,6 @@ class Spider(Spider):
         return r.text
 
     def _flight(self, url, timeout=12):
-        """抓取 Next.js RSC flight 数据, 返回 (html, blob)"""
         if url in self._cache:
             return self._cache[url]
         html = self._get(url, timeout=timeout)
@@ -71,7 +71,6 @@ class Spider(Spider):
         return html, blob
 
     def _api(self, path, params):
-        # 签名: sign=SHA1(MD5("k1=v1&k2=v2...(key 排序)&key=signkey&t=毫秒戳"))
         ts = str(int(time.time() * 1000))
         sp = {k: str(v) for k, v in params.items()}
         q = "&".join("%s=%s" % (k, sp[k]) for k in sorted(sp))
@@ -264,35 +263,82 @@ class Spider(Spider):
         vclass = self._jstr(blob, "vodClass")
         score = self._jstr(blob, "vodScore") or self._jstr(blob, "vodDoubanScore")
         remarks = self._jstr(blob, "vodRemarks") or self._jstr(blob, "vodVersion")
-        content = self._jstr(blob, "vodContent")
-        content = re.sub(r'<[^>]+>', '', content).strip()
+        orig_content = self._jstr(blob, "vodContent")
+        orig_content = re.sub(r'<[^>]+>', '', orig_content).strip()
 
         eps = re.findall(r'\{"nid":(\d+),"name":"((?:[^"\\]|\\.)*)"', blob)
         eps = [(nid, n.replace("$", "").replace("#", "")) for nid, n in eps]
 
-        # 预取清晰度列表(取第 1 集)
+        # ====== 预取清晰度列表(取第 1 集) ======
         res_list = []
+        api_raw = "(未调用: eps 为空)"
+        api_call_url = "(未调用)"
         if eps:
             try:
-                data = self._api("/anonymous/v2/video/episode/url",
-                                 {"clientType": "1", "id": vid, "nid": eps[0][0]})
+                params = {"clientType": "1", "id": vid, "nid": eps[0][0]}
+                sp = {k: str(v) for k, v in params.items()}
+                ts = str(int(time.time() * 1000))
+                q = "&".join("%s=%s" % (k, sp[k]) for k in sorted(sp))
+                h = "%s&key=%s&t=%s" % (q, self.signkey, ts)
+                sign = hashlib.sha1(hashlib.md5(h.encode()).hexdigest().encode()).hexdigest()
+                qs = "&".join("%s=%s" % (k, quote(sp[k], safe="")) for k in sp)
+                api_call_url = self.host + "/mw-movie/anonymous/v2/video/episode/url?" + qs
+
+                data = self._api("/anonymous/v2/video/episode/url", params)
+                try:
+                    api_raw = json.dumps(data, ensure_ascii=False)
+                except Exception:
+                    api_raw = repr(data)
                 if isinstance(data, dict) and data.get("code") == 200:
                     res_list = (data.get("data") or {}).get("list", []) or []
-            except Exception:
-                pass
+            except Exception as e:
+                api_raw = "异常: %r" % e
+
         if res_list:
             play_from = [it.get("resolutionName", "默认") for it in res_list]
         else:
             play_from = ["默认"]
 
-        # 每条线路都列出全部集数, id 只拼 "vid@nid", 清晰度靠 flag 区分
-        # (原来拼 "|res_name" 会让 playerContent 拿到脏 nid 导致 API 请求失败)
         urls = []
         for _res in play_from:
             ep_line = []
             for nid, n in eps:
                 ep_line.append("%s$%s@%s" % (n, vid, nid))
             urls.append("#".join(ep_line))
+
+        # ====== 把调试信息塞进“简介”, 用户点“简介”就能看到 ======
+        # 截断保证不超长
+        res_sample = []
+        for it in res_list[:5]:
+            if isinstance(it, dict):
+                res_sample.append({
+                    "resolutionName": it.get("resolutionName"),
+                    "url": (it.get("url") or it.get("playUrl")
+                            or it.get("videoUrl") or it.get("fileUrl")
+                            or it.get("src") or "")[:200],
+                    "keys": list(it.keys()),
+                })
+        debug_block = (
+            "========== 界影视 调试信息 ==========\n"
+            "vid = {vid}\n"
+            "选集总数 = {eps_n}\n"
+            "选集前3 = {eps_head}\n"
+            "清晰度条数 = {res_n}\n"
+            "清晰度明细 = {res_sample}\n"
+            "--- API 请求 URL ---\n{api_url}\n"
+            "--- API 原始返回(前 1200 字) ---\n{api_raw}\n"
+            "=====================================\n"
+            "【原始简介】\n{orig}\n"
+        ).format(
+            vid=vid,
+            eps_n=len(eps),
+            eps_head=repr(eps[:3]),
+            res_n=len(res_list),
+            res_sample=json.dumps(res_sample, ensure_ascii=False)[:1500],
+            api_url=api_call_url[:400],
+            api_raw=(api_raw or "")[:1200],
+            orig=(orig_content or "")[:800],
+        )
 
         vod = {
             "vod_id": vid,
@@ -306,7 +352,7 @@ class Spider(Spider):
             "vod_class": vclass,
             "vod_score": score,
             "vod_remarks": remarks,
-            "vod_content": content,
+            "vod_content": debug_block,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(urls),
         }
@@ -324,35 +370,23 @@ class Spider(Spider):
         return u
 
     def playerContent(self, flag, id, vipFlags):
-        """按清晰度 flag 请求对应播放地址"""
         header = {"User-Agent": self.UA, "Referer": self.host + "/", "Origin": self.host}
-
         s = str(id or "")
-        # 兼容旧版 id 里残留的 "|清晰度" 后缀, 直接切掉
         if "|" in s:
             s = s.split("|", 1)[0]
         if "@" not in s:
             return {"parse": 0, "url": "", "header": header}
-
         vid, nid = s.split("@", 1)
-        # nid 只保留数字, 防止脏字符进签名
         m = re.search(r'\d+', nid)
         nid = m.group(0) if m else nid
-
         header["Referer"] = "%s/detail/%s" % (self.host, vid)
 
         target_url = ""
         try:
             api_data = self._api("/anonymous/v2/video/episode/url",
                                  {"clientType": "1", "id": vid, "nid": nid})
-            try:
-                print("[界影视] playerContent API: %s" %
-                      json.dumps(api_data, ensure_ascii=False)[:1500])
-            except Exception:
-                pass
             if isinstance(api_data, dict) and api_data.get("code") == 200:
                 res_list = (api_data.get("data") or {}).get("list", []) or []
-                # 按 flag 匹配清晰度
                 for item in res_list:
                     if item.get("resolutionName") == flag:
                         target_url = (item.get("url") or item.get("playUrl")
@@ -360,29 +394,18 @@ class Spider(Spider):
                                       or item.get("src") or "")
                         if target_url:
                             break
-                # 匹配不到就取第一条
                 if not target_url and res_list:
                     it = res_list[0]
                     target_url = (it.get("url") or it.get("playUrl")
                                   or it.get("videoUrl") or it.get("fileUrl")
                                   or it.get("src") or "")
-        except Exception as e:
-            try:
-                print("[界影视] playerContent 异常: %r" % e)
-            except Exception:
-                pass
-
-        target_url = self._norm_url(target_url)
-        try:
-            print("[界影视] playerContent 选中 URL: %s" % target_url)
         except Exception:
             pass
 
+        target_url = self._norm_url(target_url)
         if not target_url:
             return {"parse": 0, "url": "", "header": header}
-
         low = target_url.lower()
-        # 直链给 parse:0, 非直链交给 TVBox 嗅探
         parse = 0 if any(k in low for k in ('.m3u8', '.mp4', '.flv', '.ts')) else 1
         return {"parse": parse, "url": target_url, "header": header}
 
