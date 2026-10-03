@@ -165,15 +165,13 @@ class Spider(Spider):
         lang = get_info("语言")
         type_name = get_info("类型")
         
-        # 4. 简介精准提取与强力清洗
+        # 4. 简介精准提取（重写修复版）
         desc = ""
-        # 优先匹配苹果CMS常见简介容器
-        dm = re.search(r'<div class="module-info-item-content">(.*?)</div>', html, re.S)
+        # 尝试抓取常见的苹果CMS/MyUI简介容器
+        dm = re.search(r'<div class="(?:module-info-item-content|sketch content|detail-content|desc)"[^>]*>(.*?)</div>', html, re.S)
         if not dm:
-            dm = re.search(r'<div class="[^"]*(?:desc|content|detail)[^"]*">(.*?)</div>', html, re.S)
-        if not dm:
-            # 兜底：匹配“简介：”到“详情”或“立即播放”之间的部分
-            dm = re.search(r'简介[：:]\s*(?:</span>)?\s*(.*?)(?:<div|详情|立即播放|$)', html, re.S)
+            # 备用匹配：匹配“简介”后面的 div 内容，穿透 <div> 和 <p> 标签
+            dm = re.search(r'简介[：:]\s*(?:</span>)?\s*(?:<div[^>]*>|<p[^>]*>)?(.*?)(?:</div>|</p>|<div|详情\s*立即播放|报错\s*收藏|$)', html, re.S)
             
         if dm:
             desc = dm.group(1)
@@ -181,9 +179,11 @@ class Spider(Spider):
             desc = re.sub(r'<[^>]+>', '', desc)
             # 替换常见的HTML实体
             desc = desc.replace('&nbsp;', ' ').replace('&amp;', '&').replace('&quot;', '"')
-            # 【核心修复】强制切掉误抓的底部导航和播放列表文本
-            desc = re.sub(r'(详情\s*立即播放|报错\s*收藏|扫一扫用手机观看|排序\s*播放地址|高速\s*高速2?|第\d+集).*$', '', desc, flags=re.S)
-            # 清理多余空白和换行
+            # 强制切掉可能误抓的底部导航和播放列表文本（按顺序切割）
+            for stop_word in ['详情 立即播放', '报错 收藏', '扫一扫用手机观看', '排序 播放地址', '高速 高速2', '第01集']:
+                if stop_word in desc:
+                    desc = desc.split(stop_word)[0]
+            # 清理多余空白
             desc = re.sub(r'\s+', ' ', desc).strip()
             
         # 5. 播放列表提取
