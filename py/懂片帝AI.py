@@ -12,14 +12,18 @@ import secrets
 import hashlib
 import hmac
 import html as _html
+import http.cookiejar
 import urllib.request
 import urllib.parse
 import urllib.error
 
 
 class Spider:
+    # ========== 播放器相关开关 ==========
     # 图片直连模式，避免本地代理卡死
     DIRECT_MODE = True
+    # 若 m3u8 始终无法播放，将 FORCE_SNIFF 改为 True，强制走壳内置嗅探器
+    FORCE_SNIFF = False
 
     _BASE = 'https://dongpian20.com'
     _SIGN_SECRET = '8b9a908a05eac640e1ee06f52acaa741bfe4ba9e004eeffdbeb635e532e06666'
@@ -63,6 +67,7 @@ class Spider:
 
     def __init__(self):
         self._proxy = None
+        self._cookie_jar = http.cookiejar.CookieJar()
 
     # ================= 签名与请求 =================
     def _sign_headers(self, method, path):
@@ -92,7 +97,9 @@ class Spider:
         if self._proxy:
             handlers.append(urllib.request.ProxyHandler(
                 {'http': self._proxy, 'https': self._proxy}))
-        opener = urllib.request.build_opener(*handlers)
+        # 自动管理 Cookie
+        cookie_processor = urllib.request.HTTPCookieProcessor(self._cookie_jar)
+        opener = urllib.request.build_opener(cookie_processor, *handlers)
         for _ in range(2):
             try:
                 req = urllib.request.Request(self._BASE + path, data=data,
@@ -367,6 +374,7 @@ class Spider:
 
     def init(self, extend):
         self._proxy = None
+        self._cookie_jar = http.cookiejar.CookieJar()
         try:
             s = (extend or '').strip() if isinstance(extend, str) else ''
             if s.startswith('{'):
@@ -538,11 +546,16 @@ class Spider:
     # ================= 播放解析（核心修复） =================
     def playerContent(self, flag, id, vipFlags):
         token = (id or '').strip()
+
+        # 从 cookiejar 提取 Cookie 字符串
+        cookie_str = '; '.join(['%s=%s' % (c.name, c.value)
+                                for c in self._cookie_jar])
+
         header = {
             'User-Agent': self._UA,
             'Referer': self._BASE + '/',
             'Origin': self._BASE,
-            'Cookie': '',
+            'Cookie': cookie_str,
         }
 
         if not token:
@@ -564,7 +577,6 @@ class Spider:
                     'header': header, 'msg': '未找到可播放线路'}
 
         # 优先匹配当前 flag 对应的线路
-        # 注意：flag 是线路显示名称，play_from 是内部标识，需要同时匹配
         pick = None
         for l in lines:
             if l['name'] == flag or l['play_from'] == flag:
@@ -574,6 +586,10 @@ class Spider:
             pick = lines[0]
 
         url = pick['url']
+
+        # 若强制嗅探，直接返回
+        if self.FORCE_SNIFF:
+            return {'parse': 1, 'playUrl': url, 'url': url, 'header': header}
 
         # 对于 m3u8，先尝试 HEAD 请求验证链接是否可直接访问
         if '.m3u8' in url:
