@@ -1,18 +1,8 @@
 # -*- coding: utf-8 -*-
-# 站点: 界影视 https://yvyeigh.com/ (Next.js App Router 前端)
-# 列表/详情: 服务端渲染 RSC flight 数据, 直接解析 {"vodId":...} JSON
-# 播放: 签名 API /mw-movie/anonymous/v2/video/episode/url
-#
-# 修复历史:
-#   2026-10-03 第二轮: homeContent 并发抓 filters + 缓存; localProxy 返回 None;
-#                       type 用数字 id; 分类/搜索空结果兜底。
-#   2026-10-04 第三轮: _flight 正则放宽。
-#   2026-10-04 第四轮: playerContent 强化(字段多尝试 + Referer 用详情页 + parse 自适应)。
-#   2026-10-04 第五轮: detail 预取清晰度, player 按 flag 精准匹配。
-#   2026-10-04 第六轮: 修复 detail 里 id 带 "|res_name" 后缀导致 nid 脏;
-#                       playerContent 按 flag 匹配 + parse 自适应 + 调试日志。
-#   2026-10-04 第七轮【诊断版】: 把 API 原始返回 / 选集数 / 清晰度数 / 每个清晰度的 url
-#                       全部塞进详情页“简介”, 方便一眼定位播放失败原因。
+# 站点: 界影视 https://yvyeigh.com/
+# 实测结论(2026-10-04): 接口返回的蓝光/高清 m3u8 直链 CDN 端【不鉴权】,
+#   needLogin:true 只是前端 UI 标记, 非会员拿到直链即可直接播放, 无需 cookie/登录态。
+# 播放: 签名 API /mw-movie/anonymous/v2/video/episode/url, 实时现拿 URL(含时间戳, 不可久存)
 from base.spider import Spider
 import requests
 import re
@@ -117,12 +107,8 @@ class Spider(Spider):
             year = self._jstr(o, "vodYear")
             area = self._jstr(o, "vodArea")
             vods.append({
-                "vod_id": vid,
-                "vod_name": name,
-                "vod_pic": pic,
-                "vod_remarks": remarks,
-                "vod_year": year,
-                "vod_area": area,
+                "vod_id": vid, "vod_name": name, "vod_pic": pic,
+                "vod_remarks": remarks, "vod_year": year, "vod_area": area,
             })
         return vods
 
@@ -198,7 +184,6 @@ class Spider(Spider):
             if tid not in [c["type_id"] for c in classes]:
                 classes.append({"type_id": tid, "type_name": name})
         result = {"class": classes, "list": self._parse_vods(blob)}
-
         if self._filters_cache is None:
             filters = {}
             if classes:
@@ -263,96 +248,35 @@ class Spider(Spider):
         vclass = self._jstr(blob, "vodClass")
         score = self._jstr(blob, "vodScore") or self._jstr(blob, "vodDoubanScore")
         remarks = self._jstr(blob, "vodRemarks") or self._jstr(blob, "vodVersion")
-        orig_content = self._jstr(blob, "vodContent")
-        orig_content = re.sub(r'<[^>]+>', '', orig_content).strip()
-
+        content = self._jstr(blob, "vodContent")
+        content = re.sub(r'<[^>]+>', '', content).strip()
         eps = re.findall(r'\{"nid":(\d+),"name":"((?:[^"\\]|\\.)*)"', blob)
         eps = [(nid, n.replace("$", "").replace("#", "")) for nid, n in eps]
 
-        # ====== 预取清晰度列表(取第 1 集) ======
+        # 预取清晰度列表(只取第1集, 仅为列出"线路名"; 真正播放URL在playerContent实时现拿)
         res_list = []
-        api_raw = "(未调用: eps 为空)"
-        api_call_url = "(未调用)"
         if eps:
             try:
-                params = {"clientType": "1", "id": vid, "nid": eps[0][0]}
-                sp = {k: str(v) for k, v in params.items()}
-                ts = str(int(time.time() * 1000))
-                q = "&".join("%s=%s" % (k, sp[k]) for k in sorted(sp))
-                h = "%s&key=%s&t=%s" % (q, self.signkey, ts)
-                sign = hashlib.sha1(hashlib.md5(h.encode()).hexdigest().encode()).hexdigest()
-                qs = "&".join("%s=%s" % (k, quote(sp[k], safe="")) for k in sp)
-                api_call_url = self.host + "/mw-movie/anonymous/v2/video/episode/url?" + qs
-
-                data = self._api("/anonymous/v2/video/episode/url", params)
-                try:
-                    api_raw = json.dumps(data, ensure_ascii=False)
-                except Exception:
-                    api_raw = repr(data)
+                data = self._api("/anonymous/v2/video/episode/url",
+                                 {"clientType": "1", "id": vid, "nid": eps[0][0]})
                 if isinstance(data, dict) and data.get("code") == 200:
                     res_list = (data.get("data") or {}).get("list", []) or []
-            except Exception as e:
-                api_raw = "异常: %r" % e
-
+            except Exception:
+                pass
+        # 不做 needLogin 过滤, 按分辨率从高到低(蓝光优先), 全部列出给用户选
         if res_list:
-            play_from = [it.get("resolutionName", "默认") for it in res_list]
-        else:
-            play_from = ["默认"]
-
+            res_list = sorted(res_list, key=lambda it: -(int(it.get("resolution", 0) or 0)))
+        play_from = [it.get("resolutionName", "默认") for it in res_list] or ["默认"]
+        # 剧集条目不写死URL, 只带 vid@nid, 播放时实时请求
         urls = []
-        for _res in play_from:
-            ep_line = []
-            for nid, n in eps:
-                ep_line.append("%s$%s@%s" % (n, vid, nid))
-            urls.append("#".join(ep_line))
-
-        # ====== 把调试信息塞进“简介”, 用户点“简介”就能看到 ======
-        # 截断保证不超长
-        res_sample = []
-        for it in res_list[:5]:
-            if isinstance(it, dict):
-                res_sample.append({
-                    "resolutionName": it.get("resolutionName"),
-                    "url": (it.get("url") or it.get("playUrl")
-                            or it.get("videoUrl") or it.get("fileUrl")
-                            or it.get("src") or "")[:200],
-                    "keys": list(it.keys()),
-                })
-        debug_block = (
-            "========== 界影视 调试信息 ==========\n"
-            "vid = {vid}\n"
-            "选集总数 = {eps_n}\n"
-            "选集前3 = {eps_head}\n"
-            "清晰度条数 = {res_n}\n"
-            "清晰度明细 = {res_sample}\n"
-            "--- API 请求 URL ---\n{api_url}\n"
-            "--- API 原始返回(前 1200 字) ---\n{api_raw}\n"
-            "=====================================\n"
-            "【原始简介】\n{orig}\n"
-        ).format(
-            vid=vid,
-            eps_n=len(eps),
-            eps_head=repr(eps[:3]),
-            res_n=len(res_list),
-            res_sample=json.dumps(res_sample, ensure_ascii=False)[:1500],
-            api_url=api_call_url[:400],
-            api_raw=(api_raw or "")[:1200],
-            orig=(orig_content or "")[:800],
-        )
-
+        for _r in play_from:
+            urls.append("#".join("%s$%s@%s" % (n, vid, nid) for nid, n in eps))
         vod = {
-            "vod_id": vid,
-            "vod_name": name,
-            "vod_pic": pic,
-            "vod_actor": actor,
-            "vod_director": director,
-            "vod_area": area,
-            "vod_year": year,
-            "vod_lang": lang,
-            "vod_class": vclass,
-            "vod_score": score,
-            "vod_remarks": remarks,
-            "vod_content": debug_block,
+            "vod_id": vid, "vod_name": name, "vod_pic": pic,
+            "vod_actor": actor, "vod_director": director,
+            "vod_area": area, "vod_year": year, "vod_lang": lang,
+            "vod_class": vclass, "vod_score": score, "vod_remarks": remarks,
+            "vod_content": content,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(urls),
         }
@@ -370,7 +294,12 @@ class Spider(Spider):
         return u
 
     def playerContent(self, flag, id, vipFlags):
-        header = {"User-Agent": self.UA, "Referer": self.host + "/", "Origin": self.host}
+        """播放: 实时请求接口拿所选清晰度的 m3u8 直链, 带 Referer 直出(parse:0)。
+        实测该站 CDN 对 needLogin 不鉴权, 非会员拿到蓝光直链即可直接播。"""
+        header = {
+            "User-Agent": self.UA,
+            "Referer": self.host + "/",
+        }
         s = str(id or "")
         if "|" in s:
             s = s.split("|", 1)[0]
@@ -379,14 +308,13 @@ class Spider(Spider):
         vid, nid = s.split("@", 1)
         m = re.search(r'\d+', nid)
         nid = m.group(0) if m else nid
-        header["Referer"] = "%s/detail/%s" % (self.host, vid)
-
         target_url = ""
         try:
             api_data = self._api("/anonymous/v2/video/episode/url",
                                  {"clientType": "1", "id": vid, "nid": nid})
             if isinstance(api_data, dict) and api_data.get("code") == 200:
                 res_list = (api_data.get("data") or {}).get("list", []) or []
+                # 1) 严格按用户所选清晰度名匹配
                 for item in res_list:
                     if item.get("resolutionName") == flag:
                         target_url = (item.get("url") or item.get("playUrl")
@@ -394,20 +322,22 @@ class Spider(Spider):
                                       or item.get("src") or "")
                         if target_url:
                             break
+                # 2) 匹配不到 -> 取分辨率最高的一条(不降级)
                 if not target_url and res_list:
-                    it = res_list[0]
-                    target_url = (it.get("url") or it.get("playUrl")
-                                  or it.get("videoUrl") or it.get("fileUrl")
-                                  or it.get("src") or "")
+                    best = sorted(res_list,
+                                  key=lambda it: -(int(it.get("resolution", 0) or 0)))[0]
+                    target_url = (best.get("url") or best.get("playUrl")
+                                  or best.get("videoUrl") or best.get("fileUrl")
+                                  or best.get("src") or "")
         except Exception:
             pass
-
         target_url = self._norm_url(target_url)
         if not target_url:
             return {"parse": 0, "url": "", "header": header}
         low = target_url.lower()
-        parse = 0 if any(k in low for k in ('.m3u8', '.mp4', '.flv', '.ts')) else 1
-        return {"parse": parse, "url": target_url, "header": header}
+        if any(k in low for k in ('.m3u8', '.mp4', '.flv', '.ts')):
+            return {"parse": 0, "url": target_url, "header": header}
+        return {"parse": 1, "url": target_url, "header": header}
 
     # ---------------- search ----------------
     def searchContent(self, key, quick, pg="1"):
