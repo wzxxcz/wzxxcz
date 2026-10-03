@@ -13,9 +13,10 @@
       playerContent.header 为 dict · Python 层不调用 setCache/getCache
 生成: 2026-10-01 · 结构经真实站点逐页核对(首页/分类/筛选/详情/播放/搜索)
 修订: 2026-10-03 · 补全简介提取(多模式+meta兜底) · 改进卡片/线路/分页解析 · gzip 支持
-      · 修复每个分类第1、2项重复的卡片切块问题
-      · 修复“点交锋播放/详情变成兰香如故”的 vod_id 串位问题
-        (只以含 <img> 的 /detail/ 锚点作为卡片锚, 块到下一个海报锚为止)
+      · 修复每分类第1、2项重复
+      · 修复“点交锋详情变兰香如故”的标题/vid 串位
+        (以含 <img> 的 /detail/ 海报锚为唯一定位; 标题优先 alt,
+         其次按 vid 全局匹配文本锚; 不再依赖块内 class)
 """
 import re
 import json
@@ -38,12 +39,10 @@ class Spider:
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Accept-Encoding': 'gzip, deflate',
         }
-        # 一级分类: (名称, channel)
         self.classes = [
             ('电视剧', '1'), ('电影', '2'), ('动漫', '3'),
             ('综艺', '4'), ('短剧', '5'),
         ]
-        # 二级分类 - 类型(type id -> 名称)，与站点 /filter 链接逐一核对
         self.type_map = {
             '1': [('7', '剧情'), ('9', '古装'), ('10', '战争'), ('11', '谍战'),
                   ('12', '爱情'), ('13', '罪案'), ('14', '悬疑'), ('15', '家庭'),
@@ -116,7 +115,6 @@ class Spider:
         return u
 
     def _pick_img(self, chunk):
-        """封面优先级: data-src > data-original > data-echo > src"""
         for attr in ('data-src', 'data-original', 'data-echo', 'src'):
             pm = re.search(r'<img[^>]+' + attr + r'="([^"]+)"', chunk)
             if pm and pm.group(1) and not pm.group(1).startswith('data:'):
@@ -124,72 +122,79 @@ class Spider:
         return ''
 
     def _parse_cards(self, html):
-        """通用卡片解析:
-        只把“含 <img> 的 /detail/{id}.html 海报锚”当作卡片锚点,
-        块范围从该锚起到下一个海报锚为止 —— 一个视频只解析一次,
-        不会跨卡片串位, 也不会因标题锚被切成两张卡片。
-        叠加 (标题, 封面) 二次去重, 兜底干掉站点自身的重复项。
+        """通用卡片解析 (v3):
+        - 卡片唯一定位: 含 <img> 的 /detail/{id}.html 海报锚
+        - 标题优先级: img alt > 全局按 vid 匹配的文本锚 > 锚 title 属性
+        - 不再依赖块内 class, 避免相邻卡片串位
+        - (标题, 封面) 二次去重, 兜底干掉站点自身重复
         """
         items = []
         seen = set()
         seen_sig = set()
 
-        a_re = re.compile(r'<a\b[^>]*href="/detail/(\d+)\.html"[^>]*>(.*?)</a>', re.S)
-        anchors = [m for m in a_re.finditer(html) if '<img' in m.group(2)]
+        # 全局标题映射: 每个 vid 第一次出现的非图片文本锚
+        title_map = {}
+        generic_alt = {'封面', '图片', '海报', 'poster', 'image', 'picture', ''}
+        for tm in re.finditer(
+                r'<a\b[^>]*href="/detail/(\d+)\.html"[^>]*>(.*?)</a>', html, re.S):
+            v = tm.group(1)
+            inner_txt = tm.group(2)
+            if '<img' in inner_txt:
+                continue
+            t = self._clean(inner_txt)
+            if not t or t.isdigit() or t in generic_alt:
+                continue
+            if v not in title_map:
+                title_map[v] = t
 
-        for i, m in enumerate(anchors):
+        # 卡片锚: 含 <img> 的 /detail 锚
+        poster_anchors = []
+        for m in re.finditer(
+                r'<a\b[^>]*href="/detail/(\d+)\.html"[^>]*>(.*?)</a>', html, re.S):
+            if '<img' in m.group(2):
+                poster_anchors.append(m)
+
+        for idx, m in enumerate(poster_anchors):
             vid = m.group(1)
             if vid in seen:
                 continue
-
-            start = m.start()
-            end = anchors[i + 1].start() if i + 1 < len(anchors) else min(len(html), m.end() + 4000)
-            block = html[start:end]
             inner = m.group(2)
+            anchor_full = m.group(0)
 
             # 封面
             pic = self._pick_img(inner)
-            if not pic:
-                pic = self._pick_img(block)
 
-            # 标题: 锚 title 属性 > img alt > 块内标题 class > 块内二次锚文本
+            # 标题
             title = ''
-            tm = re.search(r'<a\b[^>]*title="([^"]+)"', m.group(0))
-            if tm:
-                title = self._clean(tm.group(1))
+            am = re.search(r'<img[^>]+alt="([^"]+)"', inner)
+            if am:
+                alt = self._clean(am.group(1))
+                if alt and alt not in generic_alt and not alt.isdigit():
+                    title = alt
+            if not title and vid in title_map:
+                title = title_map[vid]
             if not title:
-                am = re.search(r'<img[^>]+alt="([^"]+)"', inner)
-                if am:
-                    title = self._clean(am.group(1))
-            if not title:
-                for tp in (r'class="vod-title[^"]*"[^>]*>([^<]+)<',
-                           r'class="module-poster-item-title[^"]*"[^>]*>([^<]+)<',
-                           r'class="search-item-title[^"]*"[^>]*>([^<]+)<',
-                           r'class="module-card-item-title[^"]*"[^>]*>([^<]+)<',
-                           r'class="title[^"]*"[^>]*>([^<]+)<'):
-                    tm2 = re.search(tp, block)
-                    if tm2:
-                        t = self._clean(tm2.group(1))
-                        if t:
-                            title = t
-                            break
-            if not title:
-                tm2 = re.search(
-                    r'<a\b[^>]*href="/detail/{0}\.html"[^>]*>([^<]+)</a>'.format(re.escape(vid)),
-                    block)
-                if tm2:
-                    title = self._clean(tm2.group(1))
+                tm = re.search(r'\btitle="([^"]+)"', anchor_full)
+                if tm:
+                    t = self._clean(tm.group(1))
+                    if t and t not in generic_alt:
+                        title = t
             if not title:
                 continue
 
-            # 内容级去重: 相同标题 + 相同封面视为重复
+            # 内容级去重
             sig = (title, pic)
             if sig in seen_sig:
                 seen.add(vid)
                 continue
             seen_sig.add(sig)
 
-            # 备注
+            # 备注: 本海报锚到下一个海报锚之间
+            if idx + 1 < len(poster_anchors):
+                end = poster_anchors[idx + 1].start()
+            else:
+                end = min(len(html), m.end() + 800)
+            block = html[m.start():end]
             remark = ''
             for rp in (r'class="vod-badge[^"]*"[^>]*>([^<]+)<',
                        r'class="module-item-note[^"]*"[^>]*>([^<]+)<',
@@ -226,7 +231,6 @@ class Spider:
         return str(pg), str(pc)
 
     def _extract_content(self, html):
-        """提取剧情简介: 多模式匹配 + meta 兜底"""
         patterns = (
             r'<div[^>]*class="[^"]*synopsis-content[^"]*"[^>]*>(.*?)</div>',
             r'<div[^>]*class="[^"]*vod-content[^"]*"[^>]*>(.*?)</div>',
@@ -306,7 +310,7 @@ class Spider:
         m = re.search(r'\d+', s)
         return m.group(0) if m else s
 
-    # ================= 壳接口(位置参数契约) =================
+    # ================= 壳接口 =================
     def getName(self):
         return '小蜜蜂影院'
 
@@ -385,7 +389,6 @@ class Spider:
         url = '{0}/detail/{1}.html'.format(self.host, vid)
         html = self._fetch(url)
 
-        # 标题
         title = ''
         m = re.search(r'<h1[^>]*>([^<]+)</h1>', html)
         if m:
@@ -397,13 +400,11 @@ class Spider:
         if not title:
             title = vid
 
-        # 封面
         pic = ''
         pm = re.search(r'og:image"[^>]*content="([^"]+)"', html)
         if pm:
             pic = self._abs_url(pm.group(1))
 
-        # meta 键值对(类型/年份/地区/主演/导演/备注等)
         meta = {}
         for k, v in re.findall(
                 r'class="[^"]*meta-label[^"]*"[^>]*>([^<]+)<[^>]*>\s*<[^>]*class="[^"]*meta-value[^"]*"[^>]*>([^<]*)<',
@@ -415,10 +416,8 @@ class Spider:
                     html):
                 meta[self._clean(k).rstrip('：:')] = self._clean(v)
 
-        # 简介(重点)
         content = self._extract_content(html)
 
-        # 线路名 + 各线路选集
         from_names = re.findall(r'data-target="source-\d+"[^>]*>([^<]+)<', html)
         if not from_names:
             from_names = re.findall(r'class="[^"]*source-tab[^"]*"[^>]*>([^<]+)<', html)
@@ -429,7 +428,6 @@ class Spider:
             eps = [(u, t) for u, t in eps if '/vodplay/{0}-'.format(vid) in u]
             if not eps:
                 continue
-            # 普通线路二(bfzym3u8)整站已下线: 详情里直接剔除避免点到死线路
             fm = re.search(r'/vodplay/\d+-(.+)-\d+\.html', eps[0][0])
             if fm and fm.group(1) == 'bfzym3u8':
                 continue
