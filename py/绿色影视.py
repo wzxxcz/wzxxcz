@@ -129,11 +129,17 @@ class Spider(Spider):
     def detailContent(self, ids):
         vid = ids[0] if isinstance(ids, list) else ids
         html = self._fetch(f"{HOST}/movie/{vid}.html")
+        
+        # 1. 标题
         tm = re.search(r'<h1 class="title[^"]*">([^<]+)', html)
         title = tm.group(1).strip() if tm else vid
+        
+        # 2. 图片 (保持并增加容错)
         pm = re.search(r'data-original="(/img\.php\?url=[^"]+)"', html)
         if not pm:
-            pm = re.search(r'<img class="lazyload" src="(/img\.php\?url=[^"]+)"', html)
+            pm = re.search(r'data-src="(/img\.php\?url=[^"]+)"', html)
+        if not pm:
+            pm = re.search(r'<img[^>]+src="(/img\.php\?url=[^"]+)"', html)
         pic = ""
         if pm:
             pic = unquote(pm.group(1).split("url=", 1)[1])
@@ -141,18 +147,36 @@ class Spider(Spider):
             pic = HOST + pic
         if pic:
             pic = self.getProxyUrl(local=True) + "&m=img&u=" + base64.b64encode(pic.encode()).decode()
-        actor = ""
-        am = re.search(r'主演[：:]\s*([^<]+)', html)
-        if am:
-            actor = am.group(1).strip()
-        year = ""
-        ym = re.search(r'年份[：:]\s*([^<]+)', html)
-        if ym:
-            year = ym.group(1).strip()
+            
+        # 3. 通用信息提取函数 (处理 <a> 标签和换行)
+        def get_info(keyword):
+            # 匹配 关键词：</span><a>内容</a> 或 关键词：内容 <br> <p> 等
+            pattern = r'{}[：:]\s*(?:</span>|</a>|<a[^>]*>)?\s*(.*?)(?:<br|<p|</div|</li|</span>|$)'.format(keyword)
+            m = re.search(pattern, html, re.S)
+            if m:
+                text = re.sub(r'<[^>]+>', '', m.group(1)) # 去除所有HTML标签
+                text = text.replace('&nbsp;', ' ').replace('&amp;', '&').replace('&quot;', '"').strip()
+                return text
+            return ""
+
+        director = get_info("导演")
+        actor = get_info("主演") or get_info("演员")
+        area = get_info("地区")
+        year = get_info("年份")
+        lang = get_info("语言")
+        type_name = get_info("类型")
+        
+        # 4. 简介专门提取 (防止被 <p> 截断)
         desc = ""
-        dm = re.search(r'简介[：:]\s*([^<]{10,500})', html)
+        dm = re.search(r'简介[：:]\s*(?:</span>)?\s*(.*?)(?:<div class="module-play-list|$)', html, re.S)
+        if not dm:
+            dm = re.search(r'class="desc"[^>]*>(.*?)</div>', html, re.S)
         if dm:
-            desc = dm.group(1).strip()
+            desc = re.sub(r'<[^>]+>', '', dm.group(1))
+            desc = desc.replace('&nbsp;', ' ').replace('&amp;', '&').replace('&quot;', '"').strip()
+            desc = re.sub(r'\s+', ' ', desc) # 清理多余空白
+            
+        # 5. 播放列表提取 (保持原逻辑)
         plays = {}
         for pm in re.finditer(r'<div id="playlist(\d+)"[^>]*>.*?<p class="text-muted[^"]*">\s*([^<]+?)\s*</p>.*?<ul class="myui-content__list[^"]*"[^>]*>(.*?)</ul>', html, re.S):
             src_name = pm.group(2).strip()
@@ -173,12 +197,28 @@ class Spider(Spider):
                 if fidx not in plays:
                     plays[fidx] = (f"线路{int(fidx) + 1}", [])
                 plays[fidx][1].append(f"{ep_name}${HOST}{ep_url}")
+                
         play_from = []
         play_urls = []
         for fidx in sorted(plays.keys(), key=int):
             play_from.append(plays[fidx][0])
             play_urls.append("#".join(plays[fidx][1]))
-        vod = {"vod_id": vid, "vod_name": title, "vod_pic": pic, "vod_actor": actor, "vod_year": year, "vod_content": desc, "vod_play_from": "$$$".join(play_from), "vod_play_url": "$$$".join(play_urls)}
+            
+        # 6. 组装数据 (补齐所有标准字段)
+        vod = {
+            "vod_id": vid,
+            "vod_name": title,
+            "vod_pic": pic,
+            "vod_actor": actor,
+            "vod_director": director,   # 导演
+            "vod_area": area,           # 地区
+            "vod_year": year,           # 年份
+            "vod_lang": lang,           # 语言
+            "type_name": type_name,     # 类型
+            "vod_content": desc,        # 简介
+            "vod_play_from": "$$$".join(play_from),
+            "vod_play_url": "$$$".join(play_urls)
+        }
         return {"list": [vod]}
 
     def searchContent(self, key, quick=False, pg="1"):
