@@ -245,6 +245,51 @@ class Spider:
                         'url': url})
         return out
 
+    # ================= 简介提取（重点：多字段兜底 + 强清洗） =================
+    def _extract_desc(self, d):
+        """
+        从详情接口返回的数据中提取完整简介。
+        - 多字段名兜底: description / desc / summary / intro / content / overview / plot / synopsis
+        - 清洗 HTML 标签与实体
+        - 强制切断可能混入的底部导航词
+        - 无简介时用 标题+年份+地区+类型 兜底拼接
+        """
+        if not isinstance(d, dict):
+            return ''
+
+        raw = ''
+        for key in ('description', 'desc', 'summary', 'intro',
+                    'content', 'overview', 'plot', 'synopsis'):
+            v = d.get(key)
+            if isinstance(v, str) and v.strip():
+                raw = v.strip()
+                break
+
+        # 接口没给简介: 用元信息兜底
+        if not raw:
+            parts = []
+            for k in ('title', 'year', 'area'):
+                v = d.get(k)
+                if v:
+                    parts.append(str(v))
+            genres = d.get('genres')
+            if isinstance(genres, list):
+                parts.append('/'.join(str(g) for g in genres if g))
+            return ' '.join(parts).strip()
+
+        text = _html.unescape(raw)
+        text = re.sub(r'<[^>]+>', '', text)
+        text = (text.replace('&nbsp;', ' ').replace('&amp;', '&')
+                    .replace('&quot;', '"').replace('&#39;', "'")
+                    .replace('&lt;', '<').replace('&gt;', '>'))
+        # 强制切断可能混入的导航/播放列表文本
+        for sw in ['详情', '立即播放', '报错', '收藏', '扫一扫',
+                   '排序', '播放地址', '第01集', '第1集']:
+            if sw in text:
+                text = text.split(sw)[0]
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text[:3000]
+
     # ================= 封面/本地代理 =================
     def _proxy_base(self):
         try:
@@ -434,6 +479,7 @@ class Spider:
         d = self._get(vid)
         if not isinstance(d, dict):
             return {'list': []}
+
         # 选集(分页兜底)
         episodes = []
         if isinstance(d.get('episodes'), list):
@@ -452,11 +498,13 @@ class Spider:
                     break
                 offset += pag.get('returned_count') or len(eps) or 48
                 guard += 1
+
         # 用首集 token 发现线路(各集线路基本一致)
         lines = []
         if episodes:
             tok = (episodes[0] or {}).get('token') or ''
             lines = self._resolve_lines(tok)
+
         ep_items = []
         for ep in episodes:
             if not isinstance(ep, dict):
@@ -465,6 +513,11 @@ class Spider:
             tok = ep.get('token') or ''
             if t and tok:
                 ep_items.append('{0}${1}'.format(t, tok))
+
+        # ===================== 简介：多字段兜底 + 强清洗 =====================
+        vod_content = self._extract_desc(d)
+        # =====================================================================
+
         vod = {
             'vod_id': vid,
             'vod_name': d.get('title') or '',
@@ -474,8 +527,13 @@ class Spider:
             'vod_remarks': d.get('remarks') or d.get('update_status') or '',
             'vod_actor': ' '.join(d.get('actors') or []),
             'vod_director': ' '.join(d.get('directors') or []),
-            'vod_content': self._clean(d.get('description') or ''),
+            'vod_content': vod_content,
         }
+        # 类型也可作为 info 展示（部分壳会显示 type_name）
+        genres = d.get('genres')
+        if isinstance(genres, list) and genres:
+            vod['type_name'] = '/'.join(str(g) for g in genres if g)
+
         if lines and ep_items:
             vod['vod_play_from'] = '$$$'.join(l['name'] for l in lines)
             vod['vod_play_url'] = '$$$'.join('#'.join(ep_items) for _ in lines)
@@ -523,6 +581,20 @@ class Spider:
 
     def playerContent(self, flag, id, vipFlags):
         token = (id or '').strip()
+        header = {'User-Agent': self._UA, 'Referer': self._BASE + '/'}
+
+        if not token:
+            return {'parse': 0, 'playUrl': '', 'url': '',
+                    'header': header, 'msg': '空 id'}
+
+        # 直链直通：如果传入的 id 本身就是 m3u8/mp4 直链
+        if token.startswith('http') and ('.m3u8' in token or '.mp4' in token):
+            return {'parse': 0, 'playUrl': token, 'url': token, 'header': header}
+
+        # 如果 id 是 "集名$token" 形式，取 $ 后面
+        if '$' in token:
+            token = token.split('$')[-1]
+
         lines = self._resolve_lines(token)
         pick = None
         for l in lines:
@@ -531,11 +603,11 @@ class Spider:
                 break
         if pick is None and lines:
             pick = lines[0]
-        header = {'User-Agent': self._UA, 'Referer': self._BASE + '/'}
         if pick is None:
-            return {'parse': 0, 'url': '', 'header': header,
-                    'msg': '未找到可播放线路'}
-        return {'parse': 0, 'url': pick['url'], 'header': header}
+            return {'parse': 0, 'playUrl': '', 'url': '',
+                    'header': header, 'msg': '未找到可播放线路'}
+        return {'parse': 0, 'playUrl': pick['url'], 'url': pick['url'],
+                'header': header}
 
     def localProxy(self, param):
         kind, target = self._proxy_target(param)
