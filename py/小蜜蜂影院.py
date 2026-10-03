@@ -12,9 +12,11 @@
 契约: class Spider 无继承 · 14 壳方法全实现 · 位置参数契约 · $/#/$$$ 分隔
       playerContent.header 为 dict · Python 层不调用 setCache/getCache
 生成: 2026-10-01 · 结构经真实站点逐页核对(首页/分类/筛选/详情/播放/搜索)
+修订: 2026-10-03 · 补全简介提取(多模式+meta兜底) · 改进卡片/线路/分页解析 · gzip 支持
 """
 import re
 import json
+import gzip
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -29,7 +31,9 @@ class Spider:
         self.headers = {
             'User-Agent': self.ua,
             'Referer': self.host + '/',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'zh-CN,zh;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
         }
         # 一级分类: (名称, channel)
         self.classes = [
@@ -77,9 +81,15 @@ class Spider:
         req = urllib.request.Request(url, headers=h)
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             data = resp.read()
-        for enc in ('utf-8', 'gbk', 'gb18030'):
+            enc = (resp.headers.get('Content-Encoding') or '').lower()
+            if 'gzip' in enc:
+                try:
+                    data = gzip.decompress(data)
+                except Exception:
+                    pass
+        for e in ('utf-8', 'gbk', 'gb18030'):
             try:
-                return data.decode(enc)
+                return data.decode(e)
             except Exception:
                 continue
         return data.decode('utf-8', 'ignore')
@@ -89,42 +99,72 @@ class Spider:
             return ''
         s = _html.unescape(s)
         s = re.sub(r'<[^>]+>', '', s)
+        s = re.sub(r'\s+', ' ', s)
         return s.strip()
 
+    def _abs_url(self, u):
+        if not u:
+            return ''
+        u = u.strip()
+        if u.startswith('//'):
+            return 'https:' + u
+        if u.startswith('/'):
+            return self.host + u
+        return u
+
     def _parse_cards(self, html):
-        """解析视频卡片: 首页/分类/筛选页 .vod-card 与搜索页 .search-item 通用。
-        以 /detail/{id}.html 锚点切块, 就近取封面/标题/备注, 按 vid 去重保序。"""
+        """通用卡片解析: 以 /detail/{id}.html 锚点为准, 取相邻区间内的封面/标题/备注"""
         items = []
         seen = set()
-        for m in re.finditer(r'href="/detail/(\d+)\.html"', html):
+        matches = list(re.finditer(r'href="/detail/(\d+)\.html"', html))
+        for i, m in enumerate(matches):
             vid = m.group(1)
             if vid in seen:
                 continue
-            chunk = html[m.start():m.start() + 1600]
+            start = matches[i - 1].end() if i > 0 else max(0, m.start() - 900)
+            end = matches[i + 1].start() if i + 1 < len(matches) else min(len(html), m.end() + 900)
+            block = html[start:end]
+            # 封面
             pic = ''
-            pm = re.search(r'<img[^>]+src="(https?://[^"]+)"', chunk)
+            pm = re.search(r'<img[^>]+(?:data-src|data-original|data-echo|src)="([^"]+)"', block)
             if pm:
-                pic = pm.group(1)
+                pic = self._abs_url(pm.group(1))
+            # 标题
             title = ''
-            tm = re.search(r'class="vod-title[^"]*"[^>]*>([^<]+)<', chunk)
-            if not tm:
-                tm = re.search(r'class="search-item-title[^"]*"[^>]*>([^<]+)<', chunk)
-            if tm:
-                title = self._clean(tm.group(1))
-            if not title and pm:
-                am = re.search(r'alt="([^"]+?)(?:封面图片|海报)?"', chunk)
+            for tp in (r'class="vod-title[^"]*"[^>]*>([^<]+)<',
+                       r'class="module-poster-item-title[^"]*"[^>]*>([^<]+)<',
+                       r'class="search-item-title[^"]*"[^>]*>([^<]+)<',
+                       r'class="module-card-item-title[^"]*"[^>]*>([^<]+)<',
+                       r'class="title[^"]*"[^>]*>([^<]+)<'):
+                tm = re.search(tp, block)
+                if tm:
+                    t = self._clean(tm.group(1))
+                    if t:
+                        title = t
+                        break
+            if not title:
+                am = re.search(r'<img[^>]+alt="([^"]+)"', block)
                 if am:
                     title = self._clean(am.group(1))
             if not title:
+                tm = re.search(r'title="([^"]+)"', block)
+                if tm:
+                    title = self._clean(tm.group(1))
+            if not title:
                 continue
+            # 备注
             remark = ''
-            rm = re.search(r'vod-badge[^"]*"[^>]*>([^<]+)<', chunk)
-            if rm:
-                remark = self._clean(rm.group(1))[:20]
-            if not remark:
-                sm = re.search(r'class="vod-subtitle[^"]*"[^>]*>([^<]+)<', chunk)
-                if sm:
-                    remark = self._clean(sm.group(1))[:30]
+            for rp in (r'class="vod-badge[^"]*"[^>]*>([^<]+)<',
+                       r'class="module-item-note[^"]*"[^>]*>([^<]+)<',
+                       r'class="module-card-item-note[^"]*"[^>]*>([^<]+)<',
+                       r'class="vod-subtitle[^"]*"[^>]*>([^<]+)<',
+                       r'class="note[^"]*"[^>]*>([^<]+)<'):
+                rm = re.search(rp, block)
+                if rm:
+                    r = self._clean(rm.group(1))[:30]
+                    if r:
+                        remark = r
+                        break
             seen.add(vid)
             items.append({
                 'vod_id': vid,
@@ -135,12 +175,49 @@ class Spider:
         return items
 
     def _parse_pagecount(self, html, pg):
-        # 筛选页分页链接是 &amp;page=N 转义形态, 先还原再取最大页码
-        pages = [int(x) for x in re.findall(r'page=(\d+)', html.replace('&amp;', '&'))]
-        pc = max(pages) if pages else int(pg)
-        if pc < int(pg):
-            pc = int(pg)
+        try:
+            pg = int(pg)
+        except Exception:
+            pg = 1
+        text = html.replace('&amp;', '&')
+        pages = [int(x) for x in re.findall(r'[?&]page=(\d+)', text)]
+        pc = max(pages) if pages else pg
+        if pc < pg:
+            pc = pg
         return str(pg), str(pc)
+
+    def _extract_content(self, html):
+        """提取剧情简介: 多模式匹配 + meta 兜底"""
+        patterns = (
+            r'<div[^>]*class="[^"]*synopsis-content[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*vod-content[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*vod-detail-content[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*detail-content[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*introduction[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*intro[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*summary[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*desc[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*synopsis[^"]*"[^>]*>(.*?)</div>',
+            r'<p[^>]*class="[^"]*intro[^"]*"[^>]*>(.*?)</p>',
+            r'<section[^>]*class="[^"]*synopsis[^"]*"[^>]*>(.*?)</section>',
+            r'<div[^>]*id="[^"]*content[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*id="[^"]*intro[^"]*"[^>]*>(.*?)</div>',
+            r'<div[^>]*id="[^"]*desc[^"]*"[^>]*>(.*?)</div>',
+        )
+        for p in patterns:
+            cm = re.search(p, html, re.S)
+            if cm:
+                txt = self._clean(cm.group(1))
+                if txt and len(txt) > 3:
+                    return txt
+        for mp in (r'<meta[^>]+name="description"[^>]+content="([^"]+)"',
+                   r'<meta[^>]+property="og:description"[^>]+content="([^"]+)"'):
+            dm = re.search(mp, html, re.I)
+            if dm:
+                txt = self._clean(dm.group(1))
+                if txt:
+                    return txt
+        return ''
 
     def _filters(self):
         """构造二级分类筛选: 每个一级分类 -> [类型, 地区, 年份, 排序] 四组"""
@@ -201,7 +278,8 @@ class Spider:
 
     def isVideoFormat(self, url):
         u = (url or '').lower()
-        return u.endswith('.m3u8') or u.endswith('.mp4') or '.m3u8?' in u or '.mp4?' in u
+        return (u.endswith('.m3u8') or u.endswith('.mp4')
+                or '.m3u8?' in u or '.mp4?' in u)
 
     def manualVideoCheck(self):
         return False
@@ -223,10 +301,19 @@ class Spider:
         return {'class': classes, 'list': items, 'filters': self._filters()}
 
     def homeVideoContent(self):
-        return {'list': []}
+        items = []
+        try:
+            html = self._fetch(self.host + '/')
+            items = self._parse_cards(html)
+        except Exception:
+            items = []
+        return {'list': items}
 
     def categoryContent(self, tid, pg, filter, extend):
-        pg = int(pg) if str(pg).isdigit() else 1
+        try:
+            pg = int(pg)
+        except Exception:
+            pg = 1
         ext = extend if isinstance(extend, dict) else {}
         if isinstance(extend, str) and extend.strip().startswith('{'):
             try:
@@ -242,7 +329,10 @@ class Spider:
             'year': year, 'sort': sort, 'page': pg,
         })
         url = '{0}/filter?{1}'.format(self.host, q)
-        html = self._fetch(url)
+        try:
+            html = self._fetch(url)
+        except Exception:
+            html = ''
         items = self._parse_cards(html)
         page, pagecount = self._parse_pagecount(html, pg)
         return {
@@ -257,37 +347,52 @@ class Spider:
         vid = self._first_id(ids)
         url = '{0}/detail/{1}.html'.format(self.host, vid)
         html = self._fetch(url)
+
+        # 标题
         title = ''
         m = re.search(r'<h1[^>]*>([^<]+)</h1>', html)
         if m:
             title = self._clean(m.group(1))
         if not title:
-            m2 = re.search(r'og:title" content="《([^》]+)》', html)
-            title = self._clean(m2.group(1)) if m2 else vid
+            m = re.search(r'og:title"[^>]*content="《?([^》"]+)》?"', html)
+            if m:
+                title = self._clean(m.group(1))
+        if not title:
+            title = vid
+
+        # 封面
         pic = ''
-        pm = re.search(r'og:image" content="([^"]+)"', html)
+        pm = re.search(r'og:image"[^>]*content="([^"]+)"', html)
         if pm:
-            pic = pm.group(1)
+            pic = self._abs_url(pm.group(1))
+
+        # meta 键值对(类型/年份/地区/主演/导演/备注等)
         meta = {}
         for k, v in re.findall(
-                r'meta-label">([^<]+)</span>\s*<span class="meta-value">([^<]*)</span>', html):
+                r'class="[^"]*meta-label[^"]*"[^>]*>([^<]+)<[^>]*>\s*<[^>]*class="[^"]*meta-value[^"]*"[^>]*>([^<]*)<',
+                html):
             meta[self._clean(k).rstrip('：:')] = self._clean(v)
-        content = ''
-        cm = re.search(r'class="synopsis-content"[^>]*>(.*?)</div>', html, re.S)
-        if cm:
-            content = self._clean(cm.group(1))
-        # 线路名(与 source-panel 顺序一一对应) + 各线路选集
-        from_names = re.findall(r'data-target="source-\d+"[^>]*>([^<]+)</button>', html)
-        panels = re.split(r'<div class="source-panel"', html)[1:]
+        if not meta:
+            for k, v in re.findall(
+                    r'<span[^>]*class="[^"]*meta-label[^"]*"[^>]*>([^<]+)</span>\s*<span[^>]*class="[^"]*meta-value[^"]*"[^>]*>([^<]*)</span>',
+                    html):
+                meta[self._clean(k).rstrip('：:')] = self._clean(v)
+
+        # 简介(重点)
+        content = self._extract_content(html)
+
+        # 线路名 + 各线路选集
+        from_names = re.findall(r'data-target="source-\d+"[^>]*>([^<]+)<', html)
+        if not from_names:
+            from_names = re.findall(r'class="[^"]*source-tab[^"]*"[^>]*>([^<]+)<', html)
+        panels = re.split(r'<div[^>]*class="[^"]*source-panel[^"]*"', html)[1:]
         play_from, play_url = [], []
         for i, panel in enumerate(panels):
             eps = re.findall(r'href="(/vodplay/[^"]+)"[^>]*>([^<]+)</a>', panel)
-            # 相关推荐等后续区块不属于本线路, 截到下一个 section 前
             eps = [(u, t) for u, t in eps if '/vodplay/{0}-'.format(vid) in u]
             if not eps:
                 continue
-            # 普通线路二(bfzym3u8 -> fengbao12.com)整站已下线: API 照发地址但 m3u8 恒 404,
-            # 站内播放器同样播不了, 详情里直接剔除避免用户点到死线路
+            # 普通线路二(bfzym3u8)整站已下线: 详情里直接剔除避免点到死线路
             fm = re.search(r'/vodplay/\d+-(.+)-\d+\.html', eps[0][0])
             if fm and fm.group(1) == 'bfzym3u8':
                 continue
@@ -295,6 +400,7 @@ class Spider:
             play_from.append(name)
             play_url.append('#'.join(
                 '{0}${1}{2}'.format(self._clean(t), self.host, u) for u, t in eps))
+
         vod = {
             'vod_id': vid,
             'vod_name': title,
@@ -312,10 +418,16 @@ class Spider:
         return {'list': [vod]}
 
     def searchContent(self, key, quick, pg):
-        pg = int(pg) if str(pg).isdigit() else 1
+        try:
+            pg = int(pg)
+        except Exception:
+            pg = 1
         q = urllib.parse.urlencode({'keyword': key, 'sort': 'hits', 'page': pg})
         url = '{0}/search?{1}'.format(self.host, q)
-        html = self._fetch(url)
+        try:
+            html = self._fetch(url)
+        except Exception:
+            html = ''
         items = self._parse_cards(html)
         page, pagecount = self._parse_pagecount(html, pg)
         return {
