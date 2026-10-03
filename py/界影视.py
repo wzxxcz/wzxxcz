@@ -6,6 +6,12 @@
 # 修复(2026-10-03): 电视剧无二级分类按钮 -> ①homeContent 始终构建 filters(不依赖客户端 filter 参数);
 #   分类页抓取失败自动重试一次, 避免偶发失败导致整组按钮缺失;
 #   ②type 行取值改为从 href 提取数字 id(如/2/type/14 取 14), 原来误用中文名导致筛选 URL 错误
+# 修复(2026-10-04): ①补全 14 壳方法(getDependence/destroy/action/homeVideoContent);
+#   ②简介提取强化: RSC 多字段回退 + HTML 清理 + meta description 兜底;
+#   ③_parse_vods 改为按 "vodId": 切块, 避免正则漏抓;
+#   ④detailContent 入参兼容 list/dict/JSON字符串/纯数字;
+#   ⑤选集解析增加去重 + 字段名回退;
+#   ⑥API 请求失败重试一次。
 from base.spider import Spider
 import requests
 import re
@@ -13,6 +19,7 @@ import json
 import hashlib
 import time
 import uuid
+import html as _html
 from urllib.parse import quote, unquote
 
 FILTER_LABEL = {
@@ -36,6 +43,29 @@ class Spider(Spider):
     def getName(self):
         return "界影视"
 
+    def getDependence(self):
+        return []
+
+    def destroy(self):
+        try:
+            self.sess.close()
+        except Exception:
+            pass
+        return None
+
+    def action(self, action):
+        return None
+
+    def isVideoFormat(self, url):
+        u = (url or "").lower()
+        return "m3u8" in u or "mp4" in u
+
+    def manualVideoCheck(self):
+        return False
+
+    def localProxy(self, param):
+        return [200, "video/2", None, ""]
+
     # ---------------- 基础 ----------------
     def _get(self, url, timeout=20):
         r = self.sess.get(url, timeout=timeout)
@@ -43,36 +73,29 @@ class Spider(Spider):
         return r.text
 
     def _flight(self, url):
+        """抓取 Next.js RSC flight 数据, 返回 (html, blob)"""
         if url in self._cache:
             return self._cache[url]
         html = self._get(url)
-        pushes = re.findall(r'self\.__next_f\.push\(\[1,"(.*?)"\]\)</script>', html, re.S)
         blob = ""
+        # 兼容: self.__next_f.push([1,"..."])  (允许 1 与 " 之间有空格)
+        pushes = re.findall(
+            r'self\.__next_f\.push\(\[1,\s*"((?:[^"\\]|\\.)*)"\]\)',
+            html, re.S)
         for p in pushes:
             try:
                 blob += json.loads('"' + p + '"')
             except Exception:
-                pass
+                blob += p
         self._cache[url] = (html, blob)
         return html, blob
 
-    def _api(self, path, params):
-        # 签名: sign=SHA1(MD5("k1=v1&k2=v2...(key 排序)&key=signkey&t=毫秒戳"))
-        ts = str(int(time.time() * 1000))
-        q = "&".join("%s=%s" % (k, params[k]) for k in sorted(params))
-        h = "%s&key=%s&t=%s" % (q, self.signkey, ts)
-        sign = hashlib.sha1(hashlib.md5(h.encode()).hexdigest().encode()).hexdigest()
-        qs = "&".join("%s=%s" % (k, quote(str(params[k]), safe="")) for k in params)
-        url = self.host + "/mw-movie" + path + "?" + qs
-        r = self.sess.get(url, headers={
-            "sign": sign, "t": ts,
-            "deviceId": self.device_id, "authorization": "",
-        }, timeout=20)
-        return r.json()
-
     @staticmethod
     def _jstr(o, key):
-        m = re.search(r'"%s":"((?:[^"\\]|\\.)*)"' % key, o)
+        """从 flight 文本里取 "key":"value" 字符串, 兼容 \uXXXX 转义与 key 前后空格"""
+        if not o:
+            return ""
+        m = re.search(r'"%s"\s*:\s*"((?:[^"\\]|\\.)*)"' % re.escape(key), o)
         if not m:
             return ""
         try:
@@ -80,22 +103,91 @@ class Spider(Spider):
         except Exception:
             return m.group(1)
 
+    @staticmethod
+    def _clean_text(s):
+        """HTML/实体/多余空白 清理, 用于简介与 meta"""
+        if not s:
+            return ""
+        s = _html.unescape(str(s))
+        s = re.sub(r'<br\s*/?>', '\n', s, flags=re.I)
+        s = re.sub(r'</p\s*>', '\n', s, flags=re.I)
+        s = re.sub(r'<[^>]+>', '', s)
+        s = s.replace('\u00a0', ' ').replace('\u200b', '').replace('\ufeff', '')
+        s = re.sub(r'[ \t]+', ' ', s)
+        s = re.sub(r'\n[ \t]+', '\n', s)
+        s = re.sub(r'\n{3,}', '\n\n', s)
+        return s.strip()
+
+    def _extract_content(self, blob, html=""):
+        """简介提取(重点): RSC 多字段回退 + meta 兜底"""
+        # 1) flight 里按优先级尝试多个字段
+        for key in ("vodContent", "vodBlurb", "vodIntro", "vodDesc",
+                    "vodDescription", "introduction", "description",
+                    "vodSummary", "summary"):
+            v = self._jstr(blob, key)
+            if v:
+                v = self._clean_text(v)
+                if v and len(v) > 4:
+                    return v
+        # 2) 详情页 meta 兜底
+        if html:
+            for pat in (r'<meta[^>]+name="description"[^>]+content="([^"]+)"',
+                        r'<meta[^>]+property="og:description"[^>]+content="([^"]+)"'):
+                m = re.search(pat, html, re.I)
+                if m:
+                    v = self._clean_text(m.group(1))
+                    if v:
+                        return v
+        return ""
+
+    # ---------------- API 签名 ----------------
+    def _api(self, path, params):
+        # sign = SHA1( MD5("k1=v1&k2=v2...(key 排序)&key=signkey&t=毫秒戳") )
+        ts = str(int(time.time() * 1000))
+        q = "&".join("%s=%s" % (k, params[k]) for k in sorted(params))
+        h = "%s&key=%s&t=%s" % (q, self.signkey, ts)
+        sign = hashlib.sha1(hashlib.md5(h.encode()).hexdigest().encode()).hexdigest()
+        qs = "&".join("%s=%s" % (k, quote(str(params[k]), safe="")) for k in params)
+        url = self.host + "/mw-movie" + path + "?" + qs
+        last_err = None
+        for _try in range(2):
+            try:
+                r = self.sess.get(url, headers={
+                    "sign": sign, "t": ts,
+                    "deviceId": self.device_id, "authorization": "",
+                }, timeout=20)
+                return r.json()
+            except Exception as e:
+                last_err = e
+                time.sleep(0.4)
+        if last_err:
+            raise last_err
+        return {}
+
+    # ---------------- 列表解析 ----------------
     def _parse_vods(self, blob):
+        """按 "vodId": 切块解析, 避免正则 \{...\} 漏抓/串行"""
         vods = []
         seen = set()
-        for m in re.finditer(r'\{[^{}]*?"vodId":(\d+)[^{}]*?\}', blob):
+        if not blob:
+            return vods
+        parts = re.split(r'"vodId"\s*:\s*', blob)
+        for p in parts[1:]:
+            m = re.match(r'(\d+)', p)
+            if not m:
+                continue
             vid = m.group(1)
             if vid in seen:
                 continue
-            seen.add(vid)
-            o = m.group(0)
-            name = self._jstr(o, "vodName")
+            seg = p[:4000]
+            name = self._jstr(seg, "vodName")
             if not name:
                 continue
-            pic = self._jstr(o, "vodPic")
-            remarks = self._jstr(o, "vodRemarks") or self._jstr(o, "vodVersion")
-            year = self._jstr(o, "vodYear")
-            area = self._jstr(o, "vodArea")
+            seen.add(vid)
+            pic = self._jstr(seg, "vodPic")
+            remarks = self._jstr(seg, "vodRemarks") or self._jstr(seg, "vodVersion")
+            year = self._jstr(seg, "vodYear")
+            area = self._jstr(seg, "vodArea")
             vods.append({
                 "vod_id": vid,
                 "vod_name": name,
@@ -137,7 +229,6 @@ class Spider(Spider):
             if len(vals) >= 2:
                 flist.append({"key": key, "name": FILTER_LABEL[key], "value": vals})
         flist.sort(key=lambda x: FILTER_ORDER.index(x["key"]) if x["key"] in FILTER_ORDER else 99)
-        # 排序: 电影=上映时间, 其他=最近更新/添加时间
         if tid == "1":
             sorts = [{"n": "上映时间", "v": "1"}, {"n": "人气高低", "v": "3"}, {"n": "评分高低", "v": "4"}]
         else:
@@ -157,8 +248,8 @@ class Spider(Spider):
             if tid not in [c["type_id"] for c in classes]:
                 classes.append({"type_id": tid, "type_name": name})
         result = {"class": classes, "list": self._parse_vods(blob)}
-        # 二级分类按钮: 不依赖客户端是否传 filter, 始终构建 filters;
-        # 单个分类页抓取失败时重试一次, 避免某个分类(如电视剧)偶发失败导致整组按钮缺失
+        # 始终构建 filters, 不依赖客户端是否传 filter;
+        # 分类页抓取失败重试一次, 避免某个分类偶发失败导致整组按钮缺失
         filters = {}
         for c in classes:
             tid = c["type_id"]
@@ -181,6 +272,13 @@ class Spider(Spider):
         result["filters"] = filters
         return result
 
+    def homeVideoContent(self):
+        try:
+            _page, blob = self._flight(self.host + "/")
+            return {"list": self._parse_vods(blob)}
+        except Exception:
+            return {"list": []}
+
     # ---------------- category ----------------
     def categoryContent(self, tid, pg, filter, extend):
         if isinstance(extend, str):
@@ -190,21 +288,27 @@ class Spider(Spider):
                 extend = {}
         if not isinstance(extend, dict):
             extend = {}
-        url = "%s/vod/show/id/%s" % (self.host, tid)
+        url = "%s/vod/show/id/%s" % (self.host, str(tid))
         for k in FILTER_ORDER + ["sort", "sortBy"]:
             v = extend.get(k)
             if v:
-                # 先 unquote 再 quote：兼容客户端原文/预编码两种传参，避免双重编码导致服务端匹配不到过滤条件
+                # 先 unquote 再 quote: 兼容原文/预编码两种传参
                 v = quote(unquote(str(v).strip(), encoding="utf-8"), safe="~")
                 if v:
                     url += "/%s/%s" % (k, v)
-        pg = int(pg) if str(pg).isdigit() else 1
+        try:
+            pg = int(pg)
+        except Exception:
+            pg = 1
         if pg > 1:
             url += "/page/%d" % pg
-        html, blob = self._flight(url)
+        try:
+            _page, blob = self._flight(url)
+        except Exception:
+            blob = ""
         vods = self._parse_vods(blob)
         pagecount = 1
-        m = re.search(r'"totalCount":(\d+)', blob)
+        m = re.search(r'"totalCount"\s*:\s*(\d+)', blob)
         if m:
             pagecount = max(1, (int(m.group(1)) + 47) // 48)
         elif len(vods) >= 48:
@@ -212,9 +316,30 @@ class Spider(Spider):
         return {"list": vods, "page": pg, "pagecount": pagecount, "limit": 48, "total": 999999}
 
     # ---------------- detail ----------------
+    def _first_id(self, ids):
+        if isinstance(ids, (list, tuple)):
+            s = str(ids[0]) if ids else ""
+        elif isinstance(ids, dict):
+            s = str(ids.get("vod_id") or ids.get("id") or ids.get("value") or "")
+        else:
+            s = str(ids or "").strip()
+            if s.startswith("["):
+                try:
+                    arr = json.loads(s)
+                    if isinstance(arr, list) and arr:
+                        s = str(arr[0])
+                except Exception:
+                    pass
+        m = re.search(r'\d+', s)
+        return m.group(0) if m else s
+
     def detailContent(self, ids):
-        vid = ids[0]
-        _html, blob = self._flight("%s/detail/%s" % (self.host, vid))
+        vid = self._first_id(ids)
+        try:
+            page_html, blob = self._flight("%s/detail/%s" % (self.host, vid))
+        except Exception:
+            page_html, blob = "", ""
+
         name = self._jstr(blob, "vodName")
         pic = self._jstr(blob, "vodPic")
         actor = self._jstr(blob, "vodActor")
@@ -225,18 +350,51 @@ class Spider(Spider):
         vclass = self._jstr(blob, "vodClass")
         score = self._jstr(blob, "vodScore") or self._jstr(blob, "vodDoubanScore")
         remarks = self._jstr(blob, "vodRemarks") or self._jstr(blob, "vodVersion")
-        content = self._jstr(blob, "vodContent")
-        content = re.sub(r'<[^>]+>', '', content).strip()
-        eps = re.findall(r'\{"nid":(\d+),"name":"((?:[^"\\]|\\.)*)"', blob)
-        eps = [(nid, n.replace("$", "").replace("#", "")) for nid, n in eps]
-        # 取第一集的清晰度列表作为播放源
+
+        # 简介(重点): 多字段回退 + meta 兜底
+        content = self._extract_content(blob, page_html)
+
+        # 选集: 主模式 {"nid":123,"name":"..."}
+        eps = []
+        seen_nid = set()
+        for m in re.finditer(
+                r'\{"nid"\s*:\s*(\d+)[^{}]*?"name"\s*:\s*"((?:[^"\\]|\\.)*)"',
+                blob):
+            nid = m.group(1)
+            if nid in seen_nid:
+                continue
+            try:
+                n = json.loads('"' + m.group(2) + '"')
+            except Exception:
+                n = m.group(2)
+            n = n.replace("$", "").replace("#", "")
+            seen_nid.add(nid)
+            eps.append((nid, n))
+
+        # 回退: {"episodeId":..,"episodeName":".."}
+        if not eps:
+            for m in re.finditer(
+                    r'\{"episodeId"\s*:\s*(\d+)[^{}]*?"episodeName"\s*:\s*"((?:[^"\\]|\\.)*)"',
+                    blob):
+                nid = m.group(1)
+                if nid in seen_nid:
+                    continue
+                try:
+                    n = json.loads('"' + m.group(2) + '"')
+                except Exception:
+                    n = m.group(2)
+                n = n.replace("$", "").replace("#", "")
+                seen_nid.add(nid)
+                eps.append((nid, n))
+
+        # 清晰度列表(取第一集)
         res_list = []
         if eps:
             try:
                 data = self._api("/anonymous/v2/video/episode/url",
                                  {"clientType": "1", "id": vid, "nid": eps[0][0]})
                 if data.get("code") == 200:
-                    res_list = data["data"].get("list", [])
+                    res_list = data["data"].get("list", []) or []
             except Exception:
                 pass
         if res_list:
@@ -246,6 +404,7 @@ class Spider(Spider):
         urls = []
         for _r in play_from:
             urls.append(["%s$%s@%s" % (n, vid, nid) for nid, n in eps])
+
         vod = {
             "vod_id": vid,
             "vod_name": name,
@@ -266,27 +425,38 @@ class Spider(Spider):
 
     # ---------------- play ----------------
     def playerContent(self, flag, id, vipFlags):
-        vid, nid = id.split("@")
-        url = ""
+        header = {"User-Agent": self.UA, "Referer": self.host + "/"}
         try:
-            data = self._api("/anonymous/v2/video/episode/url",
-                             {"clientType": "1", "id": vid, "nid": nid})
-            if data.get("code") == 200:
-                lst = data["data"].get("list", [])
-                for it in lst:
-                    if it.get("resolutionName") == flag:
-                        url = it.get("url", "")
-                        break
-                if not url and lst:
-                    url = lst[0].get("url", "")
+            s = str(id or "")
+            if "@" in s:
+                vid, nid = s.split("@", 1)
+            else:
+                vid, nid = s, ""
+            url = ""
+            if vid and nid:
+                try:
+                    data = self._api("/anonymous/v2/video/episode/url",
+                                     {"clientType": "1", "id": vid, "nid": nid})
+                    if data.get("code") == 200:
+                        lst = data["data"].get("list", []) or []
+                        for it in lst:
+                            if it.get("resolutionName") == flag:
+                                url = it.get("url", "")
+                                break
+                        if not url and lst:
+                            url = lst[0].get("url", "")
+                except Exception:
+                    pass
+            return {"parse": 0, "url": url, "header": header}
         except Exception:
-            pass
-        return {"parse": 0, "url": url,
-                "header": {"User-Agent": self.UA, "Referer": self.host + "/"}}
+            return {"parse": 0, "url": "", "header": header}
 
     # ---------------- search ----------------
     def searchContent(self, key, quick, pg="1"):
-        pg = int(pg) if str(pg).isdigit() else 1
+        try:
+            pg = int(pg)
+        except Exception:
+            pg = 1
         vods = []
         pagecount = 1
         try:
@@ -294,10 +464,13 @@ class Spider(Spider):
                              {"keyword": key, "pageNum": str(pg),
                               "pageSize": "48", "sourceCode": "1"})
             if data.get("code") == 200:
-                res = data["data"].get("result", {})
-                total = res.get("totalCount", 0)
-                pagecount = max(1, (total + 47) // 48)
-                for it in res.get("list", []):
+                res = data["data"].get("result", {}) or {}
+                total = res.get("totalCount", 0) or 0
+                try:
+                    pagecount = max(1, (int(total) + 47) // 48)
+                except Exception:
+                    pagecount = 1
+                for it in res.get("list", []) or []:
                     vods.append({
                         "vod_id": str(it.get("vodId", "")),
                         "vod_name": it.get("vodName", ""),
@@ -312,12 +485,3 @@ class Spider(Spider):
 
     def searchContentPage(self, key, quick, page):
         return self.searchContent(key, quick, page)
-
-    def isVideoFormat(self, url):
-        return "m3u8" in url or "mp4" in url
-
-    def manualVideoCheck(self):
-        return False
-
-    def localProxy(self, param):
-        return [200, "video/2", None, ""]
