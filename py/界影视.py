@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 # 站点: 界影视 https://yvyeigh.com/
+# 壳子: webhtv (基于 FongMi, 支持本地 HTTP 代理)
 # 播放: 签名 API /mw-movie/anonymous/v2/video/episode/url
 #
-# 【本版 4 道防线, 目标: 不管用户怎么操作都能播蓝光/高清】
-#   ① 时间戳防缓存: detailContent 的每条选集 id 结尾带 @时间戳,
-#      逼 TVBox 每次重新调 playerContent, 不会复用磁盘缓存的旧 URL。
-#   ② 每次实时重签: playerContent 里用全新 device_id + 最新时间戳重新签 URL,
-#      保证返回的 m3u8 一定是当前有效的。
-#   ③ 裸请求探测: 模拟播放器"只带 UA / 不带 Referer"去请求,
-#      m3u8 索引 + 第一个分片都返回 200 才算"可播"。
-#   ④ 自动降级 + 代理兜底: 所选清晰度失效就自动降级到下一档;
-#      直连失败时自动切到本地代理(重写分片时带上父 URL 的 auth_key)。
+# 本版针对 webhtv 壳优化:
+#   ① playerContent 返回 proxy:// 本地代理地址, 由壳子转本地 HTTP 请求
+#   ② localProxy 带 Referer/UA 去拉 m3u8, 并把分片重写为代理地址
+#   ③ 分片重写时补上父 URL 的 auth_key query (Nginx secure_link 关键)
+#   ④ 每次播放新 device_id 重签 URL, 避免会话变更失效
 from base.spider import Spider
 import requests
 import re
@@ -258,7 +255,7 @@ class Spider(Spider):
         eps = re.findall(r'\{"nid":(\d+),"name":"((?:[^"\\]|\\.)*)"', blob)
         eps = [(nid, n.replace("$", "").replace("#", "")) for nid, n in eps]
 
-        # 预取清晰度列表(仅列出线路名, 播放时才签 URL)
+        # 预取清晰度列表(仅列出线路名)
         res_list = []
         if eps:
             try:
@@ -272,14 +269,9 @@ class Spider(Spider):
             res_list = sorted(res_list, key=lambda it: -(int(it.get("resolution", 0) or 0)))
         play_from = [it.get("resolutionName", "默认") for it in res_list] or ["默认"]
 
-        # 时间戳防缓存: 每条选集 id 结尾带 @ts, 逼 TVBox 每次都重新调 playerContent
-        ts = str(int(time.time()))
         urls = []
         for _r in play_from:
-            ep_line = []
-            for nid, n in eps:
-                ep_line.append("%s$%s@%s@%s" % (n, vid, nid, ts))
-            urls.append("#".join(ep_line))
+            urls.append("#".join("%s$%s@%s" % (n, vid, nid) for nid, n in eps))
 
         vod = {
             "vod_id": vid, "vod_name": name, "vod_pic": pic,
@@ -304,7 +296,7 @@ class Spider(Spider):
         return u
 
     def _abs_segment(self, m3u8_url, seg):
-        """把 m3u8 里的分片路径拼成绝对 URL, 并把父 URL 的 query 补上"""
+        """把分片路径拼成绝对 URL, 并把父 URL 的 query 补上(auth_key 关键)"""
         abs_seg = urljoin(m3u8_url, seg)
         p_url = urlparse(m3u8_url)
         p_seg = urlparse(abs_seg)
@@ -312,137 +304,60 @@ class Spider(Spider):
             abs_seg = abs_seg + "?" + p_url.query
         return abs_seg
 
-    def _verify_playable(self, url):
-        """裸请求探测: 只带 UA, 不带 Referer —— 模拟播放器直连。
-        m3u8: 索引和第一个分片都要 200; mp4/flv: 一次 200 即可。
-        """
-        if not url:
-            return False
-        try:
-            low = url.lower()
-            if any(low.endswith(ext) or (ext + "?") in low
-                   for ext in (".mp4", ".flv")):
-                r = self.sess.get(url, headers={"User-Agent": self.UA},
-                                  timeout=6, stream=True)
-                ok = (r.status_code == 200)
-                try: r.close()
-                except Exception: pass
-                return ok
-
-            r = self.sess.get(url, headers={"User-Agent": self.UA}, timeout=6)
-            if r.status_code != 200:
-                return False
-            if b"#EXTM3U" not in r.content:
-                return False
-
-            text = r.text
-            first_seg = None
-            for line in text.split("\n"):
-                ls = line.strip()
-                if ls and not ls.startswith("#"):
-                    first_seg = ls
-                    break
-            if not first_seg:
-                return True  # 空 m3u8, 至少索引有效
-
-            abs_seg = self._abs_segment(url, first_seg)
-            r2 = self.sess.get(abs_seg, headers={"User-Agent": self.UA},
-                               timeout=6, stream=True)
-            ok = (r2.status_code == 200)
-            try: r2.close()
-            except Exception: pass
-            return ok
-        except Exception:
-            return False
-
     # ---------------- play ----------------
     def playerContent(self, flag, id, vipFlags):
-        """4 道防线一起上, 保证任何入口都能播。"""
+        """返回 proxy:// 本地代理地址, 由 webhtv 壳转本地 HTTP 请求。"""
         header = {"User-Agent": self.UA, "Referer": self.host + "/"}
-        flag_clean = re.sub(r'\[.*?\]$', '', str(flag or "")).strip()
-
         s = str(id or "")
-
-        # 情形 A: id 是 http(s) URL —— 某些壳"继续播放"会直接传 URL
-        if s.startswith("http://") or s.startswith("https://"):
-            if self._verify_playable(s):
-                return {"parse": 0, "url": s, "header": header}
-            # 过期 URL 没法反推 vid/nid, 走代理兜底再试一次
-            proxy_url = "proxy://do=py&type=m3u8&url=" + quote(s, safe="")
-            return {"parse": 0, "url": proxy_url, "header": header}
-
-        # 情形 B: id 是 vid@nid 或 vid@nid@ts
         if "|" in s:
             s = s.split("|", 1)[0]
-        parts = s.split("@")
-        if len(parts) < 2:
+        if "@" not in s:
             return {"parse": 0, "url": "", "header": header}
-        vid = re.search(r'\d+', parts[0])
-        nid = re.search(r'\d+', parts[1])
-        if not vid or not nid:
-            return {"parse": 0, "url": "", "header": header}
-        vid, nid = vid.group(0), nid.group(0)
+        vid, nid = s.split("@", 1)
+        m = re.search(r'\d+', nid)
+        nid = m.group(0) if m else nid
 
-        # 每次播放都用全新 device_id + 最新时间戳签 URL
         play_device_id = str(uuid.uuid4())
-        res_list = []
+        target_url = ""
         try:
             api_data = self._api("/anonymous/v2/video/episode/url",
                                  {"clientType": "1", "id": vid, "nid": nid},
                                  device_id=play_device_id)
             if isinstance(api_data, dict) and api_data.get("code") == 200:
                 res_list = (api_data.get("data") or {}).get("list", []) or []
+                for item in res_list:
+                    if item.get("resolutionName") == flag:
+                        target_url = (item.get("url") or item.get("playUrl")
+                                      or item.get("videoUrl") or item.get("fileUrl")
+                                      or item.get("src") or "")
+                        if target_url:
+                            break
+                if not target_url and res_list:
+                    best = sorted(res_list,
+                                  key=lambda it: -(int(it.get("resolution", 0) or 0)))[0]
+                    target_url = (best.get("url") or best.get("playUrl")
+                                  or best.get("videoUrl") or best.get("fileUrl")
+                                  or best.get("src") or "")
         except Exception:
             pass
 
-        if not res_list:
+        target_url = self._norm_url(target_url)
+        if not target_url:
             return {"parse": 0, "url": "", "header": header}
 
-        # 按分辨率降序(蓝光优先)
-        res_list = sorted(res_list, key=lambda it: -(int(it.get("resolution", 0) or 0)))
-
-        def _get_url(it):
-            return (it.get("url") or it.get("playUrl") or it.get("videoUrl")
-                    or it.get("fileUrl") or it.get("src") or "")
-
-        # 候选顺序: 用户所选优先, 其余按分辨率降序
-        candidates = []
-        for it in res_list:
-            rn = it.get("resolutionName", "")
-            if rn == flag or rn == flag_clean:
-                u = self._norm_url(_get_url(it))
-                if u:
-                    candidates.append(u)
-                break
-        for it in res_list:
-            u = self._norm_url(_get_url(it))
-            if u and u not in candidates:
-                candidates.append(u)
-
-        if not candidates:
-            return {"parse": 0, "url": "", "header": header}
-
-        # 逐个探测, 第一个"裸请求可播"的胜出
-        best = ""
-        for u in candidates:
-            if self._verify_playable(u):
-                best = u
-                break
-
-        # 直连全失败: 强制用本地代理(重写分片时带 auth_key)
-        if not best:
-            proxy_url = "proxy://do=py&type=m3u8&url=" + quote(candidates[0], safe="")
-            return {"parse": 0, "url": proxy_url, "header": header}
-
-        low = best.lower()
+        low = target_url.lower()
         if any(k in low for k in ('.m3u8', '.mp4', '.flv', '.ts')):
-            return {"parse": 0, "url": best, "header": header}
-        return {"parse": 1, "url": best, "header": header}
+            # m3u8 走本地代理
+            proxy_url = "proxy://do=py&type=m3u8&url=" + quote(target_url, safe="")
+            return {"parse": 0, "url": proxy_url, "header": header}
+        return {"parse": 1, "url": target_url, "header": header}
 
-    # ---------------- localProxy (代理兜底) ----------------
+    # ---------------- localProxy (关键实现, 不能返回 None) ----------------
     def localProxy(self, param):
-        """本地代理: 拉 m3u8 带 Referer/UA, 重写分片时补父 URL 的 auth_key, ts 二进制透传。
-        param 兼容 dict / query string。
+        """webhtv 壳的本地 HTTP 代理:
+        - 拉 m3u8 带 Referer/UA;
+        - 重写分片为 proxy:// 地址, 并补父 URL 的 auth_key;
+        - ts/key 二进制透传。
         """
         try:
             if isinstance(param, str):
