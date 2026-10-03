@@ -13,6 +13,7 @@
       playerContent.header 为 dict · Python 层不调用 setCache/getCache
 生成: 2026-10-01 · 结构经真实站点逐页核对(首页/分类/筛选/详情/播放/搜索)
 修订: 2026-10-03 · 补全简介提取(多模式+meta兜底) · 改进卡片/线路/分页解析 · gzip 支持
+      · 修复每个分类第1、2项重复的卡片切块问题
 """
 import re
 import json
@@ -35,12 +36,10 @@ class Spider:
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Accept-Encoding': 'gzip, deflate',
         }
-        # 一级分类: (名称, channel)
         self.classes = [
             ('电视剧', '1'), ('电影', '2'), ('动漫', '3'),
             ('综艺', '4'), ('短剧', '5'),
         ]
-        # 二级分类 - 类型(type id -> 名称)，与站点 /filter 链接逐一核对
         self.type_map = {
             '1': [('7', '剧情'), ('9', '古装'), ('10', '战争'), ('11', '谍战'),
                   ('12', '爱情'), ('13', '罪案'), ('14', '悬疑'), ('15', '家庭'),
@@ -113,22 +112,43 @@ class Spider:
         return u
 
     def _parse_cards(self, html):
-        """通用卡片解析: 以 /detail/{id}.html 锚点为准, 取相邻区间内的封面/标题/备注"""
+        """通用卡片解析: 以 /detail/{id}.html 锚点为准。
+        同一张卡片通常挂 2 个锚点(海报 + 标题), 因此块范围必须以
+        “最近一个不同 vid 的锚点” 为边界, 避免把同一卡片解析两次,
+        也避免把邻卡内容错切到当前卡片。再叠加 (标题, 封面) 二次去重。
+        """
         items = []
         seen = set()
+        seen_sig = set()
         matches = list(re.finditer(r'href="/detail/(\d+)\.html"', html))
+
         for i, m in enumerate(matches):
             vid = m.group(1)
             if vid in seen:
                 continue
-            start = matches[i - 1].end() if i > 0 else max(0, m.start() - 900)
-            end = matches[i + 1].start() if i + 1 < len(matches) else min(len(html), m.end() + 900)
+
+            # 向前找最近一个“不同 vid”的锚点, 作为块起点
+            prev_end = 0
+            for j in range(i - 1, -1, -1):
+                if matches[j].group(1) != vid:
+                    prev_end = matches[j].end()
+                    break
+            start = max(prev_end, m.start() - 400)
+
+            # 向后找最近一个“不同 vid”的锚点, 作为块终点
+            end = len(html)
+            for j in range(i + 1, len(matches)):
+                if matches[j].group(1) != vid:
+                    end = matches[j].start()
+                    break
             block = html[start:end]
+
             # 封面
             pic = ''
             pm = re.search(r'<img[^>]+(?:data-src|data-original|data-echo|src)="([^"]+)"', block)
             if pm:
                 pic = self._abs_url(pm.group(1))
+
             # 标题
             title = ''
             for tp in (r'class="vod-title[^"]*"[^>]*>([^<]+)<',
@@ -152,6 +172,14 @@ class Spider:
                     title = self._clean(tm.group(1))
             if not title:
                 continue
+
+            # 内容级去重: 相同标题 + 相同封面视为重复
+            sig = (title, pic)
+            if sig in seen_sig:
+                seen.add(vid)
+                continue
+            seen_sig.add(sig)
+
             # 备注
             remark = ''
             for rp in (r'class="vod-badge[^"]*"[^>]*>([^<]+)<',
@@ -165,6 +193,7 @@ class Spider:
                     if r:
                         remark = r
                         break
+
             seen.add(vid)
             items.append({
                 'vod_id': vid,
@@ -172,6 +201,7 @@ class Spider:
                 'vod_pic': pic,
                 'vod_remarks': remark,
             })
+
         return items
 
     def _parse_pagecount(self, html, pg):
@@ -220,7 +250,6 @@ class Spider:
         return ''
 
     def _filters(self):
-        """构造二级分类筛选: 每个一级分类 -> [类型, 地区, 年份, 排序] 四组"""
         out = {}
         for _, ch in self.classes:
             groups = []
@@ -250,7 +279,6 @@ class Spider:
         return out
 
     def _first_id(self, ids):
-        """detailContent 入参兼容: list / JSON 字符串 / 纯字符串 / dict"""
         if isinstance(ids, (list, tuple)):
             return str(ids[0]) if ids else ''
         if isinstance(ids, dict):
@@ -269,7 +297,7 @@ class Spider:
         m = re.search(r'\d+', s)
         return m.group(0) if m else s
 
-    # ================= 壳接口(位置参数契约) =================
+    # ================= 壳接口 =================
     def getName(self):
         return '小蜜蜂影院'
 
@@ -348,7 +376,6 @@ class Spider:
         url = '{0}/detail/{1}.html'.format(self.host, vid)
         html = self._fetch(url)
 
-        # 标题
         title = ''
         m = re.search(r'<h1[^>]*>([^<]+)</h1>', html)
         if m:
@@ -360,13 +387,11 @@ class Spider:
         if not title:
             title = vid
 
-        # 封面
         pic = ''
         pm = re.search(r'og:image"[^>]*content="([^"]+)"', html)
         if pm:
             pic = self._abs_url(pm.group(1))
 
-        # meta 键值对(类型/年份/地区/主演/导演/备注等)
         meta = {}
         for k, v in re.findall(
                 r'class="[^"]*meta-label[^"]*"[^>]*>([^<]+)<[^>]*>\s*<[^>]*class="[^"]*meta-value[^"]*"[^>]*>([^<]*)<',
@@ -378,10 +403,8 @@ class Spider:
                     html):
                 meta[self._clean(k).rstrip('：:')] = self._clean(v)
 
-        # 简介(重点)
         content = self._extract_content(html)
 
-        # 线路名 + 各线路选集
         from_names = re.findall(r'data-target="source-\d+"[^>]*>([^<]+)<', html)
         if not from_names:
             from_names = re.findall(r'class="[^"]*source-tab[^"]*"[^>]*>([^<]+)<', html)
@@ -392,7 +415,6 @@ class Spider:
             eps = [(u, t) for u, t in eps if '/vodplay/{0}-'.format(vid) in u]
             if not eps:
                 continue
-            # 普通线路二(bfzym3u8)整站已下线: 详情里直接剔除避免点到死线路
             fm = re.search(r'/vodplay/\d+-(.+)-\d+\.html', eps[0][0])
             if fm and fm.group(1) == 'bfzym3u8':
                 continue
@@ -455,7 +477,6 @@ class Spider:
                     return {'parse': 0, 'url': data['url'], 'header': header}
             except Exception:
                 pass
-        # 解析失败兜底: 交给壳嗅探播放页
         return {'parse': 1, 'url': play_page, 'header': header}
 
     def localProxy(self, param):
