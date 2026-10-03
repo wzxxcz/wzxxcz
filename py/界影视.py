@@ -3,6 +3,13 @@
 # 实测结论(2026-10-04): 接口返回的蓝光/高清 m3u8 直链 CDN 端【不鉴权】,
 #   needLogin:true 只是前端 UI 标记, 非会员拿到直链即可直接播放, 无需 cookie/登录态。
 # 播放: 签名 API /mw-movie/anonymous/v2/video/episode/url, 实时现拿 URL(含时间戳, 不可久存)
+#
+# 2026-10-04 第十轮【本地代理版】:
+#   直链能拉到但 TV 端播放器仍播不了, 根因是播放器请求 m3u8 里的 ts 分片时
+#   可能丢 Referer/UA, 或 m3u8 含播放器不认的标签。改为走本地代理:
+#   playerContent 返回 "proxy://do=py&type=m3u8&url=..." 由 TVBox 转本地回环请求;
+#   localProxy 带正确 header 去拉 m3u8, 并把里面所有 ts 分片重写为代理地址,
+#   播放器只跟插件通信, 彻底绕开播放器的网络限制。
 from base.spider import Spider
 import requests
 import re
@@ -10,7 +17,7 @@ import json
 import hashlib
 import time
 import uuid
-from urllib.parse import quote, unquote
+from urllib.parse import quote, unquote, urlparse, parse_qsl
 from concurrent.futures import ThreadPoolExecutor
 
 FILTER_LABEL = {
@@ -263,11 +270,9 @@ class Spider(Spider):
                     res_list = (data.get("data") or {}).get("list", []) or []
             except Exception:
                 pass
-        # 不做 needLogin 过滤, 按分辨率从高到低(蓝光优先), 全部列出给用户选
         if res_list:
             res_list = sorted(res_list, key=lambda it: -(int(it.get("resolution", 0) or 0)))
         play_from = [it.get("resolutionName", "默认") for it in res_list] or ["默认"]
-        # 剧集条目不写死URL, 只带 vid@nid, 播放时实时请求
         urls = []
         for _r in play_from:
             urls.append("#".join("%s$%s@%s" % (n, vid, nid) for nid, n in eps))
@@ -294,8 +299,10 @@ class Spider(Spider):
         return u
 
     def playerContent(self, flag, id, vipFlags):
-        """播放: 实时请求接口拿所选清晰度的 m3u8 直链, 带 Referer 直出(parse:0)。
-        实测该站 CDN 对 needLogin 不鉴权, 非会员拿到蓝光直链即可直接播。"""
+        """播放: 实时请求接口拿所选清晰度 m3u8 直链, 然后交给本地代理中转。
+        代理带上 Referer/UA 去拉 m3u8, 并把里面所有 ts 分片重写为代理地址,
+        播放器只跟插件通信, 绕开播放器自身网络限制。
+        """
         header = {
             "User-Agent": self.UA,
             "Referer": self.host + "/",
@@ -322,7 +329,7 @@ class Spider(Spider):
                                       or item.get("src") or "")
                         if target_url:
                             break
-                # 2) 匹配不到 -> 取分辨率最高的一条(不降级)
+                # 2) 匹配不到 -> 取分辨率最高的一条
                 if not target_url and res_list:
                     best = sorted(res_list,
                                   key=lambda it: -(int(it.get("resolution", 0) or 0)))[0]
@@ -331,13 +338,88 @@ class Spider(Spider):
                                   or best.get("src") or "")
         except Exception:
             pass
+
         target_url = self._norm_url(target_url)
         if not target_url:
             return {"parse": 0, "url": "", "header": header}
+
+        # 非 m3u8 直链, 直接返回
         low = target_url.lower()
-        if any(k in low for k in ('.m3u8', '.mp4', '.flv', '.ts')):
-            return {"parse": 0, "url": target_url, "header": header}
-        return {"parse": 1, "url": target_url, "header": header}
+        if not (".m3u8" in low or ".mp4" in low or ".flv" in low or ".ts" in low):
+            return {"parse": 1, "url": target_url, "header": header}
+
+        # m3u8 走本地代理
+        proxy_url = "proxy://do=py&type=m3u8&url=" + quote(target_url, safe="")
+        return {"parse": 0, "url": proxy_url, "header": header}
+
+    # ---------------- localProxy ----------------
+    def localProxy(self, param):
+        """本地代理:
+        - 拉取 m3u8 时带 Referer/UA, 并把里面所有 ts 分片重写为代理地址;
+        - 拉取 ts 分片时直接透传二进制, 播放器只跟插件通信。
+        param 可能是 dict 或 query string, 兼容两种。
+        """
+        try:
+            if isinstance(param, str):
+                param = dict(parse_qsl(param.lstrip("?")))
+            if not isinstance(param, dict):
+                param = {}
+            u = param.get("url", "") or ""
+            u = unquote(u)
+            if not u:
+                return [404, "text/plain", b"no url", {}]
+
+            r = self.sess.get(u, headers={
+                "User-Agent": self.UA,
+                "Referer": self.host + "/",
+            }, timeout=15, allow_redirects=True)
+            content = r.content
+            ct = (r.headers.get("Content-Type") or "").lower()
+
+            is_m3u8 = ("mpegurl" in ct or u.lower().endswith(".m3u8")
+                       or ".m3u8?" in u.lower()
+                       or content[:7] == b"#EXTM3U")
+
+            if is_m3u8:
+                try:
+                    text = content.decode("utf-8", "ignore")
+                except Exception:
+                    text = content.decode("latin1", "ignore")
+
+                parsed = urlparse(u)
+                scheme_host = "%s://%s" % (parsed.scheme, parsed.netloc)
+                base_dir = u.rsplit("/", 1)[0] + "/"
+
+                new_lines = []
+                for line in text.split("\n"):
+                    ls = line.strip()
+                    if not ls or ls.startswith("#"):
+                        new_lines.append(line)
+                        continue
+                    # 拼接绝对 URL
+                    if ls.startswith("http://") or ls.startswith("https://"):
+                        full = ls
+                    elif ls.startswith("//"):
+                        full = parsed.scheme + ":" + ls
+                    elif ls.startswith("/"):
+                        full = scheme_host + ls
+                    else:
+                        full = base_dir + ls
+                    # 重写为代理地址
+                    new_lines.append("proxy://do=py&type=ts&url=" + quote(full, safe=""))
+
+                new_content = "\n".join(new_lines).encode("utf-8")
+                return [200, "application/vnd.apple.mpegurl", new_content,
+                        {"Access-Control-Allow-Origin": "*"}]
+
+            # ts / key / 其它二进制: 透传
+            return [200, r.headers.get("Content-Type", "application/octet-stream"),
+                    content, {"Access-Control-Allow-Origin": "*"}]
+        except Exception as e:
+            try:
+                return [500, "text/plain", ("proxy error: %r" % e).encode("utf-8"), {}]
+            except Exception:
+                return [500, "text/plain", b"proxy error", {}]
 
     # ---------------- search ----------------
     def searchContent(self, key, quick, pg="1"):
@@ -373,6 +455,3 @@ class Spider(Spider):
 
     def manualVideoCheck(self):
         return False
-
-    def localProxy(self, param):
-        return None
