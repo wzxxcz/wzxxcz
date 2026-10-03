@@ -4,7 +4,11 @@
 站点: https://dongpian20.com/ (懂片帝 / 懂片帝AI, React SPA)
 形态: API 站, 全部走 JSON 接口, 无需登录(匿名可调), 无需 Cookie
 
-播放方案: m3u8 通过本地代理转发, 由 Python 层携带 Referer 拉取。
+播放策略（自动降级）:
+  1) 直连 m3u8（parse:0 + 原始地址）
+  2) 本地代理转发（parse:0 + 本地代理改写地址）
+  3) 嗅探模式（parse:1 + 原始地址，交给 OK影视 / TVBox 自带嗅探器）
+  程序会按 1→2→3 顺序自动探测，选第一个能成功的方案。
 """
 import re
 import json
@@ -22,8 +26,8 @@ import urllib.error
 class Spider:
     # ========== 开关 ==========
     DIRECT_MODE = True          # 图片直连（图床无防盗链）
-    HLS_VIA_PROXY = True        # m3u8 走本地代理（解决 Referer 校验）
-    FORCE_SNIFF = False         # 若代理仍不行，强制走壳嗅探
+    # 自动降级探测超时（秒）
+    PROBE_TIMEOUT = 3
 
     _BASE = 'https://dongpian20.com'
     _SIGN_SECRET = '8b9a908a05eac640e1ee06f52acaa741bfe4ba9e004eeffdbeb635e532e06666'
@@ -68,7 +72,7 @@ class Spider:
     def __init__(self):
         self._proxy = None
 
-    # ================= 签名与请求（恢复原样，不做任何新增） =================
+    # ================= 签名与请求 =================
     def _sign_headers(self, method, path):
         ts = str(int(time.time() * 1000))
         nonce = secrets.token_hex(16)
@@ -179,6 +183,7 @@ class Spider:
             {'key': 'sort', 'name': '排序', 'value': _sorts()},
         ]
 
+    # ================= 播放线路解析 =================
     def _resolve_lines(self, token):
         if not token:
             return []
@@ -247,7 +252,6 @@ class Spider:
 
     # ================= 封面/代理工具 =================
     def _proxy_base(self):
-        """获取本地代理基址。只信 getProxyUrl()，没有就返回空。"""
         try:
             fn = getattr(self, 'getProxyUrl', None)
             if callable(fn):
@@ -273,13 +277,12 @@ class Spider:
         return 'http://127.0.0.1:9978/proxy?do=local&key=img/' + b64
 
     def _wrap_hls(self, url):
-        """把原始 m3u8 URL 包装为本地代理 URL。若本地代理不可用则返回空。"""
+        """把原始 m3u8 URL 包装为本地代理 URL。本地代理不可用时返回空。"""
         if not url:
             return ''
         base = self._proxy_base()
         if not base:
-            # 没有 getProxyUrl()，尝试默认端口兜底
-            base = 'http://127.0.0.1:9978/proxy?do=local'
+            return ''
         try:
             b64 = base64.urlsafe_b64encode(url.encode('utf-8')).decode().rstrip('=')
             sep = '&' if '?' in base else '?'
@@ -288,7 +291,7 @@ class Spider:
             return ''
 
     _IMG_PLACEHOLDER = base64.b64decode(
-        'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
+        'R0lGODlhAQABAIAAAAAAAP///y5BAEAAAAALAAAAAABAAEAAAIBRAA7')
 
     def _proxy_target(self, param):
         p = param
@@ -342,7 +345,7 @@ class Spider:
     def _serve_hls(self, url):
         """
         拉取 m3u8 内容，把分片 URL 和加密密钥 URI 全部改写为本地代理地址。
-        若 content 不是 m3u8（是二进制分片），直接透传。
+        若响应本身就是二进制分片，直接透传。
         """
         try:
             h = {
@@ -355,16 +358,18 @@ class Spider:
                 ct = (r.headers.get('Content-Type') or '').lower()
                 raw = r.read()
 
-            # 若响应就是二进制视频/TS 流，直接透传
+            # 二进制流直接透传
             if ('mpegurl' not in ct) and (b'#EXTM3U' not in raw[:512]):
-                # 判断是否 TS：TS 同步字节是 0x47
                 if raw and raw[0:1] == b'\x47':
                     return [200, 'video/mp2t', raw, {}]
                 return [200, ct or 'application/octet-stream', raw, {}]
 
             text = raw.decode('utf-8', 'ignore')
             base_url = url.rsplit('/', 1)[0] + '/'
-            base_proxy = self._proxy_base() or 'http://127.0.0.1:9978/proxy?do=local'
+            base_proxy = self._proxy_base()
+            if not base_proxy:
+                # 没有本地代理，直接返回原始 m3u8 内容
+                return [200, 'application/vnd.apple.mpegurl', raw, {}]
             sep = '&' if '?' in base_proxy else '?'
 
             def to_proxy(abs_url):
@@ -396,6 +401,24 @@ class Spider:
         except Exception as e:
             print('[懂片帝] _serve_hls 失败: %s' % e)
             return [502, 'text/plain', b'fetch failed', {}]
+
+    # ================= 探测工具 =================
+    def _probe_m3u8(self, url, with_referer=True, timeout=None):
+        """探测 m3u8 是否可直接访问：能读到 #EXTM3U 就返回 True。"""
+        if not url:
+            return False
+        t = timeout or self.PROBE_TIMEOUT
+        try:
+            h = {'User-Agent': self._UA}
+            if with_referer:
+                h['Referer'] = self._BASE + '/'
+                h['Origin'] = self._BASE
+            req = urllib.request.Request(url, headers=h)
+            with urllib.request.urlopen(req, timeout=t) as r:
+                chunk = r.read(1024)
+            return b'#EXTM3U' in chunk or b'#EXTINF' in chunk
+        except Exception:
+            return False
 
     # ================= 14 壳方法 =================
     def getName(self):
@@ -583,7 +606,7 @@ class Spider:
             })
         return {'list': items}
 
-    # ================= 播放（核心） =================
+    # ================= 播放（核心：自动降级三级策略） =================
     def playerContent(self, flag, id, vipFlags):
         header = {
             'User-Agent': self._UA,
@@ -597,49 +620,57 @@ class Spider:
                 return {'parse': 0, 'playUrl': '', 'url': '',
                         'header': header, 'msg': '空 id'}
 
-            # id 本身已是直链
+            # 已是直链
             if token.startswith('http') and ('.m3u8' in token or '.mp4' in token):
-                if self.HLS_VIA_PROXY and '.m3u8' in token:
-                    p = self._wrap_hls(token)
-                    if p:
-                        return {'parse': 0, 'playUrl': p, 'url': p, 'header': header}
-                return {'parse': 0, 'playUrl': token, 'url': token, 'header': header}
+                url = token
+            else:
+                if '$' in token:
+                    token = token.split('$')[-1]
+                lines = self._resolve_lines(token)
+                if not lines:
+                    return {'parse': 1, 'playUrl': '', 'url': '',
+                            'header': header, 'msg': '未找到可播放线路'}
+                pick = None
+                for l in lines:
+                    if l['name'] == flag or l['play_from'] == flag:
+                        pick = l
+                        break
+                if pick is None:
+                    pick = lines[0]
+                url = pick['url']
 
-            if '$' in token:
-                token = token.split('$')[-1]
+            print('[懂片帝] 候选地址: %s' % url)
 
-            lines = self._resolve_lines(token)
-            if not lines:
-                return {'parse': 1, 'playUrl': '', 'url': '',
-                        'header': header, 'msg': '未找到可播放线路'}
-
-            pick = None
-            for l in lines:
-                if l['name'] == flag or l['play_from'] == flag:
-                    pick = l
-                    break
-            if pick is None:
-                pick = lines[0]
-
-            url = pick['url']
-            print('[懂片帝] playerContent pick=%s url=%s' % (pick['name'], url))
-
-            # m3u8：优先走本地代理
-            if '.m3u8' in url:
-                if self.HLS_VIA_PROXY:
-                    p = self._wrap_hls(url)
-                    if p:
-                        print('[懂片帝] 走本地代理: %s' % p)
-                        return {'parse': 0, 'playUrl': p, 'url': p, 'header': header}
-                if self.FORCE_SNIFF:
-                    return {'parse': 1, 'playUrl': url, 'url': url, 'header': header}
+            # mp4 直接返回
+            if '.mp4' in url:
                 return {'parse': 0, 'playUrl': url, 'url': url, 'header': header}
 
-            # mp4 等其他格式
-            return {'parse': 0, 'playUrl': url, 'url': url, 'header': header}
+            # ========== 方案 1：直连探测 ==========
+            print('[懂片帝] 尝试方案1: 直连探测')
+            if self._probe_m3u8(url, with_referer=True):
+                print('[懂片帝] 方案1成功: 直连')
+                return {'parse': 0, 'playUrl': url, 'url': url, 'header': header}
+
+            # ========== 方案 2：本地代理探测 ==========
+            base_proxy = self._proxy_base()
+            if base_proxy:
+                print('[懂片帝] 尝试方案2: 本地代理 (%s)' % base_proxy)
+                proxy_url = self._wrap_hls(url)
+                if proxy_url and self._probe_m3u8(proxy_url, with_referer=False):
+                    print('[懂片帝] 方案2成功: 本地代理')
+                    return {'parse': 0, 'playUrl': proxy_url, 'url': proxy_url,
+                            'header': header}
+            else:
+                print('[懂片帝] 方案2跳过: getProxyUrl() 不可用')
+
+            # ========== 方案 3：嗅探模式 ==========
+            print('[懂片帝] 尝试方案3: 嗅探（parse:1）')
+            return {'parse': 1, 'playUrl': url, 'url': url, 'header': header}
+
         except Exception as e:
             print('[懂片帝] playerContent 异常: %s' % e)
-            return {'parse': 0, 'playUrl': '', 'url': '', 'header': header}
+            return {'parse': 1, 'playUrl': '', 'url': '',
+                    'header': header, 'msg': str(e)}
 
     def localProxy(self, param):
         try:
