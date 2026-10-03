@@ -175,10 +175,10 @@ class Spider:
             {'key': 'sort', 'name': '排序', 'value': _sorts()},
         ]
 
-    # ================= 播放线路解析（核心修复） =================
+    # ================= 播放线路解析 =================
     def _resolve_lines(self, token):
         """
-        解析 episode token，返回可直接播放的线路列表。
+        根据 token 解析播放线路，返回线路列表。
         过滤掉需要登录的线路，只保留 resolved=true 且 url 可用的线路。
         """
         if not token:
@@ -193,27 +193,21 @@ class Spider:
         for l in d.get('line_options') or []:
             if not isinstance(l, dict):
                 continue
-
             # 跳过需要登录的线路
             if l.get('resolve_required'):
                 continue
-
             # 跳过未成功解析的线路
             if not l.get('resolved'):
                 continue
-
             url_kind = l.get('url_kind') or ''
             if url_kind not in ('m3u8', 'mp4'):
                 continue
-
             url = (l.get('url') or '').strip()
             if not url.startswith('http'):
                 continue
-
             name = self._safe_title(l.get('label') or l.get('play_from') or '线路')
             if not name or name in seen:
                 continue
-
             seen.add(name)
             out.append({
                 'name': name,
@@ -548,6 +542,7 @@ class Spider:
             'User-Agent': self._UA,
             'Referer': self._BASE + '/',
             'Origin': self._BASE,
+            'Cookie': '',
         }
 
         if not token:
@@ -569,6 +564,7 @@ class Spider:
                     'header': header, 'msg': '未找到可播放线路'}
 
         # 优先匹配当前 flag 对应的线路
+        # 注意：flag 是线路显示名称，play_from 是内部标识，需要同时匹配
         pick = None
         for l in lines:
             if l['name'] == flag or l['play_from'] == flag:
@@ -579,16 +575,13 @@ class Spider:
 
         url = pick['url']
 
-        # 【关键修复】m3u8 可能带防盗链，用 parse=1 让壳走嗅探
-        # 如果 URL 本身不包含动态 token（非一次性），也可以用 parse=0
+        # 对于 m3u8，先尝试 HEAD 请求验证链接是否可直接访问
         if '.m3u8' in url:
-            # 先尝试 HEAD 请求验证链接是否可直接访问
             try:
                 req = urllib.request.Request(url, method='HEAD', headers=header)
                 with urllib.request.urlopen(req, timeout=8) as r:
                     if r.status == 200:
-                        return {'parse': 0, 'playUrl': url, 'url': url,
-                                'header': header}
+                        return {'parse': 0, 'playUrl': url, 'url': url, 'header': header}
             except Exception:
                 pass
             # HEAD 失败，走嗅探模式
