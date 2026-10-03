@@ -13,6 +13,9 @@
       playerContent.header 为 dict · Python 层不调用 setCache/getCache
 生成: 2026-10-01 · 结构经真实站点逐页核对(首页/分类/筛选/详情/播放/搜索)
 修订: 2026-10-03 · 补全简介提取(多模式+meta兜底) · 改进卡片/线路/分页解析 · gzip 支持
+      · 修复每个分类第1、2项重复的卡片切块问题
+      · 修复“点交锋播放/详情变成兰香如故”的 vod_id 串位问题
+        (只以含 <img> 的 /detail/ 锚点作为卡片锚, 块到下一个海报锚为止)
 """
 import re
 import json
@@ -112,46 +115,80 @@ class Spider:
             return self.host + u
         return u
 
+    def _pick_img(self, chunk):
+        """封面优先级: data-src > data-original > data-echo > src"""
+        for attr in ('data-src', 'data-original', 'data-echo', 'src'):
+            pm = re.search(r'<img[^>]+' + attr + r'="([^"]+)"', chunk)
+            if pm and pm.group(1) and not pm.group(1).startswith('data:'):
+                return self._abs_url(pm.group(1))
+        return ''
+
     def _parse_cards(self, html):
-        """通用卡片解析: 以 /detail/{id}.html 锚点为准, 取相邻区间内的封面/标题/备注"""
+        """通用卡片解析:
+        只把“含 <img> 的 /detail/{id}.html 海报锚”当作卡片锚点,
+        块范围从该锚起到下一个海报锚为止 —— 一个视频只解析一次,
+        不会跨卡片串位, 也不会因标题锚被切成两张卡片。
+        叠加 (标题, 封面) 二次去重, 兜底干掉站点自身的重复项。
+        """
         items = []
         seen = set()
-        matches = list(re.finditer(r'href="/detail/(\d+)\.html"', html))
-        for i, m in enumerate(matches):
+        seen_sig = set()
+
+        a_re = re.compile(r'<a\b[^>]*href="/detail/(\d+)\.html"[^>]*>(.*?)</a>', re.S)
+        anchors = [m for m in a_re.finditer(html) if '<img' in m.group(2)]
+
+        for i, m in enumerate(anchors):
             vid = m.group(1)
             if vid in seen:
                 continue
-            start = matches[i - 1].end() if i > 0 else max(0, m.start() - 900)
-            end = matches[i + 1].start() if i + 1 < len(matches) else min(len(html), m.end() + 900)
+
+            start = m.start()
+            end = anchors[i + 1].start() if i + 1 < len(anchors) else min(len(html), m.end() + 4000)
             block = html[start:end]
+            inner = m.group(2)
+
             # 封面
-            pic = ''
-            pm = re.search(r'<img[^>]+(?:data-src|data-original|data-echo|src)="([^"]+)"', block)
-            if pm:
-                pic = self._abs_url(pm.group(1))
-            # 标题
+            pic = self._pick_img(inner)
+            if not pic:
+                pic = self._pick_img(block)
+
+            # 标题: 锚 title 属性 > img alt > 块内标题 class > 块内二次锚文本
             title = ''
-            for tp in (r'class="vod-title[^"]*"[^>]*>([^<]+)<',
-                       r'class="module-poster-item-title[^"]*"[^>]*>([^<]+)<',
-                       r'class="search-item-title[^"]*"[^>]*>([^<]+)<',
-                       r'class="module-card-item-title[^"]*"[^>]*>([^<]+)<',
-                       r'class="title[^"]*"[^>]*>([^<]+)<'):
-                tm = re.search(tp, block)
-                if tm:
-                    t = self._clean(tm.group(1))
-                    if t:
-                        title = t
-                        break
+            tm = re.search(r'<a\b[^>]*title="([^"]+)"', m.group(0))
+            if tm:
+                title = self._clean(tm.group(1))
             if not title:
-                am = re.search(r'<img[^>]+alt="([^"]+)"', block)
+                am = re.search(r'<img[^>]+alt="([^"]+)"', inner)
                 if am:
                     title = self._clean(am.group(1))
             if not title:
-                tm = re.search(r'title="([^"]+)"', block)
-                if tm:
-                    title = self._clean(tm.group(1))
+                for tp in (r'class="vod-title[^"]*"[^>]*>([^<]+)<',
+                           r'class="module-poster-item-title[^"]*"[^>]*>([^<]+)<',
+                           r'class="search-item-title[^"]*"[^>]*>([^<]+)<',
+                           r'class="module-card-item-title[^"]*"[^>]*>([^<]+)<',
+                           r'class="title[^"]*"[^>]*>([^<]+)<'):
+                    tm2 = re.search(tp, block)
+                    if tm2:
+                        t = self._clean(tm2.group(1))
+                        if t:
+                            title = t
+                            break
+            if not title:
+                tm2 = re.search(
+                    r'<a\b[^>]*href="/detail/{0}\.html"[^>]*>([^<]+)</a>'.format(re.escape(vid)),
+                    block)
+                if tm2:
+                    title = self._clean(tm2.group(1))
             if not title:
                 continue
+
+            # 内容级去重: 相同标题 + 相同封面视为重复
+            sig = (title, pic)
+            if sig in seen_sig:
+                seen.add(vid)
+                continue
+            seen_sig.add(sig)
+
             # 备注
             remark = ''
             for rp in (r'class="vod-badge[^"]*"[^>]*>([^<]+)<',
@@ -165,6 +202,7 @@ class Spider:
                     if r:
                         remark = r
                         break
+
             seen.add(vid)
             items.append({
                 'vod_id': vid,
@@ -172,6 +210,7 @@ class Spider:
                 'vod_pic': pic,
                 'vod_remarks': remark,
             })
+
         return items
 
     def _parse_pagecount(self, html, pg):
@@ -220,7 +259,6 @@ class Spider:
         return ''
 
     def _filters(self):
-        """构造二级分类筛选: 每个一级分类 -> [类型, 地区, 年份, 排序] 四组"""
         out = {}
         for _, ch in self.classes:
             groups = []
@@ -250,7 +288,6 @@ class Spider:
         return out
 
     def _first_id(self, ids):
-        """detailContent 入参兼容: list / JSON 字符串 / 纯字符串 / dict"""
         if isinstance(ids, (list, tuple)):
             return str(ids[0]) if ids else ''
         if isinstance(ids, dict):
@@ -455,7 +492,6 @@ class Spider:
                     return {'parse': 0, 'url': data['url'], 'header': header}
             except Exception:
                 pass
-        # 解析失败兜底: 交给壳嗅探播放页
         return {'parse': 1, 'url': play_page, 'header': header}
 
     def localProxy(self, param):
