@@ -5,17 +5,12 @@
 一级分类: 电视剧(1) / 电影(2) / 动漫(3) / 综艺(4) / 短剧(5)
 二级分类(filters): 类型 type / 地区 area / 年份 year / 排序 sort
   列表页 /filter?channel={ch}&type={type}&area={area}&year={year}&sort={sort}&page={pg}
-  类型对照: 电视剧 7,9-42 · 电影 43-59 · 动漫 60-76 · 综艺 77-91 · 短剧无类型细分
 详情页 /detail/{vid}.html: 线路 tab(source-0..n) 与选集 /vodplay/{vid}-{from}-{n}.html 一一对应
 播放: GET /api/play-url?vodId={vid}&playFrom={from}&index={n} -> {"code":200,"mode":"native","url":"*.m3u8"}
 搜索: /search?keyword={key}&sort=hits&page={pg}
 契约: class Spider 无继承 · 14 壳方法全实现 · 位置参数契约 · $/#/$$$ 分隔
       playerContent.header 为 dict · Python 层不调用 setCache/getCache
-生成: 2026-10-01 · 结构经真实站点逐页核对(首页/分类/筛选/详情/播放/搜索)
-修订: 2026-10-03 · 补全简介提取 · 改进卡片/线路/分页解析 · gzip 支持
-      · 修复每分类第1、2项重复
-      · 修复“点交锋详情变兰香如故”的标题/vid 串位
-      · 去掉标题末尾“封面图片”等 alt 后缀
+修订: 2026-10-03 · 修复重复/串位 · 彻底去掉标题中的“封面图片”等后缀
 """
 import re
 import json
@@ -100,6 +95,7 @@ class Spider:
             return ''
         s = _html.unescape(s)
         s = re.sub(r'<[^>]+>', '', s)
+        s = s.replace('\u00a0', ' ').replace('\u200b', '').replace('\ufeff', '')
         s = re.sub(r'\s+', ' ', s)
         return s.strip()
 
@@ -113,17 +109,28 @@ class Spider:
             return self.host + u
         return u
 
+    # 标题后缀/噪声词（出现在任意位置都会被去掉）
+    _TITLE_NOISE = re.compile(
+        r'封面图片|封面图集|封面图|海报图片|海报图集|海报图|封面照|海报照|封面|海报|图片|poster|image|picture',
+        re.I,
+    )
+
     def _strip_title_suffix(self, t):
-        """去掉标题末尾的“封面图片/封面图/海报图/图片”等 alt 后缀"""
+        """去掉标题里“封面图片/封面图/海报图/图片”等噪声词。
+        先做 Unicode 空白归一化，再删除任意位置出现的噪声词，
+        最后清理残留的标点、空白与括号。"""
         if not t:
             return ''
-        t = t.strip()
-        for suf in ('封面图片', '封面图', '海报图片', '海报图',
-                    '封面', '海报', '图片', '封面照', '海报照',
-                    'poster', 'Poster', 'image', 'Image'):
-            if t.endswith(suf):
-                t = t[:-len(suf)].strip()
-        return t
+        t = _html.unescape(str(t))
+        t = t.replace('\u00a0', ' ').replace('\u200b', '').replace('\ufeff', '')
+        t = re.sub(r'\s+', ' ', t).strip()
+        # 去掉 “《…封面图片》” 这种括号包裹的噪声
+        t = re.sub(r'[\(\[（【]\s*(?:封面图片|封面图|海报图|图片)\s*[\)\]）】]', '', t)
+        # 删除任意位置出现的噪声词
+        t = self._TITLE_NOISE.sub('', t)
+        # 清理两端标点
+        t = re.sub(r'^[\s\-—–·、,，。:：;；\(\)\[\]（）【】《》<>"\']+|[\s\-—–·、,，。:：;；\(\)\[\]（）【】《》<>"\']+$', '', t)
+        return t.strip()
 
     def _pick_img(self, chunk):
         for attr in ('data-src', 'data-original', 'data-echo', 'src'):
@@ -132,21 +139,28 @@ class Spider:
                 return self._abs_url(pm.group(1))
         return ''
 
+    # 判定“通用噪声标题”，剥完为空或只剩这些词的，视为无效标题
+    _GENERIC_TITLES = {
+        '封面图片', '封面图', '封面', '海报图片', '海报图', '海报',
+        '图片', 'poster', 'image', 'picture',
+    }
+
     def _parse_cards(self, html):
-        """通用卡片解析 (v4):
+        """通用卡片解析 (v5):
         - 卡片唯一定位: 含 <img> 的 /detail/{id}.html 海报锚
-        - 标题优先级: img alt(去后缀) > 全局按 vid 匹配的文本锚 > 锚 title 属性
-        - 去掉末尾的“封面图片”等 alt 后缀
+        - 标题三级回退, 每一级都先做“封面图片”等噪声清洗:
+            1) img alt
+            2) 全局文本锚映射 title_map
+            3) 锚的 title 属性
+        - 剥完为空则回退下一级候选; 全空则丢弃该卡片
         - (标题, 封面) 二次去重
         """
         items = []
         seen = set()
         seen_sig = set()
 
-        # 全局标题映射: 每个 vid 第一次出现的非图片文本锚
+        # 全局文本锚标题映射: 每个 vid 第一次出现的非图片锚文本
         title_map = {}
-        generic_alt = {'封面', '图片', '海报', '封面图片', '封面图', '海报图',
-                       'poster', 'image', 'picture', ''}
         for tm in re.finditer(
                 r'<a\b[^>]*href="/detail/(\d+)\.html"[^>]*>(.*?)</a>', html, re.S):
             v = tm.group(1)
@@ -154,7 +168,7 @@ class Spider:
             if '<img' in inner_txt:
                 continue
             t = self._strip_title_suffix(self._clean(inner_txt))
-            if not t or t.isdigit() or t in generic_alt:
+            if not t or t.isdigit() or t.lower() in self._GENERIC_TITLES:
                 continue
             if v not in title_map:
                 title_map[v] = t
@@ -173,24 +187,32 @@ class Spider:
             inner = m.group(2)
             anchor_full = m.group(0)
 
-            # 封面
             pic = self._pick_img(inner)
 
-            # 标题
+            # 标题三级回退: 每级先剥后缀, 空则往下
             title = ''
+
+            # 1) img alt
             am = re.search(r'<img[^>]+alt="([^"]+)"', inner)
             if am:
-                alt = self._strip_title_suffix(self._clean(am.group(1)))
-                if alt and alt not in generic_alt and not alt.isdigit():
-                    title = alt
+                cand = self._strip_title_suffix(self._clean(am.group(1)))
+                if cand and not cand.isdigit() and cand.lower() not in self._GENERIC_TITLES:
+                    title = cand
+
+            # 2) 全局文本锚
             if not title and vid in title_map:
-                title = title_map[vid]
+                cand = self._strip_title_suffix(title_map[vid])
+                if cand and cand.lower() not in self._GENERIC_TITLES:
+                    title = cand
+
+            # 3) 锚的 title 属性
             if not title:
                 tm = re.search(r'\btitle="([^"]+)"', anchor_full)
                 if tm:
-                    t = self._strip_title_suffix(self._clean(tm.group(1)))
-                    if t and t not in generic_alt:
-                        title = t
+                    cand = self._strip_title_suffix(self._clean(tm.group(1)))
+                    if cand and not cand.isdigit() and cand.lower() not in self._GENERIC_TITLES:
+                        title = cand
+
             if not title:
                 continue
 
@@ -201,7 +223,7 @@ class Spider:
                 continue
             seen_sig.add(sig)
 
-            # 备注: 本海报锚到下一个海报锚之间
+            # 备注: 本海报锚到下一个海报锚之间的区间
             if idx + 1 < len(poster_anchors):
                 end = poster_anchors[idx + 1].start()
             else:
@@ -404,11 +426,11 @@ class Spider:
         title = ''
         m = re.search(r'<h1[^>]*>([^<]+)</h1>', html)
         if m:
-            title = self._clean(m.group(1))
+            title = self._strip_title_suffix(self._clean(m.group(1)))
         if not title:
             m = re.search(r'og:title"[^>]*content="《?([^》"]+)》?"', html)
             if m:
-                title = self._clean(m.group(1))
+                title = self._strip_title_suffix(self._clean(m.group(1)))
         if not title:
             title = vid
 
