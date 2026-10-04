@@ -19,7 +19,7 @@
               每个源取最优一条，最多 12 个源，按站点 source_order 排序，点击源置顶。
               和网页端一样：这部片在哪个源有，哪个源就出一条线路，切线路不用回列表。
     - 播放线路: 保留详情接口 episodes.group 分组。单分组的源线路名 = 源名
-              （如 4k60帧🔥）；多分组的源线路名 = "源名·分组名"（如 自营🔥·jlplayer），
+              （如 4k60帧）；多分组的源线路名 = "源名·分组名"（如 自营·jlplayer），
               纯技术命名（xxxm3u8/hls/mp4）与网页端一致显示为"线路 N"。
     - 解析线路: 读取 config 的 official_routes（默认解析 / 闪电 / m1907）。
               官采蓝光(qilin)的非直链线路会追加"解析·接口名"线路，可在壳子里
@@ -149,14 +149,20 @@ POSTER_BATCH = 60
 # 采集源显示名（config 拉不到时用这里的兜底，与网页端一致）
 SOURCE_NAMES = {
     "qilin": "官采蓝光",
-    "mj": "4k60帧🔥",
-    "jl": "自营🔥",
+    "mj": "4k60帧",
+    "jl": "自营",
     "wsy": "无水印",
     "360zy": "360资源",
     "dytt": "电影天堂",
     "ik": "ikun",
     "md": "魔都",
 }
+
+
+def _clean_source_name(name):
+    """去掉源名里的 🔥 和首尾空白，避免远程 config 又把 emoji 带回来。"""
+    return str(name or "").replace("🔥", "").strip()
+
 
 # 采集源排序兜底（config 拉不到时用）
 SOURCE_ORDER = ["qilin", "mj", "jl", "wsy", "360zy", "dytt", "ik", "md"]
@@ -760,7 +766,7 @@ class Spider(Spider):
             for key, info in sources.items():
                 name = (info or {}).get("name")
                 if name:
-                    self._source_names[key] = str(name)
+                    self._source_names[key] = _clean_source_name(name)
                 api = (info or {}).get("player_api")
                 if api:
                     self._player_apis[key] = api
