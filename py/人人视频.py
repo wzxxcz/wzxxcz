@@ -2,6 +2,7 @@
 import base64
 import hashlib
 import hmac
+import html as _html
 import json
 import random
 import re
@@ -166,14 +167,34 @@ def _pics(s):
     return re.findall(r'https?://[^\x00-\x20"\']+', s or '')
 
 
+def _strip_tags(s):
+    """去 HTML 标签 + 解码实体 + 折叠空白；<br> 与块级标签转换行。"""
+    if not s:
+        return ''
+    try:
+        text = str(s)
+    except Exception:
+        return ''
+    text = re.sub(r'<br\s*/?>', '\n', text, flags=re.I)
+    text = re.sub(r'</(?:p|div|h[1-6]|li|tr)\s*>', '\n', text, flags=re.I)
+    text = re.sub(r'<[^>]+>', '', text)
+    try:
+        text = _html.unescape(text)
+    except Exception:
+        pass
+    text = re.sub(r'[ \t\u3000]+', ' ', text)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
+
+
 def _card(m):
     vid = str(m.get(3, ''))
     if not vid or not m.get(5):
         return None
     p = _pics(m.get(2, ''))
-    return {'vod_id': vid, 'vod_name': m.get(5, ''),
+    return {'vod_id': vid, 'vod_name': _strip_tags(m.get(5, '')),
             'vod_pic': p[0] if p else '',
-            'vod_remarks': m.get(13, '') or m.get(26, '')}
+            'vod_remarks': _strip_tags(m.get(13, '') or m.get(26, ''))}
 
 
 class Spider(_Base):
@@ -279,7 +300,7 @@ class Spider(_Base):
         return {'class': [{'type_id': t[1], 'type_name': t[0]} for t in CATES],
                 'filters': FILTERS}
 
-    def homeVideoContent(self):
+    def homeVideoContent(self, filter=None):
         return {'list': self._v4list(
             self._get('/api/proto/v4/tag/list/detail?pagesize=21&id=117&page=1'))}
 
@@ -385,13 +406,25 @@ class Spider(_Base):
                 line[nm].append('%s$%s' % (e.get(3) or str(len(line[nm]) + 1), b64))
             if not order:
                 return {'list': []}
-            return {'list': [{'vod_id': ids[0], 'vod_name': head.get(9, ''),
-                              'vod_pic': pic, 'vod_year': head.get(18, ''),
-                              'vod_area': head.get(5, ''),
-                              'vod_remarks': head.get(26, ''),
-                              'vod_actor': head.get(25, ''),
-                              'vod_director': head.get(12, ''),
-                              'vod_content': head.get(6, ''),
+
+            # ===== 简介：多字段兜底 + HTML 清理 =====
+            raw_content = ''
+            for key in (6, 15, 14, 8):
+                v = head.get(key)
+                if v and str(v).strip():
+                    raw_content = str(v)
+                    break
+            content = _strip_tags(raw_content)[:2000]
+
+            return {'list': [{'vod_id': ids[0],
+                              'vod_name': _strip_tags(head.get(9, '')),
+                              'vod_pic': pic,
+                              'vod_year': _strip_tags(head.get(18, '')),
+                              'vod_area': _strip_tags(head.get(5, '')),
+                              'vod_remarks': _strip_tags(head.get(26, '') or 'HD'),
+                              'vod_actor': _strip_tags(head.get(25, '')),
+                              'vod_director': _strip_tags(head.get(12, '')),
+                              'vod_content': content,
                               'vod_play_from': '$$$'.join(order),
                               'vod_play_url': '$$$'.join(
                                   '#'.join(line[k]) for k in order)}]}
@@ -509,4 +542,4 @@ class Spider(_Base):
         return False
 
     def localProxy(self, param):
-        return [200, 'text/plain', '']
+        return [200, 'text/plain', b'']
