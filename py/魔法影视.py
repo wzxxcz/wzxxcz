@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# ============ 魔法盒子 / 魔法影视 (l98.cn) —— WebHTV 图片代理终版 ============
+# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 硬编码测试版 ============
 import sys, re, json, time, hashlib, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 try:
@@ -24,6 +24,10 @@ REFERER   = 'http://l98.cn/'
 PIC_REFERER = 'http://l98.cn/'
 MF_SALT   = 'mfys-api-guard-v1'
 MF_CLIENT = 'web'
+
+# ★★★★★★ 硬编码测试图片（甲武神海报），改这里就行 ★★★★★★
+TEST_PIC = 'https://img1.wsyzy.org/upload/vod/20261005-1/860d69226307329508547892947c62f5.jpg'
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
 SEARCH_SOURCES = [
     'tvbox-py://source-616fbcbf9e',
@@ -148,7 +152,7 @@ class Spider(Spider):
         except Exception:
             return {}
 
-    # ================= ★ 图片处理：走 WebHTV 本地代理 =================
+    # ================= ★ 图片处理 =================
     def _pic(self, u):
         if not u:
             return ''
@@ -178,16 +182,9 @@ class Spider(Spider):
         return ''
 
     def _pic_proxied(self, url):
-        """★ WebHTV 资源代理：走 proxy:// 协议，由本地代理带 Referer 取图
-        背景：img1.wsyzy.org 的 TLS 对 Android 原生栈不友好，
-              浏览器能开但 TVBox/WebHTV 直连会握手失败。
-              通过 proxy:// 让 WebHTV 走 localProxy 转发，代理端带 UA+Referer。
-        """
-        if not url or url.startswith('data:'):
-            return url
-        # WebHTV 支持 proxy:// 协议 → 会调用 Spider.localProxy
-        return 'proxy://type=img&url=' + urllib.parse.quote(url, safe='')
-    # ================================================================
+        """★ 硬编码测试：所有图片都返回同一张，验证代码是否被加载"""
+        return TEST_PIC
+    # =============================================
 
     def _mk(self, v, api=''):
         vid = str(v.get('vod_id') or '')
@@ -415,7 +412,6 @@ class Spider(Spider):
         if not p:
             return {'code': 403, 'content': b'', 'headers': {}}
 
-        # ★ 图片分支：带 UA + Referer 转发，绕过 Android TLS 兼容问题
         if tp == 'img' or re.search(r'\.(?:jpg|jpeg|png|webp|gif|bmp|avif)(?:\?|$)', p, re.I):
             hd = {
                 'User-Agent': self.ua,
