@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 图片 SSL 修复版 ============
+# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 图片直连终版 ============
 import sys, re, json, time, hashlib, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 try:
@@ -17,7 +17,6 @@ except ImportError:
             r = _urq.Request(url, headers=headers or {})
             return _urq.urlopen(r, timeout=15)
 
-# ============ ★ CONFIG ============
 SITE      = 'http://l98.cn'
 CMS_API   = 'https://api.wsyzy.net/api.php/provide/vod'
 UA        = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -25,9 +24,6 @@ REFERER   = 'http://l98.cn/'
 PIC_REFERER = 'http://l98.cn/'
 MF_SALT   = 'mfys-api-guard-v1'
 MF_CLIENT = 'web'
-
-# 图片代理模式：'wsrv' 公网CDN(推荐) / 'local' 本地代理 / 'none' 直连
-PIC_PROXY = 'wsrv'
 
 SEARCH_SOURCES = [
     'tvbox-py://source-616fbcbf9e',
@@ -79,7 +75,6 @@ class Spider(Spider):
         self.sess = requests.Session() if requests else None
         self._src_cache = None
 
-    # ---------- 基础请求 ----------
     def _headers(self, extra=None):
         h = {'User-Agent': self.ua, 'Referer': self.ref}
         if extra:
@@ -153,7 +148,7 @@ class Spider(Spider):
         except Exception:
             return {}
 
-    # ================= ★ 图片处理（SSL 修复）=================
+    # ================= ★ 图片处理：原样返回 =================
     def _pic(self, u):
         if not u:
             return ''
@@ -183,34 +178,12 @@ class Spider(Spider):
         return ''
 
     def _pic_proxied(self, url):
-        """★★ 核心修复：img1.wsyzy.org 的 HTTPS 是坏的，降级为 HTTP 后再走 wsrv.nl 代理"""
+        """★ 浏览器能直接打开，就原样给播放器，不做任何代理包装"""
         if not url or url.startswith('data:'):
             return url
-
-        # 1) 修复 SSL：wsyzy.org 的 https 握手失败，降级为 http
-        if 'wsyzy.org' in url or 'img1.wsyzy.org' in url:
-            url = re.sub(r'^https://', 'http://', url)
-
-        # 2) 按模式包装
-        if PIC_PROXY == 'wsrv':
-            enc = urllib.parse.quote(url, safe='')
-            return 'https://wsrv.nl/?url=' + enc + '&output=jpg&q=88&il'
-
-        if PIC_PROXY == 'local':
-            try:
-                proxy = self.getProxyUrl()
-            except Exception:
-                proxy = ''
-            if not proxy:
-                return url
-            sep = '&' if '?' in proxy else '?'
-            return proxy + sep + 'type=img&url=' + urllib.parse.quote(url, safe='')
-
-        # 'none'：直连（注意此时 url 已被降级为 http）
         return url
-    # =========================================================
+    # ======================================================
 
-    # ---------- 字段映射 ----------
     def _mk(self, v, api=''):
         vid = str(v.get('vod_id') or '')
         if api:
@@ -228,7 +201,6 @@ class Spider(Spider):
             self._src_cache = j.get('data') or []
         return self._src_cache
 
-    # ========== 首页 ==========
     def homeContent(self, filter=False):
         r = {'class': CLASSES[:]}
         if filter and FILTERS:
@@ -241,7 +213,6 @@ class Spider(Spider):
         items = [self._mk(v) for v in (j.get('list') or [])]
         return {'list': items}
 
-    # ========== 分类 ==========
     def categoryContent(self, tid, pg=1, filter=False, extend=''):
         try:
             pn = max(int(str(pg)), 1)
@@ -256,7 +227,6 @@ class Spider(Spider):
         return {'page': pn, 'pagecount': max(pc, pn), 'limit': 20,
                 'total': pc * 20 if items else 0, 'list': items}
 
-    # ========== 详情 ==========
     def detailContent(self, ids, quick='1'):
         raw = str(ids[0] if isinstance(ids, (list, tuple)) else ids or '').strip()
         if not raw:
@@ -280,7 +250,7 @@ class Spider(Spider):
         return {'list': [self._detail_dict(vid, lst[0])]}
 
     def _detail_dict(self, out_id, v):
-        d = {
+        return {
             'vod_id': out_id,
             'vod_name': v.get('vod_name') or '',
             'vod_pic': self._pic_proxied(self._get_pic(v)),
@@ -294,9 +264,7 @@ class Spider(Spider):
             'vod_play_from': v.get('vod_play_from') or '',
             'vod_play_url': v.get('vod_play_url') or '',
         }
-        return d
 
-    # ========== 搜索 ==========
     def searchContent(self, key, quick=False, pg='1'):
         try:
             pn = max(int(str(pg)), 1)
@@ -342,7 +310,6 @@ class Spider(Spider):
             it.pop('_exact', None)
         return {'list': items, 'page': pn, 'pagecount': pn + (1 if items else 0)}
 
-    # ========== 播放 ==========
     def playerContent(self, flag, id, vipFlags=None):
         url = str(id or '')
         if '$' in url:
@@ -387,7 +354,6 @@ class Spider(Spider):
             return self._proxy
         return 'http://127.0.0.1:9978/proxy?do=py'
 
-    # ========== 扩展钩子 ==========
     def isVideoFormat(self, url):
         if not url:
             return False
@@ -419,7 +385,6 @@ class Spider(Spider):
         except Exception:
             pass
 
-    # ========== 本地代理（图片/视频透传）==========
     def localProxy(self, param):
         import urllib.parse as _up
         params = {}
@@ -446,14 +411,24 @@ class Spider(Spider):
             return {'code': 403, 'content': b'', 'headers': {}}
 
         if tp == 'img' or re.search(r'\.(?:jpg|jpeg|png|webp|gif|bmp|avif)(?:\?|$)', p, re.I):
-            return self._proxy_img(p)
+            hd = {'User-Agent': self.ua, 'Referer': self.pic_ref or self.ref}
+            try:
+                if requests:
+                    r = requests.get(p, headers=hd, timeout=15, verify=False)
+                    return {'code': r.status_code, 'content': r.content,
+                            'headers': {'Content-Type': r.headers.get('Content-Type', 'image/jpeg')}}
+                import urllib.request as _urq
+                resp = _urq.urlopen(_urq.Request(p, headers=hd), timeout=15)
+                return {'code': 200, 'content': resp.read(),
+                        'headers': {'Content-Type': resp.headers.get('Content-Type', 'image/jpeg')}}
+            except Exception:
+                return {'code': 404, 'content': b'', 'headers': {}}
 
         if (tp == 'mfys' or '.m3u8' in p
                 or '/api/tvbox/play/' in p or '/api/tvbox/resolve/' in p):
             return self._proxy_m3u8(p)
 
-        hd = {'User-Agent': self.ua,
-              'Referer': self.pic_ref or self.ref, 'Accept': '*/*'}
+        hd = {'User-Agent': self.ua, 'Referer': self.pic_ref or self.ref, 'Accept': '*/*'}
         try:
             if requests:
                 r = requests.get(p, headers=hd, timeout=25, verify=False)
@@ -463,34 +438,7 @@ class Spider(Spider):
             import urllib.request as _urq
             resp = _urq.urlopen(_urq.Request(p, headers=hd), timeout=25)
             return {'code': 200, 'content': resp.read(),
-                    'headers': {'Content-Type': resp.headers.get(
-                        'Content-Type', 'application/octet-stream')}}
-        except Exception:
-            return {'code': 404, 'content': b'', 'headers': {}}
-
-    def _proxy_img(self, url):
-        # ★ 同样降级 SSL
-        if 'wsyzy.org' in url:
-            url = re.sub(r'^https://', 'http://', url)
-        hd = {
-            'User-Agent': self.ua,
-            'Referer': self.pic_ref or self.ref,
-            'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-        }
-        try:
-            if requests:
-                r = requests.get(url, headers=hd, timeout=15, verify=False)
-                ct = r.headers.get('Content-Type', 'image/jpeg')
-                return {'code': r.status_code, 'content': r.content,
-                        'headers': {'Content-Type': ct,
-                                    'Cache-Control': 'public, max-age=86400'}}
-            import urllib.request as _urq
-            resp = _urq.urlopen(_urq.Request(url, headers=hd), timeout=15)
-            ct = resp.headers.get('Content-Type', 'image/jpeg')
-            return {'code': 200, 'content': resp.read(),
-                    'headers': {'Content-Type': ct,
-                                'Cache-Control': 'public, max-age=86400'}}
+                    'headers': {'Content-Type': resp.headers.get('Content-Type', 'application/octet-stream')}}
         except Exception:
             return {'code': 404, 'content': b'', 'headers': {}}
 
