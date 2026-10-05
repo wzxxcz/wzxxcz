@@ -131,50 +131,109 @@ def _abs_url(url):
     return BASE_URL + '/' + url
 
 
+def _is_rank_img(tag_html):
+    """判断是否为排名数字图（Top 1 / Top 2 ... 这类干扰图）"""
+    if not tag_html:
+        return False
+    # class 里带 rang / rank / top-num 这类关键词
+    if re.search(r'class\s*=\s*["\'][^"\']*(?:rang_img|rank_img|top_num|top-img|topnum)[^"\']*["\']',
+                 tag_html, re.IGNORECASE):
+        return True
+    # 图片 alt="Top N"
+    if re.search(r'alt\s*=\s*["\']Top\s*\d+["\']', tag_html, re.IGNORECASE):
+        return True
+    return False
+
+
+def _is_placeholder_img(tag_html):
+    """判断是否为纯数字占位图 (1.jpg / 06.png)"""
+    if not tag_html:
+        return False
+    m = re.search(r'(?:data-src|data-original|src)\s*=\s*["\']([^"\']+)["\']',
+                  tag_html, re.IGNORECASE)
+    if not m:
+        return False
+    u = m.group(1).strip()
+    if re.match(r'^https?://[^\s"\']*/\d+\.(?:jpg|jpeg|png|webp|gif)$', u, re.IGNORECASE):
+        return True
+    if re.match(r'^/?\d+\.(?:jpg|jpeg|png|webp|gif)$', u, re.IGNORECASE):
+        return True
+    return False
+
+
 def _pick_img(tag_html):
     """
-    从 <img> 标签中挑选真实图片地址。
-    优先级：data-original > data-src > data-echo > data-lazy > src
-    兼容单双引号，过滤 base64 与纯数字占位图（如 1.jpg / 6.png）
+    从 <img> 标签中挑选真实图片地址：
+    1. 优先选 class 带 hotsearch_item_img / card-cover / poster / cover 的图
+    2. 跳过 hotsearch_rang_img (Top N 排名图)
+    3. 兼容 data-src / data-original / data-echo / data-lazy-src / src
+    4. 过滤 base64 与纯数字占位图
     """
     if not tag_html:
         return ""
 
-    lazy_attrs = (
-        'data-original', 'data-src', 'data-lazy-src', 'data-echo',
-        'data-url', 'data-img', 'data-original-src',
-    )
+    # 优先数据源属性顺序
+    lazy_attrs = ('data-original', 'data-src', 'data-lazy-src', 'data-echo',
+                  'data-url', 'data-img', 'data-original-src')
 
     def _clean(u):
         u = (u or '').strip()
         if not u or u.startswith('data:image'):
             return ""
-        # 过滤纯数字占位图：1.jpg / 06.png / 10.jpeg
-        if re.match(r'^https?://[^\s"\']*/\d+\.(jpg|jpeg|png|webp|gif)$', u, re.IGNORECASE):
+        if re.match(r'^https?://[^\s"\']*/\d+\.(?:jpg|jpeg|png|webp|gif)$', u, re.IGNORECASE):
             return ""
-        if re.match(r'^/?\d+\.(jpg|jpeg|png|webp|gif)$', u, re.IGNORECASE):
+        if re.match(r'^/?\d+\.(?:jpg|jpeg|png|webp|gif)$', u, re.IGNORECASE):
             return ""
         return _abs_url(u)
 
-    # 1) 懒加载属性
-    for attr in lazy_attrs:
-        m = re.search(rf'{attr}\s*=\s*["\']([^"\']+)["\']', tag_html, re.IGNORECASE)
+    def _extract(html):
+        for attr in lazy_attrs:
+            m = re.search(rf'{attr}\s*=\s*["\']([^"\']+)["\']', html, re.IGNORECASE)
+            if m:
+                got = _clean(m.group(1))
+                if got:
+                    return got
+        m = re.search(r'src\s*=\s*["\']([^"\']+)["\']', html, re.IGNORECASE)
         if m:
             got = _clean(m.group(1))
             if got:
                 return got
+        m = re.search(r'style\s*=\s*["\'][^"\']*url\(([^)]+)\)', html, re.IGNORECASE)
+        if m:
+            got = _clean(m.group(1).strip('\'"'))
+            if got:
+                return got
+        return ""
 
-    # 2) 回退 src
-    m = re.search(r'src\s*=\s*["\']([^"\']+)["\']', tag_html, re.IGNORECASE)
+    # 1) 先在整个块里找 class 带 hotsearch_item_img 的图（热门搜索的真实海报）
+    m = re.search(
+        r'<img\b[^>]*class\s*=\s*["\'][^"\']*hotsearch_item_img[^"\']*["\'][^>]*>',
+        tag_html, re.IGNORECASE
+    )
     if m:
-        got = _clean(m.group(1))
+        got = _extract(m.group(0))
         if got:
             return got
 
-    # 3) 兜底：style="background-image:url(...)"
-    m = re.search(r'style\s*=\s*["\'][^"\']*url\(([^)]+)\)', tag_html, re.IGNORECASE)
-    if m:
-        got = _clean(m.group(1).strip('\'"'))
+    # 2) 在块里找 class 带 card-cover / poster / cover 的图
+    for kw in ('card-cover', 'poster', 'cover'):
+        m = re.search(
+            rf'<img\b[^>]*class\s*=\s*["\'][^"\']*{kw}[^"\']*["\'][^>]*>',
+            tag_html, re.IGNORECASE
+        )
+        if m:
+            got = _extract(m.group(0))
+            if got:
+                return got
+
+    # 3) 逐个 <img> 处理，跳过排名图和占位图
+    for m in re.finditer(r'<img\b[^>]*>', tag_html, re.IGNORECASE):
+        tag = m.group(0)
+        if _is_rank_img(tag):
+            continue
+        if _is_placeholder_img(tag):
+            continue
+        got = _extract(tag)
         if got:
             return got
 
@@ -219,7 +278,7 @@ class Spider(BaseSpider):
             return json.dumps({
                 "name": self.getName(),
                 "base_url": BASE_URL,
-                "version": "1.4",
+                "version": "1.6",
                 "filter": self._build_filters(),
             }, ensure_ascii=False)
         except Exception:
@@ -266,14 +325,8 @@ class Spider(BaseSpider):
         except Exception as e:
             raise Exception("无法发送POST请求: %s" % e)
 
-    # ==================== 构建筛选 URL（关键修复） ====================
+    # ==================== 构建筛选 URL ====================
     def _build_filter_url(self, category, type_name="", region="", year="", sort="", pg=1):
-        """
-        站点真实 URL 规则（根据抓包确认）:
-          分类首页:  /vodtype/dianying.html
-          分类翻页:  /vodtype/dianying/page/2.html
-        带筛选时回退到 /vodshow/ 伪静态规则
-        """
         try:
             p = int(pg)
         except Exception:
@@ -287,17 +340,19 @@ class Spider(BaseSpider):
         )
 
         if not has_filter:
-            # 纯分类，使用 /vodtype/ 规则
             if p > 1:
                 return "%s/vodtype/%s/page/%d.html" % (BASE_URL, category, p)
             return "%s/vodtype/%s.html" % (BASE_URL, category)
 
-        # 带筛选条件，使用 /vodshow/ 规则
         params = [""] * 11
-        params[0] = region if region and region != "全部" else ""
-        params[1] = SORT_MAP.get(sort, "") if sort and sort != "综合排序" else ""
-        params[2] = type_name if type_name and type_name != "全部" else ""
-        params[10] = year if year and year != "全部" else ""
+        if region and region != "全部":
+            params[0] = quote(region, safe='')
+        if sort and sort != "综合排序":
+            params[1] = SORT_MAP.get(sort, "")
+        if type_name and type_name != "全部":
+            params[2] = quote(type_name, safe='')
+        if year and year != "全部":
+            params[10] = quote(year, safe='')
 
         path = "/vodshow/" + category + "-" + "-".join(params)
         if p > 1:
@@ -325,9 +380,15 @@ class Spider(BaseSpider):
             if not img_m:
                 continue
 
+            # 跳过明显的排名干扰卡片（整个 a 标签 class 里带 hotsearch）
+            if re.search(r'class\s*=\s*["\'][^"\']*hotsearch[^"\']*["\']', attrs, re.IGNORECASE):
+                # 这种多半是热门搜索卡片，跳过
+                continue
+
             seen.add(vid)
 
-            pic = _pick_img(img_m.group(0))
+            # 封面（新增：跳过排名图）
+            pic = _pick_img(inner)
             alt = ""
             alt_m = re.search(r'alt\s*=\s*["\']([^"\']*)["\']', img_m.group(0), re.IGNORECASE)
             if alt_m:
@@ -408,10 +469,7 @@ class Spider(BaseSpider):
             if not title:
                 continue
 
-            pic = ""
-            img_m = re.search(r'<img\b[^>]*>', block, re.IGNORECASE)
-            if img_m:
-                pic = _pick_img(img_m.group(0))
+            pic = _pick_img(block)
 
             remark = ""
             r_m = re.search(
