@@ -131,11 +131,24 @@ def _abs_url(url):
     return BASE_URL + '/' + url
 
 
+def _pick_img(tag_html):
+    """从 <img> 标签中挑选真实图片地址，优先 data-src / data-original，忽略 base64 占位图"""
+    if not tag_html:
+        return ""
+    for attr in ('data-src', 'data-original', 'data-lazy-src', 'src'):
+        m = re.search(rf'{attr}="([^"]+)"', tag_html, re.IGNORECASE)
+        if m:
+            u = m.group(1).strip()
+            if u and not u.startswith('data:image'):
+                return _abs_url(u)
+    return ""
+
+
 # ==================== 爬虫类 ====================
 class Spider(BaseSpider):
     _play_cache = SimpleCache(max_size=50, ttl=600)
 
-    # ==================== 初始化（补：支持 extend 覆盖） ====================
+    # ==================== 初始化 ====================
     def init(self, extend=""):
         global BASE_URL, USER_AGENT
         ext = {}
@@ -144,7 +157,6 @@ class Spider(BaseSpider):
                 ext = json.loads(extend) if isinstance(extend, str) else (extend or {})
             except Exception:
                 ext = {}
-        # 允许通过配置覆盖站点和 UA
         if ext.get('base_url'):
             BASE_URL = str(ext['base_url']).rstrip('/')
         if ext.get('user_agent'):
@@ -164,13 +176,13 @@ class Spider(BaseSpider):
     def isVideoFormat(self, url):
         return any(ext in (url or '').lower() for ext in VIDEO_EXTS)
 
-    # ==================== 补：TVBox action 接口 ====================
+    # ==================== TVBox action 接口 ====================
     def action(self, action_str):
         try:
             return json.dumps({
                 "name": self.getName(),
                 "base_url": BASE_URL,
-                "version": "1.1",
+                "version": "1.2",
                 "filter": self._build_filters(),
             }, ensure_ascii=False)
         except Exception:
@@ -234,7 +246,7 @@ class Spider(BaseSpider):
             path += "-" + str(p)
         return BASE_URL + path + ".html"
 
-    # ==================== 解析视频列表（宽松卡片） ====================
+    # ==================== 解析视频列表（修复图片懒加载） ====================
     def _parse_video_cards(self, html):
         videos = []
         seen = set()
@@ -257,12 +269,10 @@ class Spider(BaseSpider):
 
             seen.add(vid)
 
-            pic, alt = "", ""
-            img_tag = img_m.group(0)
-            src_m = re.search(r'(?:data-src|data-original|src)="([^"]*)"', img_tag)
-            if src_m:
-                pic = _abs_url(src_m.group(1))
-            alt_m = re.search(r'alt="([^"]*)"', img_tag)
+            # 封面：优先 data-src / data-original
+            pic = _pick_img(img_m.group(0))
+            alt = ""
+            alt_m = re.search(r'alt="([^"]*)"', img_m.group(0))
             if alt_m:
                 alt = alt_m.group(1).strip()
 
@@ -304,7 +314,7 @@ class Spider(BaseSpider):
 
         return videos
 
-    # ==================== 解析搜索结果列表 ====================
+    # ==================== 解析搜索结果列表（修复图片懒加载） ====================
     def _parse_search_results(self, html):
         videos = []
         seen = set()
@@ -341,11 +351,11 @@ class Spider(BaseSpider):
             if not title:
                 continue
 
+            # 封面：优先 data-src / data-original
             pic = ""
-            p_m = re.search(r'<img\b[^>]*(?:data-src|data-original|src)="([^"]*)"',
-                            block, re.IGNORECASE)
-            if p_m:
-                pic = _abs_url(p_m.group(1))
+            img_m = re.search(r'<img\b[^>]*>', block, re.IGNORECASE)
+            if img_m:
+                pic = _pick_img(img_m.group(0))
 
             remark = ""
             r_m = re.search(
@@ -416,7 +426,6 @@ class Spider(BaseSpider):
             except Exception:
                 pg_int = 1
 
-            # 有结果就允许继续翻页，无结果则终止
             pagecount = pg_int + 1 if vlist else pg_int
 
             return {
@@ -523,24 +532,28 @@ class Spider(BaseSpider):
                 if t_m:
                     title = t_m.group(1).strip().split('-')[0].split('_')[0].strip()
 
-            # 封面
+            # 封面（修复懒加载）
             pic = ""
-            p_m = re.search(
-                r'<img[^>]*class="[^"]*detail-cover[^"]*"[^>]*src="([^"]*)"',
+            cover_img_m = re.search(
+                r'<img[^>]*class="[^"]*detail-cover[^"]*"[^>]*>',
                 html, re.IGNORECASE
             )
-            if not p_m:
+            if cover_img_m:
+                pic = _pick_img(cover_img_m.group(0))
+            if not pic:
                 p_m = re.search(
                     r'class="[^"]*detail-hero-bg[^"]*"[^>]*style="[^"]*url\(([^)]+)\)',
                     html, re.IGNORECASE
                 )
-            if not p_m:
+                if p_m:
+                    pic = _abs_url(p_m.group(1).strip().strip('\'"'))
+            if not pic:
                 p_m = re.search(
                     r'<meta[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']*)["\']',
                     html, re.IGNORECASE
                 )
-            if p_m:
-                pic = _abs_url(p_m.group(1).strip().strip('\'"'))
+                if p_m:
+                    pic = _abs_url(p_m.group(1).strip().strip('\'"'))
 
             # 年份
             year = ""
@@ -573,7 +586,7 @@ class Spider(BaseSpider):
             director = self._extract_field(html, '导演', '導演')
             actor = self._extract_field(html, '主演', '演员', '演員')
 
-            # 简介（核心）
+            # 简介
             desc = self._extract_desc(html)
 
             # 状态
@@ -598,7 +611,7 @@ class Spider(BaseSpider):
             # 播放列表
             play_from, play_url = self._parse_playlist(html)
 
-            # 备注兜底：从首集名推断
+            # 备注兜底
             if not remark and play_url and play_url[0]:
                 first_ep = play_url[0].split('#')[0].split('$')[0]
                 if first_ep and len(first_ep) <= 20:
@@ -628,7 +641,7 @@ class Spider(BaseSpider):
             print("详情解析出错:", e)
             return {'list': []}
 
-    # ==================== 播放列表解析（补：线路名去重） ====================
+    # ==================== 播放列表解析 ====================
     def _parse_playlist(self, html):
         play_from, play_url = [], []
 
@@ -677,7 +690,6 @@ class Spider(BaseSpider):
             if not eps:
                 continue
 
-            # 线路名去重
             line_name = name or ("线路%d" % (len(play_from) + 1))
             if line_name in used_names:
                 idx = 2
@@ -731,7 +743,7 @@ class Spider(BaseSpider):
 
         return eps
 
-    # ==================== 搜索（补：翻页） ====================
+    # ==================== 搜索 ====================
     def searchContent(self, key, quick, pg="1"):
         try:
             try:
@@ -772,7 +784,7 @@ class Spider(BaseSpider):
             print("搜索出错:", e)
             return {'list': []}
 
-    # ==================== 播放解析（补：返回 header） ====================
+    # ==================== 播放解析 ====================
     def playerContent(self, flag, id, vipFlags):
         play_url = ""
         try:
