@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 硬编码测试版 ============
+# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 最终版 ============
 import sys, re, json, time, hashlib, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 try:
@@ -24,10 +24,6 @@ REFERER   = 'http://l98.cn/'
 PIC_REFERER = 'http://l98.cn/'
 MF_SALT   = 'mfys-api-guard-v1'
 MF_CLIENT = 'web'
-
-# ★★★★★★ 硬编码测试图片（甲武神海报），改这里就行 ★★★★★★
-TEST_PIC = 'https://img1.wsyzy.org/upload/vod/20261005-1/860d69226307329508547892947c62f5.jpg'
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
 SEARCH_SOURCES = [
     'tvbox-py://source-616fbcbf9e',
@@ -182,8 +178,11 @@ class Spider(Spider):
         return ''
 
     def _pic_proxied(self, url):
-        """★ 硬编码测试：所有图片都返回同一张，验证代码是否被加载"""
-        return TEST_PIC
+        """★ 图片通过 wsrv.nl 公网 CDN 中转，规避壳子对特定域名的兼容问题"""
+        if not url or url.startswith('data:'):
+            return url
+        enc = urllib.parse.quote(url, safe='')
+        return 'https://wsrv.nl/?url=' + enc + '&output=jpg&q=88'
     # =============================================
 
     def _mk(self, v, api=''):
