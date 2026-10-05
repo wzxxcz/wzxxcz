@@ -132,15 +132,36 @@ def _abs_url(url):
 
 
 def _pick_img(tag_html):
-    """从 <img> 标签中挑选真实图片地址，优先 data-src / data-original，忽略 base64 占位图"""
+    """
+    从 <img> 标签中挑选真实图片地址
+    1. 支持单引号和双引号
+    2. 优先读取 data-src, data-original 等懒加载属性
+    3. 过滤掉 base64 和纯数字占位图（如 1.jpg, 6.png）
+    """
     if not tag_html:
         return ""
-    for attr in ('data-src', 'data-original', 'data-lazy-src', 'src'):
-        m = re.search(rf'{attr}="([^"]+)"', tag_html, re.IGNORECASE)
+    
+    # 常见的懒加载属性列表
+    lazy_attrs = ('data-src', 'data-original', 'data-lazy-src', 'data-echo', 'data-url', 'data-img', 'data-original-src')
+    
+    # 1. 优先尝试所有懒加载属性（兼容单双引号）
+    for attr in lazy_attrs:
+        m = re.search(rf'{attr}\s*=\s*["\']([^"\']+)["\']', tag_html, re.IGNORECASE)
         if m:
             u = m.group(1).strip()
             if u and not u.startswith('data:image'):
                 return _abs_url(u)
+                
+    # 2. 回退到 src（兼容单双引号）
+    m = re.search(r'src\s*=\s*["\']([^"\']+)["\']', tag_html, re.IGNORECASE)
+    if m:
+        u = m.group(1).strip()
+        if u and not u.startswith('data:image'):
+            # 过滤掉纯数字占位图 (例如 1.jpg, 6.png, 10.jpeg)
+            if re.match(r'^(\/?)([0-9]+)\.(jpg|jpeg|png|webp|gif)$', u, re.IGNORECASE):
+                return ""
+            return _abs_url(u)
+            
     return ""
 
 
@@ -182,7 +203,7 @@ class Spider(BaseSpider):
             return json.dumps({
                 "name": self.getName(),
                 "base_url": BASE_URL,
-                "version": "1.2",
+                "version": "1.3",
                 "filter": self._build_filters(),
             }, ensure_ascii=False)
         except Exception:
@@ -246,7 +267,7 @@ class Spider(BaseSpider):
             path += "-" + str(p)
         return BASE_URL + path + ".html"
 
-    # ==================== 解析视频列表（修复图片懒加载） ====================
+    # ==================== 解析视频列表 ====================
     def _parse_video_cards(self, html):
         videos = []
         seen = set()
@@ -269,10 +290,10 @@ class Spider(BaseSpider):
 
             seen.add(vid)
 
-            # 封面：优先 data-src / data-original
+            # 封面：使用加强版的 _pick_img
             pic = _pick_img(img_m.group(0))
             alt = ""
-            alt_m = re.search(r'alt="([^"]*)"', img_m.group(0))
+            alt_m = re.search(r'alt\s*=\s*["\']([^"\']*)["\']', img_m.group(0), re.IGNORECASE)
             if alt_m:
                 alt = alt_m.group(1).strip()
 
@@ -284,7 +305,7 @@ class Spider(BaseSpider):
             if t_m:
                 title = _strip_html(t_m.group(1))
             if not title:
-                t_m = re.search(r'title="([^"]*)"', attrs)
+                t_m = re.search(r'title\s*=\s*["\']([^"\']*)["\']', attrs, re.IGNORECASE)
                 if t_m:
                     title = t_m.group(1).strip()
             if not title:
@@ -314,7 +335,7 @@ class Spider(BaseSpider):
 
         return videos
 
-    # ==================== 解析搜索结果列表（修复图片懒加载） ====================
+    # ==================== 解析搜索结果列表 ====================
     def _parse_search_results(self, html):
         videos = []
         seen = set()
@@ -338,7 +359,7 @@ class Spider(BaseSpider):
             seen.add(vid)
 
             title = ""
-            t_m = re.search(r'<a\b[^>]*title="([^"]*)"', block, re.IGNORECASE)
+            t_m = re.search(r'<a\b[^>]*title\s*=\s*["\']([^"\']*)["\']', block, re.IGNORECASE)
             if t_m:
                 title = t_m.group(1).strip()
             if not title:
@@ -351,7 +372,7 @@ class Spider(BaseSpider):
             if not title:
                 continue
 
-            # 封面：优先 data-src / data-original
+            # 封面：使用加强版的 _pick_img
             pic = ""
             img_m = re.search(r'<img\b[^>]*>', block, re.IGNORECASE)
             if img_m:
@@ -439,7 +460,7 @@ class Spider(BaseSpider):
             print("分类获取出错:", e)
             return {'list': [], 'page': pg, 'pagecount': 0, 'limit': 0, 'total': 0}
 
-    # ==================== 简介提取（多级兜底） ====================
+    # ==================== 简介提取 ====================
     def _extract_desc(self, html):
         patterns = [
             r'<div[^>]*class="[^"]*detail-desc[^"]*"[^>]*>([\s\S]*?)</div>',
@@ -532,7 +553,7 @@ class Spider(BaseSpider):
                 if t_m:
                     title = t_m.group(1).strip().split('-')[0].split('_')[0].strip()
 
-            # 封面（修复懒加载）
+            # 封面（使用加强版 _pick_img）
             pic = ""
             cover_img_m = re.search(
                 r'<img[^>]*class="[^"]*detail-cover[^"]*"[^>]*>',
@@ -611,7 +632,6 @@ class Spider(BaseSpider):
             # 播放列表
             play_from, play_url = self._parse_playlist(html)
 
-            # 备注兜底
             if not remark and play_url and play_url[0]:
                 first_ep = play_url[0].split('#')[0].split('$')[0]
                 if first_ep and len(first_ep) <= 20:
@@ -659,7 +679,7 @@ class Spider(BaseSpider):
                 name = _strip_html(m.group(1))
             target = ""
             for attr in ('data-target', 'data-id', 'data-tab', 'id'):
-                a_m = re.search(rf'{attr}="([^"]+)"', tag)
+                a_m = re.search(rf'{attr}\s*=\s*["\']([^"\']+)["\']', tag, re.IGNORECASE)
                 if a_m:
                     target = a_m.group(1)
                     break
@@ -668,7 +688,7 @@ class Spider(BaseSpider):
 
         blocks = {}
         for m in re.finditer(
-            r'<div[^>]*class="[^"]*ep-square-list[^"]*"[^>]*id="([^"]+)"[^>]*>([\s\S]*?)'
+            r'<div[^>]*class="[^"]*ep-square-list[^"]*"[^>]*id\s*=\s*["\']([^"\']+)["\'][^>]*>([\s\S]*?)'
             r'(?=<div[^>]*class="[^"]*ep-square-list|<div[^>]*class="[^"]*source-tab|</body>|$)',
             html, re.DOTALL | re.IGNORECASE
         ):
@@ -679,7 +699,7 @@ class Spider(BaseSpider):
             block = blocks.get(target, "")
             if not block:
                 m = re.search(
-                    rf'id="{re.escape(target)}"[^>]*>([\s\S]*?)</div>',
+                    rf'id\s*=\s*["\']{re.escape(target)}["\'][^>]*>([\s\S]*?)</div>',
                     html, re.DOTALL
                 )
                 block = m.group(1) if m else ""
@@ -714,7 +734,7 @@ class Spider(BaseSpider):
         seen = set()
 
         for m in re.finditer(
-            r'<a\b([^>]*?)href="([^"]*/play/[^"]+\.html)"([^>]*)>([\s\S]*?)</a>',
+            r'<a\b([^>]*?)href\s*=\s*["\']([^"\']*?/play/[^"\']+\.html)["\']([^>]*)>([\s\S]*?)</a>',
             block, re.DOTALL | re.IGNORECASE
         ):
             attrs = (m.group(1) or '') + (m.group(3) or '')
@@ -726,7 +746,7 @@ class Spider(BaseSpider):
             seen.add(href)
 
             name = ""
-            d_m = re.search(r'data-name="([^"]*)"', attrs)
+            d_m = re.search(r'data-name\s*=\s*["\']([^"\']*)["\']', attrs, re.IGNORECASE)
             if d_m:
                 name = d_m.group(1).strip()
             if not name:
@@ -765,7 +785,7 @@ class Spider(BaseSpider):
             if not videos:
                 seen = set()
                 for m in re.finditer(
-                    r'<a\b[^>]*href="/video/([^"/]+)\.html"[^>]*title="([^"]*)"[^>]*>',
+                    r'<a\b[^>]*href\s*=\s*["\']/video/([^"\']+)\.html["\'][^>]*title\s*=\s*["\']([^"\']*)["\'][^>]*>',
                     html, re.IGNORECASE
                 ):
                     vid, title = m.group(1), m.group(2).strip()
