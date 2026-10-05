@@ -2023,6 +2023,12 @@
             "api": "./py/追影.py"
         },
 		{
+            "key": "GimyTV剧迷",
+            "name": "🍊GimyTV剧迷",
+            "type": 3,
+            "api": "./py/GimyTV剧迷.py"
+        },
+		{
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
