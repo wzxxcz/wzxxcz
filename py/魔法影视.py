@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# ============ 魔法盒子 / 魔法影视 (l98.cn) 多源聚合 TVBox 源 ============
-# 【图片终极修复】默认走公网 CDN(wsrv.nl) 代理，兼容所有 TVBox 壳子
-# 用法: 只改 ★ CONFIG 区
+# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 图片 SSL 修复版 ============
 import sys, re, json, time, hashlib, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 try:
@@ -18,6 +16,7 @@ except ImportError:
             import urllib.request as _urq
             r = _urq.Request(url, headers=headers or {})
             return _urq.urlopen(r, timeout=15)
+
 # ============ ★ CONFIG ============
 SITE      = 'http://l98.cn'
 CMS_API   = 'https://api.wsyzy.net/api.php/provide/vod'
@@ -27,10 +26,7 @@ PIC_REFERER = 'http://l98.cn/'
 MF_SALT   = 'mfys-api-guard-v1'
 MF_CLIENT = 'web'
 
-# ★★★ 图片代理模式（三选一，改这里即可）★★★
-#   'wsrv'  = 公网 CDN 代理(images.weserv.nl)，兼容所有壳子，推荐 ★默认
-#   'local' = 走本地 9978 代理(需要壳子支持加载本地代理图片)
-#   'none'  = 直连原图(仅当图片无防盗链且路径已是绝对路径时可用)
+# 图片代理模式：'wsrv' 公网CDN(推荐) / 'local' 本地代理 / 'none' 直连
 PIC_PROXY = 'wsrv'
 
 SEARCH_SOURCES = [
@@ -157,15 +153,13 @@ class Spider(Spider):
         except Exception:
             return {}
 
-    # ================= ★ 图片处理（核心）=================
+    # ================= ★ 图片处理（SSL 修复）=================
     def _pic(self, u):
-        """图片地址归一化：补协议、补域名、去空白"""
         if not u:
             return ''
         u = str(u).strip()
         if not u:
             return ''
-        # 已经是 data URI 直接放行
         if u.startswith('data:'):
             return u
         if u.startswith('//'):
@@ -174,12 +168,9 @@ class Spider(Spider):
             u = self.base.rstrip('/') + u
         elif not (u.startswith('http://') or u.startswith('https://')):
             u = self.base.rstrip('/') + '/' + u.lstrip('/')
-        # 去掉 URL 里的空白和换行
-        u = re.sub(r'[\s\r\n]+', '', u)
-        return u
+        return re.sub(r'[\s\r\n]+', '', u)
 
     def _get_pic(self, v):
-        """多字段回退取图"""
         if not isinstance(v, dict):
             return ''
         for k in ('vod_pic', 'vod_pic_slide', 'vod_pic_thumb',
@@ -192,19 +183,19 @@ class Spider(Spider):
         return ''
 
     def _pic_proxied(self, url):
-        """★ 把图片 URL 包装成可被所有播放器加载的地址"""
-        if not url:
-            return ''
-        if url.startswith('data:'):
+        """★★ 核心修复：img1.wsyzy.org 的 HTTPS 是坏的，降级为 HTTP 后再走 wsrv.nl 代理"""
+        if not url or url.startswith('data:'):
             return url
 
-        # ---- 模式1: 公网 CDN 代理（推荐）----
+        # 1) 修复 SSL：wsyzy.org 的 https 握手失败，降级为 http
+        if 'wsyzy.org' in url or 'img1.wsyzy.org' in url:
+            url = re.sub(r'^https://', 'http://', url)
+
+        # 2) 按模式包装
         if PIC_PROXY == 'wsrv':
-            # wsrv.nl 支持 http/https 原图，能绕过防盗链、自动转码
             enc = urllib.parse.quote(url, safe='')
             return 'https://wsrv.nl/?url=' + enc + '&output=jpg&q=88&il'
 
-        # ---- 模式2: 本地代理 ----
         if PIC_PROXY == 'local':
             try:
                 proxy = self.getProxyUrl()
@@ -215,9 +206,9 @@ class Spider(Spider):
             sep = '&' if '?' in proxy else '?'
             return proxy + sep + 'type=img&url=' + urllib.parse.quote(url, safe='')
 
-        # ---- 模式3: 直连 ----
+        # 'none'：直连（注意此时 url 已被降级为 http）
         return url
-    # =====================================================
+    # =========================================================
 
     # ---------- 字段映射 ----------
     def _mk(self, v, api=''):
@@ -428,7 +419,7 @@ class Spider(Spider):
         except Exception:
             pass
 
-    # ========== 本地代理 ==========
+    # ========== 本地代理（图片/视频透传）==========
     def localProxy(self, param):
         import urllib.parse as _up
         params = {}
@@ -478,6 +469,9 @@ class Spider(Spider):
             return {'code': 404, 'content': b'', 'headers': {}}
 
     def _proxy_img(self, url):
+        # ★ 同样降级 SSL
+        if 'wsyzy.org' in url:
+            url = re.sub(r'^https://', 'http://', url)
         hd = {
             'User-Agent': self.ua,
             'Referer': self.pic_ref or self.ref,
