@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ============ 魔法盒子 / 魔法影视 (l98.cn) 多源聚合 TVBox 源 ============
-# 【图片修复】_pic 补全相对路径 + 图片走本地代理带 Referer
+# 【图片终极修复】默认走公网 CDN(wsrv.nl) 代理，兼容所有 TVBox 壳子
 # 用法: 只改 ★ CONFIG 区
 import sys, re, json, time, hashlib, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
@@ -26,8 +26,12 @@ REFERER   = 'http://l98.cn/'
 PIC_REFERER = 'http://l98.cn/'
 MF_SALT   = 'mfys-api-guard-v1'
 MF_CLIENT = 'web'
-# ★ 图片是否走本地代理（强烈建议 True，可绕过防盗链）
-USE_PIC_PROXY = True
+
+# ★★★ 图片代理模式（三选一，改这里即可）★★★
+#   'wsrv'  = 公网 CDN 代理(images.weserv.nl)，兼容所有壳子，推荐 ★默认
+#   'local' = 走本地 9978 代理(需要壳子支持加载本地代理图片)
+#   'none'  = 直连原图(仅当图片无防盗链且路径已是绝对路径时可用)
+PIC_PROXY = 'wsrv'
 
 SEARCH_SOURCES = [
     'tvbox-py://source-616fbcbf9e',
@@ -153,51 +157,67 @@ class Spider(Spider):
         except Exception:
             return {}
 
-    # ================= ★ 图片处理（修复重点）=================
+    # ================= ★ 图片处理（核心）=================
     def _pic(self, u):
-        """图片地址补全：// -> https；/ 开头 -> 拼 base；无协议 -> 拼 base"""
+        """图片地址归一化：补协议、补域名、去空白"""
         if not u:
             return ''
         u = str(u).strip()
         if not u:
             return ''
-        if u.startswith('//'):
-            return 'https:' + u
-        if u.startswith('http://') or u.startswith('https://'):
+        # 已经是 data URI 直接放行
+        if u.startswith('data:'):
             return u
-        if u.startswith('/'):
-            return self.base.rstrip('/') + u
-        return self.base.rstrip('/') + '/' + u.lstrip('/')
+        if u.startswith('//'):
+            u = 'https:' + u
+        elif u.startswith('/'):
+            u = self.base.rstrip('/') + u
+        elif not (u.startswith('http://') or u.startswith('https://')):
+            u = self.base.rstrip('/') + '/' + u.lstrip('/')
+        # 去掉 URL 里的空白和换行
+        u = re.sub(r'[\s\r\n]+', '', u)
+        return u
 
     def _get_pic(self, v):
         """多字段回退取图"""
         if not isinstance(v, dict):
             return ''
         for k in ('vod_pic', 'vod_pic_slide', 'vod_pic_thumb',
-                  'pic', 'img', 'thumbnail', 'cover', 'poster'):
+                  'pic', 'img', 'thumbnail', 'cover', 'poster', 'vod_pic_url'):
             val = v.get(k)
             if val:
-                return self._pic(val)
+                p = self._pic(val)
+                if p:
+                    return p
         return ''
 
     def _pic_proxied(self, url):
-        """★ 把真实图片 URL 包成本地代理地址，让代理带 Referer 去取图"""
+        """★ 把图片 URL 包装成可被所有播放器加载的地址"""
         if not url:
             return ''
-        if not USE_PIC_PROXY:
+        if url.startswith('data:'):
             return url
-        try:
-            proxy = self.getProxyUrl()
-        except Exception:
-            proxy = ''
-        if not proxy:
-            return url
-        # 已经是本地代理格式就不再包装
-        if 'type=img' in url and 'url=' in url:
-            return url
-        sep = '&' if '?' in proxy else '?'
-        return proxy + sep + 'type=img&url=' + urllib.parse.quote(url, safe='')
-    # =========================================================
+
+        # ---- 模式1: 公网 CDN 代理（推荐）----
+        if PIC_PROXY == 'wsrv':
+            # wsrv.nl 支持 http/https 原图，能绕过防盗链、自动转码
+            enc = urllib.parse.quote(url, safe='')
+            return 'https://wsrv.nl/?url=' + enc + '&output=jpg&q=88&il'
+
+        # ---- 模式2: 本地代理 ----
+        if PIC_PROXY == 'local':
+            try:
+                proxy = self.getProxyUrl()
+            except Exception:
+                proxy = ''
+            if not proxy:
+                return url
+            sep = '&' if '?' in proxy else '?'
+            return proxy + sep + 'type=img&url=' + urllib.parse.quote(url, safe='')
+
+        # ---- 模式3: 直连 ----
+        return url
+    # =====================================================
 
     # ---------- 字段映射 ----------
     def _mk(self, v, api=''):
@@ -207,7 +227,7 @@ class Spider(Spider):
         return {
             'vod_id': vid,
             'vod_name': v.get('vod_name') or '',
-            'vod_pic': self._pic_proxied(self._get_pic(v)),   # ★ 走本地代理
+            'vod_pic': self._pic_proxied(self._get_pic(v)),
             'vod_remarks': v.get('vod_remarks') or '',
         }
 
@@ -272,7 +292,7 @@ class Spider(Spider):
         d = {
             'vod_id': out_id,
             'vod_name': v.get('vod_name') or '',
-            'vod_pic': self._pic_proxied(self._get_pic(v)),   # ★ 走本地代理
+            'vod_pic': self._pic_proxied(self._get_pic(v)),
             'vod_year': str(v.get('vod_year') or ''),
             'vod_area': v.get('vod_area') or '',
             'vod_class': v.get('type_name') or v.get('vod_class') or '',
@@ -408,11 +428,9 @@ class Spider(Spider):
         except Exception:
             pass
 
-    # ========== 本地代理：图片 + m3u8 + 媒体透传 ==========
+    # ========== 本地代理 ==========
     def localProxy(self, param):
         import urllib.parse as _up
-
-        # 统一解析参数：支持 dict / "do=py&type=img&url=..." / "type=img&url=..."
         params = {}
         if isinstance(param, dict):
             for k, v in param.items():
@@ -436,16 +454,13 @@ class Spider(Spider):
         if not p:
             return {'code': 403, 'content': b'', 'headers': {}}
 
-        # ★ 图片代理（带 Referer）
         if tp == 'img' or re.search(r'\.(?:jpg|jpeg|png|webp|gif|bmp|avif)(?:\?|$)', p, re.I):
             return self._proxy_img(p)
 
-        # m3u8 / 站内播放代理
         if (tp == 'mfys' or '.m3u8' in p
                 or '/api/tvbox/play/' in p or '/api/tvbox/resolve/' in p):
             return self._proxy_m3u8(p)
 
-        # 其它透传
         hd = {'User-Agent': self.ua,
               'Referer': self.pic_ref or self.ref, 'Accept': '*/*'}
         try:
@@ -463,7 +478,6 @@ class Spider(Spider):
             return {'code': 404, 'content': b'', 'headers': {}}
 
     def _proxy_img(self, url):
-        """图片代理：带 Referer + UA，绕过防盗链"""
         hd = {
             'User-Agent': self.ua,
             'Referer': self.pic_ref or self.ref,
