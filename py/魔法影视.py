@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 图片代理修复版 ============
+# ============ 魔法盒子 / 魔法影视 (l98.cn) 多源聚合 TVBox 源（图片+简介修复版）============
 import sys, re, json, time, hashlib, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 try:
@@ -24,20 +24,17 @@ CMS_API     = 'https://api.wsyzy.net/api.php/provide/vod'
 UA          = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
                '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 REFERER     = 'http://l98.cn/'
-PIC_REFERER = 'http://l98.cn/'         # ★ 图片代理时携带的 Referer
+PIC_REFERER = 'http://l98.cn/'  # 图片防盗链Referer
 MF_SALT     = 'mfys-api-guard-v1'
 MF_CLIENT   = 'web'
 
-# ★ 新增：图片是否走本地代理（开启后图片会带 Referer 通过 127.0.0.1:9978 转发）
-USE_PIC_PROXY = True
-
 SEARCH_SOURCES = [
-    'tvbox-py://source-616fbcbf9e',
-    'tvbox-py://wencai',
-    'tvbox-py://source-4eb17c91b4',
-    'tvbox-py://source-0ad659640c',
-    'tvbox-py://source-cb4888cc81',
-    'tvbox-py://source-90e25e2716',
+    'tvbox-py://source-616fbcbf9e',   # 瓜子APP
+    'tvbox-py://wencai',              # 文才影视
+    'tvbox-py://source-4eb17c91b4',   # 三秋影视
+    'tvbox-py://source-0ad659640c',   # 泥巴影视
+    'tvbox-py://source-cb4888cc81',   # 剧OK影视
+    'tvbox-py://source-90e25e2716',   # 布布影视
 ]
 
 CLASSES = [
@@ -54,7 +51,6 @@ CLASSES = [
 ]
 FILTERS    = {}
 VIDEO_EXTS = 'm3u8|mp4|flv|mkv|ts'
-
 
 class Spider(BaseSpider):
     name = '魔法盒子'
@@ -91,7 +87,7 @@ class Spider(BaseSpider):
     def getName(self):
         return self.name
 
-    # ---------------- 基础请求 ----------------
+    # --------------------------------------------------------- 基础请求
     def _headers(self, extra=None):
         h = {'User-Agent': self.ua, 'Referer': self.ref}
         if extra:
@@ -111,6 +107,7 @@ class Spider(BaseSpider):
             return ''
 
     def _mf_sign(self, method, pathname, ts):
+        """FNV-1a(32位) -> base36"""
         h = 2166136261
         text = MF_SALT + '|' + method.upper() + '|' + pathname + '|' + str(ts)
         for ch in text:
@@ -126,6 +123,7 @@ class Spider(BaseSpider):
         return out
 
     def _api(self, path_qs, data=None, method=None, timeout=20):
+        """站内 API(默认POST+签名)"""
         m = (method or ('POST' if data is not None else 'GET')).upper()
         p = urllib.parse.urlparse(path_qs)
         ts = int(time.time() * 1000)
@@ -159,6 +157,7 @@ class Spider(BaseSpider):
             return {}
 
     def _cms(self, params):
+        """主 CMS 接口(苹果CMS)"""
         q = urllib.parse.urlencode(params)
         txt = self._get(self.cms + '/?' + q)
         if not txt:
@@ -168,7 +167,7 @@ class Spider(BaseSpider):
         except Exception:
             return {}
 
-    # ---------------- 图片路径补全 ----------------
+    # ★ 修复：图片路径补全（相对路径转绝对路径）
     def _pic(self, u):
         if not u:
             return ''
@@ -181,38 +180,19 @@ class Spider(BaseSpider):
             u = self.base.rstrip('/') + '/' + u.lstrip('/')
         return u
 
+    # ★ 修复：图片多字段容错提取
     def _get_pic(self, v):
-        """★ 图片字段多名字回退"""
         if not isinstance(v, dict):
             return ''
-        for k in ('vod_pic', 'vod_pic_slide', 'vod_pic_thumb',
-                  'pic', 'img', 'thumbnail', 'cover', 'poster'):
+        for k in ('vod_pic', 'vod_pic_slide', 'pic', 'img', 'thumbnail', 'cover', 'poster'):
             val = v.get(k)
             if val:
                 return self._pic(val)
         return ''
 
-    # ---------------- ★ 图片转本地代理 ----------------
-    def _pic_proxied(self, url):
-        """把图片真实 URL 转为本地代理地址，避免防盗链导致加载失败。"""
-        if not url:
-            return ''
-        if not USE_PIC_PROXY:
-            return url
-        try:
-            proxy = self.getProxyUrl()
-        except Exception:
-            proxy = ''
-        if not proxy:
-            return url
-        # 已经是本地代理格式则不再二次包装
-        if 'type=img' in url and 'url=' in url:
-            return url
-        sep = '&' if '?' in proxy else '?'
-        return proxy + sep + 'type=img&url=' + urllib.parse.quote(url, safe='')
-
-    # ---------------- 简介清理 ----------------
+    # --------------------------------------------------------- ★ 简介清理与提取
     def _clean_html(self, s):
+        """把 HTML 片段清洗为可读纯文本（保留换行，反转义实体）"""
         if not s:
             return ''
         s = re.sub(r'<br\s*/?>', '\n', s, flags=re.I)
@@ -233,6 +213,7 @@ class Spider(BaseSpider):
         return s.strip()
 
     def _pick_content(self, v):
+        """★ 简介多重回退：覆盖 CMS 源与 TVBox 子源常见字段名"""
         if not isinstance(v, dict):
             return ''
         for key in ('vod_content', 'vod_blurb', 'vod_desc', 'desc',
@@ -244,7 +225,7 @@ class Spider(BaseSpider):
                     return c[:2000]
         return ''
 
-    # ---------------- 列表项构造 ----------------
+    # --------------------------------------------------------- 字段映射
     def _mk(self, v, api=''):
         vid = str(v.get('vod_id') or '')
         if api:
@@ -252,7 +233,7 @@ class Spider(BaseSpider):
         return {
             'vod_id': vid,
             'vod_name': v.get('vod_name') or '',
-            'vod_pic': self._pic_proxied(self._get_pic(v)),  # ★ 走本地代理
+            'vod_pic': self._get_pic(v),   # ★ 使用容错提取
             'vod_remarks': v.get('vod_remarks') or '',
         }
 
@@ -262,7 +243,7 @@ class Spider(BaseSpider):
             self._src_cache = j.get('data') or []
         return self._src_cache
 
-    # ---------------- 首页 ----------------
+    # --------------------------------------------------------- 首页
     def homeContent(self, filter=False):
         r = {'class': CLASSES[:]}
         if filter and FILTERS:
@@ -278,7 +259,7 @@ class Spider(BaseSpider):
         self._home_cache = {'list': items}
         return self._home_cache
 
-    # ---------------- 分类 ----------------
+    # --------------------------------------------------------- 分类(走主CMS源)
     def categoryContent(self, tid, pg=1, filter=False, extend=''):
         try:
             pn = max(int(str(pg)), 1)
@@ -293,11 +274,12 @@ class Spider(BaseSpider):
         return {'page': pn, 'pagecount': max(pc, pn), 'limit': 20,
                 'total': pc * 20 if items else 0, 'list': items}
 
-    # ---------------- 详情 ----------------
+    # --------------------------------------------------------- 详情
     def detailContent(self, ids, quick=None):
         raw = str(ids[0] if isinstance(ids, (list, tuple)) else ids or '').strip()
         if not raw:
             return {'list': []}
+
         if '|' in raw:
             api, vid = raw.split('|', 1)
         else:
@@ -319,24 +301,24 @@ class Spider(BaseSpider):
         return {'list': [self._detail_dict(vid, lst[0])]}
 
     def _detail_dict(self, out_id, v):
-        content = self._pick_content(v)
+        content = self._pick_content(v)  # ★ 简介多重回退
         d = {
             'vod_id': out_id,
             'vod_name': v.get('vod_name') or '',
-            'vod_pic': self._pic_proxied(self._get_pic(v)),  # ★ 走本地代理
+            'vod_pic': self._get_pic(v),  # ★ 图片容错
             'vod_year': str(v.get('vod_year') or ''),
             'vod_area': v.get('vod_area') or '',
             'vod_class': v.get('type_name') or v.get('vod_class') or '',
             'vod_director': v.get('vod_director') or '',
             'vod_actor': v.get('vod_actor') or '',
-            'vod_content': content,
+            'vod_content': content,       # ★ 清洗后的简介
             'vod_remarks': v.get('vod_remarks') or '',
             'vod_play_from': v.get('vod_play_from') or '',
             'vod_play_url': v.get('vod_play_url') or '',
         }
         return d
 
-    # ---------------- 搜索 ----------------
+    # --------------------------------------------------------- 搜索(并发多源合并去重)
     def searchContent(self, key, quick=False, pg='1'):
         try:
             pn = max(int(str(pg)), 1)
@@ -386,7 +368,7 @@ class Spider(BaseSpider):
         return {'list': items, 'page': pn,
                 'pagecount': pn + (1 if items else 0)}
 
-    # ---------------- 播放 ----------------
+    # --------------------------------------------------------- 播放
     def playerContent(self, flag, id, vipFlags=None):
         url = str(id or '')
         if '$' in url:
@@ -443,7 +425,7 @@ class Spider(BaseSpider):
             return self._proxy
         return 'http://127.0.0.1:9978/proxy?do=py'
 
-    # ---------------- 扩展钩子 ----------------
+    # --------------------------------------------------------- 扩展钩子
     def isVideoFormat(self, url):
         if not url:
             return False
@@ -476,47 +458,29 @@ class Spider(BaseSpider):
         except Exception:
             pass
 
-    # ============================================================
-    #                     本地代理
-    # ============================================================
+    # --------------------------------------------------------- 本地代理
     def localProxy(self, param):
         import urllib.parse as _up
-
-        # ★ 统一解析参数（支持 dict / "do=py&type=img&url=..." / "type=img&url=..."）
-        params = {}
         if isinstance(param, dict):
-            for k, v in param.items():
-                params[str(k)] = str(v)
+            p = str(param.get('url') or param.get('key') or '')
+            qs = '&'.join('%s=%s' % (k, v) for k, v in param.items())
         else:
             s = str(param or '')
-            for prefix in ('?do=py&', 'do=py&', 'do=py?', '?do=py?'):
-                if s.startswith(prefix):
-                    s = s[len(prefix):]
-                    break
-            for kv in s.split('&'):
-                if '=' in kv:
-                    k, v = kv.split('=', 1)
-                    params[_up.unquote(k.strip())] = _up.unquote(v.strip())
-
-        p = params.get('url') or params.get('key') or ''
-        if '%' in p:
-            p = _up.unquote(p)
-        tp = params.get('type', '').lower()
-
+            qs = s
+            p = s.split('url=', 1)[-1] if 'url=' in s else s
+        p = _up.unquote(p) if '%' in p else p
+        p = p.split('&', 1)[0] if (p.startswith('http') and 'url=' not in qs) else p
         if not p:
             return {'code': 403, 'content': b'', 'headers': {}}
 
-        # ★ 图片：带 Referer 转发，返回图片二进制
-        if tp == 'img' or re.search(
-                r'\.(?:jpg|jpeg|png|webp|gif|bmp|avif)(?:\?|$)', p, re.I):
+        # ★ 图片代理透传（防图片防盗链）
+        if re.search(r'\.(?:jpg|jpeg|png|webp|gif)(?:\?|$)', p, re.I):
             return self._proxy_img(p)
 
-        # 视频 m3u8 / 站内播放代理
-        if (tp == 'mfys' or '.m3u8' in p
-                or '/api/tvbox/play/' in p or '/api/tvbox/resolve/' in p):
+        if ('.m3u8' in p or '/api/tvbox/play/' in p
+                or '/api/tvbox/resolve/' in p or 'type=mfys' in qs):
             return self._proxy_m3u8(p)
 
-        # 其它透传
         hd = {'User-Agent': self.ua,
               'Referer': self.pic_ref or self.ref, 'Accept': '*/*'}
         try:
@@ -533,27 +497,18 @@ class Spider(BaseSpider):
         except Exception:
             return {'code': 404, 'content': b'', 'headers': {}}
 
-    # ★ 图片代理：带 Referer，解决防盗链
     def _proxy_img(self, url):
-        hd = {
-            'User-Agent': self.ua,
-            'Referer': self.pic_ref or self.ref,
-            'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-        }
+        """图片代理透传（解决防盗链图片无法显示）"""
+        hd = {'User-Agent': self.ua, 'Referer': self.pic_ref or self.ref}
         try:
             if requests:
                 r = requests.get(url, headers=hd, timeout=15, verify=False)
-                ct = r.headers.get('Content-Type', 'image/jpeg')
                 return {'code': r.status_code, 'content': r.content,
-                        'headers': {'Content-Type': ct,
-                                    'Cache-Control': 'public, max-age=86400'}}
+                        'headers': {'Content-Type': r.headers.get('Content-Type', 'image/jpeg')}}
             import urllib.request as _urq
             resp = _urq.urlopen(_urq.Request(url, headers=hd), timeout=15)
-            ct = resp.headers.get('Content-Type', 'image/jpeg')
             return {'code': 200, 'content': resp.read(),
-                    'headers': {'Content-Type': ct,
-                                'Cache-Control': 'public, max-age=86400'}}
+                    'headers': {'Content-Type': resp.headers.get('Content-Type', 'image/jpeg')}}
         except Exception:
             return {'code': 404, 'content': b'', 'headers': {}}
 
