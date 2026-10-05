@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-# ============ ik4k在线影院(ik4k.com)测试源（88测试结构派生 + IKGuard纯Python过盾引擎） ============
+# ============ ik4k在线影院(ik4k.com) 修复补全版 ============
 # 站点: MacCMS系·短视主题(dsn2) + 自研WAF(easy_slide滑块挑战)
-# 突破: ①过盾公式 x=拼图块x-8, y=guardword(拼图top坐标), guardret=b64(RC4(x+"x"+y, guard[:8])), 服务端下发_ok6_(7天)
-#       ②纯Python PNG解码(zlib)+积分图洞检测(无cv2/numpy依赖) ③分类/翻页=POST /index.php/ds_api/vod (type+tid)
-#       ④详情=/voddetail/{id}/ ⑤播放=/vodplay/{vid}-{sid}-{nid}/ (player_aaaa encrypt=0) ⑥搜索=/vodsearch/
-# 13接口=init/homeContent/categoryContent/detailContent/searchContent/playerContent/localProxy/isVideoFormat/manualVideoCheck/getDependence/destroy/progressVideo/setVideoFlags
+# 突破: ①过盾公式 x=拼图块x-8, y=guardword, guardret=b64(RC4(x+"x"+y, guard[:8]))
+#       ②纯Python PNG解码(zlib)+积分图洞检测 ③分类/翻页=POST /index.php/ds_api/vod
+#       ④详情=/voddetail/{id}/ ⑤播放=/vodplay/{vid}-{sid}-{nid}/ ⑥搜索=/vodsearch/
 import sys, re, json, time, zlib, base64, hashlib, threading, os
 from urllib.parse import urljoin, quote, unquote
 from concurrent.futures import ThreadPoolExecutor, as_completed, Future
@@ -12,9 +11,9 @@ import requests
 
 sys.path.append('..')
 try:
-    from base.spider import Spider
+    from base.spider import Spider as BaseSpider
 except ImportError:
-    class Spider:
+    class BaseSpider(object):
         def fetch(self, url, headers=None, **kw):
             kw.pop('timeout', None)
             r = requests.get(url, headers=headers, timeout=15, **kw)
@@ -22,12 +21,16 @@ except ImportError:
             return r
 
 # ============ ★ CONFIG ============
-HOSTS = ['https://www.ik4k.com']  # ★ 主域(ik4k.cn同WAF, 备用可加)
-UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-CATEGORIES = {'20': '电影', '21': '电视剧', '23': '综艺片', '24': '动漫', '25': '国产剧', '26': '美剧', '27': '韩剧',
-              '35': '日剧', '36': '港剧', '37': '台剧', '38': '泰剧', '39': '海外剧', '40': '大陆综艺', '41': '港台综艺',
-              '42': '日韩综艺', '43': '欧美综艺', '67': '国产动漫', '68': '日韩动漫', '69': '欧美动漫',
-              '70': '港台动漫', '71': '海外动漫'}  # ★ 一级+二级分类(tid→名称, 已验证)
+HOSTS = ['https://www.ik4k.com']
+UA = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+      '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+CATEGORIES = {
+    '20': '电影', '21': '电视剧', '23': '综艺片', '24': '动漫', '25': '国产剧',
+    '26': '美剧', '27': '韩剧', '35': '日剧', '36': '港剧', '37': '台剧',
+    '38': '泰剧', '39': '海外剧', '40': '大陆综艺', '41': '港台综艺',
+    '42': '日韩综艺', '43': '欧美综艺', '67': '国产动漫', '68': '日韩动漫',
+    '69': '欧美动漫', '70': '港台动漫', '71': '海外动漫',
+}
 PK = ''
 REFERER = ''
 PIC_REFERER = ''
@@ -35,16 +38,16 @@ FD_ZONE = 0
 PROBE = 0
 SITE_KEY = ''
 VIDEO_EXTS = 'm3u8|mp4|flv|mkv|avi|ts'
-DEBUG = 1  # ★ 诊断日志开关(1开/0关)
+DEBUG = 1
 LOG_PATH = '/sdcard/ik4k_debug.log'
 TTL_HOME = 3600
 TTL_DETAIL = 1800
 TTL_PLAY = 900
 SERIAL = 0
-THROTTLE_GAP = 0.35  # ★ 全局请求节流间隔(秒)
-BAN_COOL = 15  # ★ 熔断冷静期基数(秒)
-BAN_MAX = 90  # ★ 熔断冷静期上限(秒)
-PAGE_SIZE = 40  # ds_api/vod 每页条数(服务端默认40)
+THROTTLE_GAP = 0.35
+BAN_COOL = 15
+BAN_MAX = 90
+PAGE_SIZE = 40
 CONT = 1
 CURSOR_TTL = 7200
 HOLD_TTL = 21600
@@ -58,11 +61,13 @@ BF_POS = 0
 MISS_TTL = 60
 LI_CAP = 600
 GATHER_BUDGET = 8.0
-# ★ IKGuard 过盾引擎(easy_slide滑块)
 GUARD = 1
 GUARD_HOST = 'https://www.ik4k.com'
-GUARD_COOKIE_PATHS = ['/sdcard/tmp/ik4k_guard.json', '/storage/emulated/0/tmp/ik4k_guard.json', '/tmp/ik4k_guard.json']
+GUARD_COOKIE_PATHS = ['/sdcard/tmp/ik4k_guard.json',
+                      '/storage/emulated/0/tmp/ik4k_guard.json',
+                      '/tmp/ik4k_guard.json']
 GUARD_TRIES = 3
+
 
 def _log(msg):
     if not DEBUG:
@@ -73,7 +78,8 @@ def _log(msg):
     except Exception:
         pass
 
-# ============ ★ IKGuard过盾引擎（ik4k专用·纯Python；无cv2/numpy依赖） ============
+
+# ============ ★ IKGuard过盾引擎 ============
 def _rc4(data, key):
     S = list(range(256)); j = 0
     for i in range(256):
@@ -86,6 +92,7 @@ def _rc4(data, key):
         S[i], S[j] = S[j], S[i]
         out.append(ch ^ S[(S[i] + S[j]) & 0xFF])
     return bytes(out)
+
 
 def _png_gray(data):
     if not data or data[:8] != b'\x89PNG\r\n\x1a\n':
@@ -141,16 +148,22 @@ def _png_gray(data):
         rows.append(bytes(line)); prev = line
     if ct == 3 and plte:
         npal = max(1, len(plte) // 3)
-        pg = [0.299 * plte[i * 3] + 0.587 * plte[i * 3 + 1] + 0.114 * plte[i * 3 + 2] for i in range(npal)]
+        pg = [0.299 * plte[i * 3] + 0.587 * plte[i * 3 + 1] + 0.114 * plte[i * 3 + 2]
+              for i in range(npal)]
         pg += [0.0] * (256 - len(pg))
         gray = [[pg[b] for b in rows[y]] for y in range(len(rows))]
     elif ct == 0:
         gray = [[rows[y][x] for x in range(W)] for y in range(len(rows))]
     elif ct == 2:
-        gray = [[0.299 * rows[y][x * 3] + 0.587 * rows[y][x * 3 + 1] + 0.114 * rows[y][x * 3 + 2] for x in range(W)] for y in range(len(rows))]
+        gray = [[0.299 * rows[y][x * 3] + 0.587 * rows[y][x * 3 + 1] +
+                 0.114 * rows[y][x * 3 + 2] for x in range(W)]
+                for y in range(len(rows))]
     else:
-        gray = [[0.299 * rows[y][x * 4] + 0.587 * rows[y][x * 4 + 1] + 0.114 * rows[y][x * 4 + 2] for x in range(W)] for y in range(len(rows))]
+        gray = [[0.299 * rows[y][x * 4] + 0.587 * rows[y][x * 4 + 1] +
+                 0.114 * rows[y][x * 4 + 2] for x in range(W)]
+                for y in range(len(rows))]
     return W, H, gray
+
 
 def _find_hole(W, H, gray, gw):
     I = [[0] * (W + 1) for _ in range(H + 1)]
@@ -200,6 +213,7 @@ def _find_hole(W, H, gray, gw):
         if best is None or score > best[0]:
             best = (score, x0, y0, s / 1368)
     return best
+
 
 def _slot_blocks(gray, W, H, gw):
     I = [[0] * (W + 1) for _ in range(H + 1)]
@@ -251,6 +265,7 @@ def _slot_blocks(gray, W, H, gw):
             break
     return picked
 
+
 class IKGuard:
     def __init__(self, host, cookie_paths, log=None):
         self.host = (host or GUARD_HOST).rstrip('/')
@@ -267,7 +282,8 @@ class IKGuard:
             try:
                 d = json.load(open(p, encoding='utf-8'))
                 if isinstance(d, dict) and d.get('_ok6_'):
-                    self.ck = {k: str(v) for k, v in d.items() if v and not k.startswith('guard')}
+                    self.ck = {k: str(v) for k, v in d.items()
+                               if v and not k.startswith('guard')}
                     self.path = p
                     self.log('guard: cookie loaded %s' % p)
                     return True
@@ -284,7 +300,9 @@ class IKGuard:
             except Exception:
                 pass
             try:
-                json.dump({k: v for k, v in self.ck.items() if v and not k.startswith('guard')}, open(p, 'w', encoding='utf-8'))
+                json.dump({k: v for k, v in self.ck.items()
+                           if v and not k.startswith('guard')},
+                          open(p, 'w', encoding='utf-8'))
                 self.path = p
                 return True
             except Exception:
@@ -295,7 +313,8 @@ class IKGuard:
         return '; '.join('%s=%s' % (k, v) for k, v in self.ck.items())
 
     def _hd(self, ref=None):
-        hd = {'User-Agent': self.ua, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
+        hd = {'User-Agent': self.ua,
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
         if ref:
             hd['Referer'] = ref
         if self.ck:
@@ -314,7 +333,9 @@ class IKGuard:
         for sc in scs:
             if not sc:
                 continue
-            for m in re.finditer(r'(?:^|[,;]\s*)(guardword|guarddata|guard|guardret|_ok6_|server_session_[0-9a-f]+)=([^;,]+)', sc):
+            for m in re.finditer(
+                    r'(?:^|[,;]\s*)(guardword|guarddata|guard|guardret|_ok6_|'
+                    r'server_session_[0-9a-f]+)=([^;,]+)', sc):
                 k, v = m.group(1), m.group(2).strip()
                 if v:
                     self.ck[k] = v
@@ -350,9 +371,10 @@ class IKGuard:
             self.log('guard: start')
             self.ck.pop('guardret', None)
             self.req(self.host + '/', ref=self.host + '/', timeout=10)
-            self.req(self.host + '/_guard/html.js?js=easy_slider_html', ref=self.host + '/', timeout=10)
-            r = self.req(self.host + '/_guard/easy_slide.png?t=%d' % int(time.time() * 1000),
-                         ref=self.host + '/', timeout=10)
+            self.req(self.host + '/_guard/html.js?js=easy_slider_html',
+                     ref=self.host + '/', timeout=10)
+            r = self.req(self.host + '/_guard/easy_slide.png?t=%d'
+                         % int(time.time() * 1000), ref=self.host + '/', timeout=10)
             if r is None:
                 self.log('guard: png fail')
                 return False
@@ -379,7 +401,8 @@ class IKGuard:
                     continue
                 seen.append(x)
                 self.ck['guardret'] = base64.b64encode(
-                    _rc4(('%dx%d' % (x, gw)).encode('utf-8', 'ignore'), gk[:8].encode('utf-8', 'ignore'))).decode()
+                    _rc4(('%dx%d' % (x, gw)).encode('utf-8', 'ignore'),
+                         gk[:8].encode('utf-8', 'ignore'))).decode()
                 r3 = self.req(self.host + '/', ref=self.host + '/', timeout=10)
                 ok = r3 is not None and len(r3.text) > 8000
                 self.log('guard: try x=%d ok=%s' % (x, ok))
@@ -396,9 +419,63 @@ class IKGuard:
         finally:
             self._busy = False
 
-class Spider(Spider):
+
+# ============================================================
+#                     Spider 主体
+# ============================================================
+class Spider(BaseSpider):
+    name = 'ik4k在线影院'
+    host = HOSTS[0]
     ik = None
+
+    def __init__(self, extend=''):
+        try:
+            super(Spider, self).__init__(extend)
+        except Exception:
+            pass
+        self.extend = extend
+        # 初始化一次，供外部直接 new 时也能用
+        try:
+            self.init(extend)
+        except Exception:
+            pass
+
+    # --------------------------------------------------------- 通用工具
+    def _clean_text(self, s):
+        """统一清理 HTML 片段为纯文本（含实体反转义）。"""
+        if not s:
+            return ''
+        s = re.sub(r'<br\s*/?>', '\n', s, flags=re.I)
+        s = re.sub(r'</p\s*>', '\n', s, flags=re.I)
+        s = re.sub(r'<[^>]+>', '', s)
+        s = (s.replace('&nbsp;', ' ')
+              .replace('&amp;', '&')
+              .replace('&lt;', '<')
+              .replace('&gt;', '>')
+              .replace('&quot;', '"')
+              .replace('&#39;', "'")
+              .replace('&ldquo;', '“')
+              .replace('&rdquo;', '”')
+              .replace('&mdash;', '—')
+              .replace('&ndash;', '–'))
+        s = re.sub(r'[ \t\r\f\v]+', ' ', s)
+        s = re.sub(r'\n{2,}', '\n', s)
+        return s.strip()
+
+    def _pic(self, u):
+        if not u:
+            return ''
+        if u.startswith('//'):
+            u = 'https:' + u
+        return u
+
+    def _safe(self, s):
+        return str(s or '').replace('#', '-').replace('$', '|')
+
+    # --------------------------------------------------------- init
     def init(self, extend=''):
+        if extend:
+            self.extend = extend
         self.base = HOSTS[0].rstrip('/')
         self.ua = UA
         self.pk = PK
@@ -415,13 +492,17 @@ class Spider(Spider):
         self._ban_until = 0.0
         self._ban_hits = 0
         self._th = threading.Lock()
+        self._in_swap = 0
+        self._siteKey = SITE_KEY
+        self._vflags = {}
         self.ik = None
         if GUARD:
             self.ik = IKGuard(GUARD_HOST or self.base, GUARD_COOKIE_PATHS, log=_log)
             self.ik.load()
         if self.ik and not self.ik.ck:
             try:
-                r = requests.get(self.base + '/', headers={'User-Agent': self.ua}, timeout=5)
+                r = requests.get(self.base + '/',
+                                 headers={'User-Agent': self.ua}, timeout=5)
                 t = r.text or ''
                 if t and self.ik.challenge(t):
                     self.ik.run()
@@ -429,8 +510,12 @@ class Spider(Spider):
                     self.ik.feed(r)
             except Exception:
                 pass
+        return True
 
-    # ========== IKGuard通道: 自管cookie + 挑战检测 + 过盾重试 ==========
+    def getName(self):
+        return self.name
+
+    # --------------------------------------------------------- 通道封装
     def _ikget(self, url, headers=None, timeout=15000):
         hd = dict(headers or {'User-Agent': self.ua, 'Referer': self.ref})
         for i in range(3):
@@ -454,7 +539,8 @@ class Spider(Spider):
         return ''
 
     def _ikpost(self, url, data, headers=None, timeout=15000):
-        hd = dict(headers or {'User-Agent': self.ua, 'Referer': self.ref, 'X-Requested-With': 'XMLHttpRequest'})
+        hd = dict(headers or {'User-Agent': self.ua, 'Referer': self.ref,
+                              'X-Requested-With': 'XMLHttpRequest'})
         for i in range(3):
             if time.time() < self._ban_until:
                 _log('ik: ban skip post %s' % url[:60])
@@ -483,7 +569,10 @@ class Spider(Spider):
             if gap < THROTTLE_GAP:
                 time.sleep(THROTTLE_GAP - gap)
             self._last_req = time.time()
-        s = max(8, int((timeout or 15000) / 1000))
+        try:
+            s = max(8, int((timeout or 15000) / 1000))
+        except Exception:
+            s = 15
         r = None
         if method == 'post':
             try:
@@ -508,20 +597,29 @@ class Spider(Spider):
                     return None
         self._ban_hits = 0
         if self.ik:
-            self.ik.feed(r)
+            try:
+                self.ik.feed(r)
+            except Exception:
+                pass
         try:
             return r.text if hasattr(r, 'text') else str(r)
         except Exception:
             return ''
+
     def _ik_err(self, kind, e):
         msg = str(e)
-        hard = ('RemoteDisconnected' in msg or 'Connection aborted' in msg or 'NewConnectionError' in msg)
+        hard = ('RemoteDisconnected' in msg or 'Connection aborted' in msg
+                or 'NewConnectionError' in msg)
         self._ban_hits = self._ban_hits + 1 if hard else 0
         if hard and self._ban_hits >= 3:
-            self._ban_until = time.time() + min(BAN_MAX, BAN_COOL * (self._ban_hits - 2))
-            _log('ik %s err ban+%ds hits=%d %s' % (kind, int(self._ban_until - time.time()), self._ban_hits, msg[:60]))
+            self._ban_until = time.time() + min(
+                BAN_MAX, BAN_COOL * (self._ban_hits - 2))
+            _log('ik %s err ban+%ds hits=%d %s'
+                 % (kind, int(self._ban_until - time.time()),
+                    self._ban_hits, msg[:60]))
         else:
             _log('ik %s err %s' % (kind, msg[:80]))
+
     def _rfetch(self, url, headers=None, sec=15):
         hd = dict(headers or {'User-Agent': self.ua, 'Referer': self.ref})
         for i in range(2):
@@ -535,17 +633,8 @@ class Spider(Spider):
                 if i < 1:
                     time.sleep(0.35)
         return None
-    def _get(self, url, headers=None, timeout=15000):
-        return self._ikget(url, headers, timeout)
 
-    def _pic(self, u):
-        if not u:
-            return ''
-        if u.startswith('//'):
-            u = 'https:' + u
-        return u
-
-    # ========== 工具(88测试结构: TTL缓存/续读梯/列表记忆/最小结构) ==========
+    # --------------------------------------------------------- 缓存工具
     def _tget(self, key, ttl):
         v = self._ttl.get(key)
         if v and time.time() - v[0] < ttl:
@@ -597,14 +686,18 @@ class Spider(Spider):
         it = self._li_get(vid)
         if not it:
             return None
-        return {'vod_id': str(vid), 'vod_name': it.get('vod_name', ''), 'vod_pic': it.get('vod_pic', ''),
-                'vod_year': '', 'vod_area': '', 'vod_class': '', 'vod_director': '', 'vod_actor': '',
-                'vod_content': '', 'vod_remarks': it.get('vod_remarks', ''), 'vod_play_from': '', 'vod_play_url': ''}
+        return {'vod_id': str(vid), 'vod_name': it.get('vod_name', ''),
+                'vod_pic': it.get('vod_pic', ''), 'vod_year': '', 'vod_area': '',
+                'vod_class': '', 'vod_director': '', 'vod_actor': '',
+                'vod_content': '', 'vod_remarks': it.get('vod_remarks', ''),
+                'vod_play_from': '', 'vod_play_url': ''}
 
     def _norm_name(self, s):
         s = str(s or '')
         s = re.sub(r'[《》「」【】“”"\'\'（）()\[\]!！?？,，。.、·~～…\-—_：:\s]', '', s)
-        for suf in ('精简版', '完整版', '未删减版', '未删减', '加长版', '导演剪辑版', 'TV版', 'DVD版', '电影版', '国语版', '粤语版', '英语版', '原声版', '中字', '字幕版'):
+        for suf in ('精简版', '完整版', '未删减版', '未删减', '加长版',
+                    '导演剪辑版', 'TV版', 'DVD版', '电影版', '国语版',
+                    '粤语版', '英语版', '原声版', '中字', '字幕版'):
             if s.endswith(suf) and len(s) > len(suf) + 1:
                 s = s[: -len(suf)]
                 break
@@ -628,61 +721,14 @@ class Spider(Spider):
                     out.append(cut)
         return out[:4]
 
-    def _find_swap(self, nm, vid):
-        vid = str(vid)
-        best = ''
-        for q in self._search_names(nm):
-            qn = self._norm_name(q)
-            if len(qn) < 2:
-                continue
-            try:
-                hq = self._ikget('%s/vodsearch/%s-------------/' % (self.base, quote(q, safe='')))
-                if not hq:
-                    continue
-                for it in self._ik_search_items(hq)[:10]:
-                    vid2 = str(it.get('vod_id') or '')
-                    if not vid2 or vid2 == vid:
-                        continue
-                    n2 = self._norm_name(it.get('vod_name'))
-                    if not n2:
-                        continue
-                    if n2 == qn:
-                        return vid2
-                    if not best and (qn in n2 or n2 in qn):
-                        best = vid2
-            except Exception:
-                continue
-        return best
-
-    def _detail_swap(self, vid, nm):
-        if not nm:
-            return None
-        v2 = self._find_swap(nm, vid)
-        if not v2:
-            return None
-        try:
-            d2 = self.detailContent([v2])
-        except Exception:
-            return None
-        if not d2 or not d2.get('list'):
-            return None
-        dd = d2['list'][0]
-        if not dd.get('vod_play_from') or not dd.get('vod_play_url'):
-            return None
-        dd['vod_id'] = str(vid)
-        _log('detail swap %s->%s' % (vid, v2))
-        return {'list': [dd]}
-
-    def _safe(self, s):
-        return str(s or '').replace('#', '-').replace('$', '|')
-
-    # ========== 首页 ==========
+    # --------------------------------------------------------- 首页
     def homeContent(self, filter=False):
         ck = 'home:%d' % (1 if filter else 0)
         c = self._tget(ck, TTL_HOME)
         if c:
             return c
-        r = {'class': [{'type_id': k, 'type_name': v} for k, v in self.types.items()]}
+        r = {'class': [{'type_id': k, 'type_name': v}
+                       for k, v in self.types.items()]}
         if filter and self.filters:
             r['filters'] = self.filters
         r['list'] = self.homeVideoContent().get('list', [])
@@ -720,14 +766,17 @@ class Spider(Spider):
             seen.add(vid)
             nm = re.search(r'title="([^"]*)"', seg)
             pm = re.search(r'<img[^>]+(?:data-src|src)="([^"]+)"', seg)
-            rem = re.search(r'public-list-prb[^>]*>([^<]*)<', seg) or re.search(r'public-list-subtitle[^>]*>([^<]*)<', seg)
-            items.append({'vod_id': vid,
-                          'vod_name': (nm.group(1).strip() if nm else '')[:80],
-                          'vod_pic': self._pic(pm.group(1)) if pm else '',
-                          'vod_remarks': rem.group(1).strip()[:40] if rem else ''})
+            rem = (re.search(r'public-list-prb[^>]*>([^<]*)<', seg)
+                   or re.search(r'public-list-subtitle[^>]*>([^<]*)<', seg))
+            items.append({
+                'vod_id': vid,
+                'vod_name': (nm.group(1).strip() if nm else '')[:80],
+                'vod_pic': self._pic(pm.group(1)) if pm else '',
+                'vod_remarks': rem.group(1).strip()[:40] if rem else '',
+            })
         return items
 
-    # ========== 分类(POST /index.php/ds_api/vod; type=tid&page=pn) ==========
+    # --------------------------------------------------------- 分类
     def categoryContent(self, tid, pg=1, filter=False, extend=''):
         try:
             pn = max(int(str(pg)), 1)
@@ -738,15 +787,16 @@ class Spider(Spider):
         c = self._tget(ck, 300)
         if c:
             return c
-        items, pc = self._cat_fetch(t, '', '', {}, pn)
+        items, pc = self._cat_fetch(t, pn)
         if items:
             self._li_mem(items)
-        r = {'page': pn, 'pagecount': pc or pn, 'limit': PAGE_SIZE, 'total': len(items), 'list': items}
+        r = {'page': pn, 'pagecount': pc or pn, 'limit': PAGE_SIZE,
+             'total': len(items), 'list': items}
         if items:
             return self._tset(ck, r)
         return r
 
-    def _cat_fetch(self, t, cls, ex2, ex, pn):
+    def _cat_fetch(self, t, pn):
         txt = self._ikpost(self.base + '/index.php/ds_api/vod',
                            {'type': t, 'page': pn, 'limit': PAGE_SIZE})
         if not txt:
@@ -764,18 +814,21 @@ class Spider(Spider):
             pl = it.get('vod_pic') or ''
             if pl.startswith('//'):
                 pl = 'https:' + pl
-            items.append({'vod_id': str(vid),
-                          'vod_name': str(it.get('vod_name') or '')[:80],
-                          'vod_pic': self._pic(pl),
-                          'vod_remarks': str(it.get('vod_remarks') or it.get('vod_state') or '')[:40]})
+            items.append({
+                'vod_id': str(vid),
+                'vod_name': str(it.get('vod_name') or '')[:80],
+                'vod_pic': self._pic(pl),
+                'vod_remarks': str(it.get('vod_remarks')
+                                   or it.get('vod_state') or '')[:40],
+            })
         try:
             pc = int(d.get('pagecount') or 0)
         except Exception:
             pc = 0
         return items, pc
 
-    # ========== 详情(/voddetail/{id}/) ==========
-    def detailContent(self, ids, quick='1'):
+    # --------------------------------------------------------- 详情（含简介）
+    def detailContent(self, ids):
         vid = str(ids[0] if isinstance(ids, list) else ids or '')
         m = re.search(r'(\d+)', vid)
         vid = m.group(1) if m else ''
@@ -784,11 +837,15 @@ class Spider(Spider):
         c = self._tget('d:' + vid, TTL_DETAIL)
         if c:
             return c
-        h = self._rty('dt:%s' % vid, lambda: self._ikget('%s/voddetail/%s/' % (self.base, vid)), (0, 0.45, 1.2))
+
+        h = self._rty('dt:%s' % vid,
+                      lambda: self._ikget('%s/voddetail/%s/' % (self.base, vid)),
+                      (0, 0.45, 1.2))
         if not h:
             _log('detail miss %s' % vid)
             v = self._minstruct(vid)
             return {'list': [v]} if v else {'list': []}
+
         if 'slide-info' not in h and 'anthology' not in h:
             _log('detail gone %s' % vid)
             sw = None
@@ -805,36 +862,75 @@ class Spider(Spider):
                 return self._tset('d:' + vid, sw)
             v = self._minstruct(vid)
             return {'list': [v]} if v else {'list': []}
-        d = {'vod_id': vid, 'vod_name': '', 'vod_pic': '', 'vod_year': '', 'vod_area': '',
-             'vod_class': '', 'vod_director': '', 'vod_actor': '', 'vod_content': '',
-             'vod_remarks': '', 'vod_play_from': '', 'vod_play_url': ''}
+
+        d = {'vod_id': vid, 'vod_name': '', 'vod_pic': '', 'vod_year': '',
+             'vod_area': '', 'vod_class': '', 'vod_director': '', 'vod_actor': '',
+             'vod_content': '', 'vod_remarks': '', 'vod_play_from': '',
+             'vod_play_url': ''}
+
+        # 标题
         tn = re.search(r'<h3 class="slide-info-title hide">([^<]*)</h3>', h)
         name = tn.group(1) if tn else ''
         if not name:
             tt = re.search(r'<title>(.*?)</title>', h)
             name = re.sub(r'[_|]\s*[^_|]*\s*-\s*.*$', '', tt.group(1)) if tt else ''
         d['vod_name'] = re.sub(r'\s+', ' ', name).strip()[:100]
-        pm = re.search(r'data-src="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"', h, re.I) or \
-            re.search(r'<img[^>]+src="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"', h, re.I)
+
+        # 海报
+        pm = (re.search(r'data-src="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"',
+                        h, re.I)
+              or re.search(r'<img[^>]+src="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"',
+                           h, re.I))
         if pm:
             d['vod_pic'] = self._pic(pm.group(1))
+
+        # 备注
         rm = re.search(r'slide-info-remarks cor5">([^<]*)<', h)
         if rm:
             d['vod_remarks'] = rm.group(1).strip()[:40]
+
+        # 年份 / 地区
         rl = re.findall(r'slide-info-remarks"><a[^>]*>([^<]*)</a>', h)
         if len(rl) >= 2:
             if re.match(r'^(19|20)\d{2}$', rl[0].strip()):
                 d['vod_year'] = rl[0].strip()
             d['vod_area'] = rl[1].strip()[:20]
+
+        # 导演 / 演员
         dm = re.search(r'导演\s*:?</strong>([\s\S]*?)</div>', h)
         if dm:
-            d['vod_director'] = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>|&nbsp;', ' ', dm.group(1))).strip(' ,')[:120]
+            d['vod_director'] = self._clean_text(dm.group(1)).strip(' ,')[:120]
         am = re.search(r'演员\s*:?</strong>([\s\S]*?)</div>', h)
         if am:
-            d['vod_actor'] = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>|&nbsp;', ' ', am.group(1))).strip(' ,')[:200]
-        cm = re.search(r'id="height_limit"[^>]*>([\s\S]*?)</div>', h)
-        if cm:
-            d['vod_content'] = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>|&nbsp;', '', cm.group(1))).strip()[:500]
+            d['vod_actor'] = self._clean_text(am.group(1)).strip(' ,')[:200]
+
+        # ★ 简介：多重回退 + 实体反转义
+        content = ''
+        for pat in (
+            r'id="height_limit"[^>]*>([\s\S]*?)</div>',
+            r'class="[^"]*slide-info-content[^"]*"[^>]*>([\s\S]*?)</div>',
+            r'class="[^"]*vod-content[^"]*"[^>]*>([\s\S]*?)</div>',
+            r'class="[^"]*detail-content[^"]*"[^>]*>([\s\S]*?)</div>',
+            r'id="desc"[^>]*>([\s\S]*?)</div>',
+            r'<div[^>]*class="[^"]*introduction[^"]*"[^>]*>([\s\S]*?)</div>',
+        ):
+            mm = re.search(pat, h)
+            if mm:
+                c2 = self._clean_text(mm.group(1))
+                if c2:
+                    content = c2
+                    break
+        if not content:
+            mm = re.search(r'(?:剧情简介|内容简介|简介|剧情介绍)[：:]?\s*([\s\S]{5,400}?)</', h)
+            if mm:
+                content = self._clean_text(mm.group(1))
+        if not content:
+            mm = re.search(r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']', h, re.I)
+            if mm:
+                content = self._clean_text(mm.group(1))
+        d['vod_content'] = content[:600]
+
+        # 播放源
         pf, pu = self._play_sources(h)
         d['vod_play_from'] = '$$$'.join(pf)
         d['vod_play_url'] = '$$$'.join(pu)
@@ -851,24 +947,45 @@ class Spider(Spider):
                 txt = re.sub(r'\s+', '', txt)
                 if txt:
                     names.append(txt)
+
+        # 首选：分线路 <ul class="anthology-list-play">
         uls = re.findall(r'<ul class="anthology-list-play[^"]*">([\s\S]*?)</ul>', h)
         for i, ul in enumerate(uls):
             links = re.findall(r'href="(/vodplay/[^"]+)"[^>]*>([^<]+)</a>', ul)
             if links:
                 nm = names[i] if i < len(names) else ('线路%d' % (i + 1))
                 pf.append(self._safe(nm))
-                pu.append('#'.join('%s$%s' % (self._safe(ep.strip()), urljoin(self.base, href)) for href, ep in links))
+                pu.append('#'.join(
+                    '%s$%s' % (self._safe(ep.strip()), urljoin(self.base, href))
+                    for href, ep in links))
+
+        # 兜底：全页扫描 /vodplay/{vid}-{sid}-{nid}/
         if not pf:
             routes = {}
-            for href, sid, ep in re.findall(r'href="(/vodplay/(\d+)-(\d+)-\d+/)"[^>]*>([^<]+)</a>', h):
+            # 注意：正则 4 组 → 解包 4 个变量（原版这里是 3 个，会直接崩）
+            for href, vid, sid, ep in re.findall(
+                    r'href="(/vodplay/(\d+)-(\d+)-\d+/)"[^>]*>([^<]+)</a>', h):
                 routes.setdefault(sid, []).append((ep, href))
-            for i, sid in enumerate(sorted(routes.keys(), key=lambda x: int(x) if x.isdigit() else 999)):
+            for i, sid in enumerate(sorted(routes.keys(),
+                                           key=lambda x: int(x) if x.isdigit() else 999)):
                 nm = names[i] if i < len(names) else ('线路%d' % (i + 1))
                 pf.append(self._safe(nm))
-                pu.append('#'.join('%s$%s' % (self._safe(ep.strip()), urljoin(self.base, href)) for ep, href in routes[sid]))
+                pu.append('#'.join(
+                    '%s$%s' % (self._safe(ep.strip()), urljoin(self.base, href))
+                    for ep, href in routes[sid]))
+
+        # 最后一层兜底：直接抓 href 里含 vodplay 的链接
+        if not pf:
+            loose = re.findall(r'href="(/vodplay/[^"]+)"[^>]*>([^<]*)</a>', h)
+            if loose:
+                pf.append('线路1')
+                pu.append('#'.join(
+                    '%s$%s' % (self._safe((ep or '').strip() or ('第%02d集' % (i + 1))),
+                               urljoin(self.base, href))
+                    for i, (href, ep) in enumerate(loose)))
         return pf, pu
 
-    # ========== 搜索(/vodsearch/{q}----------{pg}---/) ==========
+    # --------------------------------------------------------- 搜索
     def searchContent(self, key, quick=False, pg='1'):
         try:
             pn = max(int(str(pg)), 1)
@@ -886,7 +1003,8 @@ class Spider(Spider):
             url = '%s/vodsearch/%s-------------/' % (self.base, q)
         else:
             url = '%s/vodsearch/%s----------%d---/' % (self.base, q, pn)
-        h = self._rty('sq:%s:%s' % (kw, pn), lambda: self._ikget(url), (0, 0.45, 1.2))
+        h = self._rty('sq:%s:%s' % (kw, pn),
+                      lambda: self._ikget(url), (0, 0.45, 1.2))
         if not h:
             return {'list': [], 'page': pn, 'pagecount': 1}
         items = self._ik_search_items(h)
@@ -916,15 +1034,18 @@ class Spider(Spider):
             if not t:
                 continue
             seen.add(vid)
-            pm = re.search(r'(?:data-src|src)="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"', seg, re.I)
+            pm = re.search(r'(?:data-src|src)="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"',
+                           seg, re.I)
             rem = re.search(r'slide-info-remarks[^>]*>([^<]*)<', seg)
-            items.append({'vod_id': vid,
-                          'vod_name': t.group(1).strip()[:80],
-                          'vod_pic': self._pic(pm.group(1)) if pm else '',
-                          'vod_remarks': rem.group(1).strip()[:40] if rem else ''})
+            items.append({
+                'vod_id': vid,
+                'vod_name': t.group(1).strip()[:80],
+                'vod_pic': self._pic(pm.group(1)) if pm else '',
+                'vod_remarks': rem.group(1).strip()[:40] if rem else '',
+            })
         return items
 
-    # ========== 播放(/vodplay/{vid}-{sid}-{nid}/ → player_aaaa) ==========
+    # --------------------------------------------------------- 播放
     def playerContent(self, flag, id, vipFlags=None):
         raw = str(id) if id else str(flag)
         ck = 'p:' + raw
@@ -961,9 +1082,12 @@ class Spider(Spider):
             if swp:
                 return self._tset(ck, self._pres(swp))
             _log('play parse1 %s' % u[:90])
-            return self._tset(ck, {'parse': 1, 'url': u, 'header': {'User-Agent': self.ua, 'Referer': self.base + '/'}})
+            return self._tset(ck, {'parse': 1, 'url': u,
+                                   'header': {'User-Agent': self.ua,
+                                              'Referer': self.base + '/'}})
         _log('play empty %s' % str(u)[:90])
         return self._pres(u)
+
     def _alt_sid(self, full):
         m = re.search(r'/vodplay/(\d+)-(\d+)-(\d+)', full)
         if not m:
@@ -974,6 +1098,7 @@ class Spider(Spider):
             return ''
         res = {}
         lk = threading.Lock()
+
         def probe(s2):
             try:
                 p2 = '%s/vodplay/%s-%d-%s/' % (self.base, vid, s2, nid)
@@ -985,6 +1110,7 @@ class Spider(Spider):
                             res[s2] = u2
             except Exception:
                 pass
+
         ex = ThreadPoolExecutor(max_workers=2)
         try:
             futs = [ex.submit(probe, s2) for s2 in cands]
@@ -1003,7 +1129,8 @@ class Spider(Spider):
 
     def _m3u8_ok(self, u):
         try:
-            r = requests.get(u, headers={'User-Agent': self.ua, 'Referer': self.ref}, timeout=6, stream=True)
+            r = requests.get(u, headers={'User-Agent': self.ua, 'Referer': self.ref},
+                             timeout=6, stream=True)
             ok = getattr(r, 'status_code', 0) == 200
             if ok:
                 try:
@@ -1041,7 +1168,8 @@ class Spider(Spider):
         qs = self._search_names(name)
         for q in qs:
             try:
-                hq = self._ikget('%s/vodsearch/%s-------------/' % (self.base, quote(q, safe='')))
+                hq = self._ikget('%s/vodsearch/%s-------------/'
+                                 % (self.base, quote(q, safe='')))
                 if not hq:
                     continue
                 for it in self._ik_search_items(hq)[:8]:
@@ -1081,7 +1209,8 @@ class Spider(Spider):
         if '$' in s:
             a, b = s.split('$', 1)[1], s.rsplit('$', 1)[-1]
             s = b if ('://' in b or b.startswith('/')) else a
-        if '#' in s and '://' not in s.split('#', 1)[0] and not s.split('#', 1)[1].startswith('/'):
+        if '#' in s and '://' not in s.split('#', 1)[0] \
+                and not s.split('#', 1)[1].startswith('/'):
             s = s.split('#', 1)[0]
         return s
 
@@ -1130,13 +1259,14 @@ class Spider(Spider):
             pass
         return u if u.startswith('http') else ''
 
-    # ========== 四壳13接口扩展钩子 ==========
+    # --------------------------------------------------------- 四壳13接口扩展钩子
     def isVideoFormat(self, url):
         if not url:
             return False
         if '.m3u8' in url:
             return True
-        return bool(re.search(r'\.(?:%s)(?:\?|$)' % (VIDEO_EXTS or 'm3u8|mp4|flv'), url, re.I))
+        return bool(re.search(r'\.(?:%s)(?:\?|$)' % (VIDEO_EXTS or 'm3u8|mp4|flv'),
+                              url, re.I))
 
     def manualVideoCheck(self):
         return False
@@ -1155,7 +1285,7 @@ class Spider(Spider):
         except Exception:
             pass
 
-    def progressVideo(self, speed, time, end):
+    def progressVideo(self, speed, time_, end):
         return False
 
     def setVideoFlags(self, siteKey, flags):
@@ -1165,7 +1295,7 @@ class Spider(Spider):
         except Exception:
             pass
 
-    # ========== 本地代理(图片/直链/m3u8重写兜底) ==========
+    # --------------------------------------------------------- 本地代理
     def localProxy(self, param):
         if isinstance(param, dict):
             q, s = param, ''
@@ -1200,7 +1330,9 @@ class Spider(Spider):
             return [404, 'text/plain', '']
         if hasattr(r, 'status_code') and r.status_code != 200:
             return [r.status_code, 'text/plain', '']
-        return {'code': 200, 'content': r.content, 'headers': {'Content-Type': r.headers.get('Content-Type', 'application/octet-stream')}}
+        return {'code': 200, 'content': r.content,
+                'headers': {'Content-Type': r.headers.get('Content-Type',
+                                                          'application/octet-stream')}}
 
     def _rewrite_m3u8(self, url):
         r = self._rfetch(url, {'User-Agent': self.ua, 'Referer': self.ref}, 15)
@@ -1222,7 +1354,8 @@ class Spider(Spider):
                         ku = origin + ku
                     elif not ku.startswith('http'):
                         ku = base + ku
-                    ln = ln.replace('URI="%s"' % m.group(1), 'URI="%s"' % ('proxy?url=' + quote(ku, safe='')))
+                    ln = ln.replace('URI="%s"' % m.group(1),
+                                    'URI="%s"' % ('proxy?url=' + quote(ku, safe='')))
             elif ln.startswith('http'):
                 ln = 'proxy?url=' + quote(ln, safe='')
             elif ln.startswith('/') and not ln.startswith('//'):
@@ -1232,11 +1365,14 @@ class Spider(Spider):
             elif ln and not ln.startswith('#'):
                 ln = 'proxy?url=' + quote(base + ln.strip(), safe='')
             out.append(ln)
-        return {'code': 200, 'content': '\n'.join(out), 'headers': {'Content-Type': 'application/vnd.apple.mpegurl'}}
+        return {'code': 200, 'content': '\n'.join(out),
+                'headers': {'Content-Type': 'application/vnd.apple.mpegurl'}}
 
     def _img(self, u):
         try:
-            r = requests.get(u, headers={'User-Agent': self.ua, 'Referer': PIC_REFERER or (self.ref or self.base)}, timeout=15)
+            r = requests.get(u, headers={'User-Agent': self.ua,
+                                         'Referer': PIC_REFERER or (self.ref or self.base)},
+                             timeout=15)
             data, ct = r.content, r.headers.get('Content-Type', 'image/jpeg')
             if data[:4] == b'RIFF' or 'webp' in ct:
                 try:
