@@ -1,23 +1,111 @@
 # coding: utf-8
-"""Gimy TV 劇迷 drpy source."""
+"""Gimy TV 劇迷 drpy source.
+
+Cloudflare 处理（在 extend 中配置）：
+
+1. FlareSolverr 代理（推荐，长期稳定）：
+   extend = 'http://127.0.0.1:8191'
+   或
+   extend = 'flaresolverr=http://127.0.0.1:8191'
+
+2. 手动注入 Cookie（简单，但需定期更新）：
+   extend = 'https://gimyai.tw||cookie=cf_clearance=xxx;__cf_bm=yyy'
+
+3. 双保险（优先 FlareSolverr，失败降级 Cookie）：
+   extend = 'flaresolverr=http://127.0.0.1:8191||cookie=cf_clearance=xxx'
+"""
 import re
 import json
+import time
 from urllib.parse import quote, urljoin
 from base.spider import Spider
 
 
 class Spider(Spider):
     host = 'https://gimyai.tw'
-
     UA = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
           '(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36')
 
+    # 站点分类（电影/美剧需登录，但保留入口）
+    CATEGORIES = [
+        {'type_id': '2',  'type_name': '電視劇'},
+        {'type_id': '1',  'type_name': '電影'},
+        {'type_id': '4',  'type_name': '動漫'},
+        {'type_id': '29', 'type_name': '綜藝'},
+        {'type_id': '13', 'type_name': '陸劇'},
+        {'type_id': '20', 'type_name': '韓劇'},
+        {'type_id': '16', 'type_name': '美劇'},
+        {'type_id': '15', 'type_name': '日劇'},
+        {'type_id': '14', 'type_name': '台劇'},
+        {'type_id': '21', 'type_name': '港劇'},
+        {'type_id': '34', 'type_name': '短劇'},
+        {'type_id': '38', 'type_name': 'AI漫劇'},
+        {'type_id': '31', 'type_name': '海外劇'},
+        {'type_id': '22', 'type_name': '紀錄片'},
+    ]
+
+    # ==================== 初始化 ====================
     def init(self, extend=''):
         ext = (extend or '').strip()
-        if ext.startswith('http'):
-            self.host = ext.rstrip('/')
+        self.cookie = ''
+        self.flaresolverr = ''
+        self.host = 'https://gimyai.tw'
+
+        if '||' in ext:
+            left, right = ext.split('||', 1)
+            left, right = left.strip(), right.strip()
         else:
-            self.host = 'https://gimyai.tw'
+            left, right = ext, ''
+
+        # 左侧：FlareSolverr 或 站点地址
+        if left.startswith('flaresolverr='):
+            self.flaresolverr = left.split('=', 1)[1].strip().rstrip('/')
+        elif left.startswith('http'):
+            if ':8191' in left or 'flaresolverr' in left.lower():
+                self.flaresolverr = left.rstrip('/')
+            else:
+                self.host = left.rstrip('/')
+
+        # 右侧：Cookie
+        if right.startswith('cookie='):
+            self.cookie = right[7:].strip()
+        elif right:
+            self.cookie = right
+
+        # 无任何保护时做一次预热握手
+        if not self.flaresolverr and not self.cookie:
+            self._warmup()
+
+    def _warmup(self):
+        try:
+            resp = self.fetch(self.host + '/', headers=self._headers(self.host))
+            ck = ''
+            h = getattr(resp, 'headers', None)
+            if h:
+                try:
+                    ck = h.get('set-cookie') or h.get('Set-Cookie') or ''
+                except Exception:
+                    ck = ''
+            if not ck:
+                try:
+                    ck = self.getCookie(self.host)
+                except Exception:
+                    ck = ''
+            if ck:
+                self.cookie = self._merge_cookie(self.cookie, ck)
+        except Exception:
+            pass
+
+    @staticmethod
+    def _merge_cookie(old, new):
+        jar = {}
+        for part in (old or '').split(';') + (new or '').split(';'):
+            part = part.strip()
+            if not part or '=' not in part:
+                continue
+            k, v = part.split('=', 1)
+            jar[k.strip()] = v.strip()
+        return '; '.join('%s=%s' % (k, v) for k, v in jar.items())
 
     # ==================== 基础工具 ====================
     def _text(self, resp):
@@ -29,18 +117,92 @@ class Spider(Spider):
             return resp.decode('utf-8', 'ignore')
         return str(resp)
 
-    def _get(self, url, referer=None):
-        headers = {
+    def _headers(self, referer=''):
+        h = {
             'User-Agent': self.UA,
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8',
+            'Cache-Control': 'no-cache',
         }
         if referer:
-            headers['Referer'] = referer
+            h['Referer'] = referer
+        if self.cookie:
+            h['Cookie'] = self.cookie
+        return h
+
+    def _is_challenge(self, html):
+        """判断是否落在 Cloudflare 挑战页"""
+        if not html:
+            return True
+        if len(html) < 4000:
+            keys = ('Just a moment', 'cf-challenge', 'cf_chl_opt',
+                    'Checking your browser', '正在进行安全验证',
+                    '進行安全驗證', 'DDoS protection', 'challenge-platform')
+            for k in keys:
+                if k in html:
+                    return True
+        return False
+
+    def _fs_get(self, url):
+        """走 FlareSolverr 代理"""
         try:
-            return self._text(self.fetch(url, headers=headers))
+            body = json.dumps({
+                'cmd': 'request.get',
+                'url': url,
+                'maxTimeout': 60000,
+            })
+            headers = {'Content-Type': 'application/json'}
+            resp = None
+            try:
+                resp = self.fetch(self.flaresolverr + '/v1',
+                                  headers=headers,
+                                  data=body.encode('utf-8'),
+                                  method='POST')
+            except TypeError:
+                # 部分 drpy 版本 fetch 不支持 method 参数
+                try:
+                    resp = self.post(self.flaresolverr + '/v1',
+                                     data=body, headers=headers)
+                except Exception:
+                    resp = None
+            text = self._text(resp)
+            data = json.loads(text)
+            if data.get('status') == 'ok':
+                sol = data.get('solution') or {}
+                return sol.get('response') or ''
         except Exception:
-            return ''
+            pass
+        return ''
+
+    def _get(self, url, referer=None, retry=2):
+        """统一请求入口，自动处理 Cloudflare"""
+        # 优先 FlareSolverr
+        if self.flaresolverr:
+            html = self._fs_get(url)
+            if html and not self._is_challenge(html):
+                return html
+            if not self.cookie:
+                return html or ''
+
+        # 降级为带 Cookie 的直接请求
+        last = ''
+        for i in range(retry + 1):
+            try:
+                resp = self.fetch(url, headers=self._headers(referer or self.host))
+                try:
+                    ck = self.getCookie(self.host)
+                    if ck:
+                        self.cookie = self._merge_cookie(self.cookie, ck)
+                except Exception:
+                    pass
+                text = self._text(resp)
+                last = text
+                if text and not self._is_challenge(text):
+                    return text
+            except Exception:
+                pass
+            time.sleep(0.5 * (i + 1))
+        return last
 
     @staticmethod
     def _clean(s):
@@ -95,7 +257,7 @@ class Spider(Spider):
         return urljoin(self.host, url)
 
     def _extract_json(self, html, key):
-        """从 html 中提取 key = {...} 的完整 JSON（花括号配对）"""
+        """提取 key = {...} 的完整 JSON（花括号配对）"""
         idx = html.find(key)
         if idx < 0:
             return ''
@@ -142,12 +304,12 @@ class Spider(Spider):
                 continue
             seen.add(vid)
 
+            # 标题优先取 img alt（更干净）
             title = self._pick(body, [
+                r'<img[^>]+alt=["\']([^"\']+)["\']',
                 r'class=["\'][^"\']*poster__title[^"\']*["\'][^>]*>([\s\S]*?)</',
                 r'<h[23][^>]*>([\s\S]*?)</h[23]>',
             ])
-            if not title:
-                title = self._pick(body, [r'<img[^>]+alt=["\']([^"\']+)'])
 
             mi = re.search(r'<img[^>]+(?:data-src|data-original|src)=["\']([^"\']+)', body, re.I)
             pic = self._abs(mi.group(1)) if mi else ''
@@ -171,20 +333,7 @@ class Spider(Spider):
 
     # ==================== 首页 ====================
     def homeContent(self, filter):
-        classes = [
-            {'type_id': '2',  'type_name': '電視劇'},
-            {'type_id': '4',  'type_name': '動漫'},
-            {'type_id': '29', 'type_name': '綜藝'},
-            {'type_id': '13', 'type_name': '陸劇'},
-            {'type_id': '20', 'type_name': '韓劇'},
-            {'type_id': '15', 'type_name': '日劇'},
-            {'type_id': '14', 'type_name': '台劇'},
-            {'type_id': '21', 'type_name': '港劇'},
-            {'type_id': '34', 'type_name': '短劇'},
-            {'type_id': '38', 'type_name': 'AI漫劇'},
-            {'type_id': '31', 'type_name': '海外劇'},
-            {'type_id': '22', 'type_name': '紀錄片'},
-        ]
+        classes = [{'type_id': c['type_id'], 'type_name': c['type_name']} for c in self.CATEGORIES]
 
         filters = [{
             'key': 'area', 'name': '地區', 'value': [
@@ -210,7 +359,7 @@ class Spider(Spider):
             ]},
         ]
 
-        flt = {c['type_id']: filters for c in classes}
+        flt = {c['type_id']: filters for c in self.CATEGORIES}
         return {'class': classes, 'filters': flt, 'list': []}
 
     def homeVideoContent(self, filter=None):
@@ -238,55 +387,50 @@ class Spider(Spider):
         year = str(f.get('year') or '').strip()
         sort = str(f.get('sort') or '').strip()
 
-        # 站点 URL 结构：
-        #   /genre/{tid}.html
-        #   /explore/{tid}-{地區}----------{page}.html
-        #   /explore/{tid}--{排序}---------{page}.html
-        #   /explore/{tid}-----------{年份}.html
-        # 统一按 12 段拼装，空字段留空（站点会自行忽略）
+        # 站点 URL 结构（实测）：
+        #   /genre/{tid}.html                              无筛选第1页
+        #   /explore/{tid}-----------.html                 无筛选第1页
+        #   /explore/{tid}--------{pg}---.html             无筛选第N页
+        #   /explore/{tid}-{area}----------.html           仅地区
+        #   /explore/{tid}-----------{year}.html           仅年份
+        #   /explore/{tid}--{sort}---------.html           仅排序
+        # 拆为 12 段： [tid, area, sort, '', '', '', '', '', pg, '', '', year]
+
         if not (area or year or sort) and pg <= 1:
             url = '%s/genre/%s.html' % (self.host, tid)
         else:
-            segs = [
-                str(tid),
-                quote(area),
-                '',
-                sort,
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                year,
-                str(pg) if pg > 1 else '',
-            ]
-            url = '%s/explore/%s.html' % (self.host, '-'.join(segs))
+            parts = [''] * 12
+            parts[0] = str(tid)
+            if area:
+                parts[1] = quote(area)
+            if sort:
+                parts[2] = sort
+            if pg > 1:
+                parts[8] = str(pg)
+            if year:
+                parts[11] = year
+            url = '%s/explore/%s.html' % (self.host, '-'.join(parts))
 
         html = self._get(url, referer=self.host)
         items = self._cards(html)
 
-        # 兜底：explore 失败时退回分类页
+        # 兜底：探索页失败时退回分类页
         if not items and pg == 1:
             html = self._get('%s/genre/%s.html' % (self.host, tid), referer=self.host)
             items = self._cards(html)
 
         # 解析分页数
-        nums = []
+        pagecount = pg
         if html:
-            for x in re.findall(r'[-/](\d{1,4})\.html', html):
+            for m in re.finditer(r'href="[^"]*?(\d+)---\.html"', html):
                 try:
-                    n = int(x)
+                    n = int(m.group(1))
+                    if 1 <= n <= 5000 and n > pagecount:
+                        pagecount = n
                 except Exception:
-                    continue
-                if 1 <= n <= 2000:
-                    nums.append(n)
+                    pass
 
-        if items:
-            pagecount = max([pg] + nums) if nums else pg
-            if pagecount < pg:
-                pagecount = pg
-        else:
+        if not items:
             pagecount = max(1, pg - 1)
 
         return {
@@ -381,28 +525,24 @@ class Spider(Spider):
             r'評\s*分[：:]\s*([\d.]+)',
         ])
 
-        # ---- 简介（重点补全） ----
+        # ---- 简介（多级兜底） ----
         content = self._pick(html, [
-            # 详情页常见的简介容器
             r'<div[^>]+class=["\'][^"\']*\bdetail__content\b[^"\']*["\'][^>]*>([\s\S]*?)</div>',
             r'<div[^>]+class=["\'][^"\']*\bdetail__desc\b[^"\']*["\'][^>]*>([\s\S]*?)</div>',
             r'<div[^>]+class=["\'][^"\']*\bdetail__intro\b[^"\']*["\'][^>]*>([\s\S]*?)</div>',
             r'<div[^>]+class=["\'][^"\']*\bdetail__summary\b[^"\']*["\'][^>]*>([\s\S]*?)</div>',
-            # 通用语义 class
             r'<div[^>]+class=["\'][^"\']*\b(?:plot|summary|synopsis|intro|description|desc|content|txt)\b[^"\']*["\'][^>]*>([\s\S]*?)</div>',
             r'<p[^>]+class=["\'][^"\']*\b(?:plot|summary|synopsis|intro|description|desc|content)\b[^"\']*["\'][^>]*>([\s\S]*?)</p>',
-            # 「簡介：」标签
             r'(?:劇情簡介|剧情简介|簡\s*介|简\s*介|故事簡介)[：:]?\s*</[^>]+>\s*([\s\S]*?)</(?:div|p|section|article)>',
             r'(?:劇情簡介|剧情简介|簡\s*介|简\s*介|故事簡介)[：:]\s*([\s\S]*?)</(?:div|p|section|article)>',
-            # 兜底：meta 描述
             r'<meta[^>]+property=["\']og:description["\'][^>]+content=["\']([^"\']*)',
             r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']*)',
         ])
 
         if not content:
-            # 再兜底一次：抓 detail 区块整体文本
-            dm = re.search(r'<div[^>]+class=["\'][^"\']*\bdetail\b[^"\']*["\'][^>]*>([\s\S]*?)</div>\s*</div>',
-                           html, re.S | re.I)
+            dm = re.search(
+                r'<div[^>]+class=["\'][^"\']*\bdetail\b[^"\']*["\'][^>]*>([\s\S]*?)</div>\s*</div>',
+                html, re.S | re.I)
             if dm:
                 content = self._clean(dm.group(1))
 
@@ -467,7 +607,7 @@ class Spider(Spider):
             'vod_actor': actors,
             'vod_director': director,
             'vod_score': score,
-            'vod_content': content,          # ← 简介已补全
+            'vod_content': content,
             'vod_play_from': '$$$'.join(routes.keys()),
             'vod_play_url': '$$$'.join(routes.values()),
         }
@@ -487,7 +627,6 @@ class Spider(Spider):
             try:
                 data = json.loads(raw)
             except Exception:
-                # JSON 里可能有转义斜杠，尝试修复
                 try:
                     data = json.loads(raw.replace('\\/', '/'))
                 except Exception:
@@ -516,24 +655,20 @@ class Spider(Spider):
                 media = m.group(1)
 
         headers = {'User-Agent': self.UA, 'Referer': url}
+        if self.cookie:
+            headers['Cookie'] = self.cookie
 
         if media:
             media = media.replace('\\/', '/').replace('\\u002F', '/').strip()
             if media.startswith('//'):
                 media = 'https:' + media
             return {
-                'parse': 0,
-                'jx': 0,
-                'playUrl': '',
-                'url': media,
-                'header': headers,
+                'parse': 0, 'jx': 0, 'playUrl': '',
+                'url': media, 'header': headers,
             }
 
         # 未解析出直链 → 交给壳端嗅探
         return {
-            'parse': 1,
-            'jx': 1,
-            'playUrl': '',
-            'url': url,
-            'header': headers,
+            'parse': 1, 'jx': 1, 'playUrl': '',
+            'url': url, 'header': headers,
         }
