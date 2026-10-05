@@ -387,12 +387,10 @@
             }
         },
 		{
-            "key": "央视网页",
-            "name": "🍊小橙子央卫直播",
+            "key": "央视频",
+            "name": "🍊小橙子央视频",
             "type": 3,
-            "jar": "https://ghfast.top/https://raw.githubusercontent.com/wzxxcz/wzxxcz/maing/jars/WvSpider.jar",
-            "api": "csp_WvSpider",
-            "ext": "https://ghfast.top/https://raw.githubusercontent.com/wzxxcz/wzxxcz/maing/js/%E5%A4%AE%E8%A7%86%E7%9B%B4%E6%92%AD.js"
+            "api": "./py/央视频.py"
         },
         {
             "key": "hipy_js_好趣网",
@@ -2017,12 +2015,6 @@
             "name": "🍊ik4k影院",
             "type": 3,
             "api": "./py/ik4k影院.py"
-        },
-		{
-            "key": "央视频",
-            "name": "🍊央视频",
-            "type": 3,
-            "api": "./py/央视频.py"
         },
 		{
             "key": "爬虫影视",
