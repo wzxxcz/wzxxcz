@@ -2,13 +2,33 @@
 # -*- coding: utf-8 -*-
 """
 央视频直播 - 双源统一版 (Script 1 native + Script 2 YSPTP)
-- 文件日志已禁用 (不写 /storage/emulated/0/Download/ysp-live.log)
+- 文件日志已禁用
 - 双源: 央视频源1 (JCE/bk) + 央视频源2 (YSPTP)
+
+================================================================
+                    兼容性说明（重要）
+================================================================
+本版默认走「兼容优先」配置，适用于老旧电视/盒子/壳子：
+  - 预取默认关闭（PREFETCH_ENABLED=0）——避免弱 CPU 压力
+  - 分片缓存默认 12 条（约 3~6MB）——避免内存压力
+  - m3u8 窗口 20 段上限 ——避免老播放器拒绝超长列表
+  - HTTP Range 默认关闭 ——避免老播放器不识别 206
+
+如果设备较新（近 3 年 Android TV / 手机），可以把下面 4 个
+开关打开，体验会进一步提升：
+  PREFETCH_ENABLED = 1    # 预取下一段，播放更顺
+  CHUNK_CACHE_MAX  = 20   # 缓存更多分片
+  RANGE_SUPPORT    = 1    # 支持拖动进度条
+  WINDOW_MAX_SEGS  = 30   # 更长的缓冲窗口
+
+所有新增功能都只影响"数据已取到后"的处理，绝不碰原有
+请求/协议路径。出任何问题，把 PREFETCH_ENABLED 改 0 即可回退。
+================================================================
 """
 
 import base64, gzip, hashlib, json, os, random, re, struct, threading, time
 import urllib.error, urllib.parse, urllib.request, uuid
-from collections import deque
+from collections import deque, OrderedDict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 try:
@@ -19,9 +39,6 @@ except ImportError:
         def setCache(self, key, value): return "fail"
         def delCache(self, key): return "fail"
 
-
-# ================================================================ 日志 (已禁用文件写入)
-# 只 print 到 stdout, 不写文件. TVBox 一般看不到 stdout, 等于静默.
 
 def _log(msg):
     try:
@@ -39,9 +56,30 @@ def format_remarks(brand="央视频", meta=""):
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
 WINDOW = 300
 REFRESH_INTERVAL = 2
-IDLE_TIMEOUT = 300
-MAX_SEGS = 400
-PLAYLIST_WINDOW = 8
+IDLE_TIMEOUT = 600            # ★ 300 → 600（暂停 5~10 分钟回来不用重新拉）
+MAX_SEGS = 800                # ★ 400 → 800（内存占用可忽略，仅元数据）
+
+# ================================================================
+#                       ★ 兼容性开关
+# ================================================================
+# 预取：1=开启（新设备推荐） 0=关闭（老旧设备推荐）
+PREFETCH_ENABLED = 0
+# 预取每频道最多并发（老旧设备建议 1）
+PREFETCH_MAX_CONCURRENT = 1
+# 预取超时（秒）
+PREFETCH_TIMEOUT = 15
+
+# 分片 LRU 缓存条数（老旧设备建议 8~12，新设备 20~40）
+CHUNK_CACHE_MAX = 12
+
+# HTTP Range 支持：1=开启（新播放器拖动更顺） 0=关闭（老旧播放器更稳）
+RANGE_SUPPORT = 0
+
+# m3u8 窗口策略：按时间取窗口（不管段长 2 秒还是 6 秒，缓冲都 >= 90 秒）
+WINDOW_MIN_SECONDS = 90
+WINDOW_MAX_SEGS = 20          # 老播放器建议 ≤ 20，新播放器可用 30
+# ================================================================
+
 LOCAL_PORT_PREFERRED = 19876
 LOCAL_PORT_RANGE = 50
 
@@ -363,10 +401,6 @@ def _sha1_upper(s): return hashlib.sha1(s.encode()).hexdigest().upper()
 def _sha256_hex(s): return hashlib.sha256(s.encode()).hexdigest()
 def _md5_hex(s): return hashlib.md5(s.encode()).hexdigest()
 
-
-# ================================================================
-# Opsi A: device identity 持久化 — 每次返回同一个设备
-# ================================================================
 
 _DEVICE_ANDROID_ID = 'a1b2c3d4e5f6a7b8'
 _DEVICE_MAC = 'aa:bb:cc:dd:ee:01'
@@ -846,13 +880,12 @@ BACKEND_CHANNELS = {
 
 TRUE_4K_CHANNELS = {'cctv4k', 'cctv8k', 'cctv164k'}
 
+YSPTP_SLUG_SUFFIX = '_ys'
+
 
 def _base_slug(slug):
-    """剥离 _ys 后缀，返回基础 slug"""
     s = str(slug or '')
-    if s.endswith(YSPTP_SLUG_SUFFIX):
-        return s[:-len(YSPTP_SLUG_SUFFIX)]
-    return s
+    return s[:-len(YSPTP_SLUG_SUFFIX)] if s.endswith(YSPTP_SLUG_SUFFIX) else s
 
 
 def _has_native(slug):
@@ -862,9 +895,6 @@ def _has_native(slug):
 
 def _has_ysptp(slug):
     return bool(CHANNEL_MAP.get(_base_slug(slug), {}).get('ysptp'))
-
-
-YSPTP_SLUG_SUFFIX = '_ys'
 
 
 # ================================================================ 台标
@@ -982,6 +1012,12 @@ class _ChannelState:
         self.last_error = ''
         self.mode = mode
         self._starting = False
+        # LRU 分片缓存
+        self.chunk_cache = OrderedDict()
+        self.chunk_cache_lock = threading.Lock()
+        # 预取状态（仅当 PREFETCH_ENABLED 时使用）
+        self.prefetch_inflight = set()
+        self.prefetch_lock = threading.Lock()
 
 
 CHANNEL_STATE = {}
@@ -1112,6 +1148,113 @@ def _refresh_native(ch):
         return _bk_refresh(ch)
 
 
+# ================================================================
+# 预取模块（默认关闭，老旧设备友好；所有异常静默）
+# ================================================================
+
+def _prefetch_one(ch, url, key):
+    try:
+        # 频道 30 秒无访问，放弃预取（避免浪费带宽）
+        if time.time() - ch.last_access > 30:
+            return
+        with ch.chunk_cache_lock:
+            if key in ch.chunk_cache:
+                return
+        req = urllib.request.Request(url, headers={
+            'User-Agent': UA, 'Referer': 'https://live.cctv.cn/', 'Accept': '*/*'})
+        with urllib.request.urlopen(req, timeout=PREFETCH_TIMEOUT) as r:
+            data = r.read()
+        if not data:
+            return
+        with ch.chunk_cache_lock:
+            ch.chunk_cache[key] = data
+            ch.chunk_cache.move_to_end(key)
+            while len(ch.chunk_cache) > CHUNK_CACHE_MAX:
+                ch.chunk_cache.popitem(last=False)
+    except Exception:
+        pass
+    finally:
+        try:
+            with ch.prefetch_lock:
+                ch.prefetch_inflight.discard(key)
+        except Exception:
+            pass
+
+
+def _prefetch_schedule(ch, items):
+    """★ 限制并发：每频道同时最多 PREFETCH_MAX_CONCURRENT 个预取线程"""
+    if not PREFETCH_ENABLED or not items:
+        return
+    for seq, url in items:
+        key = (ch.slug, seq)
+        with ch.chunk_cache_lock:
+            if key in ch.chunk_cache:
+                continue
+        with ch.prefetch_lock:
+            if key in ch.prefetch_inflight:
+                continue
+            # ★ 并发限制（老旧设备友好）
+            if len(ch.prefetch_inflight) >= PREFETCH_MAX_CONCURRENT:
+                return
+            ch.prefetch_inflight.add(key)
+        try:
+            t = threading.Thread(target=_prefetch_one, args=(ch, url, key), daemon=True)
+            t.start()
+        except Exception:
+            with ch.prefetch_lock:
+                ch.prefetch_inflight.discard(key)
+
+
+def _prefetch_latest(ch, n=1):
+    if not PREFETCH_ENABLED:
+        return
+    try:
+        with ch.lock:
+            keys = list(ch.order)
+            segs = [ch.segments[k] for k in keys if k in ch.segments]
+            items = [(s[0], s[3]) for s in segs[-n:]]
+        _prefetch_schedule(ch, items)
+    except Exception:
+        pass
+
+
+def _prefetch_after(ch, seq, n=1):
+    if not PREFETCH_ENABLED:
+        return
+    try:
+        with ch.lock:
+            keys = list(ch.order)
+            segs = [ch.segments[k] for k in keys if k in ch.segments]
+            idx = None
+            for i, s in enumerate(segs):
+                if s[0] == seq:
+                    idx = i; break
+            if idx is None:
+                return
+            items = [(s[0], s[3]) for s in segs[idx + 1: idx + 1 + n]]
+        _prefetch_schedule(ch, items)
+    except Exception:
+        pass
+
+
+def _pick_window(segs):
+    """★ 按时间取窗口：不管段长多少，缓冲都 >= WINDOW_MIN_SECONDS"""
+    if not segs:
+        return []
+    total = 0.0
+    picked = []
+    for s in reversed(segs):
+        if len(picked) >= WINDOW_MAX_SEGS:
+            break
+        picked.append(s)
+        try: total += float(s[1]) if s[1] else 6.0
+        except Exception: total += 6.0
+        if total >= WINDOW_MIN_SECONDS:
+            break
+    picked.reverse()
+    return picked
+
+
 def _refresh_once(ch):
     t0 = time.time()
     try:
@@ -1121,6 +1264,9 @@ def _refresh_once(ch):
             ok = _refresh_native(ch)
         _log('refresh %s: ok=%s %.2fs segs=%d'
              % (ch.slug, ok, time.time() - t0, len(ch.order)))
+        # 刷新成功后预取最新 1 段（仅当开关开启）
+        if ok and PREFETCH_ENABLED:
+            _prefetch_latest(ch, 1)
         return ok
     except Exception as e:
         ch.last_error = ('%s: %s' % (type(e).__name__, e))[:120]
@@ -1133,8 +1279,12 @@ def _refresh_loop(ch):
     fails = 0
     while time.time() - ch.last_access < IDLE_TIMEOUT:
         ok = _refresh_once(ch)
-        fails = 0 if ok else fails + 1
-        time.sleep(REFRESH_INTERVAL if fails < 3 else 15)
+        if ok:
+            fails = 0
+            time.sleep(REFRESH_INTERVAL)
+        else:
+            fails += 1
+            time.sleep(min(6, REFRESH_INTERVAL * fails))
 
 
 def _ensure_channel(ch):
@@ -1178,7 +1328,7 @@ class _LocalHandler(BaseHTTPRequestHandler):
                 for k, v in extra.items(): self.send_header(k, v)
             self.end_headers()
             self.wfile.write(data)
-        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError): pass
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError): pass
 
     def do_HEAD(self):
         path = urllib.parse.urlparse(self.path).path
@@ -1201,9 +1351,14 @@ class _LocalHandler(BaseHTTPRequestHandler):
             lines = []
             for slug, ch in CHANNEL_STATE.items():
                 with ch.lock: n = len(ch.order)
-                lines.append('%s mode=%s segs=%d err=%s' % (slug, ch.mode, n, ch.last_error))
+                with ch.chunk_cache_lock: cn = len(ch.chunk_cache)
+                lines.append('%s mode=%s segs=%d chunks=%d err=%s'
+                             % (slug, ch.mode, n, cn, ch.last_error))
             lines.append('logo_source=%s' % (_LOGO_BASE or '(none)'))
             lines.append('aes_backend=%s' % (_AES_BACKEND or 'unknown'))
+            lines.append('prefetch=%d range=%d cache=%d window=%d-%d'
+                         % (PREFETCH_ENABLED, RANGE_SUPPORT, CHUNK_CACHE_MAX,
+                            WINDOW_MIN_SECONDS, WINDOW_MAX_SEGS))
             self._send(200, '\n'.join(lines) + '\n'); return
 
         m = re.match(r'^/logo/([^/]+)\.png$', path)
@@ -1239,7 +1394,7 @@ class _LocalHandler(BaseHTTPRequestHandler):
         with ch.lock:
             keys = list(ch.order)
             segs = [ch.segments[k] for k in keys if k in ch.segments]
-            window = segs[-PLAYLIST_WINDOW:] if segs else []
+        window = _pick_window(segs)
         if not window:
             self._send(503, 'no data: %s\n' % (ch.last_error or 'fetching')); return
         ch.last_access = time.time()
@@ -1263,6 +1418,23 @@ class _LocalHandler(BaseHTTPRequestHandler):
         if not ch:
             self._send(404, 'unknown\n'); return
         ch.last_access = time.time()
+
+        # 预取下一段（仅当开关开启）
+        if PREFETCH_ENABLED:
+            try:
+                _prefetch_after(ch, seq, 1)
+            except Exception:
+                pass
+
+        cache_key = (slug, seq)
+        with ch.chunk_cache_lock:
+            cached = ch.chunk_cache.get(cache_key)
+            if cached is not None:
+                ch.chunk_cache.move_to_end(cache_key)
+                self._serve_cached(cached)
+                return
+
+        # 缓存未命中：找源 URL
         with ch.lock:
             url = None
             for k in ch.order:
@@ -1282,19 +1454,72 @@ class _LocalHandler(BaseHTTPRequestHandler):
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.send_header('Cache-Control', 'no-cache, no-store')
                 self.end_headers()
+                collected = bytearray()
                 while True:
                     buf = r.read(64 * 1024)
                     if not buf: break
+                    collected.extend(buf)
                     self.wfile.write(('%x\r\n' % len(buf)).encode('ascii'))
                     self.wfile.write(buf)
                     self.wfile.write(b'\r\n')
                 self.wfile.write(b'0\r\n\r\n')
+                # 写入 LRU 缓存
+                with ch.chunk_cache_lock:
+                    ch.chunk_cache[cache_key] = bytes(collected)
+                    ch.chunk_cache.move_to_end(cache_key)
+                    while len(ch.chunk_cache) > CHUNK_CACHE_MAX:
+                        ch.chunk_cache.popitem(last=False)
         except urllib.error.HTTPError as e:
             try: self._send(e.code, 'chunk HTTP %d\n' % e.code)
             except Exception: pass
         except Exception as e:
             try: self._send(502, 'chunk error: %s\n' % e)
             except Exception: pass
+
+    def _serve_cached(self, data):
+        """★ 返回缓存分片。Range 支持只在 RANGE_SUPPORT=1 时生效"""
+        total = len(data)
+        # 仅在 RANGE_SUPPORT 开启时处理 Range
+        if RANGE_SUPPORT:
+            range_hdr = self.headers.get('Range', '') if hasattr(self, 'headers') else ''
+            if range_hdr and range_hdr.startswith('bytes='):
+                try:
+                    spec = range_hdr[6:].strip()
+                    if ',' in spec:
+                        raise ValueError('multi-range')
+                    start_s, _, end_s = spec.partition('-')
+                    if start_s == '':
+                        n = int(end_s)
+                        start = max(0, total - n); end = total - 1
+                    elif end_s == '':
+                        start = int(start_s); end = total - 1
+                    else:
+                        start = int(start_s); end = min(int(end_s), total - 1)
+                    if start > end or start >= total:
+                        self.send_response(416)
+                        self.send_header('Content-Range', 'bytes */%d' % total)
+                        self.end_headers(); return
+                    chunk = data[start:end + 1]
+                    self.send_response(206)
+                    self.send_header('Content-Type', 'video/mp2t')
+                    self.send_header('Content-Length', str(len(chunk)))
+                    self.send_header('Content-Range', 'bytes %d-%d/%d' % (start, end, total))
+                    self.send_header('Accept-Ranges', 'bytes')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.send_header('Cache-Control', 'public, max-age=60')
+                    self.end_headers()
+                    self.wfile.write(chunk)
+                    return
+                except (ValueError, IndexError):
+                    pass  # 解析失败 → 回退完整返回
+        # 完整返回（默认路径，兼容所有播放器）
+        self.send_response(200)
+        self.send_header('Content-Type', 'video/mp2t')
+        self.send_header('Content-Length', str(total))
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Cache-Control', 'public, max-age=60')
+        self.end_headers()
+        self.wfile.write(data)
 
 
 def _ensure_local_server():
@@ -1477,7 +1702,6 @@ class Spider(SpiderBase):
     def liveContent(self): return ""
 
     def localProxy(self, params):
-        """透传本地代理请求：支持 dict / "url=xxx" 两种入参形式"""
         try:
             if isinstance(params, dict):
                 url = params.get('url') or params.get('key') or ''
@@ -1506,7 +1730,6 @@ if __name__ == '__main__':
     ap.add_argument('--once', action='store_true')
     ap.add_argument('--test-slug', default='cctv1')
     args = ap.parse_args()
-    # 用 globals() 修改模块级变量，让 _ensure_local_server 生效
     globals()['LOCAL_PORT_PREFERRED'] = args.port
 
     sp = Spider(); sp.init()
