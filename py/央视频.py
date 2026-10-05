@@ -431,7 +431,7 @@ def _ysptp_headers(ident, ctype='application/json; charset=utf-8', accept='appli
         'X-Version': YSPTP_VERSION,
         'X-Timestamp': str(ts if ts is not None else _ysptp_now_ms()),
         'X-Nonce': str(uuid.uuid4()),
-        'Content-Type': ctype,
+        'Content-Type': ctype or 'application/json; charset=utf-8',
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
         'Cache-Control': 'no-cache',
@@ -847,13 +847,21 @@ BACKEND_CHANNELS = {
 TRUE_4K_CHANNELS = {'cctv4k', 'cctv8k', 'cctv164k'}
 
 
+def _base_slug(slug):
+    """剥离 _ys 后缀，返回基础 slug"""
+    s = str(slug or '')
+    if s.endswith(YSPTP_SLUG_SUFFIX):
+        return s[:-len(YSPTP_SLUG_SUFFIX)]
+    return s
+
+
 def _has_native(slug):
-    info = CHANNEL_MAP.get(slug, {})
+    info = CHANNEL_MAP.get(_base_slug(slug), {})
     return bool(info.get('sid')) and bool(info.get('pid'))
 
 
 def _has_ysptp(slug):
-    return bool(CHANNEL_MAP.get(slug, {}).get('ysptp'))
+    return bool(CHANNEL_MAP.get(_base_slug(slug), {}).get('ysptp'))
 
 
 YSPTP_SLUG_SUFFIX = '_ys'
@@ -937,7 +945,7 @@ def _logo_url(slug, name=''):
     _ensure_logo_source(wait=0)
     if not _LOGO_DONE.is_set():
         return _local_logo_url(slug)
-    fname = _logo_file(slug, name)
+    fname = _logo_file(_base_slug(slug), name)
     base = _LOGO_BASE
     direct = (base + urllib.parse.quote(fname)) if (base and fname) else ''
     if LOGO_MODE == 'direct': return direct or _local_logo_url(slug)
@@ -946,7 +954,7 @@ def _logo_url(slug, name=''):
 
 
 def _fetch_logo_bytes(slug, name):
-    fname = _logo_file(slug, name)
+    fname = _logo_file(_base_slug(slug), name)
     if fname:
         bases = ([_LOGO_BASE] if _LOGO_BASE else []) + [b for b in LOGO_MIRRORS if b != _LOGO_BASE]
         q = urllib.parse.quote(fname)
@@ -1174,11 +1182,16 @@ class _LocalHandler(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         path = urllib.parse.urlparse(self.path).path
-        for pat, ct in [(r'^/[\w]+\.m3u8$', 'application/vnd.apple.mpegurl'),
-                        (r'^/logo/[\w]+\.png$', 'image/png')]:
-            if re.match(pat, path):
-                self.send_response(200); self.send_header('Content-Type', ct); self.end_headers(); return
-        self.send_response(404); self.end_headers()
+        if re.match(r'^/[^/]+\.m3u8$', path):
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/vnd.apple.mpegurl')
+            self.end_headers(); return
+        if re.match(r'^/logo/[^/]+\.png$', path):
+            self.send_response(200)
+            self.send_header('Content-Type', 'image/png')
+            self.end_headers(); return
+        self.send_response(404)
+        self.end_headers()
 
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path
@@ -1193,16 +1206,19 @@ class _LocalHandler(BaseHTTPRequestHandler):
             lines.append('aes_backend=%s' % (_AES_BACKEND or 'unknown'))
             self._send(200, '\n'.join(lines) + '\n'); return
 
-        m = re.match(r'^/logo/([\w]+)\.png$', path)
-        if m: self._serve_logo(m.group(1)); return
-        m = re.match(r'^/([\w]+)\.m3u8$', path)
-        if m: self._serve_m3u8(m.group(1)); return
-        m = re.match(r'^/chunk/([\w]+)/(\d+)\.ts$', path)
-        if m: self._serve_chunk(m.group(1), int(m.group(2))); return
+        m = re.match(r'^/logo/([^/]+)\.png$', path)
+        if m:
+            self._serve_logo(urllib.parse.unquote(m.group(1))); return
+        m = re.match(r'^/([^/]+)\.m3u8$', path)
+        if m:
+            self._serve_m3u8(urllib.parse.unquote(m.group(1))); return
+        m = re.match(r'^/chunk/([^/]+)/(\d+)\.ts$', path)
+        if m:
+            self._serve_chunk(urllib.parse.unquote(m.group(1)), int(m.group(2))); return
         self._send(404, 'not found\n')
 
     def _serve_logo(self, slug):
-        base = slug[:-len(YSPTP_SLUG_SUFFIX)] if slug.endswith(YSPTP_SLUG_SUFFIX) else slug
+        base = _base_slug(slug)
         info = CHANNEL_MAP.get(base)
         name = info['name'] if info else ''
         with _LOGO_CACHE_LOCK: data = _LOGO_CACHE.get(base)
@@ -1305,7 +1321,10 @@ def _ensure_local_server():
 
 class Spider(SpiderBase):
     def __init__(self):
-        super(Spider, self).__init__()
+        try:
+            super(Spider, self).__init__()
+        except Exception:
+            pass
         self.brandActor = "📺 央视频直播"
         self.brandDirector = "ysp-live-multi"
 
@@ -1365,12 +1384,14 @@ class Spider(SpiderBase):
 
     def detailContent(self, ids):
         slug = ids[0] if isinstance(ids, (list, tuple)) else str(ids)
-        info = CHANNEL_MAP.get(slug)
-        if not info: return {"list": []}
+        base_slug = _base_slug(slug)
+        info = CHANNEL_MAP.get(base_slug)
+        if not info:
+            return {"list": []}
         try:
             _ensure_local_server()
-            if _has_native(slug):
-                ch = CHANNEL_STATE.get(slug)
+            if _has_native(base_slug):
+                ch = CHANNEL_STATE.get(base_slug)
                 if ch:
                     _ensure_channel(ch)
                     t0 = time.time()
@@ -1378,8 +1399,8 @@ class Spider(SpiderBase):
                         with ch.lock:
                             if ch.order: break
                         time.sleep(0.1)
-            if _has_ysptp(slug):
-                ch_ys = CHANNEL_STATE.get(slug + YSPTP_SLUG_SUFFIX)
+            if _has_ysptp(base_slug):
+                ch_ys = CHANNEL_STATE.get(base_slug + YSPTP_SLUG_SUFFIX)
                 if ch_ys:
                     threading.Thread(
                         target=lambda c: _ensure_channel(c),
@@ -1388,12 +1409,12 @@ class Spider(SpiderBase):
 
         lines_1 = []
         lines_2 = []
-        if _has_native(slug):
-            lines_1.append("超清$%s" % slug)
-        if _has_ysptp(slug):
-            lines_2.append("超清(YSPTP)$%s%s" % (slug, YSPTP_SLUG_SUFFIX))
+        if _has_native(base_slug):
+            lines_1.append("超清$%s" % base_slug)
+        if _has_ysptp(base_slug):
+            lines_2.append("超清(YSPTP)$%s%s" % (base_slug, YSPTP_SLUG_SUFFIX))
         if not lines_1 and not lines_2:
-            lines_1.append("超清$%s" % slug)
+            lines_1.append("超清$%s" % base_slug)
 
         play_from_parts = []
         play_url_parts = []
@@ -1408,8 +1429,8 @@ class Spider(SpiderBase):
         escaped = (full_desc.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
         vod = {
-            "vod_id": slug, "vod_name": info['name'],
-            "vod_pic": _logo_url(slug, info['name']),
+            "vod_id": base_slug, "vod_name": info['name'],
+            "vod_pic": _logo_url(base_slug, info['name']),
             "vod_actor": self.brandActor, "vod_director": self.brandDirector,
             "vod_remarks": format_remarks("央视频", "直播"),
             "vod_content": escaped,
@@ -1454,7 +1475,28 @@ class Spider(SpiderBase):
 
     def action(self, action): return {"msg": "ok"}
     def liveContent(self): return ""
-    def localProxy(self, params): return [404, "text/plain; charset=utf-8", "Proxy not configured"]
+
+    def localProxy(self, params):
+        """透传本地代理请求：支持 dict / "url=xxx" 两种入参形式"""
+        try:
+            if isinstance(params, dict):
+                url = params.get('url') or params.get('key') or ''
+            else:
+                s = str(params or '')
+                url = ''
+                for part in s.split('&'):
+                    if part.startswith('url='):
+                        url = urllib.parse.unquote(part[4:]); break
+            if not url:
+                return [404, "text/plain; charset=utf-8", "no url"]
+            req = urllib.request.Request(url, headers={
+                'User-Agent': UA, 'Referer': 'https://live.cctv.cn/'})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                data = r.read()
+                ct = r.headers.get('Content-Type', 'application/octet-stream')
+            return [200, ct, data]
+        except Exception as e:
+            return [502, "text/plain; charset=utf-8", str(e)]
 
 
 if __name__ == '__main__':
@@ -1464,7 +1506,8 @@ if __name__ == '__main__':
     ap.add_argument('--once', action='store_true')
     ap.add_argument('--test-slug', default='cctv1')
     args = ap.parse_args()
-    LOCAL_PORT_PREFERRED = args.port
+    # 用 globals() 修改模块级变量，让 _ensure_local_server 生效
+    globals()['LOCAL_PORT_PREFERRED'] = args.port
 
     sp = Spider(); sp.init()
     print("homeContent:", json.dumps(sp.homeContent({}), ensure_ascii=False))
