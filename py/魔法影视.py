@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# ============ 魔法盒子 / 魔法影视 (l98.cn) —— 图片直连终版 ============
+# ============ 魔法盒子 / 魔法影视 (l98.cn) —— WebHTV 图片代理终版 ============
 import sys, re, json, time, hashlib, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 try:
@@ -148,7 +148,7 @@ class Spider(Spider):
         except Exception:
             return {}
 
-    # ================= ★ 图片处理：原样返回 =================
+    # ================= ★ 图片处理：走 WebHTV 本地代理 =================
     def _pic(self, u):
         if not u:
             return ''
@@ -178,11 +178,16 @@ class Spider(Spider):
         return ''
 
     def _pic_proxied(self, url):
-        """★ 浏览器能直接打开，就原样给播放器，不做任何代理包装"""
+        """★ WebHTV 资源代理：走 proxy:// 协议，由本地代理带 Referer 取图
+        背景：img1.wsyzy.org 的 TLS 对 Android 原生栈不友好，
+              浏览器能开但 TVBox/WebHTV 直连会握手失败。
+              通过 proxy:// 让 WebHTV 走 localProxy 转发，代理端带 UA+Referer。
+        """
         if not url or url.startswith('data:'):
             return url
-        return url
-    # ======================================================
+        # WebHTV 支持 proxy:// 协议 → 会调用 Spider.localProxy
+        return 'proxy://type=img&url=' + urllib.parse.quote(url, safe='')
+    # ================================================================
 
     def _mk(self, v, api=''):
         vid = str(v.get('vod_id') or '')
@@ -410,17 +415,25 @@ class Spider(Spider):
         if not p:
             return {'code': 403, 'content': b'', 'headers': {}}
 
+        # ★ 图片分支：带 UA + Referer 转发，绕过 Android TLS 兼容问题
         if tp == 'img' or re.search(r'\.(?:jpg|jpeg|png|webp|gif|bmp|avif)(?:\?|$)', p, re.I):
-            hd = {'User-Agent': self.ua, 'Referer': self.pic_ref or self.ref}
+            hd = {
+                'User-Agent': self.ua,
+                'Referer': self.pic_ref or self.ref,
+                'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+                'Accept-Language': 'zh-CN,zh;q=0.9',
+            }
             try:
                 if requests:
                     r = requests.get(p, headers=hd, timeout=15, verify=False)
                     return {'code': r.status_code, 'content': r.content,
-                            'headers': {'Content-Type': r.headers.get('Content-Type', 'image/jpeg')}}
+                            'headers': {'Content-Type': r.headers.get('Content-Type', 'image/jpeg'),
+                                        'Cache-Control': 'public, max-age=86400'}}
                 import urllib.request as _urq
                 resp = _urq.urlopen(_urq.Request(p, headers=hd), timeout=15)
                 return {'code': 200, 'content': resp.read(),
-                        'headers': {'Content-Type': resp.headers.get('Content-Type', 'image/jpeg')}}
+                        'headers': {'Content-Type': resp.headers.get('Content-Type', 'image/jpeg'),
+                                    'Cache-Control': 'public, max-age=86400'}}
             except Exception:
                 return {'code': 404, 'content': b'', 'headers': {}}
 
