@@ -1,16 +1,13 @@
 # coding=utf-8
 """
-豆花电影网 dhvideo.cc | TVBox Python 爬虫 (V4 稳健版)
-关键改进: 
-  1. 会话预热 (先访问首页拿 Cookie)
-  2. 完整浏览器请求头
-  3. 详细日志 (看 TVBox 里到底拿到什么)
-  4. 超宽松正则 (容错所有卡片结构)
+豆花电影网 dhvideo.cc | TVBox Python 爬虫 (V5 PoW 破解版)
+关键: 破解服务端 SHA1 PoW 挑战 (attack_key)
 """
 import re
 import sys
 import json
 import time
+import hashlib
 import urllib.parse
 
 sys.path.append('..')
@@ -115,28 +112,21 @@ for c in CLASSES:
 
 
 # ===================== 正则 =====================
-# 卡片核心：href + alt + data-src
 _RE_CARD = re.compile(
     r'href="(/(?:movie|tv)/[^"]+?\.html)[^"]*"[^>]*>'
-    r'[\s\S]{0,200}?'          # 中间可以有属性
+    r'[\s\S]{0,200}?'
     r'<img[^>]*?alt="([^"]*)"[^>]*?(?:data-src|src)="([^"]*)"',
     re.S | re.I)
 
-# 备用1：仅 href 有 movie/tv
 _RE_HREF = re.compile(r'href="(/(?:movie|tv)/[^"]+?\.html)', re.I)
-
-# 备用2：仅 img 有 alt + data-src
 _RE_IMG = re.compile(
     r'<img[^>]*?alt="([^"]*)"[^>]*?(?:data-src|src)="([^"]*)"',
     re.S | re.I)
-
 _RE_REMARK = re.compile(
     r'<span class="bg-black/60[^>]*>\s*([^<]+?)\s*</span>', re.I)
-
 _RE_EPISODE = re.compile(
     r'<a\s+href="([^"]+)"[^>]*?data-origin="([^"]+)"[^>]*?data-title="([^"]+)"',
     re.S | re.I)
-
 _RE_PLAYER_AA = re.compile(r"aa\s*:\s*JSON\.parse\('(.*?)'\)", re.S)
 _RE_H1 = re.compile(r'<h1[^>]*>([\s\S]*?)</h1>', re.I)
 _RE_PIC_ID = re.compile(r'/img/id/[A-Za-z0-9]+\.(?:jpg|png|webp)', re.I)
@@ -154,6 +144,10 @@ _RE_HOT = re.compile(r'([\d,]+)\s*\(电视剧排名:\s*(\d+),\s*总排名:\s*(\d
 _RE_META_DESC = re.compile(
     r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']',
     re.I)
+
+# PoW 挑战页特征
+_RE_POW_HASH = re.compile(r"var\s+hash\s*=\s*['\"]([a-f0-9]{40})['\"]")
+_RE_POW_TARGET = re.compile(r"var\s+target\s*=\s*['\"]([a-f0-9]{40})['\"]")
 
 _LINE_PRIORITY = ["vip", "1080zyk", "wztv", "bfzym3u8", "dyttm3u8",
                   "ffm3u8", "lzm3u8", "modum3u8", "jsm3u8", "mtm3u8"]
@@ -194,23 +188,65 @@ class Spider(Spider):
 
     # -------- 预热 (拿 Cookie) --------
     def _warm_up(self):
-        """先访问一次首页，让服务器下发 Cookie"""
         if self._warmed:
             return
         try:
             self._fetch(self.site_url + "/?sion_id=" + self.sion_id,
-                        timeout=10)
+                        timeout=15)
             self._warmed = True
             self.log("预热完成")
         except Exception as e:
             self.log("预热失败: %s" % e)
 
-    # -------- 网络 --------
-    def _fetch(self, url, timeout=15, headers=None):
+    # -------- 关键：PoW 挑战求解 --------
+    def _solve_pow(self, html):
+        """
+        从挑战页提取 hash 和 target，暴力破解 attack_key
+        成功返回整数 i，失败返回 None
+        """
+        m1 = _RE_POW_HASH.search(html)
+        m2 = _RE_POW_TARGET.search(html)
+        if not m1 or not m2:
+            self.log("PoW: 未找到 hash/target")
+            return None
+
+        hash_prefix = m1.group(1)
+        target = m2.group(1)
+        self.log("PoW: hash=%s target=%s" % (hash_prefix[:16], target[:16]))
+
+        max_i = 10 * 1000 * 1000  # 1000 万
+        start = time.time()
+        prefix_b = hash_prefix.encode()
+
+        for i in range(max_i):
+            s = hashlib.sha1(prefix_b + str(i).encode()).hexdigest()
+            if s == target:
+                cost = time.time() - start
+                self.log("PoW 破解成功: i=%d 耗时=%.2fs" % (i, cost))
+                return i
+
+            # 每 100 万次检查超时
+            if (i + 1) % 1000000 == 0:
+                cost = time.time() - start
+                self.log("PoW 进度: %d 万, 已耗时 %.1fs" % ((i + 1) // 10000, cost))
+                if cost > 60:
+                    self.log("PoW 超时 (>60s)")
+                    return None
+
+        self.log("PoW 未在范围内破解")
+        return None
+
+    # -------- 网络请求（带 PoW 自动处理）--------
+    def _fetch(self, url, timeout=60, headers=None):
+        """
+        请求 URL，自动处理 PoW 挑战。
+        注意: PoW 可能耗时较长, timeout 设大一点。
+        """
         try:
             h = dict(self.headers)
             if headers:
                 h.update(headers)
+
             rsp = self.fetch(url, headers=h, timeout=timeout)
             text = ""
             if hasattr(rsp, "text"):
@@ -219,7 +255,39 @@ class Spider(Spider):
                 text = rsp.content.decode("utf-8", "ignore")
             else:
                 text = str(rsp)
+
+            # 检测是否为 PoW 挑战页
+            if ("正在检测" in text) or ("sha1(hash" in text
+                                       and "attack_key" in text):
+                self.log("⚠️ 遇到 PoW 挑战, 开始破解...")
+                attack_key = self._solve_pow(text)
+                if attack_key is not None:
+                    sep = "&" if "?" in url else "?"
+                    new_url = url + sep + "attack_key=" + str(attack_key)
+                    self.log("带 attack_key 重新请求")
+                    rsp2 = self.fetch(new_url, headers=h, timeout=timeout)
+                    text2 = ""
+                    if hasattr(rsp2, "text"):
+                        text2 = rsp2.text or ""
+                    elif hasattr(rsp2, "content"):
+                        text2 = rsp2.content.decode("utf-8", "ignore")
+                    self.log("PoW 后 HTML 长度: %d" % len(text2))
+
+                    # 二次挑战？再破一次（少见）
+                    if "正在检测" in text2 and "sha1(hash" in text2:
+                        self.log("⚠️ 再次遇到挑战, 再破一次...")
+                        attack_key2 = self._solve_pow(text2)
+                        if attack_key2 is not None:
+                            sep2 = "&" if "?" in new_url else "?"
+                            new_url2 = new_url + sep2 + "attack_key=" + str(attack_key2)
+                            rsp3 = self.fetch(new_url2, headers=h, timeout=timeout)
+                            text2 = rsp3.text if hasattr(rsp3, "text") else str(rsp3)
+                    return text2
+                else:
+                    self.log("PoW 破解失败")
+                    return text
             return text
+
         except Exception as e:
             self.log("fetch FAIL %s -> %s" % (url, e))
             return ""
@@ -256,9 +324,8 @@ class Spider(Spider):
             self.log("  HTML 为空")
             return videos
 
-        # 方法1: 完整卡片
         matches = _RE_CARD.findall(html)
-        self.log("  方法1(完整卡片): %d 条" % len(matches))
+        self.log("  完整卡片: %d 条" % len(matches))
 
         if matches:
             for href, alt, pic in matches:
@@ -274,10 +341,10 @@ class Spider(Spider):
                 })
             return videos
 
-        # 方法2: 分别抓 href 和 img，按顺序配对
+        # 备用：分开抓
         hrefs = _RE_HREF.findall(html)
         imgs = _RE_IMG.findall(html)
-        self.log("  方法2: href=%d img=%d" % (len(hrefs), len(imgs)))
+        self.log("  分开: href=%d img=%d" % (len(hrefs), len(imgs)))
 
         if hrefs and imgs:
             for i, href in enumerate(hrefs):
@@ -295,8 +362,6 @@ class Spider(Spider):
                 })
             return videos
 
-        # 方法3: 只抓 href
-        self.log("  方法3(只抓href): %d 条" % len(hrefs))
         for href in hrefs:
             if href in seen:
                 continue
@@ -327,11 +392,9 @@ class Spider(Spider):
     def homeVideoContent(self):
         self._warm_up()
         url = "%s/?sion_id=%s" % (self.site_url, self.sion_id)
-        self.log("home: %s" % url)
         html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
+        self.log("home HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
-        self.log("  最终解析: %d 条" % len(videos))
         return {"list": videos}
 
     def categoryContent(self, tid, pg, filter, extend):
@@ -349,7 +412,6 @@ class Spider(Spider):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
 
-        # 该站 page 参数从 0 开始
         params = {
             "page": page - 1,
             "sort_field": extend.get("sort_field") or "play_hot",
@@ -369,14 +431,9 @@ class Spider(Spider):
         html = self._fetch(url)
         self.log("  HTML 长度: %d" % len(html))
 
-        # 检查是否被拦截
-        if html and len(html) < 5000:
-            self.log("  ⚠️ HTML 太短, 可能被反爬. 前 300 字:")
-            self.log("  " + html[:300].replace("\n", " "))
-
         videos = self._extract_videos(html)
         pagecount = self._page_count(html)
-        self.log("  最终解析: %d 条, 总页数: %d" % (len(videos), pagecount))
+        self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
 
         return {
             "list": videos, "page": page, "pagecount": pagecount,
@@ -393,11 +450,10 @@ class Spider(Spider):
         html = self._fetch(url)
         self.log("  HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
-        pagecount = self._page_count(html)
-        self.log("  最终解析: %d 条" % len(videos))
         return {
-            "list": videos, "page": page, "pagecount": pagecount,
-            "limit": 24, "total": pagecount * 24,
+            "list": videos, "page": page,
+            "pagecount": self._page_count(html),
+            "limit": 24, "total": 999,
         }
 
     def searchContentPage(self, key, quick, pg="1"):
@@ -577,29 +633,12 @@ class Spider(Spider):
 
         text = ""
         try:
-            if hasattr(rsp, "text"):
-                text = rsp.text or ""
-            elif hasattr(rsp, "content"):
-                text = rsp.content.decode("utf-8", "ignore")
+            text = rsp.text or ""
         except Exception:
             pass
 
         if "#EXTM3U" in text:
             return api_url
-
-        try:
-            data = json.loads(text)
-            if isinstance(data, dict):
-                u = (data.get("url") or data.get("playUrl") or
-                     data.get("play_url") or "")
-                if u:
-                    if u.startswith("//"):
-                        u = "https:" + u
-                    elif u.startswith("/"):
-                        u = self.site_url + u
-                    return u
-        except Exception:
-            pass
         return ""
 
     def localProxy(self, param):
