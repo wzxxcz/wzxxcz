@@ -364,11 +364,11 @@ class Spider(Spider):
         if pm:
             pic = self._fix_url(pm.group(1))
 
-        # 简介
+        # 简介（已加上前缀）
         content = ""
         cm = _RE_SYNOPSIS.search(html)
         if cm:
-            content = self._clean(cm.group(1))
+            content = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！" + self._clean(cm.group(1))
 
         # 元信息
         meta = {}
