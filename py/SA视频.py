@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-SA视频 lsjys11.com | TVBox Python 爬虫 (V6.0)
-- 修正 __NUXT_DATA__ 正则
-- 列表页从 Nuxt JSON 提取
-- 详情页从 Nuxt links[].items[] 提取真实剧集 hash ID
-- playerContent 返回详情页 URL（含 ?id= 和集数锚点），parse=1 让 TVBox 嗅探
-- 补全 6 大分类筛选
+SA视频 lsjys11.com | TVBox Python 爬虫 (V7.0)
+修正:
+  - __NUXT_DATA__ 引用解析：data_list[0] 是 int 引用，不是 dict
+  - 列表筛选响应字段严格化（要求 total/last_page）
+  - 详情页从 links[].items[] 提取真实剧集 hash ID
+  - playerContent 返回详情页 URL，parse=1 让 TVBox 嗅探
+  - 补全 6 大分类筛选
 """
 import re
 import sys
@@ -245,20 +246,28 @@ class Spider(Spider):
               .replace("&#39;", "'").replace("&lt;", "<").replace("&gt;", ">"))
         return s.strip()
 
-    # ---------------- Nuxt 引用解析 ----------------
+    # ---------------- Nuxt 引用解析（核心修正） ----------------
     @staticmethod
-    def _resolve_nuxt(raw, idx, depth=0, max_depth=15):
+    def _resolve_nuxt(raw, idx, depth=0, max_depth=25):
+        """
+        Nuxt __NUXT_DATA__ 是一个扁平数组，元素之间通过整数索引互相引用。
+        本函数递归把 int 索引替换为实际值。
+        - idx 是 int  → 从 raw[idx] 取值并继续递归
+        - idx 是 dict → 对 value 逐个递归
+        - idx 是 list → 对元素逐个递归
+        - 其它       → 直接返回
+        """
         if depth > max_depth:
             return None
-        if isinstance(idx, int) and 0 <= idx < len(raw):
-            val = raw[idx]
-            if isinstance(val, list):
-                return [Spider._resolve_nuxt(raw, i, depth + 1, max_depth) for i in val]
-            elif isinstance(val, dict):
-                return {k: Spider._resolve_nuxt(raw, v, depth + 1, max_depth)
-                        for k, v in val.items()}
-            else:
-                return val
+        if isinstance(idx, int):
+            if 0 <= idx < len(raw):
+                return Spider._resolve_nuxt(raw, raw[idx], depth + 1, max_depth)
+            return idx
+        if isinstance(idx, dict):
+            return {k: Spider._resolve_nuxt(raw, v, depth + 1, max_depth)
+                    for k, v in idx.items()}
+        if isinstance(idx, list):
+            return [Spider._resolve_nuxt(raw, i, depth + 1, max_depth) for i in idx]
         return idx
 
     def _parse_nuxt(self, html):
@@ -274,31 +283,29 @@ class Spider(Spider):
             return None
         return raw
 
-    # ---------------- 列表解析 ----------------
+    # ---------------- 列表解析（关键修正） ----------------
     def _extract_videos_from_nuxt(self, html):
         raw = self._parse_nuxt(html)
         if not raw:
             return None
+
+        # 优先寻找 API 响应结构：{data: <int>, total: <int>, ...}
+        # 排除 Pinia 的 state（有 data 但无 total）
         for item in raw:
             if not isinstance(item, dict):
                 continue
-            if "data" not in item or not isinstance(item.get("data"), int):
+            if "data" not in item:
+                continue
+            # 严格化：必须有 total 或 last_page，说明是列表响应
+            if "total" not in item and "last_page" not in item:
                 continue
             data_ref = item["data"]
+            if not isinstance(data_ref, int):
+                continue
             if not (0 <= data_ref < len(raw)):
                 continue
             data_list = raw[data_ref]
             if not isinstance(data_list, list) or not data_list:
-                continue
-            first = data_list[0]
-            if not isinstance(first, dict):
-                continue
-            if "name" not in first or "id" not in first:
-                continue
-            first_resolved = self._resolve_nuxt(raw, first, max_depth=6)
-            if not isinstance(first_resolved, dict):
-                continue
-            if not first_resolved.get("name") or not first_resolved.get("id"):
                 continue
 
             videos = []
@@ -306,6 +313,7 @@ class Spider(Spider):
                 v = self._resolve_nuxt(raw, v_ref)
                 if not isinstance(v, dict):
                     continue
+                # 跳过广告
                 if v.get("type") == "ad" or v.get("ad_position_code"):
                     continue
                 name = v.get("name") or ""
@@ -313,6 +321,7 @@ class Spider(Spider):
                 vid = v.get("id") or ""
                 if not name or not vid:
                     continue
+                # 详情 ID 格式：slug-id，如 yuhongjiushi-aa56cccd30f76823
                 vod_id = "%s-%s" % (slug, vid) if slug else str(vid)
                 pic = v.get("img") or ""
                 score = v.get("score") or "0"
@@ -324,9 +333,11 @@ class Spider(Spider):
                     "vod_remarks": str(remarks),
                     "vod_score":   str(score),
                 })
+
             if videos:
                 self.log("  Nuxt 列表解析成功: %d 部" % len(videos))
                 return videos
+
         return None
 
     def _extract_videos(self, html):
@@ -383,6 +394,7 @@ class Spider(Spider):
         raw = self._parse_nuxt(html)
         if not raw:
             return None
+        # 详情页响应结构：{"data": <int>, "seo": <int>}
         for item in raw:
             if not isinstance(item, dict):
                 continue
@@ -396,14 +408,19 @@ class Spider(Spider):
                 continue
             if "name" not in data_obj or "id" not in data_obj:
                 continue
+
             v = self._resolve_nuxt(raw, data_obj)
             if not isinstance(v, dict):
                 continue
+
             name = v.get("name") or vod_id
             content = v.get("description") or ""
             pic = v.get("img") or self.default_pic
+
             play_from = []
             play_url = []
+
+            # links 结构：[{"name": "1-34", "items": [{"id": "...", "name": "第N集"}]}]
             links = v.get("links")
             if isinstance(links, list):
                 for group in links:
@@ -418,10 +435,12 @@ class Spider(Spider):
                         ep_name = ep.get("name") or ""
                         ep_id = ep.get("id") or ""
                         if ep_name and ep_id:
+                            # 格式：名称$vod_id/ep_id
                             eps.append("%s$%s/%s" % (ep_name, vod_id, ep_id))
                     if eps:
                         play_from.append(str(line_name))
                         play_url.append("#".join(eps))
+
             if play_from:
                 self.log("  Nuxt 详情: %s, %d 线路" % (name, len(play_from)))
                 return {
@@ -454,8 +473,7 @@ class Spider(Spider):
     def playerContent(self, flag, id, vipFlags):
         """
         id 格式：`vod_id/ep_id`
-        返回详情页 URL（带 ?ep= 参数），parse=1 让 TVBox 用 WebView 打开并嗅探 m3u8。
-        headers 里带 Origin 和 Referer，避免 CDN 拒绝跨域请求。
+        返回详情页 URL，parse=1 让 TVBox 用 WebView 打开并嗅探 m3u8。
         """
         if id.startswith("http"):
             target = id
