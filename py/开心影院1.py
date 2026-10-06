@@ -1,293 +1,569 @@
-# -*- coding: utf-8 -*-
-# 八度影院 h.sdgtrl.com | MacCMS v10魔改(拼音分类/films详情/vodlist播放) | 71us v7.3定制 | 必须安卓UA
-import sys, re, json, hashlib, time
-from urllib.parse import urljoin, quote, unquote
-import requests
-
-try:
-    requests.packages.urllib3.disable_warnings()
-except:
-    pass
+# coding=utf-8
+"""
+开心影院 kxyy1.cc TVBox Python 爬虫
+苹果CMS v10 模板 + 自建 nby.php 两段式解析
+"""
+import re
+import sys
+import json
+import base64
+import urllib.parse
 
 sys.path.append('..')
+
 try:
     from base.spider import Spider
 except ImportError:
-    class Spider:
+    import requests as _rq
+    try:
+        import urllib3
+        urllib3.disable_warnings()
+    except Exception:
+        pass
+
+    class _BaseSpider:
+        def __init__(self):
+            self._session = None
+
+        @property
+        def _sess(self):
+            if self._session is None:
+                self._session = _rq.Session()
+                self._session.verify = False
+                adapter = _rq.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10, max_retries=0)
+                self._session.mount('https://', adapter)
+                self._session.mount('http://', adapter)
+            return self._session
+
         def fetch(self, url, headers=None, **kw):
-            kw.pop('timeout', None)
-            r = requests.get(url, headers=headers, timeout=15, **kw)
+            timeout = kw.pop('timeout', 15)
+            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
             r.encoding = 'utf-8'
             return r
 
-HOSTS = ['https://h.sdgtrl.com']
-UA = 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
-CATEGORIES = {
-    'dianying': '电影', 'dianshiju': '电视剧', 'zongyi': '综艺', 'dongman': '动漫',
-    'fanzuipian': '犯罪片', 'xijupian': '喜剧片', 'dongzuopian': '动作片', 'aiqingpian': '爱情片',
-    'kehuanpian': '科幻片', 'kongbupian': '恐怖片', 'juqingpian': '剧情片', 'zhanzhengpian': '战争片',
-    'jingsongpian': '惊悚片', 'jiatingpian': '家庭片', 'guzhangpian': '古装片', 'lishipian': '历史片',
-    'xianyipian': '悬疑片', 'zainanpian': '灾难片', 'jilupian': '纪录片', 'donghuapian': '动画片',
-    'rihan': '日韩', 'guochanju': '国产剧', 'xianggangju': '香港剧', 'hanguoju': '韩国剧',
-    'oumeiju': '欧美剧', 'taiwanju': '台湾剧', 'ribenju': '日本剧', 'haiwaiju': '海外剧',
-    'taiguoju': '泰国剧', 'duanju': '短剧'}
+        def log(self, *a, **kw):
+            try:
+                print("[kxyy]", *a)
+            except Exception:
+                pass
+
+    Spider = _BaseSpider
+
+HOST = "https://www.kxyy1.cc"
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+DEFAULT_PIC = HOST + "/images/img-bj-k.png"
+
+# ============ 分类 ============
+CLASSES = [
+    {"type_id": "1",  "type_name": "电影"},
+    {"type_id": "2",  "type_name": "电视剧"},
+    {"type_id": "3",  "type_name": "综艺"},
+    {"type_id": "4",  "type_name": "动漫"},
+    {"type_id": "26", "type_name": "短剧"},
+    {"type_id": "24", "type_name": "纪录片"},
+]
+
+_AREAS = ["", "中国大陆", "中国香港", "中国台湾", "美国", "日本", "韩国", "泰国", "英国", "法国", "德国", "意大利", "印度", "马来西亚"]
+_YEARS = ["", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018",
+          "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010",
+          "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002",
+          "2001", "2000", "90年代", "80年代", "70年代", "其他"]
+_SORTS = [
+    {"n": "更新时间", "v": "time"},
+    {"n": "近期热门", "v": "hits_week"},
+    {"n": "豆瓣评分", "v": "douban_score"},
+]
+
+FILTERS = {}
+for cid in ["1", "2", "3", "4", "26", "24"]:
+    FILTERS[cid] = [
+        {"key": "area", "name": "地区", "value": [{"n": a or "不限", "v": a} for a in _AREAS]},
+        {"key": "year", "name": "年份", "value": [{"n": y or "不限", "v": y} for y in _YEARS]},
+        {"key": "by", "name": "排序", "value": _SORTS},
+    ]
+
+# ============ 正则 ============
+_RE_CARD = re.compile(
+    r'<div class="card card-sm card-link">(.*?)</div>\s*</div>\s*</div>',
+    re.S | re.I)
+_RE_CARD_A = re.compile(
+    r'<a[^>]*href="(/voddetail/\d+\.html)"[^>]*?(?:title="([^"]*)")?[^>]*>(.*?)</a>',
+    re.S | re.I)
+_RE_PIC = re.compile(r'<img[^>]*?(?:data-src|src)="([^"]+)"', re.I)
+_RE_TITLE_IN_CARD = re.compile(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', re.I)
+_RE_BADGE = re.compile(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</span>', re.I)
+_RE_RIBBON = re.compile(r'<strong[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</strong>', re.I)
+
+_RE_DETAIL_TITLE = re.compile(r'<h1[^>]*class="[^"]*d-none d-md-block[^"]*"[^>]*>([^<]+)</h1>', re.I)
+_RE_DETAIL_TITLE_M = re.compile(r'<h2[^>]*class="[^"]*d-sm-block d-md-none[^"]*"[^>]*>([^<]+)</h2>', re.I)
+_RE_DETAIL_PIC = re.compile(r'<div class="col-md-auto[^"]*"><img[^>]*src="([^"]+)"', re.I)
+_RE_DETAIL_CONTENT = re.compile(r'<div class="card-body"><p>(.*?)</p></div>', re.S | re.I)
+_RE_DETAIL_META = re.compile(r'<p class="[^"]*mb-0 mb-md-2[^"]*"><strong>([^：<]+)：</strong>(.*?)</p>', re.S | re.I)
+
+_RE_TABS = re.compile(
+    r'<li class="nav-item"><a href="#tabs-home-(\d+)"[^>]*>([^<]+)&nbsp;<span class="badge">(\d+)</span></a></li>',
+    re.I)
+_RE_PANE = re.compile(r'<div class="tab-pane[^"]*" id="tabs-home-(\d+)">(.*?)</div>\s*</div>', re.S | re.I)
+_RE_EP_BTN = re.compile(r'<a class="btn btn-square[^"]*"\s+href="([^"]+)"[^>]*>([^<]+)</a>', re.I)
+
+_RE_PLAYER_DATA = re.compile(r'var player_data=(\{.*?\});', re.S | re.I)
+_RE_TAIL_PAGE = re.compile(r'href="[^"]*?(\d+)\.html"[^>]*>尾页</a>', re.I)
+
+# 直接抓 m3u8 / mp4 的兜底正则
+_RE_M3U8_ANY = re.compile(r'https?://[^\s"\'<>\\\u4e00-\u9fff]+\.m3u8[^\s"\'<>\\\u4e00-\u9fff]*', re.I)
 
 
 class Spider(Spider):
-    def init(self, extend=''):
-        self.base = HOSTS[0].rstrip('/')
-        self.ua = UA
-        self.types = dict(CATEGORIES)
+
+    def getName(self):
+        return "开心影院"
+
+    def init(self, extend=""):
+        self.site_url = HOST
+        self.headers = {
+            'User-Agent': UA,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'zh-CN,zh;q=0.9',
+            'Referer': self.site_url + "/",
+        }
+        self.default_pic = DEFAULT_PIC
+
+    # ---------- 网络 ----------
+    def _fetch(self, url, timeout=15, headers=None):
         try:
-            h = self._get(self.base)
-            if not h:
-                return
-            ts = {}
-            for m in re.finditer(r'<a href="/vod/([a-z0-9]+)\.html"[^>]*>\s*<span[^>]*>([^<]+)</span>', h):
-                name = m.group(2).strip()
-                if name and name != '理论' and name != '伦理片':
-                    ts.setdefault(m.group(1), name)
-            if len(ts) >= 4:
-                self.types = {k: v for k, v in self.types.items() if k in ts} or self.types
-        except:
-            pass
+            req_h = dict(self.headers)
+            if headers:
+                req_h.update(headers)
+            rsp = self.fetch(url, headers=req_h, timeout=timeout)
+            if hasattr(rsp, 'text'):
+                return rsp.text
+            if hasattr(rsp, 'content'):
+                return rsp.content.decode('utf-8', 'ignore')
+            return str(rsp)
+        except Exception as e:
+            self.log("fetch fail: %s - %s" % (url, e))
+            return ""
 
-    def _get(self, url, headers=None, timeout=15000):
-        last = ''
-        for u in [url] + ([url.replace(self.base, h.rstrip('/'), 1) for h in HOSTS if h.rstrip('/') != self.base and url.startswith(self.base)]):
-            try:
-                hs = headers or {'User-Agent': self.ua, 'Referer': self.base}
-                try:
-                    r = self.fetch(u, headers=hs, timeout=timeout)
-                except TypeError:
-                    r = self.fetch(u, headers=hs)
-                last = r.text if hasattr(r, 'text') else str(r)
-                if last:
-                    return last
-            except:
-                try:
-                    rr = requests.get(u, headers=hs, timeout=max(timeout / 1000.0, 10), verify=False)
-                    last = rr.text
-                    if last:
-                        return last
-                except:
-                    pass
-        return last
+    def _fetch_json(self, url, timeout=12, headers=None):
+        text = self._fetch(url, timeout=timeout, headers=headers)
+        if not text:
+            return None
+        try:
+            return json.loads(text)
+        except Exception:
+            return None
 
-    def _pic(self, u):
-        if not u:
+    def _fix_url(self, url):
+        if not url:
+            return ""
+        url = url.strip()
+        if url.startswith("//"):
+            return "https:" + url
+        if not url.startswith("http"):
+            return urllib.parse.urljoin(self.site_url, url)
+        return url
+
+    def _clean(self, s):
+        if not s:
             return ''
-        if u.startswith('//'):
-            u = 'https:' + u
-        elif u.startswith('/'):
-            u = self.base + u
-        return u
+        s = re.sub(r'<br\s*/?>', '\n', s, flags=re.I)
+        s = re.sub(r'<[^>]+>', '', s)
+        s = (s.replace('&nbsp;', ' ').replace('\xa0', ' ')
+               .replace('&amp;', '&').replace('&quot;', '"')
+               .replace('&#39;', "'").replace('&lt;', '<')
+               .replace('&gt;', '>'))
+        s = re.sub(r'[ \t\r\f\v]+', ' ', s)
+        s = re.sub(r'\n{2,}', '\n', s)
+        return s.strip()
 
-    def _pagecount(self, h, cur=1):
-        mx = cur
-        for m in re.finditer(r'page=(\d+)', h):
+    # ---------- 列表解析 ----------
+    def _extract_videos(self, html):
+        videos = []
+        seen = set()
+        if not html:
+            return videos
+
+        for cm in _RE_CARD.finditer(html):
+            block = cm.group(1)
+            am = _RE_CARD_A.search(block)
+            if not am:
+                continue
+            href, title_attr, inner = am.groups()
+            vm = re.search(r'/voddetail/(\d+)\.html', href)
+            if not vm:
+                continue
+            vid = vm.group(1)
+            if vid in seen:
+                continue
+
+            title = ""
+            tm = _RE_TITLE_IN_CARD.search(block)
+            if tm:
+                title = self._clean(tm.group(1))
+            if not title and title_attr:
+                title = self._clean(title_attr)
+            if not title:
+                title = self._clean(inner)
+            if not title:
+                continue
+
+            pic = self.default_pic
+            pm = _RE_PIC.search(block)
+            if pm:
+                pic = self._fix_url(pm.group(1))
+
+            remark = ""
+            bm = _RE_BADGE.search(block)
+            if bm:
+                remark = self._clean(bm.group(1))
+            if not remark:
+                rm = _RE_RIBBON.search(block)
+                if rm:
+                    remark = self._clean(rm.group(1))
+
+            seen.add(vid)
+            videos.append({
+                "vod_id": vid,
+                "vod_name": title[:100],
+                "vod_pic": pic,
+                "vod_remarks": remark[:30],
+            })
+        return videos
+
+    def _get_pagecount(self, html):
+        if not html:
+            return 1
+        tm = _RE_TAIL_PAGE.search(html)
+        if tm:
+            return int(tm.group(1))
+        pages = re.findall(r'vodshow/[^"]*?-(\d+)-[^"]*?\.html', html)
+        if pages:
             try:
-                n = int(m.group(1))
-                if n > mx:
-                    mx = n
-            except:
+                return max(int(p) for p in pages)
+            except Exception:
                 pass
-        if re.search(r'下一页', h):
-            mx = max(mx, cur + 1)
-        return mx
+        return 1
 
-    def _items(self, h, drop=False):
-        items, seen = [], set()
-        for m in re.finditer(r'<a[^>]*?href="/films/(\d+)\.html"[^>]*?>', h):
-            tag = m.group(0)
-            tm = re.search(r'title="([^"]+)"', tag)
-            if not tm or m.group(1) in seen:
-                continue
-            pic = ''
-            dm = re.search(r'data-original="([^"]+)"', tag)
-            if dm:
-                pic = dm.group(1)
-            else:
-                sm = re.search(r'style="([^"]*)"', tag)
-                if sm:
-                    pm = re.search(r'(/upload/[^"\')&\s]+\.(?:jpe?g|png|webp)|https?://[^"\')&\s]+\.(?:jpe?g|png|webp))', sm.group(1), re.I)
-                    if pm:
-                        pic = pm.group(1)
-            if drop and not pic:
-                continue
-            remark = ''
-            rm = re.search(r'<span[^>]*class="[^"]*(?:pic-text|pic-tag)[^"]*"[^>]*>([^<]+)<', h[m.end():m.end() + 300])
-            if rm:
-                remark = rm.group(1).strip()
-            seen.add(m.group(1))
-            items.append({'vod_id': m.group(1), 'vod_name': tm.group(1).strip()[:80], 'vod_pic': self._pic(pic), 'vod_remarks': remark})
-        return items
-
+    # ---------- TVBox 接口 ----------
     def homeContent(self, filter=False):
-        r = {'class': [{'type_id': k, 'type_name': v} for k, v in self.types.items()]}
-        r['list'] = self.homeVideoContent().get('list', [])
-        return r
+        return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        h = self._get(self.base)
-        return {'list': self._items(h, True) if h else []}
+        html = self._fetch(self.site_url + "/")
+        videos = self._extract_videos(html) if html else []
+        return {"list": videos}
 
-    def categoryContent(self, tid, pg=1, filter=False, extend=''):
-        try:
-            pn = max(int(str(pg)), 1)
-        except:
-            pn = 1
-        t2 = str(tid).split('|')[0].split('$')[0]
-        url = f'{self.base}/stars/{t2}.html' if t2 == 'duanju' else f'{self.base}/vod/{t2}.html'
-        h = self._get(f'{url}?page={pn}')
-        if not h:
-            return {'page': pn, 'pagecount': 1, 'limit': 42, 'total': 0, 'list': []}
-        idx = h.find('stui-vodlist clearfix')
-        if idx > 0:
-            h = h[idx:]
-        items = self._items(h)
-        return {'page': pn, 'pagecount': self._pagecount(h, pn), 'limit': 42, 'total': len(items), 'list': items}
+    def categoryContent(self, tid, pg, filter, extend):
+        page = int(pg) if pg else 1
+        if isinstance(extend, str):
+            try:
+                extend = json.loads(extend)
+            except Exception:
+                extend = {}
+        if not extend:
+            extend = {}
 
-    def detailContent(self, ids, quick='1'):
-        vid = str(ids[0] if isinstance(ids, list) else ids or '')
-        m = re.search(r'(\d+)', vid)
-        vid = m.group(1) if m else ''
-        if not vid:
-            return {'list': []}
-        h = self._get(f'{self.base}/films/{vid}.html')
-        if not h:
-            return {'list': []}
-        d = {'vod_id': vid, 'vod_name': '', 'vod_pic': '', 'vod_year': '', 'vod_area': '',
-             'vod_class': '', 'vod_director': '', 'vod_actor': '', 'vod_content': '',
-             'vod_remarks': '', 'vod_play_from': '', 'vod_play_url': ''}
-        tn = re.search(r'<h1[^>]*>\s*<a[^>]*title="([^"]+)"', h) or re.search(r'<title>(.*?)</title>', h)
-        if tn:
-            d['vod_name'] = re.sub(r'[《》]', '', tn.group(1).split('-')[0]).replace('免费在线观看', '').replace('高清完整版', '').strip()
-        pm = re.search(r'<div[^>]*class="[^"]*stui-content__thumb[^"]*"[^>]*>[\s\S]*?<img[^>]*src="([^"]+)"', h)
+        area = extend.get("area", "")
+        year = extend.get("year", "")
+        by = extend.get("by", "time")
+
+        parts = [tid]
+        parts.append(urllib.parse.quote(area) if area else "")
+        parts.append(by or "")
+        parts.append("")
+        if page > 1:
+            parts.append(str(page))
+        else:
+            parts.append("")
+        parts.append("")
+        parts.append("")
+        parts.append(year or "")
+        path = "-".join(parts)
+        url = f"{self.site_url}/vodshow/{path}.html"
+
+        html = self._fetch(url)
+        videos = self._extract_videos(html) if html else []
+        pagecount = self._get_pagecount(html)
+
+        return {
+            "list": videos,
+            "page": page,
+            "pagecount": pagecount,
+            "limit": 48,
+            "total": pagecount * 48,
+        }
+
+    def searchContent(self, key, quick, pg="1"):
+        page = int(pg) if pg else 1
+        keyword = urllib.parse.quote(key)
+        url = f"{self.site_url}/vodsearch/-------------.html?wd={keyword}"
+        if page > 1:
+            url += f"&page={page}"
+        html = self._fetch(url)
+        videos = self._extract_videos(html) if html else []
+        pagecount = self._get_pagecount(html)
+        return {
+            "list": videos,
+            "page": page,
+            "pagecount": pagecount,
+            "limit": 48,
+            "total": pagecount * 48,
+        }
+
+    def searchContentPage(self, key, quick, pg="1"):
+        return self.searchContent(key, quick, pg)
+
+    def detailContent(self, ids):
+        if not ids:
+            return {"list": []}
+        vid = str(ids[0])
+        url = f"{self.site_url}/voddetail/{vid}.html"
+        html = self._fetch(url)
+        if not html:
+            return {"list": []}
+
+        name = vid
+        tm = _RE_DETAIL_TITLE.search(html) or _RE_DETAIL_TITLE_M.search(html)
+        if tm:
+            name = self._clean(tm.group(1))
+            name = re.sub(r'\s*\(\d{4}\)\s*$', '', name)
+
+        pic = self.default_pic
+        pm = _RE_DETAIL_PIC.search(html)
         if pm:
-            d['vod_pic'] = self._pic(pm.group(1))
-        for pm in re.finditer(r'<p[^>]*class="[^"]*\bdata\b[^"]*"[^>]*>([\s\S]*?)</p>', h):
-            t = re.sub(r'<[^>]+>', '', pm.group(1)).replace('&nbsp;', '').replace('\xa0', '').strip(' ：:')
-            for k, kk in (('vod_year', '年代'), ('vod_director', '导演'), ('vod_actor', '演员'), ('vod_area', '地区'), ('vod_remarks', '状态')):
-                if not d[k] and t.startswith(kk):
-                    d[k] = t[len(kk):].strip(' ：:').strip()
-        dc = re.search(r'<span[^>]*class="[^"]*detail-sketch[^"]*"[^>]*>([\s\S]*?)</span>', h)
-        if dc:
-            d['vod_content'] = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', dc.group(1)).replace('&nbsp;', ' ')).strip()[:500]
-        uls = re.findall(r'<ul[^>]*class="[^"]*stui-content__playlist[^"]*"[^>]*>([\s\S]*?)</ul>', h)
-        pf, pu = [], []
-        for i, uu in enumerate(uls):
-            eps = re.findall(r'href="(/vodlist/[^"]+)"[^>]*>\s*([^<]+?)\s*</a>', uu)
+            pic = self._fix_url(pm.group(1))
+
+        content = ""
+        cm = _RE_DETAIL_CONTENT.search(html)
+        if cm:
+            content = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！" + self._clean(cm.group(1))
+
+        meta = {}
+        for m in _RE_DETAIL_META.finditer(html):
+            label = self._clean(m.group(1)).strip()
+            val = self._clean(m.group(2)).strip()
+            if label and val:
+                meta[label] = val
+
+        play_from = []
+        play_url = []
+
+        tabs = _RE_TABS.findall(html)
+        panes = _RE_PANE.findall(html)
+        pane_dict = {pid: pcontent for pid, pcontent in panes}
+
+        for sid, tab_name, ep_count in tabs:
+            tab_name = self._clean(tab_name)
+            pane_content = pane_dict.get(sid, "")
+            if not pane_content:
+                continue
+            eps = []
+            for ep_href, ep_name in _RE_EP_BTN.findall(pane_content):
+                ep_name = self._clean(ep_name)
+                eps.append(f"{ep_name}${ep_href}")
             if eps:
-                pf.append('wjm3u8' if i == 0 else f'线路{i + 1}')
-                pu.append('#'.join(f'{t.strip().replace("#", "-").replace("$", "|")}${urljoin(self.base, u)}' for u, t in eps))
-        if pf:
-            d['vod_play_from'] = '$$$'.join(pf)
-            d['vod_play_url'] = '$$$'.join(pu)
-        return {'list': [d]}
+                play_from.append(tab_name)
+                play_url.append("#".join(eps))
 
-    def searchContent(self, key, quick=False, pg='1'):
+        if not play_url:
+            return {"list": []}
+
+        return {"list": [{
+            "vod_id": vid,
+            "vod_name": name,
+            "vod_pic": pic,
+            "vod_content": content,
+            "vod_actor": meta.get("主演", ""),
+            "vod_director": meta.get("导演", ""),
+            "vod_year": meta.get("首播", meta.get("年份", "")),
+            "vod_area": meta.get("制片国家/地区", ""),
+            "vod_lang": meta.get("语言", ""),
+            "vod_type": meta.get("类型", ""),
+            "vod_remarks": (meta.get("集数", "") and ("全" + meta["集数"] + "集")) or "",
+            "vod_play_from": "$$$".join(play_from),
+            "vod_play_url": "$$$".join(play_url),
+        }]}
+
+    # ---------- 播放解析 ----------
+    def _resolve_nby(self, from_key, raw_url):
+        """
+        nby.php 两段式解析：
+        1. GET {site}/static/player/nby.php?get_signed_url=1&url=<encode(raw_url)>
+           → {"signed_url": "..."}
+        2. GET signed_url
+           → {"urltype": "hls", "jmurl": "真实m3u8"}
+        返回真实 m3u8，失败返回空字符串
+        """
+        iframe_base = f"{self.site_url}/static/player/{from_key.lower()}.php"
+
+        # 第一段：get_signed_url
+        step1_url = (
+            iframe_base
+            + "?get_signed_url=1&url="
+            + urllib.parse.quote(raw_url, safe='')
+        )
+        step1_headers = {
+            "User-Agent": UA,
+            "Referer": f"{self.site_url}/vodplay/",  # 播放页同源即可
+            "X-Requested-With": "XMLHttpRequest",
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+        }
+        data1 = self._fetch_json(step1_url, timeout=12, headers=step1_headers)
+        if not data1:
+            self.log("step1 no json")
+            return ""
+
+        signed_url = data1.get("signed_url", "")
+        if not signed_url:
+            self.log("step1 no signed_url: %s" % data1)
+            return ""
+
+        # 相对路径补全
+        if signed_url.startswith("//"):
+            signed_url = "https:" + signed_url
+        elif signed_url.startswith("/"):
+            signed_url = self.site_url + signed_url
+
+        # 第二段：请求 signed_url
+        step2_headers = {
+            "User-Agent": UA,
+            "Referer": step1_url,
+            "X-Requested-With": "XMLHttpRequest",
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+        }
+        data2 = self._fetch_json(signed_url, timeout=12, headers=step2_headers)
+        if not data2:
+            self.log("step2 no json")
+            return ""
+
+        # 优先 jmurl，其次 url
+        jmurl = data2.get("jmurl") or data2.get("url") or ""
+        if jmurl:
+            jmurl = jmurl.replace('\\/', '/')
+            return jmurl
+        self.log("step2 no jmurl: %s" % data2)
+        return ""
+
+    def playerContent(self, flag, id, vipFlags):
+        if id.startswith("http"):
+            play_url = id
+        else:
+            play_url = self._fix_url(id)
+
+        html = self._fetch(play_url)
+        if not html:
+            return {"parse": 1, "url": play_url, "header": self.headers}
+
+        m = _RE_PLAYER_DATA.search(html)
+        if not m:
+            return {"parse": 1, "url": play_url, "header": self.headers}
+
         try:
-            pn = max(int(str(pg)), 1)
-        except:
-            pn = 1
-        h = self._get(f'{self.base}/mosr?wd={quote(key)}&page={pn}', timeout=30000)
-        if not h:
-            return {'list': [], 'page': pn}
-        idx = h.find('stui-vodlist__media')
-        if idx > 0:
-            end = h.find('</ul>', idx)
-            if end > 0:
-                h = h[idx:end]
-        return {'list': self._items(h, True), 'page': pn}
+            data = json.loads(m.group(1))
+        except Exception:
+            return {"parse": 1, "url": play_url, "header": self.headers}
 
-    def playerContent(self, flag, id, vipFlags=None):
-        url = str(id) if id else str(flag)
-        if '://' in url and re.search(r'\.(m3u8|mp4|flv|mp3)(\?|$)', url, re.I):
-            return {'parse': 0, 'url': url}
-        full = url if url.startswith('http') else urljoin(self.base, url)
-        h = self._get(full)
-        if not h:
-            return {'parse': 0, 'url': ''}
-        return {'parse': 0, 'url': self._parse_play(h)}
+        encrypt = str(data.get("encrypt", "0"))
+        raw_url = data.get("url", "")
+        from_key = data.get("from", "")
 
-    def _parse_play(self, h):
-        for key in ('player_data', 'player_aaaa'):
-            pd = re.search(r'var\s+%s\s*=\s*(\{[\s\S]*?\})\s*[;<]' % key, h)
-            if pd:
-                try:
-                    u = json.loads(pd.group(1)).get('url', '')
-                    if u:
-                        u = u.replace('\\/', '/')
-                        if re.search(r'\.(m3u8|mp4|flv)(\?|$)', u, re.I):
-                            return u
-                except:
-                    pass
-        m = re.search(r'var\s*(?:now|url)\s*=\s*["\']([^"\']+)["\']', h)
-        if m and re.search(r'\.(m3u8|mp4|flv)(\?|$)', m.group(1), re.I):
-            return m.group(1)
-        fm = re.search(r'(https?://[^\s"\'<>]+\.(?:m3u8|mp4|flv))', h)
-        if fm:
-            return fm.group(1)
-        iframe = re.search(r'<iframe[^>]+src="([^"]+)"', h, re.I)
-        if iframe:
-            u = iframe.group(1)
-            if u.startswith('http'):
-                h2 = self._get(u)
-                if h2:
-                    return self._parse_play(h2)
-        return ''
+        if encrypt == "1":
+            raw_url = urllib.parse.unquote(raw_url)
+        elif encrypt == "2":
+            try:
+                raw_url = base64.b64decode(raw_url).decode('utf-8', 'ignore')
+            except Exception:
+                pass
+
+        if not raw_url:
+            return {"parse": 1, "url": play_url, "header": self.headers}
+
+        # A. 已是 m3u8/mp4 直链
+        if any(ext in raw_url.lower() for ext in ['.m3u8', '.mp4']):
+            return {
+                "parse": 0,
+                "playUrl": "",
+                "url": raw_url,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+            }
+
+        # B. 用 nby.php 两段式解析（针对 NBY / BD / BF / MD / LZ / KS / TT / IK）
+        if from_key and from_key.lower() not in ("", "parse"):
+            try:
+                real = self._resolve_nby(from_key, raw_url)
+                if real:
+                    return {
+                        "parse": 0,
+                        "playUrl": "",
+                        "url": real,
+                        "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+                    }
+            except Exception as e:
+                self.log("nby resolve fail: %s" % e)
+
+        # C. 兜底：把 iframe URL 交给 TVBox 嗅探
+        iframe_url = ""
+        if from_key:
+            iframe_url = (
+                f"{self.site_url}/static/player/{from_key.lower()}.php?url="
+                + urllib.parse.quote(raw_url, safe='')
+            )
+            return {
+                "parse": 1,
+                "playUrl": "",
+                "url": iframe_url,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+            }
+
+        return {"parse": 1, "url": play_url, "header": self.headers}
 
     def localProxy(self, param):
-        p = param.split('url=', 1)[-1] if 'url=' in param else param
-        p = unquote(p) if '%' in p else p
-        if re.search(r'\.(jpe?g|png|webp|gif)(\?|$)', p, re.I):
-            try:
-                r = requests.get(p, headers={'User-Agent': self.ua, 'Referer': self.base}, timeout=15)
-                return {'code': r.status_code, 'content': r.content, 'headers': {'Content-Type': r.headers.get('Content-Type', 'image/jpeg')}}
-            except:
-                return {'code': 404, 'content': b'', 'headers': {}}
-        if '.m3u8' in p:
-            return self._rewrite_m3u8(p)
         try:
-            try:
-                r = self.fetch(p, headers={'User-Agent': self.ua, 'Referer': self.base}, timeout=20000)
-            except TypeError:
-                r = self.fetch(p, headers={'User-Agent': self.ua, 'Referer': self.base})
-            if hasattr(r, 'status_code') and r.status_code != 200:
-                return {'code': r.status_code, 'content': b'', 'headers': {}}
-            return {'code': 200, 'content': r.content, 'headers': {'Content-Type': r.headers.get('Content-Type', 'application/octet-stream')}}
-        except:
-            return {'code': 404, 'content': b'', 'headers': {}}
+            url = ""
+            if isinstance(param, dict):
+                url = param.get("url", "")
+            else:
+                params = {}
+                if isinstance(param, str):
+                    for pair in param.split("&"):
+                        if "=" in pair:
+                            k, v = pair.split("=", 1)
+                            params[k] = v
+                url = params.get("url", "")
+            if not url:
+                return [200, "image/jpeg", b"", ""]
+            url = urllib.parse.unquote(url) if '%' in url else url
+            if url.startswith("//"):
+                url = "https:" + url
+            elif url.startswith("/"):
+                url = self.site_url + url
 
-    def _rewrite_m3u8(self, url):
-        try:
-            try:
-                r = self.fetch(url, headers={'User-Agent': self.ua, 'Referer': self.base}, timeout=20000)
-            except TypeError:
-                r = self.fetch(url, headers={'User-Agent': self.ua, 'Referer': self.base})
-            if hasattr(r, 'status_code') and r.status_code != 200:
-                return {'code': r.status_code, 'content': b'', 'headers': {}}
-            body = r.text if hasattr(r, 'text') else str(r)
-        except:
-            return {'code': 404, 'content': b'', 'headers': {}}
-        base = url.rsplit('/', 1)[0] + '/'
-        origin = re.match(r'https?://[^/]+', url)
-        origin = origin.group(0) if origin else ''
-        out = []
-        for ln in body.splitlines():
-            if ln.startswith('#EXT-X-KEY'):
-                m = re.search(r'URI="([^"]+)"', ln)
-                if m:
-                    ku = m.group(1)
-                    if ku.startswith('/'):
-                        ku = origin + ku
-                    elif not ku.startswith('http'):
-                        ku = base + ku
-                    ln = ln.replace('URI="%s"' % m.group(1), 'URI="%s"' % ('proxy?url=' + quote(ku, safe='')))
-            elif ln.startswith('http'):
-                ln = 'proxy?url=' + quote(ln, safe='')
-            elif ln.startswith('/') and not ln.startswith('//'):
-                ln = 'proxy?url=' + quote(origin + ln, safe='')
-            out.append(ln)
-        return {'code': 200, 'content': '\n'.join(out), 'headers': {'Content-Type': 'application/vnd.apple.mpegurl'}}
+            rsp = self.fetch(url, headers=self.headers, timeout=15)
+            content = rsp.content
+            ctype = rsp.headers.get("Content-Type", "image/jpeg")
+            if not ctype.startswith("image/"):
+                ul = url.lower()
+                if ".png" in ul:
+                    ctype = "image/png"
+                elif ".webp" in ul:
+                    ctype = "image/webp"
+                elif ".gif" in ul:
+                    ctype = "image/gif"
+                else:
+                    ctype = "image/jpeg"
+            return [200, ctype, content, ""]
+        except Exception:
+            return [200, "image/jpeg", b"", ""]
+
+    def isVideoFormat(self, url):
+        return '.m3u8' in url or '.mp4' in url or url.startswith('http')
+
+    def manualVideoCheck(self):
+        return False
+
+    def destroy(self):
+        pass
+
+    def close(self):
+        self.destroy()
