@@ -83,27 +83,32 @@ for cid in ["1", "2", "3", "4", "26", "24"]:
         {"key": "year", "name": "年份", "value": [{"n": y or "不限", "v": y} for y in _YEARS]},
     ]
 
-_RE_VID = re.compile(r'/voddetail/(\d+)\.html', re.I)
+# ============ 正则 ============
+# 列表页：完整的 <a ... href="/voddetail/N.html" ...>...</a>
+_RE_DETAIL_A = re.compile(
+    r'<a[^>]*?href="(/voddetail/(\d+)\.html)"[^>]*>(.*?)</a>',
+    re.S | re.I)
+_RE_TITLE_ATTR = re.compile(r'title="([^"]+)"', re.I)
+_RE_IMG_SRC = re.compile(r'<img[^>]*?(?:data-src|src)="([^"]+)"', re.I)
+_RE_BADGE_TXT = re.compile(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</span>', re.I)
+_RE_CARD_TITLE = re.compile(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', re.I)
+_RE_RIBBON_TXT = re.compile(r'<(?:strong|div)[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</(?:strong|div)>', re.I)
+
+# 详情页：所有剧集链接 /vodplay/{vid}-{sid}-{nid}.html
+_RE_PLAY_LINK = re.compile(
+    r'href="(/vodplay/(\d+)-(\d+)-(\d+)\.html)"[^>]*>([^<]+)</a>',
+    re.I)
+
+# 详情页：线路名（tab 里的 <a>...</a>，会包含 svg）
+_RE_LINE_A = re.compile(
+    r'<a href="#tabs-home-(\d+)"[^>]*>(.*?)</a>',
+    re.S | re.I)
 
 _RE_DETAIL_TITLE = re.compile(r'<h1[^>]*class="[^"]*d-none d-md-block[^"]*"[^>]*>([^<]+)</h1>', re.I)
 _RE_DETAIL_TITLE_M = re.compile(r'<h2[^>]*class="[^"]*d-sm-block d-md-none[^"]*"[^>]*>([^<]+)</h2>', re.I)
 _RE_DETAIL_PIC = re.compile(r'<div class="col-md-auto[^"]*"><img[^>]*src="([^"]+)"', re.I)
 _RE_DETAIL_CONTENT = re.compile(r'<div class="card-body"><p>(.*?)</p></div>', re.S | re.I)
 _RE_DETAIL_META = re.compile(r'<p class="[^"]*mb-0 mb-md-2[^"]*"><strong>([^：<]+)：</strong>(.*?)</p>', re.S | re.I)
-
-# ★ 修正后的 TABS 正则：抓整个 <a> 内容
-_RE_TABS = re.compile(
-    r'<li class="nav-item">\s*<a href="#tabs-home-(\d+)"[^>]*>(.*?)</a>\s*</li>',
-    re.S | re.I)
-# 从 tab 内容里提取 badge 数字
-_RE_TAB_BADGE = re.compile(r'<span class="badge">(\d+)</span>', re.I)
-
-_RE_PANE = re.compile(r'<div class="tab-pane[^"]*" id="tabs-home-(\d+)">(.*?)</div>\s*</div>', re.S | re.I)
-
-# 剧集按钮：详情页是 "btn btn-square"，播放页是 "btn btn-success btn-square"
-_RE_EP_BTN = re.compile(
-    r'<a class="btn[^"]*btn-square[^"]*"\s+href="([^"]+)"[^>]*>([^<]+)</a>',
-    re.I)
 
 _RE_PLAYER_DATA = re.compile(r'var player_data=(\{.*?\});', re.S | re.I)
 _RE_TAIL_PAGE = re.compile(r'href="[^"]*?(\d+)\.html"[^>]*>尾页</a>', re.I)
@@ -138,6 +143,7 @@ class Spider(Spider):
             except Exception as e:
                 self.log("host fail %s: %s" % (h, e))
         self.default_pic = self.site_url + "/images/img-bj-k.png"
+        self.log("init done: site_url=%s" % self.site_url)
 
     # ---------- 网络 ----------
     def _fetch(self, url, timeout=15, headers=None):
@@ -178,6 +184,7 @@ class Spider(Spider):
         if not s:
             return ''
         s = re.sub(r'<br\s*/?>', '\n', s, flags=re.I)
+        s = re.sub(r'<svg.*?</svg>', '', s, flags=re.S | re.I)
         s = re.sub(r'<[^>]+>', '', s)
         s = (s.replace('&nbsp;', ' ').replace('\xa0', ' ')
                .replace('&amp;', '&').replace('&quot;', '"')
@@ -194,37 +201,38 @@ class Spider(Spider):
         if not html:
             return videos
 
-        for m in _RE_VID.finditer(html):
-            vid = m.group(1)
+        for m in _RE_DETAIL_A.finditer(html):
+            href, vid, inner = m.groups()
             if vid in seen:
                 continue
 
-            start = max(0, m.start() - 400)
-            end = min(len(html), m.end() + 500)
-            ctx = html[start:end]
-
+            # 标题：优先 a 标签本身的 title 属性
             title = ""
-            tm = re.search(r'title="([^"]+)"', ctx, re.I)
+            tm = _RE_TITLE_ATTR.search(m.group(0))
             if tm:
                 title = self._clean(tm.group(1))
             if not title:
-                tm = re.search(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', ctx, re.I)
-                if tm:
-                    title = self._clean(tm.group(1))
+                # 从 a 后面的 600 字符里找 card-title
+                after = html[m.end():m.end() + 600]
+                cm = _RE_CARD_TITLE.search(after)
+                if cm:
+                    title = self._clean(cm.group(1))
+            if not title:
+                title = self._clean(inner)
             if not title:
                 continue
 
             pic = self.default_pic
-            pm = re.search(r'<img[^>]*?(?:data-src|src)="([^"]+)"', ctx, re.I)
+            pm = _RE_IMG_SRC.search(inner)
             if pm:
                 pic = self._fix_url(pm.group(1))
 
             remark = ""
-            bm = re.search(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</span>', ctx, re.I)
+            bm = _RE_BADGE_TXT.search(inner)
             if bm:
                 remark = self._clean(bm.group(1))
             if not remark:
-                rm = re.search(r'<(?:strong|div)[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</(?:strong|div)>', ctx, re.I)
+                rm = _RE_RIBBON_TXT.search(m.group(0))
                 if rm:
                     remark = self._clean(rm.group(1))
 
@@ -277,15 +285,9 @@ class Spider(Spider):
         parts = [
             str(tid),
             urllib.parse.quote(area) if area else "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
+            "", "", "", "", "", "",
             str(page) if page > 1 else "",
-            "",
-            "",
+            "", "",
             year or "",
         ]
         path = "-".join(parts)
@@ -294,8 +296,7 @@ class Spider(Spider):
         html = self._fetch(url)
         videos = self._extract_videos(html) if html else []
         pagecount = self._get_pagecount(html)
-        if not videos:
-            self.log("empty category: url=%s html_len=%d" % (url, len(html) if html else 0))
+        self.log("category %s page %d: %d videos" % (tid, page, len(videos)))
 
         return {
             "list": videos,
@@ -332,25 +333,29 @@ class Spider(Spider):
         url = f"{self.site_url}/voddetail/{vid}.html"
         html = self._fetch(url)
         if not html:
-            self.log("detail page empty: %s" % url)
+            self.log("detail empty: %s" % url)
             return {"list": []}
 
+        # 标题
         name = vid
         tm = _RE_DETAIL_TITLE.search(html) or _RE_DETAIL_TITLE_M.search(html)
         if tm:
             name = self._clean(tm.group(1))
             name = re.sub(r'\s*\(\d{4}\)\s*$', '', name)
 
+        # 封面
         pic = self.default_pic
         pm = _RE_DETAIL_PIC.search(html)
         if pm:
             pic = self._fix_url(pm.group(1))
 
+        # 简介
         content = ""
         cm = _RE_DETAIL_CONTENT.search(html)
         if cm:
             content = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！" + self._clean(cm.group(1))
 
+        # 元信息
         meta = {}
         for m in _RE_DETAIL_META.finditer(html):
             label = self._clean(m.group(1)).strip()
@@ -358,50 +363,42 @@ class Spider(Spider):
             if label and val:
                 meta[label] = val
 
-        # ---------- 播放线路（修正版）----------
+        # ---------- 线路名 ----------
+        line_names = {}
+        for m in _RE_LINE_A.finditer(html):
+            sid, inner = m.groups()
+            # 去掉 svg 和 badge
+            clean = re.sub(r'<svg.*?</svg>', '', inner, flags=re.S | re.I)
+            clean = re.sub(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>.*?</span>', '', clean, flags=re.S | re.I)
+            clean = re.sub(r'&nbsp;', '', clean)
+            clean = re.sub(r'<[^>]+>', '', clean)
+            clean = re.sub(r'\s+', ' ', clean).strip()
+            if clean:
+                line_names[sid] = clean
+        self.log("detail lines: %s" % line_names)
+
+        # ---------- 剧集分组 ----------
+        groups = {}  # sid -> [(nid, name, href)]
+        for m in _RE_PLAY_LINK.finditer(html):
+            href, v, sid, nid, ep_name = m.groups()
+            if v != vid:
+                continue
+            groups.setdefault(sid, []).append((int(nid), ep_name.strip(), href))
+        self.log("detail groups: %s" % {k: len(v) for k, v in groups.items()})
+
+        # ---------- 组装 ----------
         play_from = []
         play_url = []
+        for sid, eps in groups.items():
+            eps_sorted = sorted(eps, key=lambda x: x[0])
+            line_name = line_names.get(sid, "线路%s" % sid)
+            play_from.append(line_name)
+            play_url.append("#".join("%s$%s" % (n, h) for _, n, h in eps_sorted))
 
-        # 1) 抓所有 tab：<li ...><a href="#tabs-home-N" ...>内容(含 svg)</a></li>
-        tabs = []
-        for m in _RE_TABS.finditer(html):
-            sid = m.group(1)
-            tab_inner = m.group(2)
-            bm = _RE_TAB_BADGE.search(tab_inner)
-            if not bm:
-                continue
-            tab_name = self._clean(tab_inner)
-            # 去掉名字末尾的 badge 数字（例如 "YX源 47" → "YX源"）
-            tab_name = re.sub(r'\s*\d+\s*$', '', tab_name).strip()
-            if not tab_name:
-                tab_name = "线路%s" % sid
-            tabs.append((sid, tab_name))
-
-        self.log("detail tabs found: %d" % len(tabs))
-
-        # 2) 抓所有 pane
-        panes = _RE_PANE.findall(html)
-        pane_dict = {pid: pcontent for pid, pcontent in panes}
-        self.log("detail panes found: %d" % len(panes))
-
-        for sid, tab_name in tabs:
-            pane_content = pane_dict.get(sid, "")
-            if not pane_content:
-                self.log("pane %s empty" % sid)
-                continue
-            eps = []
-            for ep_href, ep_name in _RE_EP_BTN.findall(pane_content):
-                ep_name = self._clean(ep_name)
-                if not ep_name:
-                    continue
-                eps.append(f"{ep_name}${ep_href}")
-            self.log("pane %s eps: %d" % (sid, len(eps)))
-            if eps:
-                play_from.append(tab_name)
-                play_url.append("#".join(eps))
+        self.log("detail play_from: %s, eps_count: %s" % (play_from, [len(x.split('#')) for x in play_url]))
 
         if not play_url:
-            self.log("no play_url resolved")
+            self.log("detail: no play_url resolved")
             return {"list": []}
 
         return {"list": [{
@@ -452,12 +449,9 @@ class Spider(Spider):
         except Exception:
             data1 = None
         if not isinstance(data1, dict):
-            self.log("step1 not json")
             return ""
-
         signed_url = data1.get("signed_url", "")
         if not signed_url:
-            self.log("step1 no signed_url")
             return ""
 
         if signed_url.startswith("http://") or signed_url.startswith("https://"):
@@ -485,7 +479,6 @@ class Spider(Spider):
         except Exception:
             data2 = None
         if not isinstance(data2, dict):
-            self.log("step2 not json")
             return ""
 
         jmurl = data2.get("jmurl") or data2.get("url") or ""
@@ -493,7 +486,6 @@ class Spider(Spider):
             jmurl = jmurl.replace('\\/', '/')
             self.log("m3u8 got: %s" % jmurl[:120])
             return jmurl
-        self.log("step2 no jmurl")
         return ""
 
     def playerContent(self, flag, id, vipFlags):
@@ -509,18 +501,17 @@ class Spider(Spider):
 
         html = self._fetch(play_url_main)
         if not html:
-            self.log("play page empty: %s" % play_url_main)
+            self.log("play page empty")
             return {"parse": 1, "url": play_url_main, "header": self.headers}
 
         m2 = _RE_PLAYER_DATA.search(html)
         if not m2:
-            self.log("no player_data in page")
+            self.log("no player_data")
             return {"parse": 1, "url": play_url_main, "header": self.headers}
 
         try:
             data = json.loads(m2.group(1))
-        except Exception as e:
-            self.log("player_data parse error: %s" % e)
+        except Exception:
             return {"parse": 1, "url": play_url_main, "header": self.headers}
 
         encrypt = str(data.get("encrypt", "0"))
