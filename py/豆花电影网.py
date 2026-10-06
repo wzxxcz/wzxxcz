@@ -1,9 +1,10 @@
 # coding=utf-8
 """
-豆花电影网 dhvideo.cc | TVBox Python 爬虫 (V6 播放修复版)
+豆花电影网 dhvideo.cc | TVBox Python 爬虫 (V6.1 简介前缀修复版)
 关键: 
   - 破解服务端 SHA1 PoW 挑战 (attack_key)
   - 解析 box.dyrs.com.de 的 master m3u8，提取真实子 m3u8
+  - 简介添加指定前缀，并补全提取兜底
 """
 import re
 import sys
@@ -59,6 +60,9 @@ SION_ID = "6ac4b6643b9fea31774d1157"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/template/douhua/douhua.me.png"
+
+# 简介前缀
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
 CLASSES = [
     {"type_id": "dianying",  "type_name": "电影"},
@@ -132,17 +136,16 @@ _RE_EPISODE = re.compile(
 _RE_PLAYER_AA = re.compile(r"aa\s*:\s*JSON\.parse\('(.*?)'\)", re.S)
 _RE_H1 = re.compile(r'<h1[^>]*>([\s\S]*?)</h1>', re.I)
 _RE_PIC_ID = re.compile(r'/img/id/[A-Za-z0-9]+\.(?:jpg|png|webp)', re.I)
+
+# 简介提取（多层兜底）
 _RE_INTRO = re.compile(
     r'<span\s+class="font-bold text-\[#ff3347\] mr-1">简介:</span>\s*'
     r'([\s\S]*?)</div>', re.S | re.I)
-_RE_DIRECTOR = re.compile(
-    r'<span class="text-\[#2e2e2e\] font-bold">导演</span>\s*'
-    r'<span[^>]*>([^<]+)</span>', re.S)
-_RE_ACTOR = re.compile(
-    r'<span class="text-\[#2e2e2e\] font-bold">主演</span>\s*'
-    r'<span[^>]*>([\s\S]*?)</span>', re.S)
-_RE_SCORE = re.compile(r'vk-badge">\s*([\d.]+)\s*</div>')
-_RE_HOT = re.compile(r'([\d,]+)\s*\(电视剧排名:\s*(\d+),\s*总排名:\s*(\d+)\)')
+# 兜底 1：特定 div 类名
+_RE_INTRO_DIV = re.compile(
+    r'<div[^>]*class="[^"]*text-\[#555\][^"]*reset-style[^"]*"[^>]*>'
+    r'([\s\S]*?)</div>', re.S | re.I)
+# 兜底 2：meta 标签
 _RE_META_DESC = re.compile(
     r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']',
     re.I)
@@ -205,10 +208,6 @@ class Spider(Spider):
 
     # -------- PoW 挑战求解 --------
     def _solve_pow(self, html):
-        """
-        从挑战页提取 hash 和 target，暴力破解 attack_key
-        成功返回整数 i，失败返回 None
-        """
         m1 = _RE_POW_HASH.search(html)
         m2 = _RE_POW_TARGET.search(html)
         if not m1 or not m2:
@@ -470,6 +469,7 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
+        # 标题
         name = ""
         m = _RE_H1.search(html)
         if m:
@@ -480,20 +480,33 @@ class Spider(Spider):
                 name = self._clean(m.group(1).split("_")[0].split("-")[0])
         name = re.sub(r"\s*\(\d{4}\)\s*$", "", name).strip() or vod_id
 
+        # 封面
         pic = self.default_pic
         m = _RE_PIC_ID.search(html)
         if m:
             pic = self.site_url + m.group(0)
 
+        # 简介（带兜底）
         content = ""
         m = _RE_INTRO.search(html)
         if m:
             content = self._clean(m.group(1))
         if not content:
+            m = _RE_INTRO_DIV.search(html)
+            if m:
+                content = self._clean(m.group(1))
+        if not content:
             m = _RE_META_DESC.search(html)
             if m:
                 content = self._clean(m.group(1))
 
+        # 增加简介前缀
+        if content:
+            content = INTRO_PREFIX + content
+        else:
+            content = INTRO_PREFIX
+
+        # 导演 / 演员 / 评分等
         director = ""
         m = _RE_DIRECTOR.search(html)
         if m:
@@ -514,6 +527,7 @@ class Spider(Spider):
         if m:
             hot_info = "热度%s (排名%s)" % (m.group(1), m.group(2))
 
+        # 剧集
         groups = {}
         for m in _RE_EPISODE.finditer(html):
             href, origin, ep_name = m.group(1), m.group(2), m.group(3)
@@ -614,14 +628,7 @@ class Spider(Spider):
             return m2.group(1) if m2 else ""
 
     def _resolve_to_real_m3u8(self, api_url, referer=None):
-        """
-        完整流程:
-          1. 请求 /api/m3u8?origin=..&url=.. (302)
-          2. 拿到 box.dyrs.com.de/api/super?... (master m3u8)
-          3. 请求 master m3u8, 解析出子 m3u8 (绝对 URL)
-          4. 返回子 m3u8 给 TVBox 直链播放
-        """
-        # Step 1: 请求 /api/m3u8，拿 302 Location
+        # Step 1: /api/m3u8 拿 302
         try:
             try:
                 rsp = self.fetch(api_url, headers={
@@ -644,7 +651,6 @@ class Spider(Spider):
             loc = (rsp.headers.get("Location", "") or
                    rsp.headers.get("location", ""))
 
-        # 没有 302，直接返回 m3u8?
         if not loc:
             text = ""
             try:
@@ -654,8 +660,6 @@ class Spider(Spider):
             if "#EXTM3U" in text:
                 self.log("api 直接返回 m3u8")
                 return api_url
-            self.log("无 Location 且无 m3u8，前100字: %s"
-                     % text[:100].replace("\n", " "))
             return ""
 
         if loc.startswith("//"):
@@ -677,19 +681,14 @@ class Spider(Spider):
                 text2 = rsp2.content.decode("utf-8", "ignore")
         except Exception as e:
             self.log("resolve#2 fail: %s" % e)
-            return loc  # 兜底：返回 master m3u8
-
-        if "#EXTM3U" not in text2:
-            self.log("  master 无 m3u8 头, 前200字: %s"
-                     % text2[:200].replace("\n", " "))
             return loc
 
-        self.log("  master m3u8 内容:")
-        self.log("  " + text2[:400].replace("\n", " | "))
+        if "#EXTM3U" not in text2:
+            self.log("  master 无 m3u8 头")
+            return loc
 
-        # Step 3: 解析第一个 #EXT-X-STREAM-INF 后面的子 m3u8 URL
+        # Step 3: 解析子 m3u8
         lines = [ln.strip() for ln in text2.split("\n") if ln.strip()]
-
         for i, line in enumerate(lines):
             if line.startswith("#EXT-X-STREAM-INF"):
                 if i + 1 < len(lines):
@@ -703,7 +702,6 @@ class Spider(Spider):
                     self.log("  子 m3u8: %s" % full[:160])
                     return full
 
-        # 没有子列表 → 本身就是 TS 索引，直接返回 master
         self.log("  无子 m3u8, 返回 master")
         return loc
 
