@@ -91,9 +91,19 @@ _RE_DETAIL_PIC = re.compile(r'<div class="col-md-auto[^"]*"><img[^>]*src="([^"]+
 _RE_DETAIL_CONTENT = re.compile(r'<div class="card-body"><p>(.*?)</p></div>', re.S | re.I)
 _RE_DETAIL_META = re.compile(r'<p class="[^"]*mb-0 mb-md-2[^"]*"><strong>([^：<]+)：</strong>(.*?)</p>', re.S | re.I)
 
-_RE_TABS = re.compile(r'<li class="nav-item"><a href="#tabs-home-(\d+)"[^>]*>([^<]+)&nbsp;<span class="badge">(\d+)</span></a></li>', re.I)
+# ★ 修正后的 TABS 正则：抓整个 <a> 内容
+_RE_TABS = re.compile(
+    r'<li class="nav-item">\s*<a href="#tabs-home-(\d+)"[^>]*>(.*?)</a>\s*</li>',
+    re.S | re.I)
+# 从 tab 内容里提取 badge 数字
+_RE_TAB_BADGE = re.compile(r'<span class="badge">(\d+)</span>', re.I)
+
 _RE_PANE = re.compile(r'<div class="tab-pane[^"]*" id="tabs-home-(\d+)">(.*?)</div>\s*</div>', re.S | re.I)
-_RE_EP_BTN = re.compile(r'<a class="btn btn-square[^"]*"\s+href="([^"]+)"[^>]*>([^<]+)</a>', re.I)
+
+# 剧集按钮：详情页是 "btn btn-square"，播放页是 "btn btn-success btn-square"
+_RE_EP_BTN = re.compile(
+    r'<a class="btn[^"]*btn-square[^"]*"\s+href="([^"]+)"[^>]*>([^<]+)</a>',
+    re.I)
 
 _RE_PLAYER_DATA = re.compile(r'var player_data=(\{.*?\});', re.S | re.I)
 _RE_TAIL_PAGE = re.compile(r'href="[^"]*?(\d+)\.html"[^>]*>尾页</a>', re.I)
@@ -177,7 +187,7 @@ class Spider(Spider):
         s = re.sub(r'\n{2,}', '\n', s)
         return s.strip()
 
-    # ---------- 列表解析（上下文匹配）----------
+    # ---------- 列表解析 ----------
     def _extract_videos(self, html):
         videos = []
         seen = set()
@@ -322,6 +332,7 @@ class Spider(Spider):
         url = f"{self.site_url}/voddetail/{vid}.html"
         html = self._fetch(url)
         if not html:
+            self.log("detail page empty: %s" % url)
             return {"list": []}
 
         name = vid
@@ -347,27 +358,50 @@ class Spider(Spider):
             if label and val:
                 meta[label] = val
 
+        # ---------- 播放线路（修正版）----------
         play_from = []
         play_url = []
 
-        tabs = _RE_TABS.findall(html)
+        # 1) 抓所有 tab：<li ...><a href="#tabs-home-N" ...>内容(含 svg)</a></li>
+        tabs = []
+        for m in _RE_TABS.finditer(html):
+            sid = m.group(1)
+            tab_inner = m.group(2)
+            bm = _RE_TAB_BADGE.search(tab_inner)
+            if not bm:
+                continue
+            tab_name = self._clean(tab_inner)
+            # 去掉名字末尾的 badge 数字（例如 "YX源 47" → "YX源"）
+            tab_name = re.sub(r'\s*\d+\s*$', '', tab_name).strip()
+            if not tab_name:
+                tab_name = "线路%s" % sid
+            tabs.append((sid, tab_name))
+
+        self.log("detail tabs found: %d" % len(tabs))
+
+        # 2) 抓所有 pane
         panes = _RE_PANE.findall(html)
         pane_dict = {pid: pcontent for pid, pcontent in panes}
+        self.log("detail panes found: %d" % len(panes))
 
-        for sid, tab_name, ep_count in tabs:
-            tab_name = self._clean(tab_name)
+        for sid, tab_name in tabs:
             pane_content = pane_dict.get(sid, "")
             if not pane_content:
+                self.log("pane %s empty" % sid)
                 continue
             eps = []
             for ep_href, ep_name in _RE_EP_BTN.findall(pane_content):
                 ep_name = self._clean(ep_name)
+                if not ep_name:
+                    continue
                 eps.append(f"{ep_name}${ep_href}")
+            self.log("pane %s eps: %d" % (sid, len(eps)))
             if eps:
                 play_from.append(tab_name)
                 play_url.append("#".join(eps))
 
         if not play_url:
+            self.log("no play_url resolved")
             return {"list": []}
 
         return {"list": [{
@@ -388,20 +422,9 @@ class Spider(Spider):
 
     # ---------- 播放解析 ----------
     def _resolve_nby(self, from_key, raw_url, play_page_url):
-        """
-        nby.php 两段式：
-        1. GET {site}/static/player/{from}.php?get_signed_url=1&url=<加密串>
-           → {"signed_url": "?url=...&fetch_data=1&timestamp=...&signature=..."}
-        2. GET {site}/static/player/{from}.php{?url=...&fetch_data=1&...}
-           → {"urltype":"hls","jmurl":"真实m3u8"}
-        关键修正：
-        - signed_url 以 "?" 开头时，要拼到 nby.php 后面，而不是当成绝对路径
-        - 第二步 Referer 用 iframe 页面 URL，不是播放页
-        """
         iframe_base = f"{self.site_url}/static/player/{from_key.lower()}.php"
         iframe_page = iframe_base + "?url=" + urllib.parse.quote(raw_url, safe='')
 
-        # 先访问一次 iframe 页面，建立 cookie 会话
         try:
             self._fetch(iframe_page, timeout=8, headers={
                 "User-Agent": UA,
@@ -410,7 +433,6 @@ class Spider(Spider):
         except Exception:
             pass
 
-        # 第一段
         step1_url = (
             iframe_base
             + "?get_signed_url=1&url="
@@ -423,7 +445,7 @@ class Spider(Spider):
             "Accept": "application/json, text/javascript, */*; q=0.01",
         }
         text1 = self._fetch(step1_url, timeout=12, headers=step1_headers)
-        self.log("step1 body: %s" % (text1[:300] if text1 else "EMPTY"))
+        self.log("step1 body: %s" % (text1[:200] if text1 else "EMPTY"))
 
         try:
             data1 = json.loads(text1)
@@ -435,27 +457,20 @@ class Spider(Spider):
 
         signed_url = data1.get("signed_url", "")
         if not signed_url:
-            self.log("step1 no signed_url: %s" % data1)
+            self.log("step1 no signed_url")
             return ""
 
-        # ★ 关键修正：根据 signed_url 的不同开头拼接
         if signed_url.startswith("http://") or signed_url.startswith("https://"):
-            # 完整 URL
             step2_url = signed_url
         elif signed_url.startswith("//"):
             step2_url = "https:" + signed_url
         elif signed_url.startswith("/"):
             step2_url = self.site_url + signed_url
         elif signed_url.startswith("?"):
-            # 相对 nby.php 的查询参数
             step2_url = iframe_base + signed_url
         else:
-            # 兜底：当成相对路径
             step2_url = iframe_base + "?" + signed_url
 
-        self.log("step2 url: %s" % step2_url[:200])
-
-        # 第二段：Referer 用 iframe 页面（不是播放页）
         step2_headers = {
             "User-Agent": UA,
             "Referer": iframe_page,
@@ -463,7 +478,7 @@ class Spider(Spider):
             "Accept": "application/json, text/javascript, */*; q=0.01",
         }
         text2 = self._fetch(step2_url, timeout=12, headers=step2_headers)
-        self.log("step2 body: %s" % (text2[:300] if text2 else "EMPTY"))
+        self.log("step2 body: %s" % (text2[:200] if text2 else "EMPTY"))
 
         try:
             data2 = json.loads(text2)
@@ -478,7 +493,7 @@ class Spider(Spider):
             jmurl = jmurl.replace('\\/', '/')
             self.log("m3u8 got: %s" % jmurl[:120])
             return jmurl
-        self.log("step2 no jmurl: %s" % data2)
+        self.log("step2 no jmurl")
         return ""
 
     def playerContent(self, flag, id, vipFlags):
@@ -487,11 +502,10 @@ class Spider(Spider):
         else:
             play_url = self._fix_url(id)
 
-        # 强制用主域名访问播放页
         play_url_main = play_url
         m = re.search(r'/vodplay/(\d+)-(\d+)-(\d+)\.html', play_url)
         if m:
-            play_url_main = f"https://www.kxyyhd.com/vodplay/{m.group(1)}-{m.group(2)}-{m.group(3)}.html"
+            play_url_main = f"{self.site_url}/vodplay/{m.group(1)}-{m.group(2)}-{m.group(3)}.html"
 
         html = self._fetch(play_url_main)
         if not html:
@@ -525,7 +539,6 @@ class Spider(Spider):
         if not raw_url:
             return {"parse": 1, "url": play_url_main, "header": self.headers}
 
-        # A. 已是 m3u8/mp4 直链
         if any(ext in raw_url.lower() for ext in ['.m3u8', '.mp4']):
             return {
                 "parse": 0,
@@ -534,7 +547,6 @@ class Spider(Spider):
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
 
-        # B. nby.php 两段式解析
         if from_key and from_key.lower() not in ("", "parse"):
             try:
                 real = self._resolve_nby(from_key, raw_url, play_url_main)
@@ -548,7 +560,6 @@ class Spider(Spider):
             except Exception as e:
                 self.log("nby resolve fail: %s" % e)
 
-            # C. 兜底：把 iframe URL 交给 TVBox 嗅探
             iframe_url = (
                 f"{self.site_url}/static/player/{from_key.lower()}.php?url="
                 + urllib.parse.quote(raw_url, safe='')
