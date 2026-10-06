@@ -70,21 +70,38 @@ CLASSES = [
     {"type_id": "24", "type_name": "纪录片"},
 ]
 
-_AREAS = ["", "中国大陆", "中国香港", "中国台湾", "美国", "日本", "韩国", "泰国", "英国", "法国", "德国", "意大利", "印度", "马来西亚"]
-_YEARS = ["", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018",
-          "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010",
-          "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002",
-          "2001", "2000", "90年代", "80年代", "70年代", "其他"]
+_AREAS = [
+    "", "中国大陆", "中国香港", "中国台湾",
+    "美国", "日本", "韩国", "泰国",
+    "英国", "法国", "德国", "意大利",
+    "印度", "马来西亚", "其他",
+]
+
+# ★ 新增：类型筛选（macCMS 里 class 用中文匹配）
+_TYPES = [
+    "", "剧情", "喜剧", "爱情", "动作", "科幻",
+    "恐怖", "战争", "犯罪", "惊悚", "悬疑", "冒险",
+    "武侠", "古装", "历史", "传记", "纪录片", "奇幻",
+    "家庭", "青春", "动画", "人物", "文化", "其他",
+]
+
+_YEARS = [
+    "", "2026", "2025", "2024", "2023", "2022", "2021", "2020",
+    "2019", "2018", "2017", "2016", "2015", "2014", "2013",
+    "2012", "2011", "2010", "2009", "2008", "2007", "2006",
+    "2005", "2004", "2003", "2002", "2001", "2000",
+    "90年代", "80年代", "70年代", "其他",
+]
 
 FILTERS = {}
 for cid in ["1", "2", "3", "4", "26", "24"]:
     FILTERS[cid] = [
-        {"key": "area", "name": "地区", "value": [{"n": a or "不限", "v": a} for a in _AREAS]},
-        {"key": "year", "name": "年份", "value": [{"n": y or "不限", "v": y} for y in _YEARS]},
+        {"key": "area",  "name": "地区", "value": [{"n": a or "不限", "v": a} for a in _AREAS]},
+        {"key": "class", "name": "类型", "value": [{"n": t or "不限", "v": t} for t in _TYPES]},
+        {"key": "year",  "name": "年份", "value": [{"n": y or "不限", "v": y} for y in _YEARS]},
     ]
 
 # ============ 正则 ============
-# 列表页：完整的 <a ... href="/voddetail/N.html" ...>...</a>
 _RE_DETAIL_A = re.compile(
     r'<a[^>]*?href="(/voddetail/(\d+)\.html)"[^>]*>(.*?)</a>',
     re.S | re.I)
@@ -94,12 +111,10 @@ _RE_BADGE_TXT = re.compile(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</spa
 _RE_CARD_TITLE = re.compile(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', re.I)
 _RE_RIBBON_TXT = re.compile(r'<(?:strong|div)[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</(?:strong|div)>', re.I)
 
-# 详情页：所有剧集链接 /vodplay/{vid}-{sid}-{nid}.html
 _RE_PLAY_LINK = re.compile(
     r'href="(/vodplay/(\d+)-(\d+)-(\d+)\.html)"[^>]*>([^<]+)</a>',
     re.I)
 
-# 详情页：线路名（tab 里的 <a>...</a>，会包含 svg）
 _RE_LINE_A = re.compile(
     r'<a href="#tabs-home-(\d+)"[^>]*>(.*?)</a>',
     re.S | re.I)
@@ -127,6 +142,7 @@ class Spider(Spider):
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Referer': self.site_url + "/",
         }
+        # 自动探测能通的域名
         for h in _CANDIDATE_HOSTS:
             try:
                 rsp = self.fetch(h + "/", headers={'User-Agent': UA}, timeout=8)
@@ -206,13 +222,11 @@ class Spider(Spider):
             if vid in seen:
                 continue
 
-            # 标题：优先 a 标签本身的 title 属性
             title = ""
             tm = _RE_TITLE_ATTR.search(m.group(0))
             if tm:
                 title = self._clean(tm.group(1))
             if not title:
-                # 从 a 后面的 600 字符里找 card-title
                 after = html[m.end():m.end() + 600]
                 cm = _RE_CARD_TITLE.search(after)
                 if cm:
@@ -264,12 +278,35 @@ class Spider(Spider):
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
+        """首页：抓首屏 + 若首屏没数据再试几个聚合页"""
         html = self._fetch(self.site_url + "/")
         videos = self._extract_videos(html) if html else []
         self.log("home videos: %d (html_len=%d)" % (len(videos), len(html) if html else 0))
-        return {"list": videos}
+
+        # 首屏有数据就直接返回
+        if videos:
+            return {"list": videos}
+
+        # 兜底：抓几个 show 页面拼起来
+        extra = []
+        seen = set()
+        for cid in ["1", "2", "3", "4"]:
+            try:
+                h = self._fetch(f"{self.site_url}/vodshow/{cid}-----------.html")
+                for v in self._extract_videos(h):
+                    if v["vod_id"] not in seen:
+                        seen.add(v["vod_id"])
+                        extra.append(v)
+            except Exception:
+                pass
+        self.log("home fallback videos: %d" % len(extra))
+        return {"list": extra}
 
     def categoryContent(self, tid, pg, filter, extend):
+        """
+        macCMS v10 12 段路径：
+        id - area - by - class - lang - letter - ? - ? - page - ? - ? - year
+        """
         page = int(pg) if pg else 1
         if isinstance(extend, str):
             try:
@@ -279,16 +316,23 @@ class Spider(Spider):
         if not extend:
             extend = {}
 
-        area = extend.get("area", "")
-        year = extend.get("year", "")
+        area  = extend.get("area", "")
+        clazz = extend.get("class", "")
+        year  = extend.get("year", "")
 
         parts = [
-            str(tid),
-            urllib.parse.quote(area) if area else "",
-            "", "", "", "", "", "",
-            str(page) if page > 1 else "",
-            "", "",
-            year or "",
+            str(tid),                                    # 1 id
+            urllib.parse.quote(area) if area else "",    # 2 area
+            "",                                          # 3 by（排序）
+            urllib.parse.quote(clazz) if clazz else "",  # 4 class（类型）
+            "",                                          # 5 lang
+            "",                                          # 6 letter
+            "",                                          # 7
+            "",                                          # 8
+            str(page) if page > 1 else "",               # 9 page
+            "",                                          # 10
+            "",                                          # 11
+            year or "",                                  # 12 year
         ]
         path = "-".join(parts)
         url = f"{self.site_url}/vodshow/{path}.html"
@@ -296,7 +340,7 @@ class Spider(Spider):
         html = self._fetch(url)
         videos = self._extract_videos(html) if html else []
         pagecount = self._get_pagecount(html)
-        self.log("category %s page %d: %d videos" % (tid, page, len(videos)))
+        self.log("category %s page %d: %d videos url=%s" % (tid, page, len(videos), url))
 
         return {
             "list": videos,
@@ -315,6 +359,7 @@ class Spider(Spider):
         html = self._fetch(url)
         videos = self._extract_videos(html) if html else []
         pagecount = self._get_pagecount(html)
+        self.log("search '%s' page %d: %d videos" % (key, page, len(videos)))
         return {
             "list": videos,
             "page": page,
@@ -367,7 +412,6 @@ class Spider(Spider):
         line_names = {}
         for m in _RE_LINE_A.finditer(html):
             sid, inner = m.groups()
-            # 去掉 svg 和 badge
             clean = re.sub(r'<svg.*?</svg>', '', inner, flags=re.S | re.I)
             clean = re.sub(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>.*?</span>', '', clean, flags=re.S | re.I)
             clean = re.sub(r'&nbsp;', '', clean)
@@ -378,7 +422,7 @@ class Spider(Spider):
         self.log("detail lines: %s" % line_names)
 
         # ---------- 剧集分组 ----------
-        groups = {}  # sid -> [(nid, name, href)]
+        groups = {}
         for m in _RE_PLAY_LINK.finditer(html):
             href, v, sid, nid, ep_name = m.groups()
             if v != vid:
@@ -422,6 +466,7 @@ class Spider(Spider):
         iframe_base = f"{self.site_url}/static/player/{from_key.lower()}.php"
         iframe_page = iframe_base + "?url=" + urllib.parse.quote(raw_url, safe='')
 
+        # 先访问一次 iframe 页，建立 cookie 会话
         try:
             self._fetch(iframe_page, timeout=8, headers={
                 "User-Agent": UA,
@@ -530,6 +575,7 @@ class Spider(Spider):
         if not raw_url:
             return {"parse": 1, "url": play_url_main, "header": self.headers}
 
+        # A. 已是 m3u8/mp4 直链
         if any(ext in raw_url.lower() for ext in ['.m3u8', '.mp4']):
             return {
                 "parse": 0,
@@ -538,6 +584,7 @@ class Spider(Spider):
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
 
+        # B. nby.php 两段式解析
         if from_key and from_key.lower() not in ("", "parse"):
             try:
                 real = self._resolve_nby(from_key, raw_url, play_url_main)
@@ -551,6 +598,7 @@ class Spider(Spider):
             except Exception as e:
                 self.log("nby resolve fail: %s" % e)
 
+            # C. 兜底交给 TVBox 嗅探
             iframe_url = (
                 f"{self.site_url}/static/player/{from_key.lower()}.php?url="
                 + urllib.parse.quote(raw_url, safe='')
