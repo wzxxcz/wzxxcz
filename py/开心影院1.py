@@ -1,7 +1,7 @@
 # coding=utf-8
 """
-开心影院 kxyy1.cc TVBox Python 爬虫
-苹果CMS v10 模板 + 自建 nby.php 两段式解析
+开心影院 kxyy TVBox Python 爬虫
+自动探测主域名 + macCMS v10
 """
 import re
 import sys
@@ -49,12 +49,19 @@ except ImportError:
 
     Spider = _BaseSpider
 
-HOST = "https://www.kxyy1.cc"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-DEFAULT_PIC = HOST + "/images/img-bj-k.png"
 
-# ============ 分类 ============
+# 候选主域名（按优先级）
+_CANDIDATE_HOSTS = [
+    "https://www.kxyyhd.com",
+    "https://www.kxyy1.cc",
+    "https://kxyy1.cc",
+    "https://www.kxyy.tv",
+    "https://www.kxyy.app",
+    "https://www.kxyytv.com",
+]
+
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
     {"type_id": "2",  "type_name": "电视剧"},
@@ -69,24 +76,15 @@ _YEARS = ["", "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2
           "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010",
           "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002",
           "2001", "2000", "90年代", "80年代", "70年代", "其他"]
-_SORTS = [
-    {"n": "更新时间", "v": "time"},
-    {"n": "近期热门", "v": "hits_week"},
-    {"n": "豆瓣评分", "v": "douban_score"},
-]
 
 FILTERS = {}
 for cid in ["1", "2", "3", "4", "26", "24"]:
     FILTERS[cid] = [
         {"key": "area", "name": "地区", "value": [{"n": a or "不限", "v": a} for a in _AREAS]},
         {"key": "year", "name": "年份", "value": [{"n": y or "不限", "v": y} for y in _YEARS]},
-        {"key": "by", "name": "排序", "value": _SORTS},
     ]
 
-# ============ 正则 ============
-_RE_DETAIL_LINK = re.compile(
-    r'<a[^>]*?href="(/voddetail/(\d+)\.html)"[^>]*?>(.*?)</a>',
-    re.S | re.I)
+_RE_VID = re.compile(r'/voddetail/(\d+)\.html', re.I)
 
 _RE_DETAIL_TITLE = re.compile(r'<h1[^>]*class="[^"]*d-none d-md-block[^"]*"[^>]*>([^<]+)</h1>', re.I)
 _RE_DETAIL_TITLE_M = re.compile(r'<h2[^>]*class="[^"]*d-sm-block d-md-none[^"]*"[^>]*>([^<]+)</h2>', re.I)
@@ -94,9 +92,7 @@ _RE_DETAIL_PIC = re.compile(r'<div class="col-md-auto[^"]*"><img[^>]*src="([^"]+
 _RE_DETAIL_CONTENT = re.compile(r'<div class="card-body"><p>(.*?)</p></div>', re.S | re.I)
 _RE_DETAIL_META = re.compile(r'<p class="[^"]*mb-0 mb-md-2[^"]*"><strong>([^：<]+)：</strong>(.*?)</p>', re.S | re.I)
 
-_RE_TABS = re.compile(
-    r'<li class="nav-item"><a href="#tabs-home-(\d+)"[^>]*>([^<]+)&nbsp;<span class="badge">(\d+)</span></a></li>',
-    re.I)
+_RE_TABS = re.compile(r'<li class="nav-item"><a href="#tabs-home-(\d+)"[^>]*>([^<]+)&nbsp;<span class="badge">(\d+)</span></a></li>', re.I)
 _RE_PANE = re.compile(r'<div class="tab-pane[^"]*" id="tabs-home-(\d+)">(.*?)</div>\s*</div>', re.S | re.I)
 _RE_EP_BTN = re.compile(r'<a class="btn btn-square[^"]*"\s+href="([^"]+)"[^>]*>([^<]+)</a>', re.I)
 
@@ -110,14 +106,30 @@ class Spider(Spider):
         return "开心影院"
 
     def init(self, extend=""):
-        self.site_url = HOST
+        self.site_url = _CANDIDATE_HOSTS[0]
         self.headers = {
             'User-Agent': UA,
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Referer': self.site_url + "/",
         }
-        self.default_pic = DEFAULT_PIC
+        # 自动探测能通的域名
+        for h in _CANDIDATE_HOSTS:
+            try:
+                rsp = self.fetch(h + "/", headers={'User-Agent': UA}, timeout=8)
+                html = ""
+                if hasattr(rsp, 'text'):
+                    html = rsp.text
+                elif hasattr(rsp, 'content'):
+                    html = rsp.content.decode('utf-8', 'ignore')
+                if html and '/voddetail/' in html:
+                    self.site_url = h
+                    self.headers['Referer'] = h + "/"
+                    self.log("host picked: %s" % h)
+                    break
+            except Exception as e:
+                self.log("host fail %s: %s" % (h, e))
+        self.default_pic = self.site_url + "/images/img-bj-k.png"
 
     # ---------- 网络 ----------
     def _fetch(self, url, timeout=15, headers=None):
@@ -167,55 +179,44 @@ class Spider(Spider):
         s = re.sub(r'\n{2,}', '\n', s)
         return s.strip()
 
-    # ---------- 列表解析（更稳健）----------
+    # ---------- 列表解析（上下文匹配）----------
     def _extract_videos(self, html):
         videos = []
         seen = set()
         if not html:
             return videos
 
-        for m in _RE_DETAIL_LINK.finditer(html):
-            href, vid, inner = m.groups()
+        for m in _RE_VID.finditer(html):
+            vid = m.group(1)
             if vid in seen:
                 continue
 
-            a_start = m.start()
-            a_end = m.end()
-            a_tag = html[a_start:a_end]
+            start = max(0, m.start() - 400)
+            end = min(len(html), m.end() + 500)
+            ctx = html[start:end]
 
-            # 标题：优先 a 的 title 属性，其次 a 后面 card-body 的 h3
             title = ""
-            tm = re.search(r'title="([^"]+)"', a_tag, re.I)
+            tm = re.search(r'title="([^"]+)"', ctx, re.I)
             if tm:
                 title = self._clean(tm.group(1))
             if not title:
-                tail = html[a_end:a_end + 800]
-                tm = re.search(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', tail, re.I)
+                tm = re.search(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', ctx, re.I)
                 if tm:
                     title = self._clean(tm.group(1))
             if not title:
-                title = self._clean(inner)
-            if not title:
                 continue
 
-            # 图片
             pic = self.default_pic
-            pm = re.search(r'<img[^>]*?(?:data-src|src)="([^"]+)"', inner, re.I)
+            pm = re.search(r'<img[^>]*?(?:data-src|src)="([^"]+)"', ctx, re.I)
             if pm:
                 pic = self._fix_url(pm.group(1))
 
-            # 备注
             remark = ""
-            tail = html[a_end:a_end + 800]
-            bm = re.search(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</span>', tail, re.I)
+            bm = re.search(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</span>', ctx, re.I)
             if bm:
                 remark = self._clean(bm.group(1))
             if not remark:
-                rm = re.search(r'<strong[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</strong>', a_tag, re.I)
-                if rm:
-                    remark = self._clean(rm.group(1))
-            if not remark:
-                rm = re.search(r'<div class="ribbon[^"]*">([^<]+)</div>', a_tag, re.I)
+                rm = re.search(r'<(?:strong|div)[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</(?:strong|div)>', ctx, re.I)
                 if rm:
                     remark = self._clean(rm.group(1))
 
@@ -234,7 +235,6 @@ class Spider(Spider):
         tm = _RE_TAIL_PAGE.search(html)
         if tm:
             return int(tm.group(1))
-        # 从分页链接里找最大数字段
         pages = re.findall(r'vodshow/[^"]*?-(\d+)-[^"]*?\.html', html)
         if pages:
             try:
@@ -250,6 +250,7 @@ class Spider(Spider):
     def homeVideoContent(self):
         html = self._fetch(self.site_url + "/")
         videos = self._extract_videos(html) if html else []
+        self.log("home videos: %d (html_len=%d)" % (len(videos), len(html) if html else 0))
         return {"list": videos}
 
     def categoryContent(self, tid, pg, filter, extend):
@@ -264,23 +265,22 @@ class Spider(Spider):
 
         area = extend.get("area", "")
         year = extend.get("year", "")
-        by = extend.get("by", "time")
 
-        # macCMS v10 12 段路径：
-        # {id}-{area}-{by}-{class}-{lang}-{letter}-{?}-{?}-{page}-{?}-{?}-{year}
+        # 12 段路径：
+        # id - area - sort - class - lang - letter - ? - ? - page - ? - ? - year
         parts = [
-            str(tid),                                 # f1 频道 id
-            urllib.parse.quote(area) if area else "", # f2 地区
-            by or "",                                 # f3 排序
-            "",                                       # f4 类型（暂未支持）
-            "",                                       # f5 语言
-            "",                                       # f6 字母
-            "",                                       # f7
-            "",                                       # f8
-            str(page) if page > 1 else "",            # f9 页码
-            "",                                       # f10
-            "",                                       # f11
-            year or "",                               # f12 年份
+            str(tid),
+            urllib.parse.quote(area) if area else "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            str(page) if page > 1 else "",
+            "",
+            "",
+            year or "",
         ]
         path = "-".join(parts)
         url = f"{self.site_url}/vodshow/{path}.html"
@@ -288,6 +288,8 @@ class Spider(Spider):
         html = self._fetch(url)
         videos = self._extract_videos(html) if html else []
         pagecount = self._get_pagecount(html)
+        if not videos:
+            self.log("empty category: url=%s html_len=%d" % (url, len(html) if html else 0))
 
         return {
             "list": videos,
@@ -390,20 +392,8 @@ class Spider(Spider):
 
     # ---------- 播放解析 ----------
     def _resolve_nby(self, from_key, raw_url):
-        """
-        nby.php 两段式：
-        1. GET {site}/static/player/{from}.php?get_signed_url=1&url=<encode(raw_url)>
-           → {"signed_url": "..."}
-        2. GET signed_url
-           → {"urltype": "hls", "jmurl": "真实m3u8"}
-        """
         iframe_base = f"{self.site_url}/static/player/{from_key.lower()}.php"
-
-        step1_url = (
-            iframe_base
-            + "?get_signed_url=1&url="
-            + urllib.parse.quote(raw_url, safe='')
-        )
+        step1_url = iframe_base + "?get_signed_url=1&url=" + urllib.parse.quote(raw_url, safe='')
         step1_headers = {
             "User-Agent": UA,
             "Referer": self.site_url + "/",
@@ -414,12 +404,10 @@ class Spider(Spider):
         if not data1:
             self.log("step1 no json: %s" % step1_url)
             return ""
-
         signed_url = data1.get("signed_url", "")
         if not signed_url:
             self.log("step1 no signed_url: %s" % data1)
             return ""
-
         if signed_url.startswith("//"):
             signed_url = "https:" + signed_url
         elif signed_url.startswith("/"):
@@ -435,11 +423,9 @@ class Spider(Spider):
         if not data2:
             self.log("step2 no json: %s" % signed_url)
             return ""
-
         jmurl = data2.get("jmurl") or data2.get("url") or ""
         if jmurl:
-            jmurl = jmurl.replace('\\/', '/')
-            return jmurl
+            return jmurl.replace('\\/', '/')
         self.log("step2 no jmurl: %s" % data2)
         return ""
 
@@ -477,7 +463,6 @@ class Spider(Spider):
         if not raw_url:
             return {"parse": 1, "url": play_url, "header": self.headers}
 
-        # A. 已是 m3u8/mp4 直链
         if any(ext in raw_url.lower() for ext in ['.m3u8', '.mp4']):
             return {
                 "parse": 0,
@@ -486,7 +471,6 @@ class Spider(Spider):
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
 
-        # B. nby.php 两段式解析
         if from_key and from_key.lower() not in ("", "parse"):
             try:
                 real = self._resolve_nby(from_key, raw_url)
@@ -500,8 +484,6 @@ class Spider(Spider):
             except Exception as e:
                 self.log("nby resolve fail: %s" % e)
 
-        # C. 兜底交给 TVBox 嗅探
-        if from_key:
             iframe_url = (
                 f"{self.site_url}/static/player/{from_key.lower()}.php?url="
                 + urllib.parse.quote(raw_url, safe='')
