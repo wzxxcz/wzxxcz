@@ -84,16 +84,9 @@ for cid in ["1", "2", "3", "4", "26", "24"]:
     ]
 
 # ============ 正则 ============
-_RE_CARD = re.compile(
-    r'<div class="card card-sm card-link">(.*?)</div>\s*</div>\s*</div>',
+_RE_DETAIL_LINK = re.compile(
+    r'<a[^>]*?href="(/voddetail/(\d+)\.html)"[^>]*?>(.*?)</a>',
     re.S | re.I)
-_RE_CARD_A = re.compile(
-    r'<a[^>]*href="(/voddetail/\d+\.html)"[^>]*?(?:title="([^"]*)")?[^>]*>(.*?)</a>',
-    re.S | re.I)
-_RE_PIC = re.compile(r'<img[^>]*?(?:data-src|src)="([^"]+)"', re.I)
-_RE_TITLE_IN_CARD = re.compile(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', re.I)
-_RE_BADGE = re.compile(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</span>', re.I)
-_RE_RIBBON = re.compile(r'<strong[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</strong>', re.I)
 
 _RE_DETAIL_TITLE = re.compile(r'<h1[^>]*class="[^"]*d-none d-md-block[^"]*"[^>]*>([^<]+)</h1>', re.I)
 _RE_DETAIL_TITLE_M = re.compile(r'<h2[^>]*class="[^"]*d-sm-block d-md-none[^"]*"[^>]*>([^<]+)</h2>', re.I)
@@ -109,9 +102,6 @@ _RE_EP_BTN = re.compile(r'<a class="btn btn-square[^"]*"\s+href="([^"]+)"[^>]*>(
 
 _RE_PLAYER_DATA = re.compile(r'var player_data=(\{.*?\});', re.S | re.I)
 _RE_TAIL_PAGE = re.compile(r'href="[^"]*?(\d+)\.html"[^>]*>尾页</a>', re.I)
-
-# 直接抓 m3u8 / mp4 的兜底正则
-_RE_M3U8_ANY = re.compile(r'https?://[^\s"\'<>\\\u4e00-\u9fff]+\.m3u8[^\s"\'<>\\\u4e00-\u9fff]*', re.I)
 
 
 class Spider(Spider):
@@ -177,48 +167,55 @@ class Spider(Spider):
         s = re.sub(r'\n{2,}', '\n', s)
         return s.strip()
 
-    # ---------- 列表解析 ----------
+    # ---------- 列表解析（更稳健）----------
     def _extract_videos(self, html):
         videos = []
         seen = set()
         if not html:
             return videos
 
-        for cm in _RE_CARD.finditer(html):
-            block = cm.group(1)
-            am = _RE_CARD_A.search(block)
-            if not am:
-                continue
-            href, title_attr, inner = am.groups()
-            vm = re.search(r'/voddetail/(\d+)\.html', href)
-            if not vm:
-                continue
-            vid = vm.group(1)
+        for m in _RE_DETAIL_LINK.finditer(html):
+            href, vid, inner = m.groups()
             if vid in seen:
                 continue
 
+            a_start = m.start()
+            a_end = m.end()
+            a_tag = html[a_start:a_end]
+
+            # 标题：优先 a 的 title 属性，其次 a 后面 card-body 的 h3
             title = ""
-            tm = _RE_TITLE_IN_CARD.search(block)
+            tm = re.search(r'title="([^"]+)"', a_tag, re.I)
             if tm:
                 title = self._clean(tm.group(1))
-            if not title and title_attr:
-                title = self._clean(title_attr)
+            if not title:
+                tail = html[a_end:a_end + 800]
+                tm = re.search(r'<h3[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)</h3>', tail, re.I)
+                if tm:
+                    title = self._clean(tm.group(1))
             if not title:
                 title = self._clean(inner)
             if not title:
                 continue
 
+            # 图片
             pic = self.default_pic
-            pm = _RE_PIC.search(block)
+            pm = re.search(r'<img[^>]*?(?:data-src|src)="([^"]+)"', inner, re.I)
             if pm:
                 pic = self._fix_url(pm.group(1))
 
+            # 备注
             remark = ""
-            bm = _RE_BADGE.search(block)
+            tail = html[a_end:a_end + 800]
+            bm = re.search(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)</span>', tail, re.I)
             if bm:
                 remark = self._clean(bm.group(1))
             if not remark:
-                rm = _RE_RIBBON.search(block)
+                rm = re.search(r'<strong[^>]*class="[^"]*ribbon[^"]*"[^>]*>([^<]+)</strong>', a_tag, re.I)
+                if rm:
+                    remark = self._clean(rm.group(1))
+            if not remark:
+                rm = re.search(r'<div class="ribbon[^"]*">([^<]+)</div>', a_tag, re.I)
                 if rm:
                     remark = self._clean(rm.group(1))
 
@@ -237,6 +234,7 @@ class Spider(Spider):
         tm = _RE_TAIL_PAGE.search(html)
         if tm:
             return int(tm.group(1))
+        # 从分页链接里找最大数字段
         pages = re.findall(r'vodshow/[^"]*?-(\d+)-[^"]*?\.html', html)
         if pages:
             try:
@@ -268,17 +266,22 @@ class Spider(Spider):
         year = extend.get("year", "")
         by = extend.get("by", "time")
 
-        parts = [tid]
-        parts.append(urllib.parse.quote(area) if area else "")
-        parts.append(by or "")
-        parts.append("")
-        if page > 1:
-            parts.append(str(page))
-        else:
-            parts.append("")
-        parts.append("")
-        parts.append("")
-        parts.append(year or "")
+        # macCMS v10 12 段路径：
+        # {id}-{area}-{by}-{class}-{lang}-{letter}-{?}-{?}-{page}-{?}-{?}-{year}
+        parts = [
+            str(tid),                                 # f1 频道 id
+            urllib.parse.quote(area) if area else "", # f2 地区
+            by or "",                                 # f3 排序
+            "",                                       # f4 类型（暂未支持）
+            "",                                       # f5 语言
+            "",                                       # f6 字母
+            "",                                       # f7
+            "",                                       # f8
+            str(page) if page > 1 else "",            # f9 页码
+            "",                                       # f10
+            "",                                       # f11
+            year or "",                               # f12 年份
+        ]
         path = "-".join(parts)
         url = f"{self.site_url}/vodshow/{path}.html"
 
@@ -388,16 +391,14 @@ class Spider(Spider):
     # ---------- 播放解析 ----------
     def _resolve_nby(self, from_key, raw_url):
         """
-        nby.php 两段式解析：
-        1. GET {site}/static/player/nby.php?get_signed_url=1&url=<encode(raw_url)>
+        nby.php 两段式：
+        1. GET {site}/static/player/{from}.php?get_signed_url=1&url=<encode(raw_url)>
            → {"signed_url": "..."}
         2. GET signed_url
            → {"urltype": "hls", "jmurl": "真实m3u8"}
-        返回真实 m3u8，失败返回空字符串
         """
         iframe_base = f"{self.site_url}/static/player/{from_key.lower()}.php"
 
-        # 第一段：get_signed_url
         step1_url = (
             iframe_base
             + "?get_signed_url=1&url="
@@ -405,13 +406,13 @@ class Spider(Spider):
         )
         step1_headers = {
             "User-Agent": UA,
-            "Referer": f"{self.site_url}/vodplay/",  # 播放页同源即可
+            "Referer": self.site_url + "/",
             "X-Requested-With": "XMLHttpRequest",
             "Accept": "application/json, text/javascript, */*; q=0.01",
         }
         data1 = self._fetch_json(step1_url, timeout=12, headers=step1_headers)
         if not data1:
-            self.log("step1 no json")
+            self.log("step1 no json: %s" % step1_url)
             return ""
 
         signed_url = data1.get("signed_url", "")
@@ -419,13 +420,11 @@ class Spider(Spider):
             self.log("step1 no signed_url: %s" % data1)
             return ""
 
-        # 相对路径补全
         if signed_url.startswith("//"):
             signed_url = "https:" + signed_url
         elif signed_url.startswith("/"):
             signed_url = self.site_url + signed_url
 
-        # 第二段：请求 signed_url
         step2_headers = {
             "User-Agent": UA,
             "Referer": step1_url,
@@ -434,10 +433,9 @@ class Spider(Spider):
         }
         data2 = self._fetch_json(signed_url, timeout=12, headers=step2_headers)
         if not data2:
-            self.log("step2 no json")
+            self.log("step2 no json: %s" % signed_url)
             return ""
 
-        # 优先 jmurl，其次 url
         jmurl = data2.get("jmurl") or data2.get("url") or ""
         if jmurl:
             jmurl = jmurl.replace('\\/', '/')
@@ -488,7 +486,7 @@ class Spider(Spider):
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
 
-        # B. 用 nby.php 两段式解析（针对 NBY / BD / BF / MD / LZ / KS / TT / IK）
+        # B. nby.php 两段式解析
         if from_key and from_key.lower() not in ("", "parse"):
             try:
                 real = self._resolve_nby(from_key, raw_url)
@@ -502,8 +500,7 @@ class Spider(Spider):
             except Exception as e:
                 self.log("nby resolve fail: %s" % e)
 
-        # C. 兜底：把 iframe URL 交给 TVBox 嗅探
-        iframe_url = ""
+        # C. 兜底交给 TVBox 嗅探
         if from_key:
             iframe_url = (
                 f"{self.site_url}/static/player/{from_key.lower()}.php?url="
