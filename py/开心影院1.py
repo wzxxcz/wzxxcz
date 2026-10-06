@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 开心影院 kxyy TVBox Python 爬虫
-自动探测主域名 + macCMS v10
+自动探测主域名 + macCMS v10 + nby.php 两段式解析
 """
 import re
 import sys
@@ -391,19 +391,48 @@ class Spider(Spider):
         }]}
 
     # ---------- 播放解析 ----------
-    def _resolve_nby(self, from_key, raw_url):
+    def _resolve_nby(self, from_key, raw_url, play_page_url):
+        """
+        nby.php 两段式：
+        1. GET {site}/static/player/{from}.php?get_signed_url=1&url=<加密串>
+           → {"signed_url": "..."}
+        2. GET signed_url
+           → {"urltype": "hls", "jmurl": "真实m3u8"}
+        关键：Referer 用真实播放页 URL
+        """
         iframe_base = f"{self.site_url}/static/player/{from_key.lower()}.php"
-        step1_url = iframe_base + "?get_signed_url=1&url=" + urllib.parse.quote(raw_url, safe='')
+
+        # 先访问一次 iframe 页面本身，建立会话 cookie
+        try:
+            self._fetch(iframe_base, timeout=8, headers={
+                "User-Agent": UA,
+                "Referer": play_page_url,
+            })
+        except Exception:
+            pass
+
+        step1_url = (
+            iframe_base
+            + "?get_signed_url=1&url="
+            + urllib.parse.quote(raw_url, safe='')
+        )
         step1_headers = {
             "User-Agent": UA,
-            "Referer": self.site_url + "/",
+            "Referer": play_page_url,
             "X-Requested-With": "XMLHttpRequest",
             "Accept": "application/json, text/javascript, */*; q=0.01",
         }
-        data1 = self._fetch_json(step1_url, timeout=12, headers=step1_headers)
-        if not data1:
-            self.log("step1 no json: %s" % step1_url)
+        text1 = self._fetch(step1_url, timeout=12, headers=step1_headers)
+        self.log("step1 body: %s" % (text1[:300] if text1 else "EMPTY"))
+
+        try:
+            data1 = json.loads(text1)
+        except Exception:
+            data1 = None
+        if not isinstance(data1, dict):
+            self.log("step1 not json")
             return ""
+
         signed_url = data1.get("signed_url", "")
         if not signed_url:
             self.log("step1 no signed_url: %s" % data1)
@@ -415,17 +444,26 @@ class Spider(Spider):
 
         step2_headers = {
             "User-Agent": UA,
-            "Referer": step1_url,
+            "Referer": play_page_url,
             "X-Requested-With": "XMLHttpRequest",
             "Accept": "application/json, text/javascript, */*; q=0.01",
         }
-        data2 = self._fetch_json(signed_url, timeout=12, headers=step2_headers)
-        if not data2:
-            self.log("step2 no json: %s" % signed_url)
+        text2 = self._fetch(signed_url, timeout=12, headers=step2_headers)
+        self.log("step2 body: %s" % (text2[:300] if text2 else "EMPTY"))
+
+        try:
+            data2 = json.loads(text2)
+        except Exception:
+            data2 = None
+        if not isinstance(data2, dict):
+            self.log("step2 not json")
             return ""
+
         jmurl = data2.get("jmurl") or data2.get("url") or ""
         if jmurl:
-            return jmurl.replace('\\/', '/')
+            jmurl = jmurl.replace('\\/', '/')
+            self.log("m3u8 got: %s" % jmurl[:120])
+            return jmurl
         self.log("step2 no jmurl: %s" % data2)
         return ""
 
@@ -435,22 +473,32 @@ class Spider(Spider):
         else:
             play_url = self._fix_url(id)
 
-        html = self._fetch(play_url)
-        if not html:
-            return {"parse": 1, "url": play_url, "header": self.headers}
+        # 强制用主域名访问播放页（kxyyhd.com）
+        play_url_main = play_url
+        m = re.search(r'/vodplay/(\d+)-(\d+)-(\d+)\.html', play_url)
+        if m:
+            play_url_main = f"https://www.kxyyhd.com/vodplay/{m.group(1)}-{m.group(2)}-{m.group(3)}.html"
 
-        m = _RE_PLAYER_DATA.search(html)
-        if not m:
-            return {"parse": 1, "url": play_url, "header": self.headers}
+        html = self._fetch(play_url_main)
+        if not html:
+            self.log("play page empty: %s" % play_url_main)
+            return {"parse": 1, "url": play_url_main, "header": self.headers}
+
+        m2 = _RE_PLAYER_DATA.search(html)
+        if not m2:
+            self.log("no player_data in page")
+            return {"parse": 1, "url": play_url_main, "header": self.headers}
 
         try:
-            data = json.loads(m.group(1))
-        except Exception:
-            return {"parse": 1, "url": play_url, "header": self.headers}
+            data = json.loads(m2.group(1))
+        except Exception as e:
+            self.log("player_data parse error: %s" % e)
+            return {"parse": 1, "url": play_url_main, "header": self.headers}
 
         encrypt = str(data.get("encrypt", "0"))
         raw_url = data.get("url", "")
         from_key = data.get("from", "")
+        self.log("player_data: from=%s encrypt=%s url=%s" % (from_key, encrypt, raw_url[:60]))
 
         if encrypt == "1":
             raw_url = urllib.parse.unquote(raw_url)
@@ -461,8 +509,9 @@ class Spider(Spider):
                 pass
 
         if not raw_url:
-            return {"parse": 1, "url": play_url, "header": self.headers}
+            return {"parse": 1, "url": play_url_main, "header": self.headers}
 
+        # A. 已是 m3u8/mp4 直链
         if any(ext in raw_url.lower() for ext in ['.m3u8', '.mp4']):
             return {
                 "parse": 0,
@@ -471,9 +520,10 @@ class Spider(Spider):
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
 
+        # B. nby.php 两段式解析（用真实播放页作 Referer）
         if from_key and from_key.lower() not in ("", "parse"):
             try:
-                real = self._resolve_nby(from_key, raw_url)
+                real = self._resolve_nby(from_key, raw_url, play_url_main)
                 if real:
                     return {
                         "parse": 0,
@@ -484,6 +534,7 @@ class Spider(Spider):
             except Exception as e:
                 self.log("nby resolve fail: %s" % e)
 
+            # C. 兜底：把 iframe URL 交给 TVBox 嗅探
             iframe_url = (
                 f"{self.site_url}/static/player/{from_key.lower()}.php?url="
                 + urllib.parse.quote(raw_url, safe='')
@@ -492,10 +543,10 @@ class Spider(Spider):
                 "parse": 1,
                 "playUrl": "",
                 "url": iframe_url,
-                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+                "header": {"User-Agent": UA, "Referer": play_url_main},
             }
 
-        return {"parse": 1, "url": play_url, "header": self.headers}
+        return {"parse": 1, "url": play_url_main, "header": self.headers}
 
     def localProxy(self, param):
         try:
