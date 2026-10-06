@@ -1,8 +1,8 @@
 # coding=utf-8
 """
-片库 pianku.online TVBox Python 爬虫
+片库 pianku.online TVBox Python 爬虫（多路解析兜底版）
 站点：4k01.pianku.online
-苹果CMS v10 模板
+苹果CMS v10 模板 + 第三方 m3u8 解析
 """
 import re
 import sys
@@ -44,7 +44,10 @@ except ImportError:
             return r
 
         def log(self, *a, **kw):
-            pass
+            try:
+                print("[pianku]", *a)
+            except Exception:
+                pass
 
     Spider = _BaseSpider
 
@@ -53,7 +56,6 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/load.gif"
 
-# 一级分类
 CLASSES = [
     {"type_id": "20", "type_name": "电影"},
     {"type_id": "37", "type_name": "剧集"},
@@ -61,7 +63,6 @@ CLASSES = [
     {"type_id": "45", "type_name": "综艺"},
 ]
 
-# 二级分类（用于筛选）
 _FILTER_TYPES = {
     "20": [
         {"n": "全部", "v": ""},
@@ -123,11 +124,6 @@ for tid in ["20", "37", "43", "45"]:
     ]
 
 # ==================== 正则预编译 ====================
-_RE_CARD = re.compile(
-    r'<div class="vod-item">\s*<a[^>]*href="(/voddetail/(\d+)\.html)"[^>]*title="([^"]*)"[^>]*>'
-    r'(.*?)</a>\s*</div>',
-    re.S | re.I)
-
 _RE_LIST_ITEM = re.compile(
     r'<div class="vod-item">\s*<a[^>]*href="(/voddetail/(\d+)\.html)"[^>]*>(.*?)</a>\s*</div>',
     re.S | re.I)
@@ -137,36 +133,76 @@ _RE_REMARKS = re.compile(r'<span class="remarks">([^<]*)</span>', re.I)
 _RE_TITLE = re.compile(r'<h4 class="title">([^<]*)</h4>', re.I)
 _RE_SUBTITLE = re.compile(r'<p class="subtitle">([^<]*)</p>', re.I)
 
-# 详情页
 _RE_DETAIL_TITLE = re.compile(r'<h1 class="detail-title">([^<]*)<span', re.S | re.I)
 _RE_DETAIL_PIC = re.compile(r'<div class="detail-poster">\s*<img[^>]*src="([^"]+)"', re.S | re.I)
 _RE_DETAIL_DESC = re.compile(r'<div class="detail-desc">.*?<p>(.*?)</p>', re.S | re.I)
 _RE_DETAIL_META = re.compile(r'<div class="detail-meta">(.*?)</div>', re.S | re.I)
 _RE_META_ITEM = re.compile(r'<span>([^：]+)：([^<]*)</span>', re.I)
 
-# 播放线路
 _RE_SOURCE_TAB = re.compile(r'<span class="source-tab-item[^"]*"[^>]*data-target="([^"]+)"[^>]*>([^<]+)</span>', re.I)
 _RE_SOURCE_PANE = re.compile(r'<div class="source-pane[^"]*" id="([^"]+)">(.*?)</div>\s*</div>', re.S | re.I)
 _RE_PLAY_BTN = re.compile(r'<a href="([^"]+)" class="play-btn-item[^"]*"[^>]*>([^<]+)</a>', re.I)
 
-# 播放页 player_aaaa
 _RE_PLAYER_AAAA = re.compile(r'var player_aaaa=(\{.*?\});', re.S | re.I)
 
-# 分页
-_RE_PAGE_LINK = re.compile(r'<a[^>]*href="([^"]+)"[^>]*>尾页</a>', re.I)
+# ==================== 多重 m3u8 提取正则 ====================
+# 1. 直接抓 URL
+_RE_M3U8_URL = re.compile(r'https?://[^\s"\'<>\\\u4e00-\u9fff]+\.m3u8[^\s"\'<>\\\u4e00-\u9fff]*', re.I)
+# 2. JSON 里的 "url":"..."
+_RE_JSON_URL = re.compile(r'"url"\s*:\s*"([^"]+)"', re.I)
+# 3. JSON 里的 "data":"..." 或 "video":"..."
+_RE_JSON_DATA = re.compile(r'"(?:data|video|play_url|playUrl|source|src)"\s*:\s*"([^"]+)"', re.I)
+# 4. video/source 标签
+_RE_VIDEO_TAG = re.compile(r'<(?:video|source)[^>]*\bsrc\s*=\s*["\']([^"\']+)["\']', re.I)
+# 5. script 里的 src = "xxx.m3u8"
+_RE_JS_SRC = re.compile(r'\b(?:url|src|source|video)\s*[:=]\s*["\']([^"\']*?\.(?:m3u8|mp4)[^"\']*)["\']', re.I)
 
-# 第三方解析接口（从 playerconfig.js 中提取）
-_PARSE_PREFIX = {
-    "wsym3u8": "https://wsyzy.top/m3u8/?url=",
-    "360zy": "https://free.maccms.xyz/?url=",
-    "qq": "https://tv.time1080.xyz/player/?url=",
-    "qiyi": "https://tv.time1080.xyz/player/?url=",
-    "youku": "https://tv.time1080.xyz/player/?url=",
-    "mgtv": "https://tv.time1080.xyz/player/?url=",
-    "bilibili": "https://tv.time1080.xyz/player/?url=",
-    "mjzy": "https://mujizybf.com/m3u8/?url=",
-    "jlm3u8": "https://jimaoys99.com/parse?url=",
+# ==================== 第三方解析接口（按优先级） ====================
+# 每个 from_key 对应一个列表，依次尝试
+_PARSE_PREFIXES = {
+    "qq": [
+        "https://wsyzy.top/m3u8/?url=",        # 备用线路：直接 m3u8
+        "https://mujizybf.com/m3u8/?url=",     # 自营 4K
+        "https://jimaoys99.com/parse?url=",    # 自营
+        "https://tv.time1080.xyz/player/?url=",  # 腾讯官方
+        "https://free.maccms.xyz/?url=",       # 无广告线路
+    ],
+    "qiyi": [
+        "https://wsyzy.top/m3u8/?url=",
+        "https://mujizybf.com/m3u8/?url=",
+        "https://tv.time1080.xyz/player/?url=",
+    ],
+    "youku": [
+        "https://wsyzy.top/m3u8/?url=",
+        "https://mujizybf.com/m3u8/?url=",
+        "https://tv.time1080.xyz/player/?url=",
+    ],
+    "mgtv": [
+        "https://wsyzy.top/m3u8/?url=",
+        "https://mujizybf.com/m3u8/?url=",
+        "https://tv.time1080.xyz/player/?url=",
+    ],
+    "bilibili": [
+        "https://wsyzy.top/m3u8/?url=",
+        "https://tv.time1080.xyz/player/?url=",
+    ],
 }
+
+# 通用兜底（未匹配到 from 时）
+_FALLBACK_PREFIXES = [
+    "https://wsyzy.top/m3u8/?url=",
+    "https://mujizybf.com/m3u8/?url=",
+    "https://jimaoys99.com/parse?url=",
+    "https://tv.time1080.xyz/player/?url=",
+    "https://free.maccms.xyz/?url=",
+]
+
+# 模拟浏览器 UA 池（部分接口对 UA 敏感）
+_UA_POOL = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+]
 
 class Spider(Spider):
 
@@ -185,17 +221,29 @@ class Spider(Spider):
         self._play_cache = {}
 
     # ---------- 网络请求 ----------
-    def _fetch(self, url, timeout=15):
+    def _fetch(self, url, timeout=15, headers=None, follow_redirects=True):
         try:
-            rsp = self.fetch(url, headers=self.headers, timeout=timeout)
+            req_headers = dict(self.headers)
+            if headers:
+                req_headers.update(headers)
+            rsp = self.fetch(url, headers=req_headers, timeout=timeout)
+            text = ""
             if hasattr(rsp, 'text'):
-                return rsp.text
-            if hasattr(rsp, 'content'):
-                return rsp.content.decode('utf-8', 'ignore')
-            return str(rsp)
+                text = rsp.text
+            elif hasattr(rsp, 'content'):
+                text = rsp.content.decode('utf-8', 'ignore')
+            else:
+                text = str(rsp)
+            # 记录最终 URL（有些接口会 302 到真实 m3u8）
+            final_url = ""
+            try:
+                final_url = rsp.url if hasattr(rsp, 'url') else url
+            except Exception:
+                final_url = url
+            return text, final_url
         except Exception as e:
             self.log("fetch fail: %s - %s" % (url, e))
-            return ""
+            return "", url
 
     def _fix_url(self, url):
         if not url:
@@ -274,7 +322,7 @@ class Spider(Spider):
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        html = self._fetch(self.site_url + "/")
+        html, _ = self._fetch(self.site_url + "/")
         videos = self._extract_videos(html) if html else []
         return {"list": videos}
 
@@ -295,7 +343,7 @@ class Spider(Spider):
         else:
             url = f"{self.site_url}/vodtype/{class_tid}-{page}.html"
 
-        html = self._fetch(url)
+        html, _ = self._fetch(url)
         videos = self._extract_videos(html) if html else []
         pagecount = self._get_pagecount(html)
 
@@ -313,7 +361,7 @@ class Spider(Spider):
         url = f"{self.site_url}/vodsearch/-------------.html?wd={keyword}"
         if page > 1:
             url += f"&page={page}"
-        html = self._fetch(url)
+        html, _ = self._fetch(url)
         videos = self._extract_videos(html) if html else []
         pagecount = self._get_pagecount(html)
         return {
@@ -332,29 +380,25 @@ class Spider(Spider):
             return {"list": []}
         vid = str(ids[0])
         url = f"{self.site_url}/voddetail/{vid}.html"
-        html = self._fetch(url)
+        html, _ = self._fetch(url)
         if not html:
             return {"list": []}
 
-        # 标题
         name = vid
         tm = _RE_DETAIL_TITLE.search(html)
         if tm:
             name = self._clean(tm.group(1))
 
-        # 封面
         pic = self.default_pic
         pm = _RE_DETAIL_PIC.search(html)
         if pm:
             pic = self._fix_url(pm.group(1))
 
-        # 简介
         content = ""
         cm = _RE_DETAIL_DESC.search(html)
         if cm:
             content = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！" + self._clean(cm.group(1))
 
-        # 元信息
         meta = {}
         for block in _RE_DETAIL_META.findall(html):
             for label, val in _RE_META_ITEM.findall(block):
@@ -363,7 +407,6 @@ class Spider(Spider):
                 if label and val:
                     meta[label] = val
 
-        # 播放线路
         play_from = []
         play_url = []
 
@@ -407,22 +450,153 @@ class Spider(Spider):
             "vod_play_url": "$$$".join(play_url),
         }]}
 
+    # ---------- 核心：多路解析 m3u8 ----------
+    def _extract_m3u8_from_response(self, html, final_url):
+        """
+        从响应中多重提取 m3u8/mp4 直链。
+        返回找到的第一个可用地址，找不到返回空字符串。
+        """
+        if not html and not final_url:
+            return ""
+
+        # 如果响应本身就是 m3u8（Content-Type 为 mpegurl）
+        if html and html.lstrip().startswith("#EXTM3U"):
+            # 本身是 m3u8 内容，返回 final_url
+            if final_url and ('.m3u8' in final_url.lower() or 'm3u8' in final_url.lower()):
+                return final_url
+            # 有些接口把 url 也放在响应里
+            mm = _RE_M3U8_URL.search(html)
+            if mm:
+                return mm.group(0)
+            # 无法从内容推断 URL，只能返回 final_url
+            return final_url if final_url else ""
+
+        # 依次尝试 5 种提取方式
+        candidates = []
+
+        # 1) 直接的 m3u8 URL
+        candidates += _RE_M3U8_URL.findall(html or "")
+
+        # 2) JSON url 字段
+        for u in _RE_JSON_URL.findall(html or ""):
+            if u and ('.m3u8' in u.lower() or '.mp4' in u.lower()):
+                candidates.append(u)
+
+        # 3) JSON data/video/source 字段
+        for u in _RE_JSON_DATA.findall(html or ""):
+            if u and ('.m3u8' in u.lower() or '.mp4' in u.lower()):
+                candidates.append(u)
+
+        # 4) video/source 标签
+        for u in _RE_VIDEO_TAG.findall(html or ""):
+            if u and ('.m3u8' in u.lower() or '.mp4' in u.lower() or u.startswith('http')):
+                candidates.append(u)
+
+        # 5) JS 里的 url/src/source
+        for u in _RE_JS_SRC.findall(html or ""):
+            if u:
+                candidates.append(u)
+
+        # 清洗并去重
+        cleaned = []
+        seen = set()
+        for u in candidates:
+            if not u:
+                continue
+            # unescape / unicode 转义处理
+            u = u.replace('\\/', '/').replace('\\u002F', '/').replace('\\u0026', '&')
+            u = u.rstrip('\\').rstrip('"').rstrip("'").strip()
+            if not u:
+                continue
+            # 相对路径转绝对
+            if u.startswith('//'):
+                u = 'https:' + u
+            if u.startswith('/'):
+                u = self.site_url + u
+            if not u.startswith('http'):
+                continue
+            if u in seen:
+                continue
+            seen.add(u)
+            cleaned.append(u)
+
+        # 优先返回 m3u8
+        for u in cleaned:
+            if '.m3u8' in u.lower():
+                return u
+        # 其次 mp4
+        for u in cleaned:
+            if '.mp4' in u.lower():
+                return u
+        # 最后任意
+        return cleaned[0] if cleaned else ""
+
+    def _try_parse_prefix(self, prefix, raw_url):
+        """尝试一个解析接口，成功返回 m3u8 URL，失败返回空字符串"""
+        encoded = urllib.parse.quote(raw_url, safe='')
+        test_url = prefix + encoded
+        try:
+            # 用不同的 UA 试一次
+            for ua in _UA_POOL[:2]:
+                text, final_url = self._fetch(
+                    test_url,
+                    timeout=10,
+                    headers={
+                        "User-Agent": ua,
+                        "Referer": self.site_url + "/",
+                        "Accept": "*/*",
+                    }
+                )
+                m3u8 = self._extract_m3u8_from_response(text, final_url)
+                if m3u8:
+                    self.log("resolve OK: %s -> %s" % (prefix, m3u8[:80]))
+                    return m3u8
+            self.log("resolve NO: %s" % prefix)
+        except Exception as e:
+            self.log("resolve ERR: %s - %s" % (prefix, e))
+        return ""
+
+    def _resolve_m3u8(self, from_key, raw_url):
+        """多路尝试解析，返回 m3u8 直链"""
+        prefixes = _PARSE_PREFIXES.get(from_key, []) or _FALLBACK_PREFIXES
+        # 先去重、去空
+        tried = set()
+        for prefix in prefixes:
+            if not prefix or prefix in tried:
+                continue
+            tried.add(prefix)
+            m3u8 = self._try_parse_prefix(prefix, raw_url)
+            if m3u8:
+                return m3u8
+        return ""
+
     def playerContent(self, flag, id, vipFlags):
         """
-        播放解析逻辑：
-        1. 请求播放页 HTML，提取 player_aaaa 变量
-        2. 根据 encrypt 字段解密 url（0=明文，1=unescape，2=base64）
-        3. 若 url 已是 m3u8/mp4 直链，直接返回
-        4. 否则根据 from 字段匹配第三方解析接口，返回给 TVBox 嗅探
+        四级兜底：
+        A. url 本身是 m3u8/mp4 直链 → parse:0
+        B. 服务端多路解析出 m3u8 → parse:0
+        C. 播放页 HTML 里直接藏着 m3u8 → parse:0
+        D. 全失败 → parse:1（先给 TVBox 一个解析页 URL 嗅探，再退到播放页 URL 嗅探）
         """
         if id.startswith("http"):
             play_url = id
         else:
             play_url = self._fix_url(id)
 
-        html = self._fetch(play_url)
+        html, _ = self._fetch(play_url)
         if not html:
             return {"parse": 1, "url": play_url, "header": self.headers}
+
+        # 先看播放页里有没有直接藏 m3u8
+        direct = self._extract_m3u8_from_response(html, "")
+        if direct:
+            self.log("direct m3u8 from page: %s" % direct[:80])
+            return {
+                "parse": 0,
+                "playUrl": "",
+                "url": direct,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+            }
 
         m = _RE_PLAYER_AAAA.search(html)
         if not m:
@@ -435,47 +609,55 @@ class Spider(Spider):
             return {"parse": 1, "url": play_url, "header": self.headers}
 
         encrypt = str(data.get("encrypt", "0"))
-        real_url = data.get("url", "")
-        play_from = data.get("from", "")
+        raw_url = data.get("url", "")
+        from_key = data.get("from", "")
 
         # 解密
         if encrypt == "1":
-            real_url = urllib.parse.unquote(real_url)
+            raw_url = urllib.parse.unquote(raw_url)
         elif encrypt == "2":
             try:
-                real_url = base64.b64decode(real_url).decode('utf-8', 'ignore')
+                raw_url = base64.b64decode(raw_url).decode('utf-8', 'ignore')
             except Exception:
                 pass
 
-        if not real_url:
+        if not raw_url:
             return {"parse": 1, "url": play_url, "header": self.headers}
 
-        # 若已是直链，直接播放
-        if any(ext in real_url.lower() for ext in ['.m3u8', '.mp4']):
+        # A. 已经是直链
+        if any(ext in raw_url.lower() for ext in ['.m3u8', '.mp4']):
             return {
                 "parse": 0,
                 "playUrl": "",
-                "url": real_url,
+                "url": raw_url,
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
 
-        # 根据 from 匹配第三方解析接口
-        prefix = _PARSE_PREFIX.get(play_from, "")
-        if prefix:
-            # 注意：真实 URL 可能带 ? &，需整体 URL 编码
-            final_url = prefix + urllib.parse.quote(real_url, safe='')
+        # B. 多路服务端解析
+        m3u8_url = self._resolve_m3u8(from_key, raw_url)
+        if m3u8_url:
+            return {
+                "parse": 0,
+                "playUrl": "",
+                "url": m3u8_url,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+            }
+
+        # D. 全失败，让 TVBox 嗅探
+        # 先尝试返回解析页 URL（TVBox 的 webview 里有完整的 JS 环境，能跑解析）
+        prefixes = _PARSE_PREFIXES.get(from_key, []) or _FALLBACK_PREFIXES
+        if prefixes:
+            sniff_url = prefixes[0] + urllib.parse.quote(raw_url, safe='')
             return {
                 "parse": 1,
                 "playUrl": "",
-                "url": final_url,
+                "url": sniff_url,
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
-
-        # 兜底：返回原始 URL 交给 TVBox 嗅探
         return {
             "parse": 1,
-            "url": real_url,
-            "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+            "url": play_url,
+            "header": self.headers,
         }
 
     def localProxy(self, param):
