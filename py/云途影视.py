@@ -53,6 +53,9 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = "https://pic.rmb.bdstatic.com/bjh/user/default.png"
 
+# 简介前缀（片方广告提醒）
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
+
 # 一级分类（真实确认：从首页导航和详情页筛选链接）
 CLASSES = [
     {"type_id": "1", "type_name": "电影"},
@@ -460,8 +463,10 @@ class Spider(Spider):
         if pm:
             pic = self._fix_url(pm.group(1))
 
-        # 简介
+        # 简介（添加前缀）
         content = self._extract_content(html)
+        if content:
+            content = INTRO_PREFIX + content
 
         # 元信息：遍历每个 <li class="data">
         director = ""
