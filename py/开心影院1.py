@@ -52,7 +52,6 @@ except ImportError:
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
-# 候选主域名（按优先级）
 _CANDIDATE_HOSTS = [
     "https://www.kxyyhd.com",
     "https://www.kxyy1.cc",
@@ -113,7 +112,6 @@ class Spider(Spider):
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Referer': self.site_url + "/",
         }
-        # 自动探测能通的域名
         for h in _CANDIDATE_HOSTS:
             try:
                 rsp = self.fetch(h + "/", headers={'User-Agent': UA}, timeout=8)
@@ -266,8 +264,6 @@ class Spider(Spider):
         area = extend.get("area", "")
         year = extend.get("year", "")
 
-        # 12 段路径：
-        # id - area - sort - class - lang - letter - ? - ? - page - ? - ? - year
         parts = [
             str(tid),
             urllib.parse.quote(area) if area else "",
@@ -395,22 +391,26 @@ class Spider(Spider):
         """
         nby.php 两段式：
         1. GET {site}/static/player/{from}.php?get_signed_url=1&url=<加密串>
-           → {"signed_url": "..."}
-        2. GET signed_url
-           → {"urltype": "hls", "jmurl": "真实m3u8"}
-        关键：Referer 用真实播放页 URL
+           → {"signed_url": "?url=...&fetch_data=1&timestamp=...&signature=..."}
+        2. GET {site}/static/player/{from}.php{?url=...&fetch_data=1&...}
+           → {"urltype":"hls","jmurl":"真实m3u8"}
+        关键修正：
+        - signed_url 以 "?" 开头时，要拼到 nby.php 后面，而不是当成绝对路径
+        - 第二步 Referer 用 iframe 页面 URL，不是播放页
         """
         iframe_base = f"{self.site_url}/static/player/{from_key.lower()}.php"
+        iframe_page = iframe_base + "?url=" + urllib.parse.quote(raw_url, safe='')
 
-        # 先访问一次 iframe 页面本身，建立会话 cookie
+        # 先访问一次 iframe 页面，建立 cookie 会话
         try:
-            self._fetch(iframe_base, timeout=8, headers={
+            self._fetch(iframe_page, timeout=8, headers={
                 "User-Agent": UA,
                 "Referer": play_page_url,
             })
         except Exception:
             pass
 
+        # 第一段
         step1_url = (
             iframe_base
             + "?get_signed_url=1&url="
@@ -437,18 +437,32 @@ class Spider(Spider):
         if not signed_url:
             self.log("step1 no signed_url: %s" % data1)
             return ""
-        if signed_url.startswith("//"):
-            signed_url = "https:" + signed_url
-        elif signed_url.startswith("/"):
-            signed_url = self.site_url + signed_url
 
+        # ★ 关键修正：根据 signed_url 的不同开头拼接
+        if signed_url.startswith("http://") or signed_url.startswith("https://"):
+            # 完整 URL
+            step2_url = signed_url
+        elif signed_url.startswith("//"):
+            step2_url = "https:" + signed_url
+        elif signed_url.startswith("/"):
+            step2_url = self.site_url + signed_url
+        elif signed_url.startswith("?"):
+            # 相对 nby.php 的查询参数
+            step2_url = iframe_base + signed_url
+        else:
+            # 兜底：当成相对路径
+            step2_url = iframe_base + "?" + signed_url
+
+        self.log("step2 url: %s" % step2_url[:200])
+
+        # 第二段：Referer 用 iframe 页面（不是播放页）
         step2_headers = {
             "User-Agent": UA,
-            "Referer": play_page_url,
+            "Referer": iframe_page,
             "X-Requested-With": "XMLHttpRequest",
             "Accept": "application/json, text/javascript, */*; q=0.01",
         }
-        text2 = self._fetch(signed_url, timeout=12, headers=step2_headers)
+        text2 = self._fetch(step2_url, timeout=12, headers=step2_headers)
         self.log("step2 body: %s" % (text2[:300] if text2 else "EMPTY"))
 
         try:
@@ -473,7 +487,7 @@ class Spider(Spider):
         else:
             play_url = self._fix_url(id)
 
-        # 强制用主域名访问播放页（kxyyhd.com）
+        # 强制用主域名访问播放页
         play_url_main = play_url
         m = re.search(r'/vodplay/(\d+)-(\d+)-(\d+)\.html', play_url)
         if m:
@@ -520,7 +534,7 @@ class Spider(Spider):
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
             }
 
-        # B. nby.php 两段式解析（用真实播放页作 Referer）
+        # B. nby.php 两段式解析
         if from_key and from_key.lower() not in ("", "parse"):
             try:
                 real = self._resolve_nby(from_key, raw_url, play_url_main)
