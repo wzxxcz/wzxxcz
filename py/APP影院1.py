@@ -52,28 +52,17 @@ except ImportError:
     Spider = _BaseSpider
 
 
-HOST = "https://app.movie"
+HOST = "https://www.appmovie.art"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/template/blueghost/img/favicon.ico"
 
+# 只保留四个主分类
 CLASSES = [
-    {"type_id": "1", "type_name": "电影"},
     {"type_id": "2", "type_name": "连续剧"},
+    {"type_id": "1", "type_name": "电影"},
     {"type_id": "3", "type_name": "综艺"},
     {"type_id": "4", "type_name": "动漫"},
-    {"type_id": "6", "type_name": "动作片"},
-    {"type_id": "7", "type_name": "喜剧片"},
-    {"type_id": "8", "type_name": "爱情片"},
-    {"type_id": "9", "type_name": "科幻片"},
-    {"type_id": "10", "type_name": "恐怖片"},
-    {"type_id": "11", "type_name": "剧情片"},
-    {"type_id": "12", "type_name": "战争片"},
-    {"type_id": "20", "type_name": "纪录片"},
-    {"type_id": "13", "type_name": "国产剧"},
-    {"type_id": "14", "type_name": "港台剧"},
-    {"type_id": "15", "type_name": "日韩剧"},
-    {"type_id": "16", "type_name": "欧美剧"},
 ]
 
 _SORTS = [
@@ -99,13 +88,29 @@ _AREAS = [
     {"n": "法国", "v": "法国"},
 ]
 
+# 每个分类的“类型”选项
+_TYPES = {
+    "2": ["全部", "古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作",
+          "奇幻", "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"],
+    "1": ["全部", "动作", "喜剧", "爱情", "科幻", "恐怖", "剧情", "战争", "纪录片"],
+    "3": ["全部", "真人秀", "脱口秀", "喜剧", "晚会", "音乐", "游戏", "生活",
+          "文化", "美食", "竞技"],
+    "4": ["全部", "动画", "冒险", "喜剧", "奇幻", "剧情", "科幻", "动作",
+          "儿童", "国漫", "日常", "爱情", "玄幻", "校园"],
+}
+
+
+def _mk_class(lst):
+    return [{"n": x, "v": "" if x == "全部" else x} for x in lst]
+
+
 FILTERS = {}
-for _tid in ["1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12",
-             "20", "13", "14", "15", "16"]:
+for _tid, _clist in _TYPES.items():
     FILTERS[_tid] = [
-        {"key": "area", "name": "地区", "value": _AREAS},
-        {"key": "year", "name": "年份", "value": _YEARS},
-        {"key": "by", "name": "排序", "value": _SORTS},
+        {"key": "class", "name": "类型", "value": _mk_class(_clist)},
+        {"key": "area",  "name": "地区", "value": _AREAS},
+        {"key": "year",  "name": "年份", "value": _YEARS},
+        {"key": "by",    "name": "排序", "value": _SORTS},
     ]
 
 
