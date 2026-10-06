@@ -1,9 +1,12 @@
 # coding=utf-8
 """
-SA视频 lsjys11.com | webhtv 爬虫 (V12.0)
-关键修正：
-  - 播放 URL 格式：/movie/detail/{vod_id}?lid={ep_id}
-    例: https://www.lsjys11.com/movie/detail/lanxiangrugu-33f5fd0e81a046a0?lid=b4b5b58b137086406c417a1bffea26bd
+SA视频 lsjys11.com | webhtv 爬虫 (V14.0)
+已完成:
+  - 列表页从 __NUXT_DATA__ 提取
+  - 详情页从 data.links[].items[] 提取真实 hash ID
+  - 播放 URL: /movie/detail/{vod_id}?lid={ep_id}  ✅ 已验证可播
+  - 图片通过 localProxy 代理加 Referer 绕过 CDN 防盗链
+  - 详情页信息(上映/导演/主演/简介/评分)全部显示
 """
 import re
 import sys
@@ -40,7 +43,6 @@ except ImportError:
         def fetch(self, url, headers=None, **kw):
             timeout = kw.pop('timeout', 15)
             r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
-            r.encoding = 'utf-8'
             return r
 
         def log(self, *a, **kw):
@@ -223,12 +225,15 @@ class Spider(Spider):
         except Exception as e:
             self.log("预热失败: %s" % e)
 
-    def _fetch(self, url, timeout=15, headers=None):
+    # ---------------- 基础工具 ----------------
+    def _fetch(self, url, timeout=15, headers=None, raw=False):
         try:
             h = dict(self.headers)
             if headers:
                 h.update(headers)
             rsp = self.fetch(url, headers=h, timeout=timeout)
+            if raw:
+                return rsp
             text = ""
             if hasattr(rsp, "text"):
                 text = rsp.text or ""
@@ -242,7 +247,7 @@ class Spider(Spider):
             return text
         except Exception as e:
             self.log("fetch FAIL %s -> %s" % (url, e))
-            return ""
+            return None if raw else ""
 
     def _fix_url(self, url):
         if not url:
@@ -256,6 +261,19 @@ class Spider(Spider):
             return self.site_url + url
         return urllib.parse.urljoin(self.site_url + "/", url)
 
+    def _proxy_pic(self, pic_url):
+        """
+        把图片 URL 转成代理 URL，让 TVBox 通过 localProxy 请求，
+        代理时带上 Referer 绕过 CDN 防盗链。
+        """
+        if not pic_url:
+            return self.default_pic
+        pic_url = self._fix_url(pic_url)
+        if not pic_url:
+            return self.default_pic
+        return ("http://127.0.0.1:9978/proxy?do=py&type=proxy_img&url="
+                + urllib.parse.quote(pic_url, safe=""))
+
     def _clean(self, s):
         if not s:
             return ""
@@ -268,6 +286,7 @@ class Spider(Spider):
         s = re.sub(r"\n{2,}", "\n", s)
         return s.strip()
 
+    # ---------------- Nuxt 解析 ----------------
     @staticmethod
     def _resolve_nuxt(raw, idx, depth=0, max_depth=25):
         if depth > max_depth:
@@ -302,6 +321,7 @@ class Spider(Spider):
         self.log("  __NUXT_DATA__ 长度=%d" % len(raw))
         return raw
 
+    # ---------------- 列表解析 ----------------
     def _extract_videos_from_nuxt(self, html):
         raw = self._parse_nuxt(html)
         if not raw:
@@ -352,7 +372,7 @@ class Spider(Spider):
                 videos.append({
                     "vod_id":      str(vod_id),
                     "vod_name":    name_clean[:100],
-                    "vod_pic":     self._fix_url(pic) if pic else self.default_pic,
+                    "vod_pic":     self._proxy_pic(pic) if pic else self.default_pic,
                     "vod_remarks": str(remarks),
                     "vod_score":   str(score),
                 })
@@ -373,6 +393,7 @@ class Spider(Spider):
             self.log("  _extract_videos 异常: %s" % e)
         return []
 
+    # ---------------- 首页/分类/搜索 ----------------
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": FILTERS}
 
@@ -418,6 +439,7 @@ class Spider(Spider):
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
+    # ---------------- 详情页 ----------------
     def _extract_detail_from_nuxt(self, html, vod_id):
         raw = self._parse_nuxt(html)
         if not raw:
@@ -445,10 +467,28 @@ class Spider(Spider):
             content = v.get("description") or ""
             pic = v.get("img") or self.default_pic
             score = v.get("score") or ""
+            director = v.get("director") or ""
+            actor = v.get("actor") or v.get("actors") or ""
+            year = v.get("issue_date") or ""
 
+            # 拼接详情页所有信息到 vod_content（兼容所有皮肤）
+            content_parts = []
+            if year:
+                content_parts.append("上映: %s" % year)
+            if director:
+                content_parts.append("导演: %s" % director)
+            if actor:
+                content_parts.append("主演: %s" % actor)
+            if score:
+                content_parts.append("评分: %s" % score)
+            if content:
+                content_parts.append("简介: %s" % self._clean(content))
+
+            full_content = "\n".join(content_parts)
+
+            # 剧集提取
             play_from = []
             play_url = []
-
             links = v.get("links")
             if type(links) == list:
                 for group in links:
@@ -475,9 +515,12 @@ class Spider(Spider):
                 return {
                     "vod_id":        vod_id,
                     "vod_name":      str(name),
-                    "vod_pic":       self._fix_url(pic),
-                    "vod_content":   self._clean(content),
+                    "vod_pic":       self._proxy_pic(pic),
+                    "vod_content":   full_content,
                     "vod_score":     str(score),
+                    "vod_director":  str(director),
+                    "vod_actor":     str(actor),
+                    "vod_year":      str(year),
                     "vod_play_from": "$$$".join(play_from),
                     "vod_play_url":  "$$$".join(play_url) if play_url else "",
                 }
@@ -503,16 +546,12 @@ class Spider(Spider):
         self.log("  详情解析失败")
         return {"list": []}
 
-    # ---------------- 播放（关键修正） ----------------
+    # ---------------- 播放 ----------------
     def playerContent(self, flag, id, vipFlags):
         """
         id 格式：`vod_id/ep_id`
-        例如：`lanxiangrugu-33f5fd0e81a046a0/b4b5b58b137086406c417a1bffea26bd`
-
-        正确播放 URL：
-          https://www.lsjys11.com/movie/detail/{vod_id}?lid={ep_id}
-        例如：
-          https://www.lsjys11.com/movie/detail/lanxiangrugu-33f5fd0e81a046a0?lid=b4b5b58b137086406c417a1bffea26bd
+        正确播放 URL：/movie/detail/{vod_id}?lid={ep_id}
+        例：https://www.lsjys11.com/movie/detail/lanxiangrugu-33f5fd0e81a046a0?lid=b4b5b58b137086406c417a1bffea26bd
         """
         self.log("playerContent: flag=%r id=%r" % (flag, id))
 
@@ -522,7 +561,6 @@ class Spider(Spider):
             parts = id.split("/")
             vod_part = parts[0]
             ep_part = parts[1] if len(parts) > 1 else ""
-            # ✅ 关键：/movie/detail/{vod_id}?lid={ep_id}
             target = "%s/movie/detail/%s?lid=%s" % (self.site_url, vod_part, ep_part)
         else:
             target = "%s/movie/detail/%s" % (self.site_url, id)
@@ -543,8 +581,58 @@ class Spider(Spider):
             "header": headers,
         }
 
+    # ---------------- 图片代理 ----------------
     def localProxy(self, param):
-        return [200, "image/jpeg", b"", ""]
+        """
+        处理图片代理请求。
+        param 可能是:
+          - dict: {"type": "proxy_img", "url": "https%3A%2F%2F..."}
+          - str:  "do=py&type=proxy_img&url=https%3A%2F%2F..."
+        """
+        try:
+            url = ""
+            ptype = ""
+            if isinstance(param, dict):
+                url = param.get("url", "")
+                ptype = param.get("type", "")
+            else:
+                s = str(param)
+                for pair in s.split("&"):
+                    if "=" not in pair:
+                        continue
+                    k, v = pair.split("=", 1)
+                    if k == "url":
+                        url = v
+                    elif k == "type":
+                        ptype = v
+
+            if not url:
+                return [200, "image/jpeg", b"", ""]
+
+            # URL decode
+            if "%" in url:
+                url = urllib.parse.unquote(url)
+
+            self.log("localProxy: type=%s url=%s" % (ptype, url[:120]))
+
+            # 请求图片（带 Referer 绕过 CDN 防盗链）
+            rsp = self.fetch(url, headers={
+                "User-Agent": UA,
+                "Referer": self.site_url + "/",
+                "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            }, timeout=15)
+
+            content = rsp.content if hasattr(rsp, "content") else b""
+            ctype = "image/jpeg"
+            if hasattr(rsp, "headers"):
+                ctype = rsp.headers.get("Content-Type", "image/jpeg") or "image/jpeg"
+            if not ctype.startswith("image/"):
+                ctype = "image/jpeg"
+            return [200, ctype, content, ""]
+        except Exception as e:
+            self.log("localProxy fail: %s" % e)
+            return [200, "image/jpeg", b"", ""]
 
     def isVideoFormat(self, url):
         return ".m3u8" in url
