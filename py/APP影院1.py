@@ -56,6 +56,10 @@ HOST = "https://www.appmovie.art"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/template/blueghost/img/favicon.ico"
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
+
+# 站点 tab 顺序（线路显示顺序）
+_SITE_ORDER = ["1", "5", "2", "3", "4"]
 
 # 只保留四个主分类
 CLASSES = [
@@ -168,14 +172,7 @@ _RE_META_DESC = re.compile(
     r'<meta[^>]*name="description"[^>]*content="([^"]*)"',
     re.I
 )
-_RE_ACTOR = re.compile(
-    r'<p[^>]*class="[^"]*data[^"]*"[^>]*>\s*<span>\s*主演：\s*</span>([^<]+)</p>',
-    re.I
-)
-_RE_DIRECTOR = re.compile(
-    r'<p[^>]*class="[^"]*data[^"]*"[^>]*>\s*<span>\s*导演：\s*</span>([^<]+)</p>',
-    re.I
-)
+_RE_SCORE = re.compile(r'vk-badge[^>]*>\s*([\d.]+)\s*<', re.I)
 
 
 class Spider(Spider):
@@ -238,6 +235,10 @@ class Spider(Spider):
         s = re.sub(r"[ \t\r\f\v]+", " ", s)
         s = re.sub(r"\n{2,}", "\n", s)
         return s.strip()
+
+    def _g(self, pat, html):
+        m = re.search(pat, html, re.I)
+        return self._clean(m.group(1)) if m else ""
 
     # ---------- 列表 ----------
     def _extract_list(self, html):
@@ -313,7 +314,8 @@ class Spider(Spider):
 
         year = extend.get("year")
         if year:
-            parts += ["year", str(year)]
+            # 站点模板把年份也塞进了 area 参数
+            parts += ["area", str(year)]
 
         by = extend.get("by")
         if by:
@@ -404,12 +406,10 @@ class Spider(Spider):
         """
         groups = {}
 
-        # 按 stui-pannel 分块
         blocks = re.split(
             r'<div[^>]*class="[^"]*stui-pannel[^"]*"', html, flags=re.I)
 
         for block in blocks[1:]:
-            # 线路名（取块内第一个 h3.title）
             mt = _RE_H3_TITLE.search(block)
             if not mt:
                 continue
@@ -417,7 +417,6 @@ class Spider(Spider):
             if not line_name or len(line_name) > 20:
                 continue
 
-            # 播放列表
             ml = _RE_PLAYLIST_UL.search(block)
             if not ml:
                 continue
@@ -479,7 +478,16 @@ class Spider(Spider):
         if m:
             pic = m.group(1)
 
-        # 简介
+        # ===== 详情字段 =====
+        v_type     = self._g(r'类型：</span><a[^>]*>([^<]+)</a>', html)
+        v_area     = self._g(r'地区：</span><a[^>]*>([^<]+)</a>', html)
+        v_year     = self._g(r'年份：</span><a[^>]*>([^<]+)</a>', html)
+        v_status   = self._g(r'状态：\s*</span>([^<]+)', html)
+        v_actor    = self._g(r'主演：</span>([^<]+)', html)
+        v_director = self._g(r'导演：</span>([^<]+)', html)
+        v_score    = self._g(r'vk-badge[^>]*>\s*([\d.]+)\s*<', html)
+
+        # 简介 + 前缀
         content = ""
         m = _RE_DETAIL_DESC.search(html)
         if m:
@@ -488,16 +496,7 @@ class Spider(Spider):
             m = _RE_META_DESC.search(html)
             if m:
                 content = self._clean(m.group(1))
-
-        # 主演 / 导演
-        actor = ""
-        m = _RE_ACTOR.search(html)
-        if m:
-            actor = self._clean(m.group(1))
-        director = ""
-        m = _RE_DIRECTOR.search(html)
-        if m:
-            director = self._clean(m.group(1))
+        content = INTRO_PREFIX + ("\n" + content if content else "")
 
         # 剧集
         groups = self._extract_play_groups(html)
@@ -506,33 +505,38 @@ class Spider(Spider):
         if not groups:
             return {"list": []}
 
-        # 线路顺序：sid 数字优先
-        def _sid_key(x):
-            return int(x) if str(x).isdigit() else 999
-
-        sorted_sids = sorted(groups.keys(), key=_sid_key)
+        # 按站点 tab 顺序排，未列出的排最后
+        sids = [s for s in _SITE_ORDER if s in groups]
+        sids += [s for s in groups if s not in sids]
 
         play_from = []
         play_url = []
-        for sid in sorted_sids:
+        for sid in sids:
             info = groups[sid]
             play_from.append(info["name"])
             play_url.append("#".join(
                 "%s$%s" % (n, u) for n, u in info["eps"]))
 
-        return {
-            "list": [{
-                "vod_id": vod_id,
-                "vod_name": name,
-                "vod_pic": self._fix_url(pic) or self.default_pic,
-                "vod_content": content,
-                "vod_actor": actor,
-                "vod_director": director,
-                "vod_remarks": "%d条线路" % len(groups),
-                "vod_play_from": "$$$".join(play_from),
-                "vod_play_url": "$$$".join(play_url),
-            }]
+        vod = {
+            "vod_id": vod_id,
+            "vod_name": name,
+            "vod_pic": self._fix_url(pic) or self.default_pic,
+            "vod_content": content,
+            "vod_actor": v_actor,
+            "vod_director": v_director,
+            "vod_year": v_year,
+            "vod_area": v_area,
+            "vod_remarks": v_status or ("%d条线路" % len(groups)),
+            "vod_play_from": "$$$".join(play_from),
+            "vod_play_url":  "$$$".join(play_url),
         }
+        if v_type:
+            vod["type_name"] = v_type
+            vod["vod_class"] = v_type
+        if v_score:
+            vod["vod_score"] = v_score
+
+        return {"list": [vod]}
 
     # ---------- 播放 ----------
     def playerContent(self, flag, id, vipFlags):
@@ -540,14 +544,17 @@ class Spider(Spider):
         self.log("player: %s" % play_page)
 
         now = int(time.time())
+        # 缓存 30 分钟
         if play_page in self._play_cache:
             ts, res = self._play_cache[play_page]
-            if now - ts < 600:
+            if now - ts < 1800:
                 return res
 
         html = self._fetch(play_page, headers={"Referer": self.site_url + "/"})
 
         real_url = ""
+        url_next = ""
+        from_tag = ""
 
         if html:
             m = _RE_PLAYER_DATA.search(html)
@@ -564,13 +571,17 @@ class Spider(Spider):
 
                 if data:
                     real_url = data.get("url") or ""
+                    url_next = data.get("url_next") or ""
+                    from_tag = data.get("from") or ""
                 else:
                     m2 = re.search(r'"url"\s*:\s*"([^"]+)"', raw)
-                    if m2:
-                        real_url = m2.group(1)
+                    if m2: real_url = m2.group(1)
+                    m3 = re.search(r'"url_next"\s*:\s*"([^"]+)"', raw)
+                    if m3: url_next = m3.group(1)
+                    m4 = re.search(r'"from"\s*:\s*"([^"]+)"', raw)
+                    if m4: from_tag = m4.group(1)
 
             if not real_url:
-                # 兜底：HTML 里的 m3u8
                 m = re.search(r'(https?://[^"\'\\\s]+?\.m3u8[^"\'\\\s]*)',
                               html, re.I)
                 if m:
@@ -583,7 +594,14 @@ class Spider(Spider):
             if real_url.startswith("//"):
                 real_url = "https:" + real_url
 
-            self.log("  => %s" % real_url[:180])
+            # m3u8 请求 Referer 用播放源域名，比主站更稳
+            try:
+                p = urllib.parse.urlparse(real_url)
+                src_host = "%s://%s/" % (p.scheme, p.netloc)
+            except Exception:
+                src_host = self.site_url + "/"
+
+            self.log("  => [%s] %s" % (from_tag, real_url[:180]))
 
             res = {
                 "parse": 0,
@@ -591,7 +609,8 @@ class Spider(Spider):
                 "url": real_url,
                 "header": {
                     "User-Agent": UA,
-                    "Referer": self.site_url + "/",
+                    "Referer": src_host,
+                    "Origin":  src_host.rstrip("/"),
                 },
             }
             self._play_cache[play_page] = (now, res)
