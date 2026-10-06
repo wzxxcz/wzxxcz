@@ -61,9 +61,6 @@ INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的�
 # 站点 tab 顺序（线路显示顺序）
 _SITE_ORDER = ["1", "5", "2", "3", "4"]
 
-# 本地代理前缀（TVBox 默认 9978）
-_PROXY = "http://127.0.0.1:9978/proxy?do=py&type=m3u8&url="
-
 # 只保留四个主分类
 CLASSES = [
     {"type_id": "2", "type_name": "连续剧"},
@@ -547,14 +544,12 @@ class Spider(Spider):
         self.log("player: %s" % play_page)
 
         now = int(time.time())
-        # 缓存 30 分钟
         if play_page in self._play_cache:
             ts, res = self._play_cache[play_page]
             if now - ts < 1800:
                 return res
 
         html = self._fetch(play_page, headers={"Referer": self.site_url + "/"})
-
         real_url = ""
         from_tag = ""
 
@@ -570,7 +565,6 @@ class Spider(Spider):
                         data = json.loads(raw.replace("\\/", "/"))
                     except Exception:
                         data = None
-
                 if data:
                     real_url = data.get("url") or ""
                     from_tag = data.get("from") or ""
@@ -581,27 +575,23 @@ class Spider(Spider):
                     if m4: from_tag = m4.group(1)
 
             if not real_url:
-                m = re.search(r'(https?://[^"\'\\\s]+?\.m3u8[^"\'\\\s]*)',
-                              html, re.I)
+                m = re.search(r'(https?://[^"\'\\\s]+?\.m3u8[^"\'\\\s]*)', html, re.I)
                 if m:
                     real_url = m.group(1)
 
         if real_url:
             real_url = (real_url.replace("\\/", "/")
-                        .replace("&amp;", "&")
-                        .replace("\\u0026", "&"))
+                        .replace("&amp;", "&").replace("\\u0026", "&"))
             if real_url.startswith("//"):
                 real_url = "https:" + real_url
 
             self.log("  => [%s] %s" % (from_tag, real_url[:180]))
 
-            # m3u8 走本地代理，由爬虫自己带 Referer 去拉
-            proxy = _PROXY + urllib.parse.quote(real_url, safe="")
-
+            # 直接返回 m3u8 直链，让 TVBox 原生播放器直连
             res = {
                 "parse": 0,
                 "playUrl": "",
-                "url": proxy,
+                "url": real_url,
                 "header": {
                     "User-Agent": UA,
                     "Referer": self.site_url + "/",
@@ -610,95 +600,14 @@ class Spider(Spider):
             self._play_cache[play_page] = (now, res)
             return res
 
-        # 兜底：交给 TVBox 嗅探
-        res = {
-            "parse": 1,
-            "playUrl": "",
-            "url": play_page,
-            "header": {
-                "User-Agent": UA,
-                "Referer": self.site_url + "/",
-            },
-        }
+        # 兜底
+        res = {"parse": 1, "playUrl": "", "url": play_page,
+               "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
         self._play_cache[play_page] = (now, res)
         return res
 
-    # ---------- 代理 ----------
     def localProxy(self, param):
-        try:
-            url = ""
-            if isinstance(param, dict):
-                url = param.get("url", "")
-            else:
-                for pair in str(param).split("&"):
-                    if "=" in pair:
-                        k, v = pair.split("=", 1)
-                        if k == "url":
-                            url = urllib.parse.unquote(v)
-            if not url:
-                return [404, "text/plain", b"no url", ""]
-
-            url = url.replace("&amp;", "&")
-            if url.startswith("//"):
-                url = "https:" + url
-
-            now = int(time.time())
-
-            # m3u8 内容缓存 5 分钟（切集、回放秒开）
-            cache_key = "m3u8:" + url
-            if cache_key in self._play_cache:
-                ts, cached = self._play_cache[cache_key]
-                if now - ts < 300:
-                    return cached
-
-            h = {
-                "User-Agent": UA,
-                "Referer": self.site_url + "/",
-                "Accept": "*/*",
-                "Accept-Language": "zh-CN,zh;q=0.9",
-            }
-
-            rsp = self.fetch(url, headers=h, timeout=12)
-            content = rsp.content
-            ctype = rsp.headers.get("Content-Type", "") or "application/octet-stream"
-
-            # 只要内容是 m3u8，就处理内部地址
-            if b"#EXTM3U" in content[:500] or "mpegurl" in ctype.lower():
-                text = content.decode("utf-8", "ignore")
-                base = url.rsplit("/", 1)[0] + "/"
-                new_lines = []
-                for ln in text.splitlines():
-                    s = ln.strip()
-                    if s and not s.startswith("#"):
-                        if s.startswith("http"):
-                            full = s
-                        elif s.startswith("/"):
-                            p = urllib.parse.urlparse(url)
-                            full = "%s://%s%s" % (p.scheme, p.netloc, s)
-                        else:
-                            full = base + s
-
-                        # 子 m3u8 继续走代理（保证 Referer 正确）
-                        # ts 分片保留原地址（直连 CDN，速度最快）
-                        if ".m3u8" in full.lower():
-                            new_lines.append(
-                                _PROXY + urllib.parse.quote(full, safe=""))
-                        else:
-                            new_lines.append(full)
-                    else:
-                        new_lines.append(ln)
-                content = "\n".join(new_lines).encode("utf-8")
-                ctype = "application/vnd.apple.mpegurl"
-
-            result = [200, ctype, content, ""]
-
-            if ".m3u8" in url.lower():
-                self._play_cache[cache_key] = (now, result)
-            return result
-
-        except Exception as e:
-            self.log("proxy FAIL %s" % e)
-            return [500, "text/plain", b"", ""]
+        return [200, "text/plain", b"", ""]
 
     def isVideoFormat(self, url):
         return ".m3u8" in url or ".mp4" in url
