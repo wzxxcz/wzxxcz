@@ -1,10 +1,10 @@
 # coding=utf-8
 """
-豆花电影网 dhvideo.cc | TVBox Python 爬虫 (V6.1 简介前缀修复版)
-关键: 
+豆花电影网 dhvideo.cc | TVBox Python 爬虫 (V6.2 完整修复版)
+关键:
   - 破解服务端 SHA1 PoW 挑战 (attack_key)
   - 解析 box.dyrs.com.de 的 master m3u8，提取真实子 m3u8
-  - 简介添加指定前缀，并补全提取兜底
+  - 简介添加指定前缀，并补全提取兜底 + 元信息正则
 """
 import re
 import sys
@@ -141,14 +141,24 @@ _RE_PIC_ID = re.compile(r'/img/id/[A-Za-z0-9]+\.(?:jpg|png|webp)', re.I)
 _RE_INTRO = re.compile(
     r'<span\s+class="font-bold text-\[#ff3347\] mr-1">简介:</span>\s*'
     r'([\s\S]*?)</div>', re.S | re.I)
-# 兜底 1：特定 div 类名
 _RE_INTRO_DIV = re.compile(
     r'<div[^>]*class="[^"]*text-\[#555\][^"]*reset-style[^"]*"[^>]*>'
     r'([\s\S]*?)</div>', re.S | re.I)
-# 兜底 2：meta 标签
 _RE_META_DESC = re.compile(
     r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']',
     re.I)
+
+# ===== 补齐的元信息正则（之前缺失！）=====
+_RE_DIRECTOR = re.compile(
+    r'<span\s+class="text-\[#2e2e2e\]\s+font-bold">导演</span>\s*'
+    r'<span[^>]*>([^<]*)</span>', re.S | re.I)
+_RE_ACTOR = re.compile(
+    r'<span\s+class="text-\[#2e2e2e\]\s+font-bold">主演</span>\s*'
+    r'<span[^>]*>([\s\S]*?)</span>', re.S | re.I)
+_RE_SCORE = re.compile(
+    r'vk-badge[^>]*>\s*([\d.]+)\s*<', re.I)
+_RE_HOT = re.compile(
+    r'([\d,]+)\s*\(电视剧排名:\s*(\d+),\s*总排名:\s*(\d+)\)', re.I)
 
 # PoW 挑战页特征
 _RE_POW_HASH = re.compile(r"var\s+hash\s*=\s*['\"]([a-f0-9]{40})['\"]")
@@ -218,7 +228,7 @@ class Spider(Spider):
         target = m2.group(1)
         self.log("PoW: hash=%s target=%s" % (hash_prefix[:16], target[:16]))
 
-        max_i = 10 * 1000 * 1000  # 1000 万
+        max_i = 10 * 1000 * 1000
         start = time.time()
         prefix_b = hash_prefix.encode()
 
@@ -255,7 +265,6 @@ class Spider(Spider):
             else:
                 text = str(rsp)
 
-            # 检测是否为 PoW 挑战页
             if ("正在检测" in text) or ("sha1(hash" in text
                                        and "attack_key" in text):
                 self.log("⚠️ 遇到 PoW 挑战, 开始破解...")
@@ -471,70 +480,108 @@ class Spider(Spider):
 
         # 标题
         name = ""
-        m = _RE_H1.search(html)
-        if m:
-            name = self._clean(m.group(1))
-        if not name:
-            m = re.search(r"<title>(.*?)</title>", html, re.S)
+        try:
+            m = _RE_H1.search(html)
             if m:
-                name = self._clean(m.group(1).split("_")[0].split("-")[0])
+                name = self._clean(m.group(1))
+        except Exception as e:
+            self.log("  提取标题失败: %s" % e)
+
+        if not name:
+            try:
+                m = re.search(r"<title>(.*?)</title>", html, re.S)
+                if m:
+                    name = self._clean(m.group(1).split("_")[0].split("-")[0])
+            except Exception:
+                pass
         name = re.sub(r"\s*\(\d{4}\)\s*$", "", name).strip() or vod_id
 
         # 封面
         pic = self.default_pic
-        m = _RE_PIC_ID.search(html)
-        if m:
-            pic = self.site_url + m.group(0)
+        try:
+            m = _RE_PIC_ID.search(html)
+            if m:
+                pic = self.site_url + m.group(0)
+        except Exception as e:
+            self.log("  提取封面失败: %s" % e)
 
-        # 简介（带兜底）
+        # 简介（多层兜底）
         content = ""
-        m = _RE_INTRO.search(html)
-        if m:
-            content = self._clean(m.group(1))
-        if not content:
-            m = _RE_INTRO_DIV.search(html)
+        try:
+            m = _RE_INTRO.search(html)
             if m:
                 content = self._clean(m.group(1))
+        except Exception as e:
+            self.log("  简介方案1失败: %s" % e)
         if not content:
-            m = _RE_META_DESC.search(html)
-            if m:
-                content = self._clean(m.group(1))
+            try:
+                m = _RE_INTRO_DIV.search(html)
+                if m:
+                    content = self._clean(m.group(1))
+            except Exception as e:
+                self.log("  简介方案2失败: %s" % e)
+        if not content:
+            try:
+                m = _RE_META_DESC.search(html)
+                if m:
+                    content = self._clean(m.group(1))
+            except Exception as e:
+                self.log("  简介方案3失败: %s" % e)
 
-        # 增加简介前缀
+        self.log("  简介原始长度: %d" % len(content))
+
+        # 增加简介前缀（加换行分隔）
         if content:
-            content = INTRO_PREFIX + content
+            content = INTRO_PREFIX + "\n" + content
         else:
             content = INTRO_PREFIX
 
+        self.log("  最终简介前80字: %s" % content[:80])
+
         # 导演 / 演员 / 评分等
         director = ""
-        m = _RE_DIRECTOR.search(html)
-        if m:
-            director = self._clean(m.group(1))
+        try:
+            m = _RE_DIRECTOR.search(html)
+            if m:
+                director = self._clean(m.group(1))
+        except Exception as e:
+            self.log("  导演提取失败: %s" % e)
 
         actor = ""
-        m = _RE_ACTOR.search(html)
-        if m:
-            actor = re.sub(r"\s*,\s*", ", ", self._clean(m.group(1)))
+        try:
+            m = _RE_ACTOR.search(html)
+            if m:
+                actor = re.sub(r"\s*,\s*", ", ", self._clean(m.group(1)))
+        except Exception as e:
+            self.log("  演员提取失败: %s" % e)
 
         score = ""
-        m = _RE_SCORE.search(html)
-        if m:
-            score = m.group(1)
+        try:
+            m = _RE_SCORE.search(html)
+            if m:
+                score = m.group(1)
+        except Exception as e:
+            self.log("  评分提取失败: %s" % e)
 
         hot_info = ""
-        m = _RE_HOT.search(html)
-        if m:
-            hot_info = "热度%s (排名%s)" % (m.group(1), m.group(2))
+        try:
+            m = _RE_HOT.search(html)
+            if m:
+                hot_info = "热度%s (排名%s)" % (m.group(1), m.group(2))
+        except Exception as e:
+            self.log("  热度提取失败: %s" % e)
 
         # 剧集
         groups = {}
-        for m in _RE_EPISODE.finditer(html):
-            href, origin, ep_name = m.group(1), m.group(2), m.group(3)
-            href = href.replace("&amp;", "&")
-            if href.startswith("/"):
-                href = self.site_url + href
-            groups.setdefault(origin, []).append((ep_name.strip(), href))
+        try:
+            for m in _RE_EPISODE.finditer(html):
+                href, origin, ep_name = m.group(1), m.group(2), m.group(3)
+                href = href.replace("&amp;", "&")
+                if href.startswith("/"):
+                    href = self.site_url + href
+                groups.setdefault(origin, []).append((ep_name.strip(), href))
+        except Exception as e:
+            self.log("  剧集解析失败: %s" % e)
 
         self.log("  剧集: %s" % {k: len(v) for k, v in groups.items()})
 
@@ -601,7 +648,6 @@ class Spider(Spider):
                 self.log("  => 直链 m3u8: %s" % real_m3u8[:160])
                 return res
 
-        # 兜底：交给 TVBox 嗅探
         res = {"parse": 1, "playUrl": "", "url": play_page,
                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
         self._play_cache[play_page] = (now, res)
@@ -628,7 +674,6 @@ class Spider(Spider):
             return m2.group(1) if m2 else ""
 
     def _resolve_to_real_m3u8(self, api_url, referer=None):
-        # Step 1: /api/m3u8 拿 302
         try:
             try:
                 rsp = self.fetch(api_url, headers={
@@ -667,7 +712,6 @@ class Spider(Spider):
         loc = loc.replace("&amp;", "&")
         self.log("  box master: %s" % loc[:150])
 
-        # Step 2: 请求 master m3u8
         try:
             rsp2 = self.fetch(loc, headers={
                 "User-Agent": UA,
@@ -687,7 +731,6 @@ class Spider(Spider):
             self.log("  master 无 m3u8 头")
             return loc
 
-        # Step 3: 解析子 m3u8
         lines = [ln.strip() for ln in text2.split("\n") if ln.strip()]
         for i, line in enumerate(lines):
             if line.startswith("#EXT-X-STREAM-INF"):
