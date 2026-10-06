@@ -1,17 +1,13 @@
 # coding=utf-8
 """
-SA视频 lsjys11.com | webhtv 爬虫 (V10.0)
-参照豆花电影网架构重写。
-关键:
-  - 首页预热建立会话
-  - 从 __NUXT_DATA__ 提取列表 (该站是 Nuxt SPA, DOM 无 <a> 标签)
-  - 从 __NUXT_DATA__ 的 data.links[].items[] 提取剧集 hash ID
-  - 播放走 parse=1 嗅探 (API body 加密，无法直解)
+SA视频 lsjys11.com | webhtv 爬虫 (V12.0)
+关键修正：
+  - 播放 URL 格式：/movie/detail/{vod_id}?lid={ep_id}
+    例: https://www.lsjys11.com/movie/detail/lanxiangrugu-33f5fd0e81a046a0?lid=b4b5b58b137086406c417a1bffea26bd
 """
 import re
 import sys
 import json
-import time
 import urllib.parse
 
 sys.path.append('..')
@@ -43,9 +39,7 @@ except ImportError:
 
         def fetch(self, url, headers=None, **kw):
             timeout = kw.pop('timeout', 15)
-            allow_redirects = kw.pop('allow_redirects', True)
-            r = self._sess.get(url, headers=headers, timeout=timeout,
-                               allow_redirects=allow_redirects, **kw)
+            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
             r.encoding = 'utf-8'
             return r
 
@@ -229,7 +223,6 @@ class Spider(Spider):
         except Exception as e:
             self.log("预热失败: %s" % e)
 
-    # ---------------- 基础工具 ----------------
     def _fetch(self, url, timeout=15, headers=None):
         try:
             h = dict(self.headers)
@@ -244,11 +237,8 @@ class Spider(Spider):
             else:
                 text = str(rsp)
             self.log("GET %s -> HTTP %s, Len=%d" % (url, rsp.status_code, len(text)))
-            # 诊断：HTML 过短或没有 __NUXT_DATA__ 时，打印前 300 字符
-            if len(text) < 5000:
+            if len(text) < 3000:
                 self.log("  短响应前 300 字符: %r" % text[:300])
-            elif "__NUXT_DATA__" not in text:
-                self.log("  ⚠️ 未找到 __NUXT_DATA__, 前 300 字符: %r" % text[:300])
             return text
         except Exception as e:
             self.log("fetch FAIL %s -> %s" % (url, e))
@@ -278,10 +268,8 @@ class Spider(Spider):
         s = re.sub(r"\n{2,}", "\n", s)
         return s.strip()
 
-    # ---------------- Nuxt 解析 ----------------
     @staticmethod
     def _resolve_nuxt(raw, idx, depth=0, max_depth=25):
-        """严格判断类型，避免 isinstance(True, int) 陷阱"""
         if depth > max_depth:
             return None
         t = type(idx)
@@ -309,18 +297,16 @@ class Spider(Spider):
             self.log("  __NUXT_DATA__ JSON 解析失败: %s" % e)
             return None
         if type(raw) != list:
-            self.log("  __NUXT_DATA__ 根不是 list, 而是 %s" % type(raw).__name__)
+            self.log("  __NUXT_DATA__ 根不是 list")
             return None
         self.log("  __NUXT_DATA__ 长度=%d" % len(raw))
         return raw
 
-    # ---------------- 列表解析 ----------------
     def _extract_videos_from_nuxt(self, html):
         raw = self._parse_nuxt(html)
         if not raw:
             return None
 
-        # 找顶层 {data: <int>, total/last_page: <int>} 结构
         candidates = []
         for i, item in enumerate(raw):
             if type(item) != dict:
@@ -335,8 +321,6 @@ class Spider(Spider):
 
         for idx, item in candidates:
             data_ref = item.get("data")
-            self.log("  候选#%d: data_ref=%r, type=%s" % (
-                idx, data_ref, type(data_ref).__name__))
             if type(data_ref) != int:
                 continue
             if not (0 <= data_ref < len(raw)):
@@ -346,19 +330,12 @@ class Spider(Spider):
                 continue
 
             videos = []
-            errors = 0
             for v_ref in data_list:
                 try:
                     v = self._resolve_nuxt(raw, v_ref)
-                except Exception as e:
-                    errors += 1
-                    if errors <= 3:
-                        self.log("    解析异常 v_ref=%r: %s" % (v_ref, e))
+                except Exception:
                     continue
                 if type(v) != dict:
-                    errors += 1
-                    if errors <= 3:
-                        self.log("    解析结果不是 dict: %r" % (v_ref,))
                     continue
                 if v.get("type") == "ad" or v.get("ad_position_code"):
                     continue
@@ -366,57 +343,46 @@ class Spider(Spider):
                 slug = v.get("slug") or ""
                 vid = v.get("id") or ""
                 if not name or not vid:
-                    errors += 1
-                    if errors <= 5:
-                        self.log("    字段缺失: name=%r id=%r slug=%r" % (name, vid, slug))
                     continue
+                name_clean = re.sub(r"<[^>]+>", "", name)
                 vod_id = "%s-%s" % (slug, vid) if slug else str(vid)
                 pic = v.get("img") or ""
                 score = v.get("score") or "0"
                 remarks = v.get("duration") or ""
                 videos.append({
                     "vod_id":      str(vod_id),
-                    "vod_name":    str(name)[:100],
+                    "vod_name":    name_clean[:100],
                     "vod_pic":     self._fix_url(pic) if pic else self.default_pic,
                     "vod_remarks": str(remarks),
                     "vod_score":   str(score),
                 })
 
-            self.log("  解析: videos=%d, errors=%d" % (len(videos), errors))
             if videos:
-                self.log("  首个: %r" % (videos[0],))
+                self.log("  解析成功: %d 部" % len(videos))
                 return videos
-
         return None
 
     def _extract_videos(self, html):
         if not html:
-            self.log("  _extract_videos: HTML 为空")
             return []
         try:
             result = self._extract_videos_from_nuxt(html)
             if result:
                 return result
-            self.log("  Nuxt 解析未拿到数据")
         except Exception as e:
             self.log("  _extract_videos 异常: %s" % e)
         return []
 
-    # ---------------- 首页 ----------------
     def homeContent(self, filter=False):
-        self.log("homeContent called")
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        self.log("homeVideoContent called")
         self._warm_up()
-        url = "%s/movie/list?cat_id=13" % self.site_url
-        html = self._fetch(url)
+        html = self._fetch("%s/movie/list?cat_id=13" % self.site_url)
         return {"list": self._extract_videos(html)}
 
-    # ---------------- 分类页 ----------------
     def categoryContent(self, tid, pg, filter, extend):
-        self.log("categoryContent: tid=%r pg=%r extend=%r" % (tid, pg, extend))
+        self.log("categoryContent: tid=%r pg=%r" % (tid, pg))
         self._warm_up()
         page = int(pg) if pg else 1
         if isinstance(extend, str):
@@ -426,33 +392,20 @@ class Spider(Spider):
                 extend = {}
         if not extend:
             extend = {}
-
-        # 清掉空值
-        params = {}
-        for k, v in extend.items():
-            if v and v != "全部":
-                params[k] = v
-
+        params = {k: v for k, v in extend.items() if v and v != "全部"}
         if page <= 1:
             url = "%s/movie/list?cat_id=%s" % (self.site_url, tid)
         else:
             url = "%s/movie/list/%d?cat_id=%s" % (self.site_url, page, tid)
         if params:
             url += "&" + urllib.parse.urlencode(params)
-
-        self.log("  请求 URL: %s" % url)
         html = self._fetch(url)
-        videos = self._extract_videos(html)
-        self.log("  返回列表长度: %d" % len(videos))
-
         return {
-            "list": videos, "page": page, "pagecount": 999,
+            "list": self._extract_videos(html), "page": page, "pagecount": 999,
             "limit": 24, "total": 9999,
         }
 
-    # ---------------- 搜索 ----------------
     def searchContent(self, key, quick, pg="1"):
-        self.log("searchContent: key=%r" % key)
         self._warm_up()
         kw = urllib.parse.quote(key)
         url = "%s/search?keywords=%s" % (self.site_url, kw)
@@ -465,12 +418,11 @@ class Spider(Spider):
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
-    # ---------------- 详情页 ----------------
     def _extract_detail_from_nuxt(self, html, vod_id):
         raw = self._parse_nuxt(html)
         if not raw:
             return None
-        # 详情响应：{"data": <int>, "seo": <int>}
+
         for item in raw:
             if type(item) != dict:
                 continue
@@ -497,7 +449,6 @@ class Spider(Spider):
             play_from = []
             play_url = []
 
-            # links: [{"name": "1-34", "items": [{"id": "hash", "name": "第N集"}]}]
             links = v.get("links")
             if type(links) == list:
                 for group in links:
@@ -543,18 +494,26 @@ class Spider(Spider):
         else:
             vod_id = raw
             url = "%s/movie/detail/%s" % (self.site_url, vod_id)
-        self.log("  detail URL: %s" % url)
         html = self._fetch(url)
         if not html:
             return {"list": []}
         detail = self._extract_detail_from_nuxt(html, vod_id)
         if detail:
             return {"list": [detail]}
-        self.log("  详情 Nuxt 解析失败")
+        self.log("  详情解析失败")
         return {"list": []}
 
-    # ---------------- 播放 ----------------
+    # ---------------- 播放（关键修正） ----------------
     def playerContent(self, flag, id, vipFlags):
+        """
+        id 格式：`vod_id/ep_id`
+        例如：`lanxiangrugu-33f5fd0e81a046a0/b4b5b58b137086406c417a1bffea26bd`
+
+        正确播放 URL：
+          https://www.lsjys11.com/movie/detail/{vod_id}?lid={ep_id}
+        例如：
+          https://www.lsjys11.com/movie/detail/lanxiangrugu-33f5fd0e81a046a0?lid=b4b5b58b137086406c417a1bffea26bd
+        """
         self.log("playerContent: flag=%r id=%r" % (flag, id))
 
         if id.startswith("http"):
@@ -563,7 +522,8 @@ class Spider(Spider):
             parts = id.split("/")
             vod_part = parts[0]
             ep_part = parts[1] if len(parts) > 1 else ""
-            target = "%s/movie/detail/%s?ep=%s" % (self.site_url, vod_part, ep_part)
+            # ✅ 关键：/movie/detail/{vod_id}?lid={ep_id}
+            target = "%s/movie/detail/%s?lid=%s" % (self.site_url, vod_part, ep_part)
         else:
             target = "%s/movie/detail/%s" % (self.site_url, id)
 
@@ -573,7 +533,7 @@ class Spider(Spider):
             "User-Agent": UA,
             "Referer": self.site_url + "/",
             "Origin": self.site_url,
-            "Accept": "*/*",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
         }
         return {
