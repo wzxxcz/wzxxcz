@@ -668,6 +668,25 @@
             },
             "timeout": 60
         },
+		{
+            "key": "蜡笔",
+            "name": "🖍️蜡笔4K",
+            "type": 3,
+            "api": "csp_PanWebShare",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "changeable": 1,
+            "ext": {
+                "site": [
+                    "https://www.fmcf.fun",
+                    "https://www.mmpanpan.site",
+                    "http://tvpanpan.site",
+                    "http://www.tvpanpan.site"
+                ]
+            },
+            "timeout": 60
+        },
         {
             "key": "多多",
             "name": "🍥多多弹幕4K弹幕",
