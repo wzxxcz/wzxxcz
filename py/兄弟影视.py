@@ -54,7 +54,7 @@ HOST = "https://www.siac-edc.com"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
-# 主分类 + 子分类
+# 严格只保留官方主导航的 6 个分类
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
     {"type_id": "2",  "type_name": "连续剧"},
@@ -62,26 +62,6 @@ CLASSES = [
     {"type_id": "4",  "type_name": "动漫"},
     {"type_id": "5",  "type_name": "短剧"},
     {"type_id": "21", "type_name": "预告片"},
-    {"type_id": "6",  "type_name": "动作片"},
-    {"type_id": "7",  "type_name": "喜剧片"},
-    {"type_id": "8",  "type_name": "爱情片"},
-    {"type_id": "9",  "type_name": "科幻片"},
-    {"type_id": "10", "type_name": "恐怖片"},
-    {"type_id": "11", "type_name": "剧情片"},
-    {"type_id": "12", "type_name": "战争片"},
-    {"type_id": "20", "type_name": "伦理片"},
-    {"type_id": "13", "type_name": "国产剧"},
-    {"type_id": "14", "type_name": "港台剧"},
-    {"type_id": "15", "type_name": "日韩剧"},
-    {"type_id": "16", "type_name": "美剧"},
-    {"type_id": "24", "type_name": "大陆综艺"},
-    {"type_id": "25", "type_name": "港台综艺"},
-    {"type_id": "26", "type_name": "日韩综艺"},
-    {"type_id": "27", "type_name": "欧美综艺"},
-    {"type_id": "30", "type_name": "国漫"},
-    {"type_id": "28", "type_name": "日韩动漫"},
-    {"type_id": "29", "type_name": "欧美动漫"},
-    {"type_id": "31", "type_name": "其他"},
 ]
 
 # ===================== 工具正则 =====================
@@ -110,6 +90,11 @@ _RE_PLAYER_AA = re.compile(
     re.S
 )
 
+# 筛选区域解析
+_RE_DL = re.compile(r'<dl[^>]*>(.*?)</dl>', re.S | re.I)
+_RE_DT = re.compile(r'<dt><span>按(.*?)</span></dt>', re.S | re.I)
+_RE_DD = re.compile(r'<dd><a[^>]*href="([^"]*)"[^>]*>(.*?)</a></dd>', re.S | re.I)
+
 
 class Spider(BaseSpider):
     def __init__(self):
@@ -122,6 +107,7 @@ class Spider(BaseSpider):
             "Referer": self.home_url + "/",
         }
         self.name = "兄弟影视"
+        self._filters_cache = {}   # 缓存每个分类的筛选
 
     def getName(self):
         return self.name
@@ -146,10 +132,48 @@ class Spider(BaseSpider):
         return False
 
     def homeContent(self, filter):
-        return {"class": CLASSES, "filters": {}}
+        # 动态获取每个分类的筛选
+        filters = {}
+        for cls in CLASSES:
+            tid = cls["type_id"]
+            if tid not in self._filters_cache:
+                self._filters_cache[tid] = self._get_filters(tid)
+            filters[tid] = self._filters_cache[tid]
+        return {"class": CLASSES, "filters": filters}
+
+    def _get_filters(self, tid):
+        """从官网分类页抓取筛选选项"""
+        url = f"{self.home_url}/xdshow/{tid}-----------.html"
+        self.log(f"获取筛选: {url}")
+        html = self._fetch(url)
+        if not html:
+            return []
+        # 找到筛选区域，通常在所有 dl 中
+        filters = []
+        for dl_match in _RE_DL.finditer(html):
+            dl_html = dl_match.group(1)
+            dt_match = _RE_DT.search(dl_html)
+            if not dt_match:
+                continue
+            dim_name = dt_match.group(1).strip()  # 如 "分类"、"地区"
+            options = []
+            for dd_match in _RE_DD.finditer(dl_html):
+                href = dd_match.group(1)
+                text = re.sub(r'<[^>]+>', '', dd_match.group(2)).strip()
+                if not href or not text:
+                    continue
+                # 将 href 作为筛选值，直接用于跳转
+                options.append({"n": text, "v": href})
+            if options:
+                filters.append({
+                    "key": dim_name,        # 用中文名作为 key，TVBox 会显示
+                    "name": dim_name,
+                    "value": options
+                })
+        self.log(f"  筛选维度: {[f['name'] for f in filters]}")
+        return filters
 
     def homeVideoContent(self):
-        """首页推荐（从首页提取推荐影视）"""
         url = self.home_url + "/"
         html = self._fetch(url)
         videos = self._parse_list(html)
@@ -157,7 +181,24 @@ class Spider(BaseSpider):
 
     def categoryContent(self, tid, page, filter, extend):
         page = int(page) if page else 1
-        # 分类 URL 格式：/xdshow/{tid}--------{page}---.html
+        # 如果 extend 中有筛选值，直接使用筛选 URL
+        if extend:
+            for key, val in extend.items():
+                if val:
+                    # val 是相对路径，如 /xdshow/1---喜剧--------.html
+                    url = self.home_url + val
+                    self.log(f"category (筛选): {url}")
+                    html = self._fetch(url)
+                    videos = self._parse_list(html)
+                    pagecount = 9999 if videos else page
+                    return {
+                        "list": videos,
+                        "page": page,
+                        "pagecount": pagecount,
+                        "limit": 24,
+                        "total": pagecount * 24,
+                    }
+        # 默认无筛选
         url = f"{self.home_url}/xdshow/{tid}--------{page}---.html"
         self.log(f"category: {url}")
         html = self._fetch(url)
@@ -173,7 +214,6 @@ class Spider(BaseSpider):
 
     def searchContent(self, key, quick, page="1"):
         page = int(page) if page else 1
-        # 搜索 URL 格式：/xdsearch/{urlencode(key)}----------{page}---.html
         kw = urlparse.quote(key)
         url = f"{self.home_url}/xdsearch/{kw}----------{page}---.html"
         self.log(f"search: {url}")
@@ -219,7 +259,7 @@ class Spider(BaseSpider):
         type_name = self._extract_text(html, r'<dt><span>类型：</span>([^<]*)</dt>')
         remarks = self._extract_text(html, r'<dd><span>备注：</span>([^<]*)</dd>')
 
-        # 简介
+        # 简介：严格按官网显示，直接提取官网文本，绝不添加任何前缀
         content = self._extract_text(
             html, r'<div[^>]*class="[^"]*tab-jq[^"]*"[^>]*>\s*<p>([\s\S]*?)</p>',
             strip_tags=True)
@@ -227,9 +267,13 @@ class Spider(BaseSpider):
             content = self._extract_text(
                 html, r'<div[^>]*class="[^"]*ee[^"]*"[^>]*>\s*<span>简介：</span>([\s\S]*?)</div>',
                 strip_tags=True)
+        if not content:
+            content = self._extract_text(
+                html, r'<meta\s+name="description"\s+content="([^"]*)"',
+                strip_tags=True)
 
         # ========== 播放列表 ==========
-        # 线路名提取（HTML 不规范，li/i 未闭合）
+        # 严格提取官网线路名（如：高清1、高清3、播放2）
         line_tabs = re.findall(
             r'<li[^>]*id="tab8(\d+)"[^>]*>.*?<i[^>]*></i>\s*([^<]+)',
             html, re.S | re.I
@@ -240,12 +284,13 @@ class Spider(BaseSpider):
         play_from = []
         play_url = []
         for m in _RE_PLAY_LIST.finditer(html):
-            stab_id = m.group(1)   # 如 "82"
+            stab_id = m.group(1)
             ul_html = m.group(2)
             episodes = _RE_EP.findall(ul_html)
             if not episodes:
                 continue
-            line_name = line_map.get(stab_id, f"线路{stab_id}")
+            line_key = stab_id[-1] if stab_id else ""
+            line_name = line_map.get(line_key, f"线路{stab_id}")
             play_from.append(line_name)
             play_url.append("#".join(f"{ep_name}${href}" for href, ep_name in episodes))
 
@@ -270,14 +315,12 @@ class Spider(BaseSpider):
         }
 
     def playerContent(self, flag, id, vipFlags):
-        # id 是播放页路径，如 /xdplay/174041-1-1.html
         url = id if id.startswith("http") else self.home_url + id
         self.log(f"player: {url}")
         html = self._fetch(url)
         if not html:
             return {"parse": 1, "url": url, "header": self.headers}
 
-        # 提取 player_aaaa
         m = _RE_PLAYER_AA.search(html)
         if m:
             try:
@@ -298,7 +341,6 @@ class Spider(BaseSpider):
             except Exception as e:
                 self.log(f"解析 player_aaaa 失败: {e}")
 
-        # 兜底：交给 TVBox 嗅探
         return {
             "parse": 1,
             "playUrl": "",
@@ -332,7 +374,6 @@ class Spider(BaseSpider):
             return ""
 
     def _parse_list(self, html):
-        """解析列表页，返回影片列表"""
         if not html:
             return []
         videos = []
@@ -365,7 +406,6 @@ class Spider(BaseSpider):
             except Exception as e:
                 self.log(f"PyQuery 解析失败: {e}")
 
-        # 正则兜底
         for m in _RE_CARD.finditer(html):
             href, title, pic, remark = m.groups()
             if href in seen:
@@ -397,23 +437,13 @@ if __name__ == '__main__':
     s = Spider()
     s.init()
     print("分类:", s.homeContent(False))
-    res = s.categoryContent("1", "1", False, {})
-    print("电影第1页:", len(res["list"]), "条")
-    for v in res["list"][:3]:
-        print(v)
-    # 测试搜索
-    sr = s.searchContent("喜剧之王", False, "1")
-    print("搜索:", len(sr["list"]), "条")
-    for v in sr["list"][:3]:
-        print(v)
+    # 测试筛选
+    res = s.categoryContent("1", "1", False, {"分类": "/xdshow/1---%E5%96%9C%E5%89%A7--------.html"})
+    print("筛选后电影:", len(res["list"]), "条")
     # 测试详情
     detail = s.detailContent(["/xddetail/174041.html"])
     if detail["list"]:
         d = detail["list"][0]
-        print("详情:", d["vod_name"], "| 线路:", d["vod_play_from"])
-        first_line_url = d["vod_play_url"].split("$$$")[0]
-        first_ep = first_line_url.split("#")[0]
-        ep_url = first_ep.split("$")[1]
-        print("播放页:", ep_url)
-        play = s.playerContent("", ep_url, [])
-        print("播放解析:", play)
+        print("详情:", d["vod_name"])
+        print("线路名:", d["vod_play_from"])
+        print("简介:", d["vod_content"][:100], "...")
