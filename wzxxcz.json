@@ -491,6 +491,12 @@
             "api": "./py/DJ呦呦.py"
         },
 		{
+            "key": "影子音乐",
+            "name": "🎵影子音乐",
+            "type": 3,
+            "api": "./py/影子音乐.py"
+        },
+		{
             "key": "戏曲多多",
             "name": "📺戏曲多多",
             "type": 3,
@@ -529,13 +535,6 @@
             "type": 3,
 			"api": "csp_Nostr",
             "homePage": "https://xcz.iptv365.org/酷我音乐.html"
-        },
-		{
-            "key": "影子音乐",
-            "name": "🎵影子音乐",
-            "type": 3,
-			"api": "csp_Nostr",
-            "homePage": "https://music.yingzi.ee"
         },
 		{
             "key": "Nostr",
