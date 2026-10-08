@@ -494,7 +494,8 @@
             "key": "影子音乐",
             "name": "🎵影子音乐",
             "type": 3,
-            "api": "./py/影子音乐.py"
+            "api": "csp_Nostr",
+            "homePage": "https://music.yingzi.ee/"
         },
 		{
             "key": "戏曲多多",
