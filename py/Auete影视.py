@@ -1,10 +1,11 @@
 # coding=utf-8
 """
-Auete 影视网 TVBox Python Spider (V1.3 稳妥版)
+Auete 影视网 TVBox Python Spider (V1.6 全子分类版)
 站点: https://www.aeete.com
 特点:
-  - 4 个主分类，每个指向已确认有内容的子分类页
-  - 列表页两步走正则（不限 alt/src 顺序）
+  - 分类与网站结构 100% 一致（子分类全部展开）
+  - 无虚拟筛选
+  - 简介统一加前缀
   - 播放地址: base64decode 解码出 m3u8 直链
 """
 import re
@@ -62,23 +63,51 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/statics/picture/loading.gif"
 
-# ⭐ 4 个分类，每个 type_id 指向一个"已确认有影片列表"的子分类路径
+# ⭐ 简介固定前缀
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
+
+# ⭐ 分类：与网站 nav-tag-list 完全一致
 CLASSES = [
-    {"type_id": "Movie/xjp",   "type_name": "电影"},
-    {"type_id": "Tv/neidi",    "type_name": "电视剧"},
-    {"type_id": "Zy/guozong",  "type_name": "综艺"},
-    {"type_id": "Dm/donghua",  "type_name": "动漫"},
+    # 电影
+    {"type_id": "Movie/xjp",  "type_name": "喜剧片"},
+    {"type_id": "Movie/dzp",  "type_name": "动作片"},
+    {"type_id": "Movie/aqp",  "type_name": "爱情片"},
+    {"type_id": "Movie/khp",  "type_name": "科幻片"},
+    {"type_id": "Movie/kbp",  "type_name": "恐怖片"},
+    {"type_id": "Movie/jsp",  "type_name": "惊悚片"},
+    {"type_id": "Movie/zzp",  "type_name": "战争片"},
+    {"type_id": "Movie/jqp",  "type_name": "剧情片"},
+    # 电视剧
+    {"type_id": "Tv/neidi",   "type_name": "国产剧"},
+    {"type_id": "Tv/oumei",   "type_name": "美剧"},
+    {"type_id": "Tv/hanju",   "type_name": "韩剧"},
+    {"type_id": "Tv/riju",    "type_name": "日剧"},
+    {"type_id": "Tv/yataiju", "type_name": "泰剧"},
+    {"type_id": "Tv/wangju",  "type_name": "网剧"},
+    {"type_id": "Tv/taiju",   "type_name": "台剧"},
+    {"type_id": "Tv/tvbgj",   "type_name": "港剧"},
+    {"type_id": "Tv/yingju",  "type_name": "英剧"},
+    {"type_id": "Tv/waiju",   "type_name": "外剧"},
+    {"type_id": "Tv/aigcju",  "type_name": "AIGC剧"},
+    # 综艺
+    {"type_id": "Zy/guozong", "type_name": "国综"},
+    {"type_id": "Zy/hanzong", "type_name": "韩综"},
+    {"type_id": "Zy/meizong", "type_name": "美综"},
+    # 动漫
+    {"type_id": "Dm/donghua", "type_name": "动画"},
+    {"type_id": "Dm/riman",   "type_name": "日漫"},
+    {"type_id": "Dm/guoman",  "type_name": "国漫"},
+    {"type_id": "Dm/meiman",  "type_name": "美漫"},
+    {"type_id": "Dm/aimanju", "type_name": "AI漫剧"},
 ]
 
 
 # ==================== 正则 ====================
-# 两步走：先拆 li 块，再独立抓字段（不限属性顺序）
 _RE_LI     = re.compile(r'<li\s+data-href="([^"]+)"[^>]*>([\s\S]*?)</li>', re.S | re.I)
 _RE_ALT    = re.compile(r'<img[^>]*?\balt="([^"]*)"', re.I)
 _RE_SRC    = re.compile(r'<img[^>]*?\b(?:data-src|src)="([^"]*)"', re.I)
 _RE_HDTAG  = re.compile(r'<span\s+class="hdtag">([^<]*)</span>', re.I)
 
-# 详情页
 _RE_H1    = re.compile(r'<h1[^>]*class="[^"]*detail-title[^"]*"[^>]*>([\s\S]*?)</h1>', re.I)
 _RE_PIC   = re.compile(r'<div class="detail-poster">\s*<img[^>]*?src="([^"]*)"', re.S | re.I)
 _RE_DESC  = re.compile(r'<p class="detail-des">([\s\S]*?)</p>', re.S | re.I)
@@ -87,18 +116,15 @@ _RE_LABEL = re.compile(
     r'<span class="detail-label">◎([^：<]+)：</span>\s*<b[^>]*>([\s\S]*?)</b>',
     re.S | re.I)
 
-# 线路块
 _RE_PLAY_BLOCK = re.compile(
     r'<div class="card mb-3 play-card"[^>]*>[\s\S]*?<b>([^<]+)</b>[\s\S]*?'
     r'<ul class="episode-list">([\s\S]*?)</ul>',
     re.S | re.I)
 
-# 剧集
 _RE_EPISODE = re.compile(
     r'<li[^>]*>\s*<a[^>]*title="([^"]*)"[^>]*href="([^"]+)"[^>]*>([^<]*)</a>',
     re.S | re.I)
 
-# 播放页
 _RE_B64_NOW = re.compile(r'var\s+now\s*=\s*base64decode\("([^"]+)"\)', re.I)
 _RE_M3U8    = re.compile(r'(https?://[^"\'\\\s<>]+\.m3u8[^"\'\\\s<>]*)', re.I)
 _RE_PAGECOUNT = re.compile(r'共\s*(\d+)\s*页')
@@ -201,10 +227,6 @@ class Spider(Spider):
         return videos
 
     def categoryContent(self, tid, pg, filter, extend):
-        """
-        tid: 形如 Movie/xjp, Tv/neidi, Zy/guozong, Dm/donghua
-        URL: /{tid}/index.html 或 /{tid}/index{page}.html
-        """
         page = int(pg) if pg else 1
         if page <= 1:
             url = "%s/%s/index.html" % (self.site_url, tid)
@@ -279,6 +301,7 @@ class Spider(Spider):
             if m:
                 pic = self._fix(m.group(1))
 
+        # ⭐ 简介 + 前缀
         content = ""
         m = _RE_DESC.search(html)
         if m:
@@ -287,6 +310,11 @@ class Spider(Spider):
             m = re.search(r'<meta\s+name="Description"\s+content="([^"]*)"', html, re.I)
             if m:
                 content = self._clean(m.group(1))
+
+        if content:
+            content = INTRO_PREFIX + "\n" + content
+        else:
+            content = INTRO_PREFIX
 
         score = ""
         m = _RE_SCORE.search(html)
