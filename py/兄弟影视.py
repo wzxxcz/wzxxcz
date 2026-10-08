@@ -65,7 +65,6 @@ CLASSES = [
 ]
 
 # ===================== 工具正则 =====================
-# 列表页卡片兜底
 _RE_CARD = re.compile(
     r'<li[^>]*>\s*<a[^>]*href="(/xddetail/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
     r'[\s\S]*?<img[^>]*?(?:data-src|src)="([^"]*)"'
@@ -73,7 +72,6 @@ _RE_CARD = re.compile(
     re.S | re.I
 )
 
-# 播放列表容器
 _RE_PLAY_LIST = re.compile(
     r'<div[^>]*id="stab(\d+)"[^>]*>[\s\S]*?<div[^>]*id="vlink_\d+"[^>]*>'
     r'[\s\S]*?<ul>([\s\S]*?)</ul>',
@@ -84,13 +82,11 @@ _RE_EP = re.compile(
     re.I
 )
 
-# 播放页 player_aaaa
 _RE_PLAYER_AA = re.compile(
     r'var\s+player_aaaa\s*=\s*(\{.*?\})\s*</script>',
     re.S
 )
 
-# 筛选区域解析
 _RE_DL = re.compile(r'<dl[^>]*>(.*?)</dl>', re.S | re.I)
 _RE_DT = re.compile(r'<dt><span>按(.*?)</span></dt>', re.S | re.I)
 _RE_DD = re.compile(r'<dd><a[^>]*href="([^"]*)"[^>]*>(.*?)</a></dd>', re.S | re.I)
@@ -107,7 +103,7 @@ class Spider(BaseSpider):
             "Referer": self.home_url + "/",
         }
         self.name = "兄弟影视"
-        self._filters_cache = {}   # 缓存每个分类的筛选
+        self._filters_cache = {}
 
     def getName(self):
         return self.name
@@ -132,7 +128,6 @@ class Spider(BaseSpider):
         return False
 
     def homeContent(self, filter):
-        # 动态获取每个分类的筛选
         filters = {}
         for cls in CLASSES:
             tid = cls["type_id"]
@@ -142,7 +137,6 @@ class Spider(BaseSpider):
         return {"class": CLASSES, "filters": filters}
 
     def _get_filters(self, tid):
-        """从官网分类页抓取筛选选项"""
         url = f"{self.home_url}/xdshow/{tid}-----------.html"
         self.log(f"获取筛选: {url}")
         html = self._fetch(url)
@@ -154,7 +148,7 @@ class Spider(BaseSpider):
             dt_match = _RE_DT.search(dl_html)
             if not dt_match:
                 continue
-            dim_name = dt_match.group(1).strip()  # 如 "分类"、"地区"
+            dim_name = dt_match.group(1).strip()
             options = []
             for dd_match in _RE_DD.finditer(dl_html):
                 href = dd_match.group(1)
@@ -179,7 +173,6 @@ class Spider(BaseSpider):
 
     def categoryContent(self, tid, page, filter, extend):
         page = int(page) if page else 1
-        # 如果 extend 中有筛选值，直接使用筛选 URL
         if extend:
             for key, val in extend.items():
                 if val:
@@ -195,7 +188,6 @@ class Spider(BaseSpider):
                         "limit": 24,
                         "total": pagecount * 24,
                     }
-        # 默认无筛选
         url = f"{self.home_url}/xdshow/{tid}--------{page}---.html"
         self.log(f"category: {url}")
         html = self._fetch(url)
@@ -237,18 +229,15 @@ class Spider(BaseSpider):
         if not html:
             return {"list": []}
 
-        # 标题
         name = self._extract_text(html, r'<dt[^>]*class="[^"]*name[^"]*"[^>]*>([^<]+)</dt>')
         if not name:
             name = self._extract_text(html, r'<title>(.*?)</title>')
             name = re.sub(r'《|》|_.*$', '', name).strip()
 
-        # 封面
         pic = self._extract_attr(html, r'<div[^>]*class="[^"]*ct-l[^"]*"[^>]*>\s*<img[^>]*src="([^"]+)"')
         if not pic:
             pic = self._extract_attr(html, r'<img[^>]*src="([^"]+)"')
 
-        # 元信息
         actor = self._extract_text(html, r'<dt><span>主演：</span>([^<]*)</dt>')
         director = self._extract_text(html, r'<dd><span>导演：</span>([^<]*)</dd>')
         area = self._extract_text(html, r'<dd><span>地区：</span>([^<]*)</dd>')
@@ -256,7 +245,6 @@ class Spider(BaseSpider):
         type_name = self._extract_text(html, r'<dt><span>类型：</span>([^<]*)</dt>')
         remarks = self._extract_text(html, r'<dd><span>备注：</span>([^<]*)</dd>')
 
-        # 简介：严格按官网显示，直接提取官网文本，绝不添加任何前缀
         content = self._extract_text(
             html, r'<div[^>]*class="[^"]*tab-jq[^"]*"[^>]*>\s*<p>([\s\S]*?)</p>',
             strip_tags=True)
@@ -270,9 +258,9 @@ class Spider(BaseSpider):
                 strip_tags=True)
 
         # ========== 播放列表 ==========
-        # 严格提取官网线路名（如：高清1、高清3、播放2）
+        # 关键修复：线路名用 tab(\d+) 捕获完整数字 82/83/81
         line_tabs = re.findall(
-            r'<li[^>]*id="tab8(\d+)"[^>]*>.*?<i[^>]*></i>\s*([^<]+)',
+            r'<li[^>]*id="tab(\d+)"[^>]*>.*?<i[^>]*></i>\s*([^<]+)',
             html, re.S | re.I
         )
         line_map = {tid: name.strip() for tid, name in line_tabs}
@@ -281,12 +269,11 @@ class Spider(BaseSpider):
         play_from = []
         play_url = []
         for m in _RE_PLAY_LIST.finditer(html):
-            stab_id = m.group(1)   # 如 "82"
+            stab_id = m.group(1)   # 82 / 83 / 81
             ul_html = m.group(2)
             episodes = _RE_EP.findall(ul_html)
             if not episodes:
                 continue
-            # 直接用完整的 tab 编号去匹配线路名，不要截取最后一位
             line_name = line_map.get(stab_id, f"线路{stab_id}")
             play_from.append(line_name)
             play_url.append("#".join(f"{ep_name}${href}" for href, ep_name in episodes))
@@ -434,10 +421,6 @@ if __name__ == '__main__':
     s = Spider()
     s.init()
     print("分类:", s.homeContent(False))
-    # 测试筛选
-    res = s.categoryContent("1", "1", False, {"分类": "/xdshow/1---%E5%96%9C%E5%89%A7--------.html"})
-    print("筛选后电影:", len(res["list"]), "条")
-    # 测试详情
     detail = s.detailContent(["/xddetail/174041.html"])
     if detail["list"]:
         d = detail["list"][0]
