@@ -1,13 +1,13 @@
 # coding=utf-8
 """
-电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.5 极速稳定版)
+电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.6 极速稳定+旧播放逻辑)
 关键:
   - 破解服务端 SHA1 PoW 挑战 (attack_key)
   - 解析 /api/m3u8 302 跳转到 box.dyrs.com.de 的 master m3u8
   - 提取子 m3u8（分片URL为绝对路径，TVBox 可直接播放）
   - 支持电影/电视剧/综艺/动漫/短剧
-  - 终极优化: 详情页只请求1次，每条线路只请求1次播放页，利用 nexturl 拿到全部剧集
-  - 稳定性: 播放页请求失败最多重试3次，递增等待 0.3s/0.6s/0.9s
+  - 线路抓取: 详情页1次 + 每条线路1次播放页(nexturl)
+  - 播放解析: 恢复旧逻辑，先 _fetch 跟随 302，再提取 m3u8
 """
 import re
 import sys
@@ -443,7 +443,7 @@ class Spider(Spider):
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
-    # ================= 详情 (终极极速版) =================
+    # ================= 详情 (极速版) =================
     def detailContent(self, ids):
         if not ids:
             return {"list": []}
@@ -451,24 +451,16 @@ class Spider(Spider):
         base_url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
         self.log("detail: %s" % base_url)
 
-        # 只请求 1 次详情页
         html = self._fetch(base_url)
         self.log("  HTML 长度: %d" % len(html))
         if not html:
             return {"list": []}
 
-        # ---------- 元信息 (优先 JSON-LD, 其次 HTML) ----------
+        # ---------- 元信息 ----------
         meta = {
-            "name": "",
-            "alternateName": "",
-            "genre": "",
-            "year": "",
-            "region": "",
-            "director": "",
-            "actors": [],
-            "description": "",
-            "pic": "",
-            "rating": "",
+            "name": "", "alternateName": "", "genre": "", "year": "",
+            "region": "", "director": "", "actors": [],
+            "description": "", "pic": "", "rating": "",
         }
 
         json_ld_raw = _RE_JSON_LD.search(html)
@@ -489,7 +481,6 @@ class Spider(Spider):
                 meta["pic"] = ld.get("image", "")
                 if ld.get("aggregateRating"):
                     meta["rating"] = str(ld["aggregateRating"].get("ratingValue", ""))
-                self.log("  JSON-LD 解析成功")
             except Exception as e:
                 self.log("  JSON-LD 解析失败: %s" % e)
 
@@ -586,7 +577,7 @@ class Spider(Spider):
 
         self.log("  默认线路 [%s]: %d 集" % (base_origin, len(default_eps)))
 
-        # ---------- 并发为每条线路请求1次播放页，解析 nexturl ----------
+        # ---------- 并发为每条线路请求1次播放页 ----------
         groups = {}
         tasks = []
         for origin in origins:
@@ -655,7 +646,7 @@ class Spider(Spider):
         self.log("  请求线路 [%s] 的播放页: %s" % (origin, play_url[:120]))
 
         html = ""
-        max_retries = 3  # 最多重试 3 次（首次 + 3 次重试 = 最多 4 次尝试）
+        max_retries = 3
 
         for attempt in range(max_retries + 1):
             try:
@@ -664,14 +655,13 @@ class Spider(Spider):
                 self.log("    [%s] 第%d次请求异常: %s" % (origin, attempt + 1, e))
                 html = ""
 
-            # 判断是否拿到了有效内容
             if html and ("nexturl" in html or _RE_PLAYER_AA.search(html)):
                 if attempt > 0:
                     self.log("    [%s] 第%d次请求成功" % (origin, attempt + 1))
                 break
 
             if attempt < max_retries:
-                wait = 0.3 * (attempt + 1)  # 0.3s / 0.6s / 0.9s
+                wait = 0.3 * (attempt + 1)
                 self.log("    [%s] 第%d次请求失败，%.1fs 后重试..."
                          % (origin, attempt + 1, wait))
                 time.sleep(wait)
@@ -714,7 +704,7 @@ class Spider(Spider):
 
         return eps
 
-    # ================= 播放 =================
+    # ================= 播放 (恢复旧逻辑，能播) =================
     def playerContent(self, flag, id, vipFlags):
         play_page = id if id.startswith("http") else self._fix_url(id)
         self.log("player: %s" % play_page)
@@ -725,24 +715,7 @@ class Spider(Spider):
             if now - ts < 600:
                 return res
 
-        # 如果 id 本身就是 /api/m3u8 地址，直接解析
-        if "/api/m3u8" in play_page:
-            real_m3u8 = self._resolve_to_real_m3u8(play_page, referer=self.site_url + "/")
-            if real_m3u8:
-                res = {
-                    "parse": 0,
-                    "playUrl": "",
-                    "url": real_m3u8,
-                    "header": {
-                        "User-Agent": UA,
-                        "Referer": BOX_HOST + "/",
-                    },
-                }
-                self._play_cache[play_page] = (now, res)
-                self.log("  => 直链 m3u8: %s" % real_m3u8[:160])
-                return res
-
-        # 否则请求播放页，提取 aa 中的 /api/m3u8 地址
+        # 请求 /api/m3u8 (跟随302)，拿到 master m3u8 页面
         html = self._fetch(play_page)
         api_url = self._extract_api_m3u8(html) if html else ""
         self.log("  api_url: %s" % (api_url[:200] if api_url else "EMPTY"))
