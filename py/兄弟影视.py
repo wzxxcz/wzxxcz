@@ -72,8 +72,9 @@ _RE_CARD = re.compile(
     re.S | re.I
 )
 
+# 播放列表容器（只捕获内部 ul 的 HTML）
 _RE_PLAY_LIST = re.compile(
-    r'<div[^>]*id="stab(\d+)"[^>]*>[\s\S]*?<div[^>]*id="vlink_\d+"[^>]*>'
+    r'<div[^>]*id="stab\d+"[^>]*>[\s\S]*?<div[^>]*id="vlink_\d+"[^>]*>'
     r'[\s\S]*?<ul>([\s\S]*?)</ul>',
     re.S | re.I
 )
@@ -82,14 +83,22 @@ _RE_EP = re.compile(
     re.I
 )
 
+# 播放页 player_aaaa
 _RE_PLAYER_AA = re.compile(
     r'var\s+player_aaaa\s*=\s*(\{.*?\})\s*</script>',
     re.S
 )
 
+# 筛选区域解析
 _RE_DL = re.compile(r'<dl[^>]*>(.*?)</dl>', re.S | re.I)
 _RE_DT = re.compile(r'<dt><span>按(.*?)</span></dt>', re.S | re.I)
 _RE_DD = re.compile(r'<dd><a[^>]*href="([^"]*)"[^>]*>(.*?)</a></dd>', re.S | re.I)
+
+# 线路名提取（只捕获名字，不关心 id）
+_RE_LINE_NAMES = re.compile(
+    r'<li[^>]*id="tab\d+"[^>]*>.*?<i[^>]*></i>\s*([^<]+)',
+    re.S | re.I
+)
 
 
 class Spider(BaseSpider):
@@ -257,24 +266,24 @@ class Spider(BaseSpider):
                 html, r'<meta\s+name="description"\s+content="([^"]*)"',
                 strip_tags=True)
 
-        # ========== 播放列表 ==========
-        # 关键修复：线路名用 tab(\d+) 捕获完整数字 82/83/81
-        line_tabs = re.findall(
-            r'<li[^>]*id="tab(\d+)"[^>]*>.*?<i[^>]*></i>\s*([^<]+)',
-            html, re.S | re.I
-        )
-        line_map = {tid: name.strip() for tid, name in line_tabs}
-        self.log(f"  线路: {line_map}")
+        # ========== 播放列表（按顺序配对） ==========
+        # 1. 按顺序提取线路名
+        line_names = _RE_LINE_NAMES.findall(html)
+        line_names = [n.strip() for n in line_names]
+        self.log(f"  线路名（按顺序）: {line_names}")
+
+        # 2. 按顺序提取播放列表容器
+        play_lists = _RE_PLAY_LIST.findall(html)
+        self.log(f"  播放列表容器数量: {len(play_lists)}")
 
         play_from = []
         play_url = []
-        for m in _RE_PLAY_LIST.finditer(html):
-            stab_id = m.group(1)   # 82 / 83 / 81
-            ul_html = m.group(2)
+        for i, ul_html in enumerate(play_lists):
             episodes = _RE_EP.findall(ul_html)
             if not episodes:
                 continue
-            line_name = line_map.get(stab_id, f"线路{stab_id}")
+            # 按顺序取线路名，如果没有则用默认
+            line_name = line_names[i] if i < len(line_names) else f"线路{i+1}"
             play_from.append(line_name)
             play_url.append("#".join(f"{ep_name}${href}" for href, ep_name in episodes))
 
@@ -420,10 +429,8 @@ class Spider(BaseSpider):
 if __name__ == '__main__':
     s = Spider()
     s.init()
-    print("分类:", s.homeContent(False))
     detail = s.detailContent(["/xddetail/174041.html"])
     if detail["list"]:
         d = detail["list"][0]
         print("详情:", d["vod_name"])
         print("线路名:", d["vod_play_from"])
-        print("简介:", d["vod_content"][:100], "...")
