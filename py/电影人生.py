@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.2 元数据补全版)
+电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.3 并发秒出版)
 关键:
   - 破解服务端 SHA1 PoW 挑战 (attack_key)
   - 解析 /api/m3u8 302 跳转到 box.dyrs.com.de 的 master m3u8
@@ -8,6 +8,7 @@
   - 支持电影/电视剧/综艺/动漫/短剧
   - 修复: 详情页逐条线路抓取剧集, 不再只拿到 1 条线路
   - 补全: 从 JSON-LD 中提取别名、类型、年份、地区、简介等元数据
+  - 优化: 多线程并发抓取所有线路, 详情页秒开
 """
 import re
 import sys
@@ -15,6 +16,7 @@ import json
 import time
 import hashlib
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed   # 🌟 新增
 
 sys.path.append('..')
 
@@ -158,7 +160,7 @@ _RE_META_DESC = re.compile(
     r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']',
     re.I)
 
-# 🌟 新增：JSON-LD 结构化数据正则
+# JSON-LD 结构化数据正则
 _RE_JSON_LD = re.compile(
     r'<script\s+type="application/ld\+json">\s*([\s\S]*?)\s*</script>',
     re.S | re.I)
@@ -211,6 +213,7 @@ class Spider(Spider):
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
         self._warmed = False
+        self._executor = ThreadPoolExecutor(max_workers=10)   # 🌟 新增线程池
         self.log("init: site=%s sid=%s" % (self.site_url, self.sion_id))
 
     # ================= PoW =================
@@ -441,7 +444,7 @@ class Spider(Spider):
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
-    # ================= 详情 (元数据补全版) =================
+    # ================= 详情 (元数据补全 + 并发版) =================
     def detailContent(self, ids):
         if not ids:
             return {"list": []}
@@ -556,7 +559,7 @@ class Spider(Spider):
         if meta["description"]:
             content += meta["description"]
 
-        # ---------- 提取线路 (保留原有逻辑) ----------
+        # ---------- 提取线路 ----------
         origin_map = {}
         try:
             pattern_tab = re.compile(
@@ -605,25 +608,25 @@ class Spider(Spider):
                 groups[default_origin] = default_eps
                 self.log("  默认线路 [%s]: %d 集" % (default_origin, len(default_eps)))
 
-        for origin, href in origin_map.items():
-            if origin in groups:
-                continue
-            self.log("  抓取线路 [%s]: %s" % (origin, href[:120]))
-            sub_html = self._fetch(href)
-            if not sub_html:
-                self.log("    -> 请求失败")
-                continue
-            eps = self._parse_episodes_from_html(sub_html, target_origin=origin)
-            if eps:
-                groups[origin] = eps
-                self.log("    -> %d 集" % len(eps))
-            else:
-                eps2 = self._parse_episodes_from_html(sub_html, target_origin=None)
-                if eps2 and len(eps2) >= 1:
-                    groups[origin] = eps2
-                    self.log("    -> (兜底) %d 集" % len(eps2))
-                else:
-                    self.log("    -> 无剧集")
+        # 🌟 多线程并发抓取剩余线路
+        tasks = [(o, h) for o, h in origin_map.items() if o not in groups]
+        if tasks:
+            self.log("  🚀 并发抓取 %d 条线路..." % len(tasks))
+            future_map = {
+                self._executor.submit(self._fetch_and_parse, o, h): o
+                for o, h in tasks
+            }
+            for fut in as_completed(future_map):
+                origin = future_map[fut]
+                try:
+                    eps = fut.result()
+                    if eps:
+                        groups[origin] = eps
+                        self.log("    ✅ [%s] %d 集" % (origin, len(eps)))
+                    else:
+                        self.log("    ⚠️ [%s] 无剧集" % origin)
+                except Exception as e:
+                    self.log("    ❌ [%s] 异常: %s" % (origin, e))
 
         self.log("  最终剧集: %s" % {k: len(v) for k, v in groups.items()})
 
@@ -690,6 +693,18 @@ class Spider(Spider):
                 eps.append((ep_name, href))
         except Exception as e:
             self.log("    _parse_episodes err: %s" % e)
+        return eps
+
+    # 🌟 新增：供线程池调用的辅助方法
+    def _fetch_and_parse(self, origin, href):
+        """单线路抓取 + 解析（在线程池中执行）"""
+        self.log("  抓取线路 [%s]: %s" % (origin, href[:120]))
+        sub_html = self._fetch(href)
+        if not sub_html:
+            return []
+        eps = self._parse_episodes_from_html(sub_html, target_origin=origin)
+        if not eps:
+            eps = self._parse_episodes_from_html(sub_html, target_origin=None)
         return eps
 
     # ================= 播放 =================
