@@ -1,13 +1,11 @@
 # coding=utf-8
 """
-Auete 影视网 TVBox Python Spider (V1.0 完整修正版)
+Auete 影视网 TVBox Python Spider (V1.3 稳妥版)
 站点: https://www.aeete.com
 特点:
-  - 静态 HTML，无反爬、无 PoW
-  - 列表页: /{目录}/{子目录}/index{page}.html
-  - 详情页: .play-card + .episode-list 多线路
-  - 播放页: base64decode("...") 直接解码出 m3u8 直链
-作者: 根据实际页面结构逆向
+  - 4 个主分类，每个指向已确认有内容的子分类页
+  - 列表页两步走正则（不限 alt/src 顺序）
+  - 播放地址: base64decode 解码出 m3u8 直链
 """
 import re
 import sys
@@ -18,7 +16,6 @@ import urllib.parse
 
 sys.path.append('..')
 
-# ==================== 兼容 base.spider ====================
 try:
     from base.spider import Spider
 except ImportError:
@@ -65,39 +62,21 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/statics/picture/loading.gif"
 
-# 目录 → 子分类
-_SUB_CLASSES = {
-    "Movie": [
-        ("xjp", "喜剧片"), ("dzp", "动作片"), ("aqp", "爱情片"),
-        ("khp", "科幻片"), ("kbp", "恐怖片"), ("jsp", "惊悚片"),
-        ("zzp", "战争片"), ("jqp", "剧情片"),
-    ],
-    "Tv": [
-        ("oumei", "美剧"), ("hanju", "韩剧"), ("riju", "日剧"),
-        ("yataiju", "泰剧"), ("wangju", "网剧"), ("taiju", "台剧"),
-        ("neidi", "国产"), ("tvbgj", "港剧"), ("yingju", "英剧"),
-        ("waiju", "外剧"), ("aigcju", "AIGC剧"),
-    ],
-    "Zy": [
-        ("guozong", "国综"), ("hanzong", "韩综"), ("meizong", "美综"),
-    ],
-    "Dm": [
-        ("donghua", "动画"), ("riman", "日漫"), ("guoman", "国漫"),
-        ("meiman", "美漫"), ("aimanju", "AI漫剧"),
-    ],
-    "qita": [
-        ("Jlp", "纪录片"),
-    ],
-}
+# ⭐ 4 个分类，每个 type_id 指向一个"已确认有影片列表"的子分类路径
+CLASSES = [
+    {"type_id": "Movie/xjp",   "type_name": "电影"},
+    {"type_id": "Tv/neidi",    "type_name": "电视剧"},
+    {"type_id": "Zy/guozong",  "type_name": "综艺"},
+    {"type_id": "Dm/donghua",  "type_name": "动漫"},
+]
 
 
 # ==================== 正则 ====================
-# 列表页卡片（兼容 data-href + img alt/src + hdtag）
-_RE_CARD = re.compile(
-    r'<li\s+data-href="([^"]+)"[^>]*>[\s\S]{0,600}?'
-    r'<img[^>]*?alt="([^"]*)"[^>]*?(?:data-src|src)="([^"]*)"'
-    r'[\s\S]{0,400}?(?:<span\s+class="hdtag">([^<]*)</span>)?',
-    re.S | re.I)
+# 两步走：先拆 li 块，再独立抓字段（不限属性顺序）
+_RE_LI     = re.compile(r'<li\s+data-href="([^"]+)"[^>]*>([\s\S]*?)</li>', re.S | re.I)
+_RE_ALT    = re.compile(r'<img[^>]*?\balt="([^"]*)"', re.I)
+_RE_SRC    = re.compile(r'<img[^>]*?\b(?:data-src|src)="([^"]*)"', re.I)
+_RE_HDTAG  = re.compile(r'<span\s+class="hdtag">([^<]*)</span>', re.I)
 
 # 详情页
 _RE_H1    = re.compile(r'<h1[^>]*class="[^"]*detail-title[^"]*"[^>]*>([\s\S]*?)</h1>', re.I)
@@ -119,16 +98,12 @@ _RE_EPISODE = re.compile(
     r'<li[^>]*>\s*<a[^>]*title="([^"]*)"[^>]*href="([^"]+)"[^>]*>([^<]*)</a>',
     re.S | re.I)
 
-# 播放页 base64
+# 播放页
 _RE_B64_NOW = re.compile(r'var\s+now\s*=\s*base64decode\("([^"]+)"\)', re.I)
-# 兜底直接抓 m3u8
 _RE_M3U8    = re.compile(r'(https?://[^"\'\\\s<>]+\.m3u8[^"\'\\\s<>]*)', re.I)
-
-# 页数
 _RE_PAGECOUNT = re.compile(r'共\s*(\d+)\s*页')
 
 
-# ==================== 主类 ====================
 class Spider(Spider):
 
     def getName(self):
@@ -149,7 +124,6 @@ class Spider(Spider):
         self._play_cache = {}
         self.log("init: site=%s" % self.site_url)
 
-    # -------------------- 工具 --------------------
     def _fetch(self, url, timeout=20, headers=None):
         try:
             h = dict(self.headers)
@@ -191,14 +165,8 @@ class Spider(Spider):
 
     # -------------------- 首页 --------------------
     def homeContent(self, filter=False):
-        classes = [{"type_id": "home", "type_name": "首页推荐"}]
-        for parent, subs in _SUB_CLASSES.items():
-            for sub_id, sub_name in subs:
-                classes.append({
-                    "type_id": "%s/%s" % (parent, sub_id),
-                    "type_name": sub_name,
-                })
-        return {"class": classes}
+        self.log("homeContent: 返回 %d 个分类" % len(CLASSES))
+        return {"class": CLASSES}
 
     def homeVideoContent(self):
         html = self._fetch(self.site_url + "/")
@@ -212,35 +180,43 @@ class Spider(Spider):
         seen = set()
         if not html:
             return videos
-        for m in _RE_CARD.finditer(html):
+        for m in _RE_LI.finditer(html):
             href = m.group(1).replace("&amp;", "&")
-            alt = m.group(2)
-            pic = m.group(3)
-            hd = m.group(4) or ""
+            block = m.group(2)
             if href in seen:
                 continue
             seen.add(href)
+            alt_m = _RE_ALT.search(block)
+            src_m = _RE_SRC.search(block)
+            hd_m  = _RE_HDTAG.search(block)
+            name = self._clean(alt_m.group(1)) if alt_m else ""
+            pic  = self._fix(src_m.group(1)) if src_m else ""
+            hd   = self._clean(hd_m.group(1)) if hd_m else ""
             videos.append({
                 "vod_id":      href,
-                "vod_name":    self._clean(alt)[:100] or href.split("/")[-2],
-                "vod_pic":     self._fix(pic) or DEFAULT_PIC,
-                "vod_remarks": self._clean(hd),
+                "vod_name":    name or href.split("/")[-2],
+                "vod_pic":     pic or DEFAULT_PIC,
+                "vod_remarks": hd,
             })
         return videos
 
     def categoryContent(self, tid, pg, filter, extend):
+        """
+        tid: 形如 Movie/xjp, Tv/neidi, Zy/guozong, Dm/donghua
+        URL: /{tid}/index.html 或 /{tid}/index{page}.html
+        """
         page = int(pg) if pg else 1
-        if tid == "home":
-            url = self.site_url + "/"
+        if page <= 1:
+            url = "%s/%s/index.html" % (self.site_url, tid)
         else:
-            if page <= 1:
-                url = "%s/%s/index.html" % (self.site_url, tid)
-            else:
-                url = "%s/%s/index%d.html" % (self.site_url, tid, page)
+            url = "%s/%s/index%d.html" % (self.site_url, tid, page)
 
-        self.log("category: %s" % url)
+        self.log("category: tid=%s pg=%s url=%s" % (tid, page, url))
         html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
+
         videos = self._extract_videos(html)
+        self.log("  解析到 %d 条" % len(videos))
 
         pagecount = 9999
         m = _RE_PAGECOUNT.search(html)
@@ -250,7 +226,6 @@ class Spider(Spider):
             except Exception:
                 pass
 
-        self.log("  -> %d 条 / 共 %d 页" % (len(videos), pagecount))
         return {
             "list": videos, "page": page, "pagecount": pagecount,
             "limit": 20, "total": pagecount * 20,
@@ -286,7 +261,6 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
-        # 标题
         name = ""
         m = _RE_H1.search(html)
         if m:
@@ -296,7 +270,6 @@ class Spider(Spider):
             if m:
                 name = self._clean(m.group(1).split("_")[0].split("-")[0])
 
-        # 封面
         pic = DEFAULT_PIC
         m = _RE_PIC.search(html)
         if m:
@@ -306,7 +279,6 @@ class Spider(Spider):
             if m:
                 pic = self._fix(m.group(1))
 
-        # 简介
         content = ""
         m = _RE_DESC.search(html)
         if m:
@@ -316,13 +288,11 @@ class Spider(Spider):
             if m:
                 content = self._clean(m.group(1))
 
-        # 评分
         score = ""
         m = _RE_SCORE.search(html)
         if m:
             score = m.group(1)
 
-        # 元信息
         director = actor = area = year = ""
         for label, val in _RE_LABEL.findall(html):
             label = label.strip()
@@ -336,12 +306,10 @@ class Spider(Spider):
             elif "年份" in label or "上映" in label:
                 year = val
 
-        # ===== 线路 & 剧集 =====
         play_from = []
         play_url = []
         for line_title, block in _RE_PLAY_BLOCK.findall(html):
             line_title = self._clean(line_title)
-            # "『狂飙』云播X线" -> "云播X线"
             m2 = re.search(r'』([^』]+)$', line_title)
             line_name = (m2.group(1) if m2 else line_title).strip()
             eps = []
@@ -391,7 +359,6 @@ class Spider(Spider):
         real_url = ""
 
         if html:
-            # 主路径：base64decode
             m = _RE_B64_NOW.search(html)
             if m:
                 try:
@@ -399,8 +366,6 @@ class Spider(Spider):
                     self.log("  b64 -> %s" % real_url[:160])
                 except Exception as e:
                     self.log("  b64 解码失败: %s" % e)
-
-            # 兜底1：直接抓页面里出现的 m3u8
             if not real_url:
                 m2 = _RE_M3U8.search(html)
                 if m2:
@@ -418,7 +383,6 @@ class Spider(Spider):
                 },
             }
         else:
-            # 兜底2：交给 TVBox 嗅探
             res = {
                 "parse": 1,
                 "playUrl": "",
@@ -432,7 +396,7 @@ class Spider(Spider):
         self._play_cache[play_page] = (now, res)
         return res
 
-    # -------------------- 图片代理（可选） --------------------
+    # -------------------- 图片代理 --------------------
     def localProxy(self, param):
         try:
             url = ""
