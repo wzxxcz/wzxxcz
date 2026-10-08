@@ -537,6 +537,13 @@
             "homePage": "https://xcz.iptv365.org/酷我音乐.html"
         },
 		{
+            "key": "影子音乐",
+            "name": "🎵影子音乐",
+            "type": 3,
+			"api": "csp_Nostr",
+            "homePage": "https://music.yingzi.ee"
+        },
+		{
             "key": "Nostr",
             "name": "🐲Nostr推荐",
             "type": 3,
