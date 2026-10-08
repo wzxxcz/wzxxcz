@@ -1,12 +1,13 @@
 # coding=utf-8
 """
-电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.4 极速版)
+电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.5 极速稳定版)
 关键:
   - 破解服务端 SHA1 PoW 挑战 (attack_key)
   - 解析 /api/m3u8 302 跳转到 box.dyrs.com.de 的 master m3u8
   - 提取子 m3u8（分片URL为绝对路径，TVBox 可直接播放）
   - 支持电影/电视剧/综艺/动漫/短剧
   - 终极优化: 详情页只请求1次，每条线路只请求1次播放页，利用 nexturl 拿到全部剧集
+  - 稳定性: 播放页请求失败最多重试3次，递增等待 0.3s/0.6s/0.9s
 """
 import re
 import sys
@@ -589,14 +590,13 @@ class Spider(Spider):
         groups = {}
         tasks = []
         for origin in origins:
-            # 构造该线路第1集的播放页 URL
-            ep1_url = self.site_url + "/tv/" + vod_id.split("/")[-1].split("-")[0] + "/" + vod_id.split("/")[-1].split("-")[1].split(".")[0] + ".html?origin=" + urllib.parse.quote(origin) + "&p=0&sion_id=" + self.sion_id
-            # 更简单的方式：直接用默认线路的 href 替换 origin
             if default_eps:
                 ep1_url = default_eps[0][1].replace(
                     "origin=" + urllib.parse.quote(base_origin),
                     "origin=" + urllib.parse.quote(origin)
                 )
+            else:
+                ep1_url = ""
             tasks.append((origin, ep1_url))
 
         if tasks:
@@ -649,10 +649,35 @@ class Spider(Spider):
             "vod_play_url":  "$$$".join(play_url),
         }]}
 
+    # ================= 播放页抓取 (带3次重试) =================
     def _fetch_and_parse_play_page(self, origin, play_url):
-        """请求播放页，从 nexturl 中提取全部剧集地址"""
+        """请求播放页，从 nexturl 中提取全部剧集地址（最多重试3次）"""
         self.log("  请求线路 [%s] 的播放页: %s" % (origin, play_url[:120]))
-        html = self._fetch(play_url)
+
+        html = ""
+        max_retries = 3  # 最多重试 3 次（首次 + 3 次重试 = 最多 4 次尝试）
+
+        for attempt in range(max_retries + 1):
+            try:
+                html = self._fetch(play_url)
+            except Exception as e:
+                self.log("    [%s] 第%d次请求异常: %s" % (origin, attempt + 1, e))
+                html = ""
+
+            # 判断是否拿到了有效内容
+            if html and ("nexturl" in html or _RE_PLAYER_AA.search(html)):
+                if attempt > 0:
+                    self.log("    [%s] 第%d次请求成功" % (origin, attempt + 1))
+                break
+
+            if attempt < max_retries:
+                wait = 0.3 * (attempt + 1)  # 0.3s / 0.6s / 0.9s
+                self.log("    [%s] 第%d次请求失败，%.1fs 后重试..."
+                         % (origin, attempt + 1, wait))
+                time.sleep(wait)
+            else:
+                self.log("    [%s] 重试 %d 次仍失败，放弃该线路" % (origin, max_retries))
+
         if not html:
             return []
 
