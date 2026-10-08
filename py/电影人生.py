@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.0)
+电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.1 多线路修复版)
 关键:
   - 破解服务端 SHA1 PoW 挑战 (attack_key)
   - 解析 /api/m3u8 302 跳转到 box.dyrs.com.de 的 master m3u8
   - 提取子 m3u8（分片URL为绝对路径，TVBox 可直接播放）
   - 支持电影/电视剧/综艺/动漫/短剧
+  - 修复: 详情页逐条线路抓取剧集, 不再只拿到 1 条线路
 """
 import re
 import sys
@@ -126,7 +127,6 @@ for c in CLASSES:
 # ========== 正则 ==========
 
 # 首页/分类/搜索：完整卡片（含标题+图片）
-# 结构：<a href="/movie/xxx" title="名字"><img data-src="/img/id/xxx.jpg" alt="名字">
 _RE_CARD = re.compile(
     r'href="(/(?:movie|tv)/[^"?]+?\.html)[^"]*"[^>]*title="([^"]*)"'
     r'[\s\S]{0,400}?<img[^>]*?(?:data-src|src)="([^"]+)"',
@@ -139,7 +139,6 @@ _RE_IMG = re.compile(
     re.S | re.I)
 
 # 剧集：兼容有/无 data-title，同时支持 data-origin
-# 结构：<a href="/tv/xxx/69837.html?origin=xxx&p=0" data-origin="超级线路" data-title="第01集">
 _RE_EPISODE_A = re.compile(r'<a\s+href="([^"]+)"([^>]*?)>(.*?)</a>', re.S | re.I)
 _RE_DATA_ORIGIN = re.compile(r'data-origin="([^"]+)"', re.I)
 _RE_DATA_TITLE = re.compile(r'data-title="([^"]+)"', re.I)
@@ -174,7 +173,7 @@ _RE_ACTOR = re.compile(
     r'<span\s+class="text-\[#2e2e2e\]\s+font-bold">主演</span>\s*'
     r'<span[^>]*>([\s\S]*?)</span>', re.S | re.I)
 
-# 分页信息（从详情页的分页链接）
+# 分页信息
 _RE_PAGE_LINK = re.compile(r'page=(\d+)', re.I)
 
 # PoW 挑战
@@ -437,7 +436,6 @@ class Spider(Spider):
         self._warm_up()
         page = int(pg) if pg else 1
         keyword = urllib.parse.quote(key)
-        # 使用 /s（与搜索结果一致）
         url = "%s/s?name=%s&sion_id=%s&page=%d" % (
             self.site_url, keyword, self.sion_id, page - 1)
         self.log("search: %s" % url)
@@ -458,15 +456,15 @@ class Spider(Spider):
         if not ids:
             return {"list": []}
         vod_id = str(ids[0])
-        url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
-        self.log("detail: %s" % url)
+        base_url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
+        self.log("detail: %s" % base_url)
 
-        html = self._fetch(url)
+        html = self._fetch(base_url)
         self.log("  HTML 长度: %d" % len(html))
         if not html:
             return {"list": []}
 
-        # 标题
+        # ---------- 元信息 ----------
         name = ""
         try:
             m = _RE_H1.search(html)
@@ -483,7 +481,6 @@ class Spider(Spider):
                 pass
         name = re.sub(r"\s*\(\d{4}\)\s*$", "", name).strip() or vod_id
 
-        # 封面
         pic = self.default_pic
         try:
             m = _RE_PIC_ID.search(html)
@@ -492,7 +489,6 @@ class Spider(Spider):
         except Exception:
             pass
 
-        # 简介
         content = ""
         try:
             m = _RE_INTRO.search(html)
@@ -514,10 +510,8 @@ class Spider(Spider):
                     content = self._clean(m.group(1))
             except Exception:
                 pass
-
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
-        # 导演/演员
         director = ""
         try:
             m = _RE_DIRECTOR.search(html)
@@ -534,49 +528,96 @@ class Spider(Spider):
         except Exception:
             pass
 
-        # ===== 剧集提取 =====
-        groups = {}
+        # ---------- 1. 提取所有线路名及其 URL ----------
+        origin_map = {}  # {线路名: 完整URL}
+
+        # 优先：从 originTabs 里抠 a 标签
         try:
-            for m in _RE_EPISODE_A.finditer(html):
-                href = m.group(1)
-                attrs = m.group(2)
-                inner = m.group(3)
-
-                mo = _RE_DATA_ORIGIN.search(attrs)
-                if not mo:
-                    continue
-                origin = mo.group(1)
-                if not origin:
-                    continue
-
-                href = href.replace("&amp;", "&")
-                if href.startswith("/"):
+            pattern_tab = re.compile(
+                r'<a\s+href="([^"]*?[?&]origin=([^"&]+)[^"]*?)"[^>]*>\s*'
+                r'<button[^>]*data-origin="([^"]+)"',
+                re.S | re.I)
+            for m in pattern_tab.finditer(html):
+                href = m.group(1).replace("&amp;", "&")
+                o_url = urllib.parse.unquote(m.group(2))
+                o_btn = m.group(3)
+                origin = o_btn or o_url
+                if not href.startswith("http"):
                     href = self.site_url + href
-
-                ep_name = ""
-                mt = _RE_DATA_TITLE.search(attrs)
-                if mt:
-                    ep_name = self._clean(mt.group(1))
-                if not ep_name:
-                    mt = _RE_BTN_TITLE.search(inner)
-                    if mt:
-                        ep_name = self._clean(mt.group(1))
-                if not ep_name:
-                    ep_name = "第%s集" % (len(groups.get(origin, [])) + 1)
-
-                groups.setdefault(origin, []).append((ep_name, href))
+                origin_map[origin] = href
         except Exception as e:
-            self.log("  剧集解析失败: %s" % e)
+            self.log("  originTabs 解析失败: %s" % e)
 
-        self.log("  剧集: %s" % {k: len(v) for k, v in groups.items()})
+        # 兜底：只找到 data-origin，没有 href，就自己拼
+        if not origin_map:
+            self.log("  originTabs 解析为空，尝试兜底")
+            base_path = base_url.split("?")[0]
+            sion_match = re.search(r'sion_id=([^&]+)', base_url)
+            sion = sion_match.group(1) if sion_match else self.sion_id
+            seen_o = set()
+            for m in re.finditer(r'data-origin="([^"]+)"', html):
+                o = m.group(1)
+                if o and o not in seen_o:
+                    seen_o.add(o)
+                    origin_map[o] = "%s?origin=%s&sion_id=%s" % (
+                        base_path, urllib.parse.quote(o), sion)
+
+        self.log("  发现 %d 条线路: %s" % (len(origin_map), list(origin_map.keys())))
+
+        # ---------- 2. 逐条线路抓取剧集 ----------
+        groups = {}
+
+        # 先解析默认页里的剧集（当前线路）
+        default_eps = self._parse_episodes_from_html(html, target_origin=None)
+        if default_eps:
+            default_origin = ""
+            for ep_name, ep_href in default_eps:
+                m = re.search(r'origin=([^&]+)', ep_href)
+                if m:
+                    default_origin = urllib.parse.unquote(m.group(1))
+                    break
+            if not default_origin:
+                m = re.search(r'data-origin="([^"]+)"[^>]*data-title="', html)
+                if m:
+                    default_origin = m.group(1)
+            if default_origin:
+                groups[default_origin] = default_eps
+                self.log("  默认线路 [%s]: %d 集" % (default_origin, len(default_eps)))
+
+        # 再逐条请求其他线路
+        for origin, href in origin_map.items():
+            if origin in groups:
+                continue
+            self.log("  抓取线路 [%s]: %s" % (origin, href[:120]))
+            sub_html = self._fetch(href)
+            if not sub_html:
+                self.log("    -> 请求失败")
+                continue
+            eps = self._parse_episodes_from_html(sub_html, target_origin=origin)
+            if eps:
+                groups[origin] = eps
+                self.log("    -> %d 集" % len(eps))
+            else:
+                # 兜底：不做 origin 过滤，全收
+                eps2 = self._parse_episodes_from_html(sub_html, target_origin=None)
+                if eps2 and len(eps2) >= 1:
+                    groups[origin] = eps2
+                    self.log("    -> (兜底) %d 集" % len(eps2))
+                else:
+                    self.log("    -> 无剧集")
+
+        self.log("  最终剧集: %s" % {k: len(v) for k, v in groups.items()})
 
         if not groups:
             return {"list": []}
 
-        sorted_origins = sorted(
-            groups.keys(),
-            key=lambda x: (_LINE_PRIORITY.index(x)
-                           if x in _LINE_PRIORITY else 999))
+        # ---------- 3. 排序输出 ----------
+        def _origin_key(x):
+            if x in _LINE_PRIORITY:
+                return _LINE_PRIORITY.index(x)
+            return 999
+
+        sorted_origins = sorted(groups.keys(), key=_origin_key)
 
         play_from = []
         play_url = []
@@ -597,6 +638,45 @@ class Spider(Spider):
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url":  "$$$".join(play_url),
         }]}
+
+    def _parse_episodes_from_html(self, html, target_origin=None):
+        """
+        从 HTML 里解析剧集。
+        target_origin=None 时解析全部；否则只解析 data-origin==target_origin 的。
+        """
+        eps = []
+        try:
+            for m in _RE_EPISODE_A.finditer(html):
+                href = m.group(1)
+                attrs = m.group(2)
+                inner = m.group(3)
+
+                mo = _RE_DATA_ORIGIN.search(attrs)
+                if not mo:
+                    continue
+                origin = mo.group(1)
+                if target_origin and origin != target_origin:
+                    continue
+
+                href = href.replace("&amp;", "&")
+                if href.startswith("/"):
+                    href = self.site_url + href
+
+                ep_name = ""
+                mt = _RE_DATA_TITLE.search(attrs)
+                if mt:
+                    ep_name = self._clean(mt.group(1))
+                if not ep_name:
+                    mt = _RE_BTN_TITLE.search(inner)
+                    if mt:
+                        ep_name = self._clean(mt.group(1))
+                if not ep_name:
+                    ep_name = "第%s集" % (len(eps) + 1)
+
+                eps.append((ep_name, href))
+        except Exception as e:
+            self.log("    _parse_episodes err: %s" % e)
+        return eps
 
     # ================= 播放 =================
     def playerContent(self, flag, id, vipFlags):
@@ -694,7 +774,6 @@ class Spider(Spider):
                    rsp.headers.get("location", ""))
 
         if not loc:
-            # 有些情况 api_url 直接返回 m3u8
             text = ""
             try:
                 text = rsp.text if hasattr(rsp, "text") else ""
