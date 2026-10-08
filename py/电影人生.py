@@ -1,13 +1,13 @@
 # coding=utf-8
 """
-电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.2 元数据补全版)
+电影人生 dyrs360.cc | TVBox Python 爬虫 (V1.8 并发+重试版)
 关键:
   - 破解服务端 SHA1 PoW 挑战 (attack_key)
   - 解析 /api/m3u8 302 跳转到 box.dyrs.com.de 的 master m3u8
   - 提取子 m3u8（分片URL为绝对路径，TVBox 可直接播放）
   - 支持电影/电视剧/综艺/动漫/短剧
-  - 修复: 详情页逐条线路抓取剧集, 不再只拿到 1 条线路
-  - 补全: 从 JSON-LD 中提取别名、类型、年份、地区、简介等元数据
+  - 详情页逐条线路抓取剧集, 补全 JSON-LD 元数据
+  - 新增: 多线程并发抓取所有线路 + 3次重试
 """
 import re
 import sys
@@ -15,6 +15,7 @@ import json
 import time
 import hashlib
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 sys.path.append('..')
 
@@ -158,7 +159,6 @@ _RE_META_DESC = re.compile(
     r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']',
     re.I)
 
-# 🌟 新增：JSON-LD 结构化数据正则
 _RE_JSON_LD = re.compile(
     r'<script\s+type="application/ld\+json">\s*([\s\S]*?)\s*</script>',
     re.S | re.I)
@@ -211,6 +211,7 @@ class Spider(Spider):
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
         self._warmed = False
+        self._executor = ThreadPoolExecutor(max_workers=10)
         self.log("init: site=%s sid=%s" % (self.site_url, self.sion_id))
 
     # ================= PoW =================
@@ -441,7 +442,7 @@ class Spider(Spider):
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
-    # ================= 详情 (元数据补全版) =================
+    # ================= 详情 (并发加速版) =================
     def detailContent(self, ids):
         if not ids:
             return {"list": []}
@@ -454,21 +455,13 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
-        # ---------- 元信息 (优先 JSON-LD, 其次 HTML) ----------
+        # ---------- 元信息 ----------
         meta = {
-            "name": "",
-            "alternateName": "",
-            "genre": "",
-            "year": "",
-            "region": "",
-            "director": "",
-            "actors": [],
-            "description": "",
-            "pic": "",
-            "rating": "",
+            "name": "", "alternateName": "", "genre": "", "year": "",
+            "region": "", "director": "", "actors": [],
+            "description": "", "pic": "", "rating": "",
         }
 
-        # 1. 从 JSON-LD 中提取（最准确）
         json_ld_raw = _RE_JSON_LD.search(html)
         if json_ld_raw:
             try:
@@ -491,7 +484,6 @@ class Spider(Spider):
             except Exception as e:
                 self.log("  JSON-LD 解析失败: %s" % e)
 
-        # 2. 回退到 HTML 解析
         if not meta["name"]:
             m = _RE_H1.search(html)
             if m:
@@ -533,7 +525,6 @@ class Spider(Spider):
                 raw = self._clean(m.group(1))
                 meta["actors"] = [a.strip() for a in re.split(r"[,，、\s]+", raw) if a.strip()]
 
-        # 构建最终简介
         intro_parts = []
         if meta["alternateName"]:
             intro_parts.append("别名：%s" % meta["alternateName"])
@@ -556,7 +547,7 @@ class Spider(Spider):
         if meta["description"]:
             content += meta["description"]
 
-        # ---------- 提取线路 (保留原有逻辑) ----------
+        # ---------- 提取线路 ----------
         origin_map = {}
         try:
             pattern_tab = re.compile(
@@ -574,6 +565,7 @@ class Spider(Spider):
         except Exception as e:
             self.log("  originTabs 解析失败: %s" % e)
 
+        # 兜底：从剧集 href 里反推 origin
         if not origin_map:
             base_path = base_url.split("?")[0]
             sion_match = re.search(r'sion_id=([^&]+)', base_url)
@@ -588,6 +580,7 @@ class Spider(Spider):
 
         self.log("  发现 %d 条线路: %s" % (len(origin_map), list(origin_map.keys())))
 
+        # ---------- 默认线路：从详情页直接解析 ----------
         groups = {}
         default_eps = self._parse_episodes_from_html(html, target_origin=None)
         if default_eps:
@@ -605,25 +598,25 @@ class Spider(Spider):
                 groups[default_origin] = default_eps
                 self.log("  默认线路 [%s]: %d 集" % (default_origin, len(default_eps)))
 
-        for origin, href in origin_map.items():
-            if origin in groups:
-                continue
-            self.log("  抓取线路 [%s]: %s" % (origin, href[:120]))
-            sub_html = self._fetch(href)
-            if not sub_html:
-                self.log("    -> 请求失败")
-                continue
-            eps = self._parse_episodes_from_html(sub_html, target_origin=origin)
-            if eps:
-                groups[origin] = eps
-                self.log("    -> %d 集" % len(eps))
-            else:
-                eps2 = self._parse_episodes_from_html(sub_html, target_origin=None)
-                if eps2 and len(eps2) >= 1:
-                    groups[origin] = eps2
-                    self.log("    -> (兜底) %d 集" % len(eps2))
-                else:
-                    self.log("    -> 无剧集")
+        # ---------- 剩余线路：并发抓取 + 3次重试 ----------
+        tasks = [(o, h) for o, h in origin_map.items() if o not in groups]
+        if tasks:
+            self.log("  🚀 并发抓取 %d 条线路（3次重试）..." % len(tasks))
+            future_map = {
+                self._executor.submit(self._fetch_line_with_retry, o, h): o
+                for o, h in tasks
+            }
+            for fut in as_completed(future_map):
+                origin = future_map[fut]
+                try:
+                    eps = fut.result()
+                    if eps:
+                        groups[origin] = eps
+                        self.log("    ✅ [%s] %d 集" % (origin, len(eps)))
+                    else:
+                        self.log("    ⚠️ [%s] 无剧集" % origin)
+                except Exception as e:
+                    self.log("    ❌ [%s] 异常: %s" % (origin, e))
 
         self.log("  最终剧集: %s" % {k: len(v) for k, v in groups.items()})
 
@@ -657,6 +650,37 @@ class Spider(Spider):
             "vod_play_url":  "$$$".join(play_url),
         }]}
 
+    # ============ 单线路抓取（带3次重试） ============
+    def _fetch_line_with_retry(self, origin, href):
+        """单线路抓取 + 解析，最多重试3次"""
+        max_retries = 3
+        last_err = ""
+        for attempt in range(max_retries + 1):
+            try:
+                sub_html = self._fetch(href)
+                if not sub_html:
+                    raise RuntimeError("empty response")
+                eps = self._parse_episodes_from_html(sub_html, target_origin=origin)
+                if not eps:
+                    eps = self._parse_episodes_from_html(sub_html, target_origin=None)
+                if eps:
+                    if attempt > 0:
+                        self.log("    [%s] 第%d次请求成功" % (origin, attempt + 1))
+                    return eps
+                else:
+                    raise RuntimeError("no episodes parsed")
+            except Exception as e:
+                last_err = str(e)
+                if attempt < max_retries:
+                    wait = 0.3 * (attempt + 1)
+                    self.log("    [%s] 第%d次失败(%s), %.1fs 后重试..."
+                             % (origin, attempt + 1, e, wait))
+                    time.sleep(wait)
+                else:
+                    self.log("    [%s] 重试 %d 次仍失败: %s" % (origin, max_retries, last_err))
+        return []
+
+    # ============ 从 HTML 解析剧集 ============
     def _parse_episodes_from_html(self, html, target_origin=None):
         eps = []
         try:
@@ -692,7 +716,7 @@ class Spider(Spider):
             self.log("    _parse_episodes err: %s" % e)
         return eps
 
-    # ================= 播放 =================
+    # ================= 播放 (保持原样，已验证能播) =================
     def playerContent(self, flag, id, vipFlags):
         play_page = id if id.startswith("http") else self._fix_url(id)
         self.log("player: %s" % play_page)
