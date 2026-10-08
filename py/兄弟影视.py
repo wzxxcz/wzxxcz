@@ -64,15 +64,17 @@ CLASSES = [
     {"type_id": "21", "type_name": "预告片"},
 ]
 
+# 简介前缀（你指定的）
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
+
 # ===================== 工具正则 =====================
 _RE_CARD = re.compile(
     r'<li[^>]*>\s*<a[^>]*href="(/xddetail/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
-    r'[\s\S]*?<img[^>]*?(?:data-src|src)="([^"]*)"'
+    r'[\s\S]*?<img[^>]*?(?:data-src|data-original|src)="([^"]*)"'
     r'[\s\S]*?<p[^>]*class="[^"]*other[^"]*"><i>([^<]*)</i>',
     re.S | re.I
 )
 
-# 播放列表容器（只捕获内部 ul 的 HTML）
 _RE_PLAY_LIST = re.compile(
     r'<div[^>]*id="stab\d+"[^>]*>[\s\S]*?<div[^>]*id="vlink_\d+"[^>]*>'
     r'[\s\S]*?<ul>([\s\S]*?)</ul>',
@@ -83,22 +85,24 @@ _RE_EP = re.compile(
     re.I
 )
 
-# 播放页 player_aaaa
 _RE_PLAYER_AA = re.compile(
     r'var\s+player_aaaa\s*=\s*(\{.*?\})\s*</script>',
     re.S
 )
 
-# 筛选区域解析
 _RE_DL = re.compile(r'<dl[^>]*>(.*?)</dl>', re.S | re.I)
 _RE_DT = re.compile(r'<dt><span>按(.*?)</span></dt>', re.S | re.I)
 _RE_DD = re.compile(r'<dd><a[^>]*href="([^"]*)"[^>]*>(.*?)</a></dd>', re.S | re.I)
 
-# 线路名提取（只捕获名字，不关心 id）
 _RE_LINE_NAMES = re.compile(
     r'<li[^>]*id="tab\d+"[^>]*>.*?<i[^>]*></i>\s*([^<]+)',
     re.S | re.I
 )
+
+# 总页数解析：从"共X条数据,当前Y/Z页"或"尾页"链接获取
+_RE_PAGE_INFO = re.compile(r'共\s*\d+\s*条数据\s*,\s*当前\s*(\d+)\s*/\s*(\d+)\s*页', re.S)
+_RE_LAST_PAGE = re.compile(r'<a[^>]*href="[^"]*?(\d+)---?\.html"[^>]*title="尾页"', re.I)
+_RE_LAST_PAGE2 = re.compile(r'title="尾页"[^>]*href="[^"]*?(\d+)---?\.html"', re.I)
 
 
 class Spider(BaseSpider):
@@ -164,6 +168,7 @@ class Spider(BaseSpider):
                 text = re.sub(r'<[^>]+>', '', dd_match.group(2)).strip()
                 if not href or not text:
                     continue
+                href = href.replace("&amp;", "&")
                 options.append({"n": text, "v": href})
             if options:
                 filters.append({
@@ -175,33 +180,44 @@ class Spider(BaseSpider):
         return filters
 
     def homeVideoContent(self):
+        """首页推荐：抓取多个区域"""
         url = self.home_url + "/"
         html = self._fetch(url)
+        if not html:
+            return {"list": []}
+        # 抓取首页所有 index-area 区域
         videos = self._parse_list(html)
-        return {"list": videos[:20]}
+        # 去重
+        seen = set()
+        unique = []
+        for v in videos:
+            if v["vod_id"] not in seen:
+                seen.add(v["vod_id"])
+                unique.append(v)
+        return {"list": unique}
 
     def categoryContent(self, tid, page, filter, extend):
         page = int(page) if page else 1
+        url = ""
+        # 有筛选
         if extend:
+            filter_val = ""
             for key, val in extend.items():
                 if val:
-                    url = self.home_url + val
-                    self.log(f"category (筛选): {url}")
-                    html = self._fetch(url)
-                    videos = self._parse_list(html)
-                    pagecount = 9999 if videos else page
-                    return {
-                        "list": videos,
-                        "page": page,
-                        "pagecount": pagecount,
-                        "limit": 24,
-                        "total": pagecount * 24,
-                    }
-        url = f"{self.home_url}/xdshow/{tid}--------{page}---.html"
-        self.log(f"category: {url}")
+                    filter_val = val
+                    break
+            if filter_val:
+                # 构造带页码的筛选 URL
+                base = filter_val  # 如 /xdshow/1---喜剧--------2026.html
+                url = self.home_url + self._build_filter_page_url(base, page)
+                self.log(f"category (筛选+p{page}): {url}")
+        # 无筛选
+        if not url:
+            url = f"{self.home_url}/xdshow/{tid}--------{page}---.html"
+            self.log(f"category: {url}")
         html = self._fetch(url)
         videos = self._parse_list(html)
-        pagecount = 9999 if videos else page
+        pagecount = self._parse_pagecount(html, page)
         return {
             "list": videos,
             "page": page,
@@ -210,19 +226,34 @@ class Spider(BaseSpider):
             "total": pagecount * 24,
         }
 
+    def _build_filter_page_url(self, base_url, page):
+        """给筛选 URL 加页码"""
+        if page <= 1:
+            return base_url
+        # 筛选 URL 形如 /xdshow/1---喜剧--------2026.html
+        # 页码插在末尾的 8 个横线区域中间：把 -------- 替换成 ----{page}---
+        if '--------' in base_url:
+            return base_url.replace('--------', '----{}---'.format(page), 1)
+        # 兜底：在 .html 前面加
+        if base_url.endswith('.html'):
+            return base_url[:-5] + f'{page}---.html'
+        return base_url
+
     def searchContent(self, key, quick, page="1"):
         page = int(page) if page else 1
-        kw = urlparse.quote(key)
+        # 用 quote_plus 处理空格
+        kw = urlparse.quote_plus(key)
         url = f"{self.home_url}/xdsearch/{kw}----------{page}---.html"
         self.log(f"search: {url}")
         html = self._fetch(url)
         videos = self._parse_list(html)
+        pagecount = self._parse_pagecount(html, page)
         return {
             "list": videos,
             "page": page,
-            "pagecount": 9999 if videos else page,
+            "pagecount": pagecount,
             "limit": 24,
-            "total": 999,
+            "total": pagecount * 24,
         }
 
     def searchContentPage(self, key, quick, page="1"):
@@ -253,7 +284,9 @@ class Spider(BaseSpider):
         year = self._extract_text(html, r'<dd><span>年份：</span>([^<]*)</dd>')
         type_name = self._extract_text(html, r'<dt><span>类型：</span>([^<]*)</dt>')
         remarks = self._extract_text(html, r'<dd><span>备注：</span>([^<]*)</dd>')
+        lang = self._extract_text(html, r'<dd><span>语言：</span>([^<]*)</dd>')
 
+        # 简介：严格按官网文本 + 指定前缀
         content = self._extract_text(
             html, r'<div[^>]*class="[^"]*tab-jq[^"]*"[^>]*>\s*<p>([\s\S]*?)</p>',
             strip_tags=True)
@@ -265,14 +298,16 @@ class Spider(BaseSpider):
             content = self._extract_text(
                 html, r'<meta\s+name="description"\s+content="([^"]*)"',
                 strip_tags=True)
+        if content:
+            content = INTRO_PREFIX + "\n" + content
+        else:
+            content = INTRO_PREFIX
 
         # ========== 播放列表（按顺序配对） ==========
-        # 1. 按顺序提取线路名
         line_names = _RE_LINE_NAMES.findall(html)
         line_names = [n.strip() for n in line_names]
         self.log(f"  线路名（按顺序）: {line_names}")
 
-        # 2. 按顺序提取播放列表容器
         play_lists = _RE_PLAY_LIST.findall(html)
         self.log(f"  播放列表容器数量: {len(play_lists)}")
 
@@ -282,7 +317,6 @@ class Spider(BaseSpider):
             episodes = _RE_EP.findall(ul_html)
             if not episodes:
                 continue
-            # 按顺序取线路名，如果没有则用默认
             line_name = line_names[i] if i < len(line_names) else f"线路{i+1}"
             play_from.append(line_name)
             play_url.append("#".join(f"{ep_name}${href}" for href, ep_name in episodes))
@@ -300,6 +334,7 @@ class Spider(BaseSpider):
                 "vod_area": area,
                 "vod_year": year,
                 "vod_type": type_name,
+                "vod_lang": lang,
                 "vod_remarks": remarks,
                 "vod_content": content,
                 "vod_play_from": "$$$".join(play_from),
@@ -320,7 +355,7 @@ class Spider(BaseSpider):
                 aa = json.loads(m.group(1))
                 play_url = aa.get("url", "")
                 if play_url:
-                    play_url = play_url.replace("\\/", "/")
+                    play_url = play_url.replace("\\/", "/").replace("&amp;", "&")
                     self.log(f"  => 直链: {play_url[:120]}")
                     return {
                         "parse": 0,
@@ -366,6 +401,28 @@ class Spider(BaseSpider):
             self.log(f"fetch fail: {url} -> {e}")
             return ""
 
+    def _parse_pagecount(self, html, current_page):
+        """解析总页数：从'共X条数据,当前Y/Z页'或'尾页'链接获取"""
+        if not html:
+            return current_page
+        # 优先：共X条数据,当前Y/Z页
+        m = _RE_PAGE_INFO.search(html)
+        if m:
+            try:
+                return int(m.group(2))
+            except Exception:
+                pass
+        # 次选：尾页链接
+        for pat in (_RE_LAST_PAGE, _RE_LAST_PAGE2):
+            m = pat.search(html)
+            if m:
+                try:
+                    return int(m.group(1))
+                except Exception:
+                    pass
+        # 兜底
+        return 9999 if current_page == 1 else current_page
+
     def _parse_list(self, html):
         if not html:
             return []
@@ -386,7 +443,9 @@ class Spider(BaseSpider):
                         continue
                     seen.add(href)
                     img = li('img').eq(0)
-                    pic = img.attr('data-src') or img.attr('src') or ''
+                    # 图片懒加载：data-src > data-original > src
+                    pic = (img.attr('data-src') or img.attr('data-original')
+                           or img.attr('src') or '')
                     remark = li('p.other i').text().strip()
                     videos.append({
                         "vod_id": href,
@@ -429,8 +488,15 @@ class Spider(BaseSpider):
 if __name__ == '__main__':
     s = Spider()
     s.init()
+    print("分类:", s.homeContent(False))
+    # 测试详情
     detail = s.detailContent(["/xddetail/174041.html"])
     if detail["list"]:
         d = detail["list"][0]
         print("详情:", d["vod_name"])
         print("线路名:", d["vod_play_from"])
+        print("简介:", d["vod_content"][:200])
+        print("语言:", d.get("vod_lang", ""))
+    # 测试首页推荐
+    hv = s.homeVideoContent()
+    print("首页推荐:", len(hv["list"]), "条")
