@@ -148,7 +148,6 @@ class Spider(BaseSpider):
         html = self._fetch(url)
         if not html:
             return []
-        # 找到筛选区域，通常在所有 dl 中
         filters = []
         for dl_match in _RE_DL.finditer(html):
             dl_html = dl_match.group(1)
@@ -162,11 +161,10 @@ class Spider(BaseSpider):
                 text = re.sub(r'<[^>]+>', '', dd_match.group(2)).strip()
                 if not href or not text:
                     continue
-                # 将 href 作为筛选值，直接用于跳转
                 options.append({"n": text, "v": href})
             if options:
                 filters.append({
-                    "key": dim_name,        # 用中文名作为 key，TVBox 会显示
+                    "key": dim_name,
                     "name": dim_name,
                     "value": options
                 })
@@ -185,7 +183,6 @@ class Spider(BaseSpider):
         if extend:
             for key, val in extend.items():
                 if val:
-                    # val 是相对路径，如 /xdshow/1---喜剧--------.html
                     url = self.home_url + val
                     self.log(f"category (筛选): {url}")
                     html = self._fetch(url)
@@ -284,13 +281,13 @@ class Spider(BaseSpider):
         play_from = []
         play_url = []
         for m in _RE_PLAY_LIST.finditer(html):
-            stab_id = m.group(1)
+            stab_id = m.group(1)   # 如 "82"
             ul_html = m.group(2)
             episodes = _RE_EP.findall(ul_html)
             if not episodes:
                 continue
-            line_key = stab_id[-1] if stab_id else ""
-            line_name = line_map.get(line_key, f"线路{stab_id}")
+            # 直接用完整的 tab 编号去匹配线路名，不要截取最后一位
+            line_name = line_map.get(stab_id, f"线路{stab_id}")
             play_from.append(line_name)
             play_url.append("#".join(f"{ep_name}${href}" for href, ep_name in episodes))
 
