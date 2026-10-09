@@ -46,20 +46,6 @@ CLASSES = [
     {"type_id": "3", "type_name": "综艺"},
     {"type_id": "4", "type_name": "动漫"},
     {"type_id": "26", "type_name": "短剧"},
-    {"type_id": "6", "type_name": "动作片"},
-    {"type_id": "7", "type_name": "喜剧片"},
-    {"type_id": "8", "type_name": "爱情片"},
-    {"type_id": "9", "type_name": "科幻片"},
-    {"type_id": "10", "type_name": "恐怖片"},
-    {"type_id": "11", "type_name": "剧情片"},
-    {"type_id": "12", "type_name": "战争片"},
-    {"type_id": "24", "type_name": "纪录片"},
-    {"type_id": "20", "type_name": "美剧"},
-    {"type_id": "13", "type_name": "韩剧"},
-    {"type_id": "14", "type_name": "日剧"},
-    {"type_id": "15", "type_name": "泰剧"},
-    {"type_id": "16", "type_name": "港剧"},
-    {"type_id": "25", "type_name": "国产剧"},
 ]
 
 # ---------- 筛选选项 ----------
@@ -173,6 +159,7 @@ FILTERS = {
     "2": _make_filters(_AREAS_TV, _CLASS_TV),
     "3": _make_filters(_AREAS_VARIETY),
     "4": _make_filters(_AREAS_ANIME),
+    # 短剧 26 没有筛选
 }
 
 
@@ -196,7 +183,6 @@ class Spider(Spider):
         }
         self.log("init: site=%s" % self.site_url)
 
-    # ---------------- 基础工具 ----------------
     def _fetch(self, url, timeout=15, headers=None):
         try:
             h = dict(self.headers)
@@ -236,7 +222,6 @@ class Spider(Spider):
         s = re.sub(r"\n{2,}", "\n", s)
         return s.strip()
 
-    # ---------------- 列表解析 ----------------
     def _parse_list(self, html):
         videos = []
         if not html:
@@ -292,7 +277,6 @@ class Spider(Spider):
                 pass
         return 9999
 
-    # ---------------- TVBox 接口 ----------------
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": FILTERS}
 
@@ -310,7 +294,6 @@ class Spider(Spider):
             except Exception:
                 extend = {}
 
-        # 子分类切换（点“类型”里的动作片等）
         if extend.get("class"):
             tid = extend["class"]
 
@@ -330,13 +313,11 @@ class Spider(Spider):
         has_filter = bool(f2 or f3 or f5 or f12)
 
         if not has_filter:
-            # 无筛选：用 list 路径（短剧、电影默认页都用这个）
             if page == 1:
                 url = "%s/list/%s.html" % (self.site_url, tid)
             else:
                 url = "%s/list/%s-%d.html" % (self.site_url, tid, page)
         else:
-            # 有筛选：用 vodshow 路径
             path = "-".join([f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12])
             url = "%s/vodshow/%s.html" % (self.site_url, path)
 
@@ -383,7 +364,6 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
-        # 标题
         name = ""
         m = re.search(r'<h1[^>]*class="title"[^>]*>([\s\S]*?)</h1>', html, re.I)
         if m:
@@ -394,7 +374,6 @@ class Spider(Spider):
                 name = self._clean(m.group(1).split("_")[0].split("-")[0])
         name = re.sub(r"\s*\(\d{4}\)\s*$", "", name).strip() or vod_id
 
-        # 图片
         pic = DEFAULT_PIC
         m = re.search(
             r'<img[^>]*class="[^"]*lazyload[^"]*"[^>]*data-original="([^"]+)"',
@@ -405,7 +384,6 @@ class Spider(Spider):
         if m:
             pic = self._fix_url(m.group(1))
 
-        # 简介
         content = ""
         m = re.search(r'<span[^>]*class="detail-content"[^>]*>([\s\S]*?)</span>', html, re.I)
         if m:
@@ -419,21 +397,18 @@ class Spider(Spider):
             if m:
                 content = self._clean(m.group(1))
 
-        # 主演
         actor = ""
         m = re.search(r'<p[^>]*class="data"[^>]*>主演：([\s\S]*?)</p>', html, re.I)
         if m:
             actors = re.findall(r'<a[^>]*>([^<]+)</a>', m.group(1))
             actor = ", ".join(self._clean(a) for a in actors)
 
-        # 导演
         director = ""
         m = re.search(r'<p[^>]*class="data"[^>]*>导演：([\s\S]*?)</p>', html, re.I)
         if m:
             directors = re.findall(r'<a[^>]*>([^<]+)</a>', m.group(1))
             director = ", ".join(self._clean(d) for d in directors)
 
-        # 播放列表
         episodes = {}
         line_names = {}
         for m in re.finditer(r'<a href="#playlist(\d+)"[^>]*>([^<]+)</a>', html, re.I):
