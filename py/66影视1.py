@@ -408,7 +408,7 @@ class Spider(Spider):
         if m:
             vod_lang = self._clean(m.group(1))
 
-        # ---------- 状态（vod_remarks）----------
+        # ---------- 状态 ----------
         vod_remarks = ""
         m = re.search(r'状态：\s*<span[^>]*>([^<]+)</span>', html, re.I)
         if m:
@@ -472,11 +472,19 @@ class Spider(Spider):
             director = ", ".join(self._clean(d) for d in directors)
 
         # ---------- 剧集 ----------
-        episodes = {}
+        # 1) 先按页面 tab 顺序记录线路顺序
+        line_order = {}
         line_names = {}
+        order_idx = 0
         for m in re.finditer(r'<a href="#playlist(\d+)"[^>]*>([^<]+)</a>', html, re.I):
-            line_names[m.group(1)] = self._clean(m.group(2))
+            sid = m.group(1)
+            if sid not in line_order:
+                line_order[sid] = order_idx
+                order_idx += 1
+            line_names[sid] = self._clean(m.group(2))
 
+        # 2) 提取剧集
+        episodes = {}
         for m in re.finditer(
             r'href="(/html/(\d+)-(\d+)-(\d+)\.html)"[^>]*>([^<]*)</a>',
             html, re.I
@@ -491,7 +499,12 @@ class Spider(Spider):
         if not episodes:
             return {"list": []}
 
-        sorted_sids = sorted(episodes.keys(), key=lambda x: int(x))
+        # 3) 按 tab 顺序排序（不在 tab 里的线路排最后）
+        sorted_sids = sorted(
+            episodes.keys(),
+            key=lambda x: line_order.get(x, 9999)
+        )
+
         play_from = []
         play_url = []
         for sid in sorted_sids:
