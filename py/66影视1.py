@@ -388,9 +388,47 @@ class Spider(Spider):
         if m:
             pic = self._fix_url(m.group(1))
 
+        # ---------- 年份 ----------
+        vod_year = ""
+        m = re.search(r'年份：<a[^>]*>(\d{4})</a>', html, re.I)
+        if not m:
+            m = re.search(r'年份：\s*(\d{4})', html, re.I)
+        if m:
+            vod_year = m.group(1)
+
+        # ---------- 地区 ----------
+        vod_area = ""
+        m = re.search(r'地区：\s*([^ /<\n]+)', html, re.I)
+        if m:
+            vod_area = self._clean(m.group(1))
+
+        # ---------- 语言 ----------
+        vod_lang = ""
+        m = re.search(r'语言：\s*([^<\n]+)', html, re.I)
+        if m:
+            vod_lang = self._clean(m.group(1))
+
+        # ---------- 状态（vod_remarks）----------
+        vod_remarks = ""
+        m = re.search(r'状态：\s*<span[^>]*>([^<]+)</span>', html, re.I)
+        if m:
+            vod_remarks = self._clean(m.group(1))
+        if not vod_remarks:
+            m = re.search(r'状态：\s*([^<\n]+)', html, re.I)
+            if m:
+                vod_remarks = self._clean(m.group(1))
+
+        # ---------- 更新日期 ----------
+        m = re.search(r'更新：\s*([\d\-]+)', html, re.I)
+        if m:
+            update_date = self._clean(m.group(1))
+            if vod_remarks:
+                vod_remarks = vod_remarks + " " + update_date
+            else:
+                vod_remarks = update_date
+
         # ---------- 简介 ----------
         content = ""
-        # 优先取 detail-content（完整简介）
         m = re.search(
             r'<span[^>]*class="[^"]*detail-content[^"]*"[^>]*>([\s\S]*?)</span>',
             html, re.I
@@ -398,7 +436,6 @@ class Spider(Spider):
         if m:
             content = self._clean(m.group(1))
 
-        # 再取 detail-sketch（被截断的短简介）
         if not content:
             m = re.search(
                 r'<span[^>]*class="[^"]*detail-sketch[^"]*"[^>]*>([\s\S]*?)</span>',
@@ -407,7 +444,6 @@ class Spider(Spider):
             if m:
                 content = self._clean(m.group(1))
 
-        # 最后兜底 meta description
         if not content:
             m = re.search(
                 r'<meta[^>]*name="description"[^>]*content="([^"]*)"',
@@ -416,7 +452,6 @@ class Spider(Spider):
             if m:
                 content = self._clean(m.group(1))
 
-        # 统一加前缀
         if content:
             content = INTRO_PREFIX + "\n" + content
         else:
@@ -471,7 +506,10 @@ class Spider(Spider):
             "vod_content": content,
             "vod_actor": actor,
             "vod_director": director,
-            "vod_remarks": "",
+            "vod_year": vod_year,
+            "vod_area": vod_area,
+            "vod_lang": vod_lang,
+            "vod_remarks": vod_remarks,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
         }]}
