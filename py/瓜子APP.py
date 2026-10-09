@@ -17,7 +17,6 @@ from base.spider import Spider
 
 sys.path.append('..')
 
-
 class Spider(Spider):
     def __init__(self):
         self.name = "瓜子"
@@ -100,7 +99,7 @@ t5lYKfpe8k83ZA==
             self.refresh_token()
         except Exception as e:
             print(f"初始化token失败: {e}")
-            # 兜底使用原有硬编码
+            # 兜底使用原有硬编码（几乎没用）
             self.token = '024212ef0975c5306a1434e113a46463.bc77313e11a248558a6ca244ca980944ec3421fa480c50e0229ad91f1cb15aea582603202cd71796885c9e5163e500f1b72f737059aff1ddb8beea47c5a331d6760540345b7f88b2302a0e6e09589f9dcf3ff9175d8c905f990203f5fc04748008ea7a366571cbf5b09509a873dcfba3cf1d5590385f5f7ef6e01d1850974aa220eb5178c89e61c24411af9b9a19435e.06fde789ece48d9b33c5dc857e04e9b5838f08264d928b87237d3476c4484b46'
 
     def sign_up(self):
@@ -147,7 +146,7 @@ t5lYKfpe8k83ZA==
         """认证类请求（不需要ensure_token）"""
         return self._send_encrypted_request(params, path, is_auth=True)
 
-    # ---------- 业务请求核心 ----------
+    # ---------- 业务请求核心（修复加密与签名） ----------
     def ensure_token(self):
         """确保token有效，如未就绪则重新获取"""
         if not self.token or not self.token_id:
@@ -160,6 +159,9 @@ t5lYKfpe8k83ZA==
     def _send_encrypted_request(self, data, path, is_auth=False):
         """
         发送加密请求，返回解密后的字典
+        :param data: 业务参数字典
+        :param path: 请求路径
+        :param is_auth: 是否为认证类请求（signUp/signIn/refresh），此时不使用ensure_token
         """
         try:
             if not is_auth:
@@ -168,7 +170,7 @@ t5lYKfpe8k83ZA==
             # 1. 将参数转为JSON并AES加密
             json_params = json.dumps(data)
             encrypted = self.aes_encrypt(json_params, self.AES_KEY, self.AES_IV)
-            request_key = encrypted.upper()
+            request_key = encrypted.upper()  # Java中是bytesToHex(encrypted).toUpperCase()
 
             # 2. 生成keys (RSA加密 iv/key JSON)
             key_json = json.dumps({"iv": self.AES_IV, "key": self.AES_KEY})
@@ -177,7 +179,7 @@ t5lYKfpe8k83ZA==
             # 3. 生成签名
             t = str(int(time.time()))
             sign_str = f"token_id=,token={self.token},phone_type=1,request_key={request_key},app_id=1,time={t},keys={keys}*&zvdvdvddbfikkkumtmdwqppp?|4Y!s!2br"
-            signature = self.get_md5(sign_str)
+            signature = self.get_md5(sign_str)  # 已改为大写
 
             # 4. 构建请求体
             body = {
@@ -185,7 +187,7 @@ t5lYKfpe8k83ZA==
                 'token_id': '',
                 'phone_type': '1',
                 'time': t,
-                'phone_model': 'xiaomi-25031',
+                'phone_model': 'xiaomi-25031',  # 与Java版保持一致
                 'keys': keys,
                 'request_key': request_key,
                 'signature': signature,
@@ -201,8 +203,10 @@ t5lYKfpe8k83ZA==
                 raise Exception(f"HTTP {response.status_code}")
 
             resp_json = response.json()
+            # 检查业务code（若不为200可能token过期）
             if 'code' in resp_json and resp_json['code'] != 200:
                 print(f"业务错误码: {resp_json['code']}, 信息: {resp_json}")
+                # 如果不是认证请求，尝试重新获取token后重试一次（这里简单处理，外层get_data已有重试）
                 raise Exception("业务错误")
 
             data_section = resp_json.get('data')
@@ -225,7 +229,7 @@ t5lYKfpe8k83ZA==
             return None
 
     def get_data(self, data, path, use_cache=True):
-        """带重试和域名轮询的数据获取"""
+        """带重试和域名轮询的数据获取（保持原框架）"""
         try:
             cache_key = f"{path}_{hash(str(data))}" if use_cache else None
             if use_cache and cache_key in self.cache:
@@ -245,9 +249,11 @@ t5lYKfpe8k83ZA==
                             self.cache[cache_key] = (result, time.time())
                         return result
 
+                    # 切换到下一个域名
                     self.host_index = (self.host_index + 1) % len(self.hosts)
                     tried += 1
 
+                # 所有域名失败，尝试重新认证并重试
                 if attempt < 2:
                     print("所有域名失败，尝试重新认证...")
                     try:
@@ -287,6 +293,7 @@ t5lYKfpe8k83ZA==
             return ""
 
     def rsa_encrypt(self, text, public_key_str):
+        """RSA公钥加密（PKCS1v1.5）"""
         try:
             key = RSA.import_key("-----BEGIN PUBLIC KEY-----\n" + public_key_str + "\n-----END PUBLIC KEY-----")
             cipher = PKCS1_v1_5.new(key)
@@ -297,6 +304,7 @@ t5lYKfpe8k83ZA==
             return ""
 
     def rsa_decrypt(self, encrypted_data, private_key_str):
+        """RSA私钥解密"""
         try:
             encrypted_bytes = base64.b64decode(encrypted_data)
             rsa_key = RSA.import_key(private_key_str)
@@ -308,46 +316,9 @@ t5lYKfpe8k83ZA==
             return ""
 
     def get_md5(self, text):
-        return hashlib.md5(text.encode()).hexdigest().upper()
+        return hashlib.md5(text.encode()).hexdigest().upper()  # 与Java一致大写
 
-    # ---------- 图片 URL 修复工具 ----------
-    def fix_pic(self, item):
-        """
-        从 item 中提取图片地址：
-        1. 兼容多种字段名
-        2. 相对路径补全为绝对路径
-        3. 加防盗链 Referer（TVBox 的 @Referer 语法）
-        如果加了 Referer 后图片反而全不显示，删掉最后那行即可。
-        """
-        pic = ''
-        for key in ['vod_pic', 'vod_pic_thumb', 'vod_pic_slide', 'pic', 'cover',
-                    'vod_pic_url', 'img', 'image', 'thumbnail']:
-            val = item.get(key)
-            if val and isinstance(val, str) and val.strip():
-                pic = val.strip()
-                break
-
-        if not pic:
-            return ''
-
-        # 处理 // 开头的协议相对地址
-        if pic.startswith('//'):
-            pic = 'https:' + pic
-
-        # 补全相对路径
-        if not pic.startswith('http'):
-            if pic.startswith('/'):
-                pic = self.host + pic
-            else:
-                pic = self.host + '/' + pic
-
-        # 加防盗链 Referer（TVBox 支持 @Referer=xxx 语法）
-        # 部分版本不支持，如导致图片全部不显示，请删掉下面这行
-        pic = pic + '@Referer=' + self.host + '/'
-
-        return pic
-
-    # ---------- 业务方法 ----------
+    # ---------- 业务方法（不变） ----------
     def homeContent(self, filter):
         result = {}
         classes = [
@@ -405,11 +376,10 @@ t5lYKfpe8k83ZA==
                 for item in data['list']:
                     vod_continu = item.get('vod_continu', 0)
                     remarks = '电影' if vod_continu == 0 else f'更新至{vod_continu}集'
-                    pic = self.fix_pic(item)
                     video = {
                         "vod_id": f"{item.get('vod_id', '')}/{vod_continu}",
                         "vod_name": item.get('vod_name', ''),
-                        "vod_pic": pic,
+                        "vod_pic": item.get('vod_pic', ''),
                         "vod_remarks": remarks
                     }
                     videos.append(video)
@@ -425,18 +395,13 @@ t5lYKfpe8k83ZA==
             qdata = self.get_data(body1, '/App/IndexPlay/playInfo')
             body2 = {"vurl_cloud_id": "2", "vod_d_id": vod_id}
             jdata = self.get_data(body2, '/App/Resource/Vurl/show')
-
             if not qdata or 'vodInfo' not in qdata:
                 return {'list': []}
             vod = qdata['vodInfo']
-
-            # 详情图片修复
-            pic = self.fix_pic(vod)
-
             video_detail = {
                 "vod_id": vod_id,
                 "vod_name": vod.get('vod_name', ''),
-                "vod_pic": pic,
+                "vod_pic": vod.get('vod_pic', ''),
                 "vod_year": vod.get('vod_year', ''),
                 "vod_area": vod.get('vod_area', ''),
                 "vod_actor": vod.get('vod_actor', ''),
@@ -472,11 +437,10 @@ t5lYKfpe8k83ZA==
                 for item in data['list']:
                     vod_continu = item.get('vod_continu', 0)
                     remarks = '电影' if vod_continu == 0 else f'更新至{vod_continu}集'
-                    pic = self.fix_pic(item)
                     videos.append({
                         "vod_id": f"{item.get('vod_id', '')}/{vod_continu}",
                         "vod_name": item.get('vod_name', ''),
-                        "vod_pic": pic,
+                        "vod_pic": item.get('vod_pic', ''),
                         "vod_remarks": remarks
                     })
         except Exception as e:
@@ -500,17 +464,8 @@ t5lYKfpe8k83ZA==
                 params['resolution'] = resolutions[0]
                 data = self.get_data(params, '/App/Resource/VurlDetail/showOne', use_cache=False)
                 if data and 'url' in data:
-                    header = {
-                        "User-Agent": "Lavf/57.83.100",
-                        "Referer": "http://WJiZxLXA2.com/"
-                    }
-                    return {
-                        "parse": 0,
-                        "playUrl": "",
-                        "url": data['url'],
-                        "header": header,
-                        'danmaku': 'http://127.0.0.1:9978/proxy?do=diydanmu'
-                    }
+                    return {"parse": 0, "playUrl": "", "url": data['url'],
+                            "header": json.dumps({"User-Agent": "Lavf/57.83.100", "Referer": "http://WJiZxLXA2.com/"}), 'danmaku': 'http://127.0.0.1:9978/proxy?do=diydanmu'}
             return {"parse": 0, "playUrl": "", "url": ""}
         except Exception as e:
             print(f"播放解析失败: {e}")
@@ -536,7 +491,6 @@ t5lYKfpe8k83ZA==
         if result:
             self.cache[cache_key] = (result, current_time)
         return result
-
 
 if __name__ == '__main__':
     pass
