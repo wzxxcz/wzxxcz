@@ -1,8 +1,7 @@
 # coding=utf-8
-print("========================================")
-print("[cupfox] 文件被加载了！这一行能出现，说明文件被 TVBox 读取")
-print("========================================")
-
+"""
+茶杯狐电影 cupfoxdy.com | TVBox Python 爬虫
+"""
 import re
 import sys
 import json
@@ -13,9 +12,7 @@ sys.path.append('..')
 
 try:
     from base.spider import Spider
-    print("[cupfox] base.spider 导入成功")
-except ImportError as e:
-    print("[cupfox] base.spider 导入失败: %s" % e)
+except ImportError:
     import requests as _rq
     try:
         import urllib3
@@ -56,7 +53,10 @@ except ImportError as e:
 HOST = "https://www.cupfoxdy.com"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-M3U8_REFERER = "https://xiaozhukankan.com/"
+
+# 播放地址替换规则
+PLAY_HOST_FROM = "1080p.huyall.com"
+PLAY_HOST_TO = "hd.kuktxu.com"
 
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
@@ -70,11 +70,9 @@ CLASSES = [
 class Spider(Spider):
 
     def getName(self):
-        print("[cupfox] getName 被调用")
         return "茶杯狐电影"
 
     def init(self, extend=""):
-        print("[cupfox] init 被调用, extend=%r" % extend)
         try:
             self.extend = json.loads(extend) if extend else {}
         except Exception:
@@ -88,7 +86,6 @@ class Spider(Spider):
             "Referer": self.site_url + "/",
         }
         self._play_cache = {}
-        print("[cupfox] init 完成, site_url=%s" % self.site_url)
 
     # ==================== 网络 ====================
 
@@ -104,7 +101,7 @@ class Spider(Spider):
                 return rsp.content.decode("utf-8", "ignore")
             return str(rsp)
         except Exception as e:
-            print("[cupfox] fetch FAIL %s -> %s" % (url, e))
+            self.log("fetch FAIL %s -> %s" % (url, e))
             return ""
 
     def _fix_url(self, url):
@@ -134,26 +131,20 @@ class Spider(Spider):
     # ==================== 首页 ====================
 
     def homeContent(self, filter=False):
-        print("[cupfox] homeContent 被调用, 返回 %d 个分类" % len(CLASSES))
         return {"class": CLASSES, "filters": {}}
 
     def homeVideoContent(self):
-        print("[cupfox] homeVideoContent 被调用")
         html = self._fetch(self.site_url + "/")
-        videos = self._extract_videos(html)
-        print("[cupfox] home 抓到 %d 条" % len(videos))
-        return {"list": videos}
+        return {"list": self._extract_videos(html)}
 
     # ==================== 分类 ====================
 
     def categoryContent(self, tid, pg, filter, extend):
-        print("[cupfox] categoryContent 被调用: tid=%s, pg=%s" % (tid, pg))
         page = int(pg) if pg else 1
         url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (
             self.site_url, tid, page)
-        print("[cupfox] category URL: %s" % url)
+        self.log("category: %s" % url)
         html = self._fetch(url)
-        print("[cupfox]   页面长度: %d" % len(html))
         videos = self._extract_videos(html)
 
         pc = 1
@@ -163,7 +154,6 @@ class Spider(Spider):
                 pc = int(m.group(1))
             except Exception:
                 pc = 1
-        print("[cupfox]   抓到 %d 条, 共 %d 页" % (len(videos), pc))
 
         return {
             "list": videos,
@@ -176,16 +166,13 @@ class Spider(Spider):
     # ==================== 搜索 ====================
 
     def searchContent(self, key, quick, pg="1"):
-        print("[cupfox] searchContent 被调用: key=%s" % key)
         page = int(pg) if pg else 1
         kw = urllib.parse.quote(key)
         url = "%s/search.php?searchword=%s&page=%d" % (self.site_url, kw, page)
-        print("[cupfox] search URL: %s" % url)
+        self.log("search: %s" % url)
         html = self._fetch(url)
-        videos = self._extract_videos(html)
-        print("[cupfox]   抓到 %d 条" % len(videos))
         return {
-            "list": videos,
+            "list": self._extract_videos(html),
             "page": page,
             "pagecount": 1,
             "limit": 24,
@@ -229,18 +216,17 @@ class Spider(Spider):
     # ==================== 详情 ====================
 
     def detailContent(self, ids):
-        print("[cupfox] detailContent 被调用: ids=%s" % ids)
         if not ids:
             return {"list": []}
         vid = str(ids[0])
         url = vid if vid.startswith("http") else self._fix_url(vid)
-        print("[cupfox] detail URL: %s" % url)
+        self.log("detail: %s" % url)
 
         html = self._fetch(url)
         if not html:
-            print("[cupfox]   页面为空")
             return {"list": []}
 
+        # 标题
         name = ""
         m = re.search(r'<h1 class="title">([^<]+)</h1>', html)
         if m:
@@ -251,26 +237,31 @@ class Spider(Spider):
                 name = self._clean(m.group(1).split("_")[0].split("-")[0])
         name = name or vid
 
+        # 海报
         pic = ""
         m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
         if m:
             pic = m.group(1).strip()
 
+        # 简介
         content = ""
         m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
         if m:
             content = self._clean(m.group(1))
 
+        # 主演
         actor = ""
         m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
         if m:
             actor = self._clean(m.group(1))
 
+        # 导演
         director = ""
         m = re.search(r'导演[：:]\s*([\s\S]*?)</span>', html)
         if m:
             director = self._clean(m.group(1))
 
+        # 播放列表
         play_from = []
         play_url = []
         for panel in re.finditer(
@@ -290,8 +281,7 @@ class Spider(Spider):
                 play_from.append(line)
                 play_url.append("#".join(eps))
 
-        print("[cupfox]   线路: %s" % play_from)
-
+        self.log("  lines: %s" % play_from)
         if not play_from:
             return {"list": []}
 
@@ -309,9 +299,8 @@ class Spider(Spider):
     # ==================== 播放 ====================
 
     def playerContent(self, flag, id, vipFlags):
-        print("[cupfox] playerContent 被调用: flag=%s, id=%s" % (flag, id))
         play_page = id if id.startswith("http") else self._fix_url(id)
-        print("[cupfox] player URL: %s" % play_page)
+        self.log("player: %s" % play_page)
 
         now_ts = int(time.time())
         if play_page in self._play_cache:
@@ -320,28 +309,37 @@ class Spider(Spider):
                 return res
 
         html = self._fetch(play_page)
-        print("[cupfox]   播放页长度: %d" % len(html))
 
+        # 播放页里有:
+        #   var now="https://1080p.huyall.com/play/en5QEn4d";
+        # 真实 m3u8 在 iframe 里:
+        #   const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
+        # 也就是把 1080p.huyall.com 换成 hd.kuktxu.com，再拼 /index.m3u8
         m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
         if m:
             now_url = m.group(1).strip()
-            m3u8_url = now_url.rstrip("/") + "/index.m3u8"
-            print("[cupfox]   now=%s" % now_url)
-            print("[cupfox]   m3u8=%s" % m3u8_url)
+            # 提取 /play/xxxxx 里的 xxxxx
+            mm = re.search(r'/play/([^/]+)/?$', now_url)
+            if mm:
+                play_id = mm.group(1)
+                m3u8_url = "https://%s/play/%s/index.m3u8" % (PLAY_HOST_TO, play_id)
+                self.log("  now=%s" % now_url)
+                self.log("  m3u8=%s" % m3u8_url)
 
-            res = {
-                "parse": 0,
-                "playUrl": "",
-                "url": m3u8_url,
-                "header": {
-                    "User-Agent": UA,
-                    "Referer": M3U8_REFERER,
-                },
-            }
-            self._play_cache[play_page] = (now_ts, res)
-            return res
+                res = {
+                    "parse": 0,
+                    "playUrl": "",
+                    "url": m3u8_url,
+                    "header": {
+                        "User-Agent": UA,
+                        "Referer": "https://%s/" % PLAY_HOST_TO,
+                    },
+                }
+                self._play_cache[play_page] = (now_ts, res)
+                return res
 
-        print("[cupfox]   无 var now, 兜底嗅探")
+        # 兜底: 嗅探
+        self.log("  兜底嗅探: %s" % play_page)
         res = {
             "parse": 1,
             "playUrl": "",
