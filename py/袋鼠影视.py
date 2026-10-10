@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 import sys
 import re
-import requests
 from urllib.parse import quote, unquote
 sys.path.append('..')
 from base.spider import Spider
 
-requests.packages.urllib3.disable_warnings()
+# 优先用 curl_cffi（能过 Cloudflare），失败则退回 requests
+try:
+    from curl_cffi import requests as http_requests
+    HAS_CFFI = True
+except ImportError:
+    import requests as http_requests
+    HAS_CFFI = False
+
+try:
+    import requests as _plain_requests
+    _plain_requests.packages.urllib3.disable_warnings()
+except Exception:
+    pass
 
 
 class Spider(Spider):
@@ -15,7 +26,9 @@ class Spider(Spider):
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Mobile Safari/537.36",
             "Referer": self.host + "/",
-            "Origin": self.host
+            "Origin": self.host,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
         }
 
     def getName(self):
@@ -88,7 +101,6 @@ class Spider(Spider):
 
     def categoryContent(self, tid, pg, filter, extend):
         ext = extend or {}
-        # 「类型」选中的子类会覆盖频道 tid
         real_tid = str(ext.get("tid") or tid)
 
         parts = [("searchtype", "5"), ("tid", real_tid), ("page", str(pg))]
@@ -113,7 +125,6 @@ class Spider(Spider):
         vid = ids[0]
         html = self.get(self.host + "/movie/index" + vid + ".html")
 
-        # 标题：h1 优先，og:title 兜底，正则清尾巴
         name = self.clean(
             self.match(html, r'<h1[^>]*>(.*?)</h1>') or
             self.match(html, r'<meta property="og:title" content="(.*?)"')
@@ -165,16 +176,9 @@ class Spider(Spider):
     # ==================== 多线路播放解析 ====================
 
     def extractPlaySources(self, html, vid):
-        """
-        从详情页提取多条播放线路。
-        真实结构: <div class="panel" data-playlist-index="N" data-playlist-name="线路名" ...>
-                      <ul class="playlistlink-N" data-playlist-url="/playlist.php?id=X&line=Y">...</ul>
-                  </div>
-        """
         play_from = []
         play_url = []
 
-        # 按 panel 切分，收集 (index, name, eps)
         panels = []
         for section in re.split(
             r'(?=<div[^>]+class=["\'][^"\']*panel[^"\']*["\'][^>]+data-playlist-name=)',
@@ -192,7 +196,6 @@ class Spider(Spider):
             )
             eps = self.extractEpisodes(ul_content) if ul_content else []
 
-            # ul 为空时走异步接口
             if not eps:
                 playlist_url = self.match(section, r'data-playlist-url=["\']([^"\']+)["\']')
                 if playlist_url:
@@ -202,14 +205,12 @@ class Spider(Spider):
             if eps:
                 panels.append((int(idx), name, eps))
 
-        # 按 data-playlist-index 排序
         panels.sort(key=lambda x: x[0])
         for _idx, name, eps in panels:
             key = name if name not in play_from else name + str(len(play_from) + 1)
             play_from.append(key)
             play_url.append("#".join(eps))
 
-        # 回退：按 vid 搜所有 /play/ 链接
         if not play_url:
             eps = []
             seen = set()
@@ -226,13 +227,11 @@ class Spider(Spider):
         return play_from, play_url
 
     def extractEpisodes(self, html):
-        """从 <a> 标签 HTML 中提取剧集，自动去重。"""
         eps = []
         seen = set()
         if not html:
             return eps
 
-        # 模式1: <a title="第01集" href="/play/xxx.html">
         for m in re.finditer(r'<a[^>]+title=["\']([^"\']+)["\'][^>]+href=["\']([^"\']*?/play/[^"\']+)["\']', html, re.S):
             t = self.clean(m.group(1))
             u = self.fix(m.group(2))
@@ -240,7 +239,6 @@ class Spider(Spider):
                 seen.add(u)
                 eps.append(t + "$" + u)
 
-        # 模式2: <a href="/play/xxx.html" ...>第01集</a>
         if not eps:
             for m in re.finditer(r'<a[^>]+href=["\']([^"\']*?/play/[^"\']+)["\'][^>]*>(.*?)</a>', html, re.S):
                 t = self.clean(m.group(2))
@@ -261,7 +259,6 @@ class Spider(Spider):
     def playerContent(self, flag, id, vipFlags):
         html = self.get(id)
 
-        # 真实播放页: var now="https://.../index.m3u8";
         url = self.match(html, r'var\s+now\s*=\s*["\']([^"\']+)["\']')
         if not url:
             url = self.match(html, r'player_aaaa\s*=\s*\{[^}]*"url"\s*:\s*"([^"]+)"')
@@ -273,7 +270,6 @@ class Spider(Spider):
         url = unquote(url) if url else id
 
         headers = dict(self.headers)
-        # 播放页 URL 作为 Referer，提高第三方 m3u8 源成功率
         headers["Referer"] = id if id.startswith("http") else self.host + id
 
         return {
@@ -291,7 +287,6 @@ class Spider(Spider):
         if not html:
             return res
 
-        # 先切 <a class="...videopic...">...</a> 块，再逐属性抽
         for m in re.finditer(r'<a\s[^>]*class=["\'][^"\']*videopic[^"\']*["\'][^>]*>[\s\S]*?</a>', html, re.S):
             block = m.group(0)
 
@@ -343,7 +338,10 @@ class Spider(Spider):
 
     def get(self, url):
         try:
-            r = requests.get(url, headers=self.headers, timeout=15, verify=False)
+            if HAS_CFFI:
+                r = http_requests.get(url, headers=self.headers, impersonate="chrome", timeout=20)
+            else:
+                r = http_requests.get(url, headers=self.headers, timeout=15, verify=False)
             r.encoding = r.apparent_encoding or "utf-8"
             return r.text
         except Exception:
