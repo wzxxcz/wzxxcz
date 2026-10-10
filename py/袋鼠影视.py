@@ -112,47 +112,24 @@ class Spider(Spider):
         except Exception:
             page_int = 1
 
+        # 用户选的子类型覆盖频道 tid
         user_sub_tid = str(ext.get("tid")) if valid(ext.get("tid")) else None
-        channel_tid = str(tid)
+        real_tid = user_sub_tid if user_sub_tid else str(tid)
 
+        # 除 tid 外是否还有其他筛选
         other_has = False
         for k in ("area", "year", "letter", "yuyan", "jq", "order"):
             if valid(ext.get(k)):
                 other_has = True
                 break
 
-        # ==================== 核心策略 ====================
-        # 静态页方案：/frim/indexXX.html 是真实存在的静态文件，能过 CF
-        # 决定用哪个 tid 的静态页
-        if user_sub_tid:
-            static_tid = user_sub_tid   # 用户选了子类型，走子类型静态页
-        else:
-            static_tid = channel_tid    # 没选子类型，走频道静态页
-
-        # 场景 1：无筛选 或 只选了类型（无其他筛选）→ 走静态页，能过 CF
-        if not other_has:
-            url = self.host + "/frim/index" + static_tid + ".html"
-            html = self.get(url)
-            items = self.parseList(html)
-            if items:
-                return {
-                    "page": page_int, "pagecount": 999, "limit": 24,
-                    "total": 999999, "list": items
-                }
-            # 静态页为空，继续往下走 search.php
-
-        # 场景 2：选了"年份/地区/语言/剧情/排序"→ 必须走 search.php（可能被 CF 拦）
-        # 确定 real_tid
-        if user_sub_tid:
-            real_tid = user_sub_tid
-        else:
-            CHANNEL_FIRST_SUB = {"2": "13", "3": "29", "4": "34", "44": "28"}
-            real_tid = CHANNEL_FIRST_SUB.get(channel_tid, channel_tid)
-
+        # ==================== 完全按站点真实 URL 拼装 ====================
+        # 顺序：page → searchtype → order → tid → year → area → letter → yuyan → jq
         parts = []
         if page_int > 1:
             parts.append(("page", str(page_int)))
         parts.append(("searchtype", "5"))
+        # 只有"非类型筛选"才带 order=weekhit（切类型时站点不带 order）
         if other_has:
             order_val = ext.get("order") if valid(ext.get("order")) else "weekhit"
             parts.append(("order", str(order_val)))
@@ -164,18 +141,11 @@ class Spider(Spider):
 
         qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
         url = self.host + "/search.php?" + qs
+
         html = self.get(url)
-        items = self.parseList(html)
-
-        # ★ 降级：search.php 空 → 退回静态页（至少出点数据）
-        if not items:
-            url2 = self.host + "/frim/index" + static_tid + ".html"
-            html2 = self.get(url2)
-            items = self.parseList(html2)
-
         return {
             "page": page_int, "pagecount": 999, "limit": 24,
-            "total": 999999, "list": items
+            "total": 999999, "list": self.parseList(html)
         }
 
     # ==================== 详情 ====================
