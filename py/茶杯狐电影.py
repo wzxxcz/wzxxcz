@@ -25,9 +25,10 @@ except ImportError:
             if self._session is None:
                 self._session = _rq.Session()
                 self._session.verify = False
-                a = _rq.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10, max_retries=0)
-                self._session.mount('https://', a)
-                self._session.mount('http://', a)
+                adapter = _rq.adapters.HTTPAdapter(
+                    pool_connections=10, pool_maxsize=10, max_retries=0)
+                self._session.mount('https://', adapter)
+                self._session.mount('http://', adapter)
             return self._session
 
         def fetch(self, url, headers=None, **kw):
@@ -71,48 +72,36 @@ class Spider(Spider):
         }
         self.log("init")
 
-    def _get(self, url):
-        try:
-            r = self.fetch(url, headers=self.headers)
-            return r.text
-        except Exception as e:
-            self.log("get fail:", url, str(e))
-            return ""
-
-    # ---- 首页 ----
+    # ---------- 首页 ----------
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": {}}
 
     def homeVideoContent(self):
-        html = self._get(HOST + "/")
-        return {"list": self._parse_list(html)}
+        return {"list": self._parse_list(self._get(HOST + "/"))}
 
-    # ---- 分类 ----
+    # ---------- 分类 ----------
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
         url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (HOST, tid, page)
         self.log("cat:", url)
         html = self._get(url)
         videos = self._parse_list(html)
-        pc = 1
         m = re.search(r'<li class="active num"><a>\d+/(\d+)</a></li>', html)
-        if m:
-            pc = int(m.group(1))
-        self.log("cat result:", len(videos), "items,", pc, "pages")
+        pc = int(m.group(1)) if m else 1
+        self.log("cat:", len(videos), "items /", pc, "pages")
         return {"list": videos, "page": page, "pagecount": pc,
                 "limit": 24, "total": pc * 24}
 
-    # ---- 搜索 ----
+    # ---------- 搜索 ----------
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
-        kw = urllib.parse.quote(key)
-        url = "%s/search.php?searchword=%s&page=%d" % (HOST, kw, page)
+        url = "%s/search.php?searchword=%s&page=%d" % (
+            HOST, urllib.parse.quote(key), page)
         self.log("search:", url)
-        html = self._get(url)
-        return {"list": self._parse_list(html), "page": page,
+        return {"list": self._parse_list(self._get(url)), "page": page,
                 "pagecount": 1, "limit": 24, "total": 999}
 
-    # ---- 详情 ----
+    # ---------- 详情 ----------
     def detailContent(self, ids):
         vid = ids[0]
         url = vid if vid.startswith("http") else HOST + vid
@@ -125,24 +114,34 @@ class Spider(Spider):
             name = m.group(1).strip()
 
         pic = ""
-        m = re.search(r'id="js-poster-img" data-original="([^"]+)"', html)
+        m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
         if m:
-            pic = m.group(1)
+            pic = m.group(1).strip()
 
         content = ""
         m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
         if m:
             content = re.sub(r'<[^>]+>', '', m.group(1)).strip()
 
-        # 播放列表：<h3>线路名</h3> ... <ul class="stui-content__playlist clearfix"> ... </ul>
-        # 里面是 <li id="00"><a title="第1集" href="/fox/17111-0-0.html" target="_self">第1集</a></li>
+        actor = ""
+        m = re.search(r'<span class="meta-item">主演：([\s\S]*?)</span>', html)
+        if m:
+            actor = re.sub(r'<[^>]+>', '', m.group(1)).strip()
+
+        director = ""
+        m = re.search(r'<span class="meta-item">导演：([\s\S]*?)</span>', html)
+        if m:
+            director = re.sub(r'<[^>]+>', '', m.group(1)).strip()
+
         play_from, play_url = [], []
-        for m in re.finditer(
-                r'<h3>([^<]+)</h3>[\s\S]*?<ul class="stui-content__playlist clearfix">([\s\S]*?)</ul>',
+        for panel in re.finditer(
+                r'<h3>([^<]+)</h3>[\s\S]*?'
+                r'<ul class="stui-content__playlist clearfix">([\s\S]*?)</ul>',
                 html):
-            line = m.group(1).strip()
+            line = panel.group(1).strip()
             eps = []
-            for a in re.finditer(r'<a title="([^"]+)" href="([^"]+)"', m.group(2)):
+            for a in re.finditer(
+                    r'<a title="([^"]+)" href="([^"]+)"', panel.group(2)):
                 ep_name, href = a.group(1), a.group(2)
                 if href.startswith("/"):
                     href = HOST + href
@@ -151,19 +150,21 @@ class Spider(Spider):
                 play_from.append(line)
                 play_url.append("#".join(eps))
 
+        self.log("detail:", play_from)
         if not play_from:
             return {"list": []}
-
         return {"list": [{
             "vod_id": vid,
             "vod_name": name,
             "vod_pic": pic,
             "vod_content": content,
+            "vod_actor": actor,
+            "vod_director": director,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
         }]}
 
-    # ---- 播放 ----
+    # ---------- 播放 ----------
     def playerContent(self, flag, id, vipFlags):
         url = id if id.startswith("http") else HOST + id
         html = self._get(url)
@@ -172,7 +173,7 @@ class Spider(Spider):
         return {"parse": 1, "playUrl": "", "url": target,
                 "header": {"User-Agent": UA, "Referer": HOST + "/"}}
 
-    # ---- 列表：完全按你 HTML 那一行硬写 ----
+    # ---------- 列表（你 HTML 卡片那行的字面翻译）----------
     def _parse_list(self, html):
         out = []
         for m in re.finditer(
@@ -191,6 +192,13 @@ class Spider(Spider):
                 "vod_remarks": "",
             })
         return out
+
+    def _get(self, url):
+        try:
+            return self.fetch(url, headers=self.headers, timeout=15).text
+        except Exception as e:
+            self.log("get fail:", url, str(e))
+            return ""
 
     def isVideoFormat(self, url):
         return False
