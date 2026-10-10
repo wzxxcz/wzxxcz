@@ -56,6 +56,9 @@ HOST = "http://dysou.de5.net"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
+# ============ 简介前缀 ============
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
+
 CLASSES = [
     {"type_id": "hot_movie", "type_name": "电影"},
     {"type_id": "hot_tv",    "type_name": "电视剧"},
@@ -144,12 +147,112 @@ class Spider(Spider):
             self.log("fetch FAIL %s -> %s" % (url, e))
             return ""
 
+    # ============ 详情页解析工具 ============
+    def _parse_detail_html(self, html, fallback_name=""):
+        """
+        从详情页 HTML 里把年份、地区、类型、更新时间、导演、编剧、主演、豆瓣、简介都抓出来
+        """
+        result = {
+            "title": fallback_name,
+            "pic": "",
+            "content": "",
+            "year": "",
+            "area": "",
+            "type_name": "",
+            "remarks": "",
+            "director": "",
+            "actor": "",
+            "score": "",
+        }
+
+        # 标题
+        m = re.search(r'<div class="detail-title">[\s\S]*?</i>\s*([^<]+?)\s*</div>', html)
+        if m:
+            result["title"] = self._clean(m.group(1))
+
+        # 封面
+        m = re.search(r'<img\s+src="([^"]+)"\s+class="detail-poster"', html)
+        if m:
+            result["pic"] = self._fix_url(m.group(1))
+
+        # 简介
+        m = re.search(r'<div class="detail-desc">([\s\S]*?)</div>', html)
+        if m:
+            result["content"] = self._clean(m.group(1))
+
+        # 年份 / 地区： detail-badges 里前两个 span
+        badges = re.findall(
+            r'<span class="detail-badge"[^>]*>([^<]+)</span>', html)
+        if len(badges) >= 1:
+            result["year"] = self._clean(badges[0])
+        if len(badges) >= 2:
+            result["area"] = self._clean(badges[1])
+
+        # 类型标签： detail-tags 里所有 detail-tag
+        tags = re.findall(
+            r'<span class="detail-tag"[^>]*>([^<]+)</span>', html)
+        if tags:
+            result["type_name"] = " / ".join(self._clean(t) for t in tags)
+
+        # 更新时间：先找 "更新时间：" 后面的文本
+        # 页面结构： <div style="...">更新时间：</div> <div style="...">2026-09-22 21:28:49</div>
+        m = re.search(
+            r'更新时间：\s*</div>\s*<div[^>]*>\s*([\d\-: ]+?)\s*</div>',
+            html)
+        if m:
+            result["remarks"] = "更新：" + m.group(1).strip()
+        else:
+            # 兜底：找任何形如 2026-09-22 21:28:49 的时间
+            m = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', html)
+            if m:
+                result["remarks"] = "更新：" + m.group(1)
+
+        # 导演 / 编剧 / 主演 / 豆瓣：从 detail-info-list 里逐行找
+        # 结构： <div><span class="info-label">导演：</span>姚晓峰</div>
+        director = ""
+        writer = ""
+        actor = ""
+        score = ""
+
+        m = re.search(
+            r'<span class="info-label">导演：</span>\s*([^<]*)', html)
+        if m:
+            director = self._clean(m.group(1))
+
+        m = re.search(
+            r'<span class="info-label">编剧：</span>\s*([^<]*)', html)
+        if m:
+            writer = self._clean(m.group(1))
+
+        m = re.search(
+            r'<span class="info-label">主演：</span>\s*([^<]*)', html)
+        if m:
+            actor = self._clean(m.group(1))
+
+        m = re.search(
+            r'<span class="info-label">豆瓣：</span>[\s\S]*?>([\d.]+分?)<',
+            html)
+        if m:
+            score = self._clean(m.group(1))
+
+        # 导演字段里把编剧也塞进去（TVBox 没有编剧字段）
+        if director and writer:
+            result["director"] = "%s / 编剧：%s" % (director, writer)
+        elif director:
+            result["director"] = director
+        elif writer:
+            result["director"] = "编剧：%s" % writer
+
+        result["actor"] = actor
+        result["score"] = score
+
+        return result
+
     # ============ 首页 ============
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": {}}
 
     def homeVideoContent(self):
-        # 调分类接口拿第一页
         videos = []
         seen = set()
         for tid in ["hot_movie", "hot_tv"]:
@@ -184,7 +287,6 @@ class Spider(Spider):
             if not title:
                 continue
             poster = item.get("poster") or ""
-            # 若图片是外链，包一层你自己的 image_proxy
             if poster.startswith("http"):
                 pic = "%s/image_proxy.php?url=%s" % (
                     self.host, urllib.parse.quote(poster, safe=""))
@@ -192,7 +294,7 @@ class Spider(Spider):
                 pic = self._fix_url(poster)
 
             videos.append({
-                "vod_id": title,   # 详情按片名查
+                "vod_id": title,
                 "vod_name": title,
                 "vod_pic": pic,
                 "vod_remarks": item.get("rate") or "",
@@ -256,7 +358,6 @@ class Spider(Spider):
                 except Exception:
                     pass
 
-        # 去重
         seen = set()
         unique = []
         for item in all_results:
@@ -266,7 +367,6 @@ class Spider(Spider):
             seen.add(k)
             unique.append(item)
 
-        # 按时间倒序
         def _t(x):
             v = x.get("vod_time") or ""
             try:
@@ -275,7 +375,6 @@ class Spider(Spider):
                 return 0
         unique.sort(key=_t, reverse=True)
 
-        # 图片包装
         for item in unique:
             pic = item.get("vod_pic") or ""
             if pic.startswith("http"):
@@ -309,12 +408,10 @@ class Spider(Spider):
         vod_id = str(ids[0])
 
         if "|" in vod_id:
-            # 从搜索来的：source|raw_id|name
             parts = vod_id.split("|", 2)
             source, raw_id, name = parts[0], parts[1], parts[2]
             return self._detail_by_source(source, raw_id, name)
         else:
-            # 从分类/首页来的：就是片名
             return self._detail_by_name(vod_id)
 
     def _detail_by_name(self, name):
@@ -325,76 +422,112 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
-        # 标题
-        title = name
-        m = re.search(r'<div class="detail-title">[\s\S]*?</i>\s*([^<]+?)\s*</div>', html)
-        if m:
-            title = self._clean(m.group(1))
+        info = self._parse_detail_html(html, fallback_name=name)
 
-        # 封面
-        pic = ""
-        m = re.search(r'<img\s+src="([^"]+)"\s+class="detail-poster"', html)
-        if m:
-            pic = self._fix_url(m.group(1))
-
-        # 简介
-        content = ""
-        m = re.search(r'<div class="detail-desc">([\s\S]*?)</div>', html)
-        if m:
-            content = self._clean(m.group(1))
-
-        # 年份/地区
-        year = ""
-        area = ""
-        badges = re.findall(r'<span class="detail-badge"[^>]*>([^<]+)</span>', html)
-        if len(badges) >= 2:
-            year = badges[0].strip()
-            area = badges[1].strip()
+        # 简介加前缀
+        if info["content"]:
+            content = INTRO_PREFIX + "\n" + info["content"]
+        else:
+            content = INTRO_PREFIX
 
         # 从页面里拿第一个 play.php 按钮的 source + id
         m = re.search(
             r'href="play\.php\?source=([^&]+)&id=([^&]+)&from=([^&]+)&episode=\d+"',
             html)
         if not m:
-            # 没有播放按钮
             return {"list": [{
-                "vod_id": name, "vod_name": title, "vod_pic": pic,
-                "vod_content": content, "vod_year": year, "vod_area": area,
-                "vod_play_from": "", "vod_play_url": "",
+                "vod_id": name,
+                "vod_name": info["title"],
+                "vod_pic": info["pic"],
+                "vod_content": content,
+                "vod_year": info["year"],
+                "vod_area": info["area"],
+                "vod_remarks": info["remarks"],
+                "type_name": info["type_name"],
+                "vod_director": info["director"],
+                "vod_actor": info["actor"],
+                "vod_score": info["score"],
+                "vod_play_from": "",
+                "vod_play_url": "",
             }]}
 
         source = m.group(1)
         raw_id = m.group(2)
 
-        # 调站里的 source_concurrent.php 拿所有线路和 m3u8
-        play_info = self._fetch_source_concurrent(title, raw_id, "")
+        play_info = self._fetch_source_concurrent(info["title"], raw_id, "")
 
         return {"list": [{
             "vod_id": name,
-            "vod_name": title,
-            "vod_pic": pic,
+            "vod_name": info["title"],
+            "vod_pic": info["pic"],
             "vod_content": content,
-            "vod_year": year,
-            "vod_area": area,
+            "vod_year": info["year"],
+            "vod_area": info["area"],
+            "vod_remarks": info["remarks"],
+            "type_name": info["type_name"],
+            "vod_director": info["director"],
+            "vod_actor": info["actor"],
+            "vod_score": info["score"],
             "vod_play_from": play_info["from"],
             "vod_play_url": play_info["url"],
         }]}
 
     def _detail_by_source(self, source, raw_id, name):
-        play_info = self._fetch_source_concurrent(name, raw_id, "")
-        info = self._fetch_from_source(source, raw_id)
-        pic = ""
-        if info:
-            pic = info.get("vod_pic") or ""
-            name = info.get("vod_name") or name
+        """搜索进来的，用 source + raw_id"""
+        # 先拿详情页 HTML（用片名查），抓完整元信息
+        info = None
+        if name:
+            url = "%s/detail.php?wd=%s" % (self.host, urllib.parse.quote(name))
+            self.log("detail: %s" % url)
+            html = self._fetch(url)
+            if html:
+                info = self._parse_detail_html(html, fallback_name=name)
+
+        # 兜底：直接从采集源拿一条
+        if not info or not info["title"]:
+            src_info = self._fetch_from_source(source, raw_id)
+            if src_info:
+                info = {
+                    "title": src_info.get("vod_name") or name,
+                    "pic": self._fix_url(src_info.get("vod_pic") or ""),
+                    "content": self._clean(src_info.get("vod_content") or ""),
+                    "year": src_info.get("vod_year") or "",
+                    "area": src_info.get("vod_area") or "",
+                    "type_name": src_info.get("type_name") or "",
+                    "remarks": src_info.get("vod_remarks") or "",
+                    "director": src_info.get("vod_director") or "",
+                    "actor": src_info.get("vod_actor") or "",
+                    "score": src_info.get("vod_score") or "",
+                }
+
+        if not info:
+            info = {
+                "title": name, "pic": "", "content": "",
+                "year": "", "area": "", "type_name": "",
+                "remarks": "", "director": "", "actor": "", "score": "",
+            }
+
+        # 简介加前缀
+        if info["content"]:
+            content = INTRO_PREFIX + "\n" + info["content"]
+        else:
+            content = INTRO_PREFIX
+
+        # 用目标站接口拿播放源
+        play_info = self._fetch_source_concurrent(info["title"], raw_id, "")
 
         return {"list": [{
-            "vod_id": "%s|%s|%s" % (source, raw_id, name),
-            "vod_name": name,
-            "vod_pic": self._fix_url(pic),
-            "vod_content": (info or {}).get("vod_content") or "",
-            "vod_year": (info or {}).get("vod_year") or "",
-            "vod_area": (info or {}).get("vod_area") or "",
+            "vod_id": "%s|%s|%s" % (source, raw_id, info["title"]),
+            "vod_name": info["title"],
+            "vod_pic": info["pic"],
+            "vod_content": content,
+            "vod_year": info["year"],
+            "vod_area": info["area"],
+            "vod_remarks": info["remarks"],
+            "type_name": info["type_name"],
+            "vod_director": info["director"],
+            "vod_actor": info["actor"],
+            "vod_score": info["score"],
             "vod_play_from": play_info["from"],
             "vod_play_url": play_info["url"],
         }]}
@@ -416,7 +549,6 @@ class Spider(Spider):
         return None
 
     def _fetch_source_concurrent(self, vod_name, vod_id, vod_type):
-        """调目标站 api/source_concurrent.php"""
         url = "%s/api/source_concurrent.php?vod_name=%s&vod_id=%s&type=%s" % (
             self.host, urllib.parse.quote(vod_name),
             urllib.parse.quote(str(vod_id)),
@@ -473,7 +605,6 @@ class Spider(Spider):
 
     # ============ 播放 ============
     def playerContent(self, flag, id, vipFlags):
-        """id 格式： source|m3u8_url"""
         url = id
         if "|" in url:
             url = url.split("|", 1)[1]
