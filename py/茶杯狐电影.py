@@ -63,7 +63,50 @@ CLASSES = [
     {"type_id": "25", "type_name": "短剧"},
 ]
 
+# ============================================================
+# FILTERS —— 循环构造，每个分类都有一份完整筛选器
+# ============================================================
 FILTERS = {}
+for c in CLASSES:
+    tid = c["type_id"]
+    FILTERS[tid] = [
+        {"key": "class", "name": "类型", "value": [
+            {"n": "全部",   "v": ""},
+            {"n": "动作片", "v": "5"},
+            {"n": "爱情片", "v": "6"},
+            {"n": "科幻片", "v": "7"},
+            {"n": "恐怖片", "v": "8"},
+            {"n": "战争片", "v": "9"},
+            {"n": "喜剧片", "v": "10"},
+            {"n": "纪录片", "v": "11"},
+            {"n": "剧情片", "v": "12"},
+        ]},
+        {"key": "area", "name": "地区", "value": [
+            {"n": "全部", "v": ""},
+            {"n": "大陆", "v": "大陆"},
+            {"n": "香港", "v": "香港"},
+            {"n": "台湾", "v": "台湾"},
+            {"n": "日本", "v": "日本"},
+            {"n": "韩国", "v": "韩国"},
+            {"n": "欧美", "v": "欧美"},
+            {"n": "泰国", "v": "泰国"},
+        ]},
+        {"key": "year", "name": "年份", "value": [
+            {"n": "全部", "v": ""},
+            {"n": "2026", "v": "2026"},
+            {"n": "2025", "v": "2025"},
+            {"n": "2024", "v": "2024"},
+            {"n": "2023", "v": "2023"},
+            {"n": "2022", "v": "2022"},
+            {"n": "2021", "v": "2021"},
+            {"n": "2020", "v": "2020"},
+        ]},
+        {"key": "sort_field", "name": "排序", "value": [
+            {"n": "时间", "v": "time"},
+            {"n": "人气", "v": "hit"},
+            {"n": "评分", "v": "commend"},
+        ]},
+    ]
 
 
 class Spider(Spider):
@@ -227,7 +270,6 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
-        # 标题
         name = ""
         m = re.search(r'<h1 class="title">([^<]+)</h1>', html)
         if m:
@@ -238,13 +280,11 @@ class Spider(Spider):
                 name = self._clean(m.group(1).split("_")[0].split("-")[0])
         name = name or vod_id
 
-        # 封面
         pic = self.default_pic
         m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
         if m:
             pic = m.group(1).strip()
 
-        # 简介
         content = ""
         m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
         if m:
@@ -254,7 +294,6 @@ class Spider(Spider):
             if m:
                 content = self._clean(m.group(1))
 
-        # 主演/导演
         actor = ""
         m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
         if m:
@@ -264,7 +303,6 @@ class Spider(Spider):
         if m:
             director = self._clean(m.group(1))
 
-        # 剧集（多线路支持）
         groups = {}
         for panel in re.finditer(
                 r'<h3>([^<]+)</h3>[\s\S]{0,500}?'
