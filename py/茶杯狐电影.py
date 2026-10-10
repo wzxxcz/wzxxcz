@@ -1,6 +1,7 @@
 # coding=utf-8
 """
 茶杯狐电影 cupfoxdy.com | TVBox Python 爬虫
+type_id 完全按网站源码：电影=1 电视剧=2 综艺=3 动漫=4 短剧=25
 """
 import re
 import sys
@@ -55,6 +56,12 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/templets/cupfoxdy/images/img/load.png"
 
+# 完全按网站源码：
+# /cup/1.html  ->  电影
+# /cup/2.html  ->  电视剧
+# /cup/3.html  ->  综艺
+# /cup/4.html  ->  动漫
+# /cup/25.html ->  短剧
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
     {"type_id": "2",  "type_name": "电视剧"},
@@ -63,50 +70,7 @@ CLASSES = [
     {"type_id": "25", "type_name": "短剧"},
 ]
 
-# ============================================================
-# FILTERS —— 循环构造，每个分类都有一份完整筛选器
-# ============================================================
 FILTERS = {}
-for c in CLASSES:
-    tid = c["type_id"]
-    FILTERS[tid] = [
-        {"key": "class", "name": "类型", "value": [
-            {"n": "全部",   "v": ""},
-            {"n": "动作片", "v": "5"},
-            {"n": "爱情片", "v": "6"},
-            {"n": "科幻片", "v": "7"},
-            {"n": "恐怖片", "v": "8"},
-            {"n": "战争片", "v": "9"},
-            {"n": "喜剧片", "v": "10"},
-            {"n": "纪录片", "v": "11"},
-            {"n": "剧情片", "v": "12"},
-        ]},
-        {"key": "area", "name": "地区", "value": [
-            {"n": "全部", "v": ""},
-            {"n": "大陆", "v": "大陆"},
-            {"n": "香港", "v": "香港"},
-            {"n": "台湾", "v": "台湾"},
-            {"n": "日本", "v": "日本"},
-            {"n": "韩国", "v": "韩国"},
-            {"n": "欧美", "v": "欧美"},
-            {"n": "泰国", "v": "泰国"},
-        ]},
-        {"key": "year", "name": "年份", "value": [
-            {"n": "全部", "v": ""},
-            {"n": "2026", "v": "2026"},
-            {"n": "2025", "v": "2025"},
-            {"n": "2024", "v": "2024"},
-            {"n": "2023", "v": "2023"},
-            {"n": "2022", "v": "2022"},
-            {"n": "2021", "v": "2021"},
-            {"n": "2020", "v": "2020"},
-        ]},
-        {"key": "sort_field", "name": "排序", "value": [
-            {"n": "时间", "v": "time"},
-            {"n": "人气", "v": "hit"},
-            {"n": "评分", "v": "commend"},
-        ]},
-    ]
 
 
 class Spider(Spider):
@@ -182,6 +146,7 @@ class Spider(Spider):
             self.log("  HTML 为空")
             return videos
 
+        # 源码卡片：<a class="stui-vodlist__thumb lazyload" href="..." title="..." data-original="...">
         pattern = re.compile(
             r'<a class="stui-vodlist__thumb lazyload" '
             r'href="([^"]+)" '
@@ -205,6 +170,7 @@ class Spider(Spider):
         return videos
 
     def _page_count(self, html):
+        # 源码：<li class="active num"><a>1/3105</a></li>
         if not html:
             return 1
         m = re.search(r'<li class="active num"><a>\d+/(\d+)</a></li>', html)
@@ -226,6 +192,7 @@ class Spider(Spider):
         return {"list": videos}
 
     def categoryContent(self, tid, pg, filter, extend):
+        # 源码分页链接：?page=1&searchtype=5&tid=1&
         page = int(pg) if pg else 1
         url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (
             self.site_url, tid, page)
@@ -303,6 +270,8 @@ class Spider(Spider):
         if m:
             director = self._clean(m.group(1))
 
+        # 源码：<h3>foxyun</h3> ... <ul class="stui-content__playlist clearfix">
+        #       <li id="00"><a title="第1集" href="/fox/17111-0-0.html">第1集</a></li>
         groups = {}
         for panel in re.finditer(
                 r'<h3>([^<]+)</h3>[\s\S]{0,500}?'
@@ -319,7 +288,6 @@ class Spider(Spider):
                 groups.setdefault(origin, []).append((ep_name, href))
 
         self.log("  剧集: %s" % {k: len(v) for k, v in groups.items()})
-
         if not groups:
             return {"list": []}
 
@@ -351,6 +319,8 @@ class Spider(Spider):
                 return res
 
         html = self._fetch(play_page)
+        # 源码：<script>var now="https://1080p.huyall.com/play/en5QEn4d";</script>
+        # iframe 内: const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
         m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
         if m:
             now_url = m.group(1).strip()
