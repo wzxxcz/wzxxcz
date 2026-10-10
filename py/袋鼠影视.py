@@ -28,6 +28,34 @@ class Spider(Spider):
     def manualVideoCheck(self):
         return False
 
+    # ==================== 网络请求 ====================
+
+    def get(self, url):
+        """
+        优先用 TVBox 基类的 self.fetch（内部走 okhttp，能过 CF）
+        失败再退回 requests
+        """
+        try:
+            rsp = self.fetch(url, headers=self.headers, timeout=15)
+            text = ""
+            if hasattr(rsp, "text"):
+                text = rsp.text or ""
+            elif hasattr(rsp, "content"):
+                text = rsp.content.decode("utf-8", "ignore")
+            elif rsp is not None:
+                text = str(rsp)
+            if text and "Just a moment" not in text[:2000]:
+                return text
+        except Exception:
+            pass
+
+        try:
+            r = requests.get(url, headers=self.headers, timeout=15, verify=False)
+            r.encoding = r.apparent_encoding or "utf-8"
+            return r.text
+        except Exception:
+            return ""
+
     # ==================== 首页 & 筛选 ====================
 
     def homeContent(self, filter):
@@ -181,7 +209,6 @@ class Spider(Spider):
         if not desc:
             desc = self.clean(self.match(html, r'<meta\s+property="og:description"\s+content="([^"]+)"'))
 
-        # ★ 简介前面加固定前缀
         if desc:
             desc = self.INTRO_PREFIX + "\n" + desc
         else:
@@ -216,7 +243,6 @@ class Spider(Spider):
         }
 
     def _extract_play_sources(self, html):
-        # 保持文档原始顺序
         play_from = []
         play_url = []
 
@@ -343,14 +369,6 @@ class Spider(Spider):
 
     def destroy(self):
         return "正在Destroy"
-
-    def get(self, url):
-        try:
-            r = requests.get(url, headers=self.headers, timeout=15, verify=False)
-            r.encoding = r.apparent_encoding or "utf-8"
-            return r.text
-        except Exception:
-            return ""
 
     def match(self, text, rule):
         m = re.search(rule, text or "", re.S)
