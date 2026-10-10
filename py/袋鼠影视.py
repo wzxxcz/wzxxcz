@@ -13,8 +13,24 @@ class Spider(Spider):
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Mobile Safari/537.36",
             "Referer": self.host + "/",
-            "Origin": self.host
+            "Origin": self.host,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
         }
+        self._session = requests.Session()
+        self._session.headers.update(self.headers)
+        self._session.verify = False
+        self._warmed = False
+
+    def _warm_up(self):
+        """首访预热，让 CF 下发 cookie"""
+        if self._warmed:
+            return
+        try:
+            self._session.get(self.host + "/", timeout=15)
+            self._warmed = True
+        except Exception:
+            pass
 
     def getName(self):
         return "袋鼠影视"
@@ -76,38 +92,51 @@ class Spider(Spider):
         }
 
     def homeVideoContent(self):
+        self._warm_up()
         return {"list": self.parseList(self.get(self.host + "/"))}
 
     def categoryContent(self, tid, pg, filter, extend):
+        self._warm_up()
+
         ext = extend or {}
+        if isinstance(ext, str):
+            try:
+                import json
+                ext = json.loads(ext)
+            except Exception:
+                ext = {}
 
         def valid(v):
             if v is None:
                 return False
-            s = str(v).strip()
-            return s not in ("", "全部", "0", "None")
+            return str(v).strip() not in ("", "全部", "0", "None")
 
-        # 收集有效筛选参数（不含 tid）
-        params = []
-        for k in ("jq", "area", "year", "yuyan", "letter", "order"):
+        # 按站点真实 URL 顺序收集有效筛选参数
+        filter_params = []
+        for k in ("year", "area", "yuyan", "letter", "order", "jq"):
             v = ext.get(k)
             if valid(v):
-                params.append((k, str(v)))
+                filter_params.append((k, str(v)))
 
-        has_filter = len(params) > 0
+        has_filter = len(filter_params) > 0
+        page_int = int(pg)
 
-        # 无筛选 + 第 1 页 → 走原始能跑的路径
-        if not has_filter and str(pg) == "1":
+        if not has_filter and page_int == 1:
+            # 无筛选 + 第 1 页 → 走原始路径（能过 CF）
             url = self.host + "/frim/index" + str(tid) + ".html"
         else:
-            # 有筛选或翻页 → 走 search.php
-            all_parts = [("searchtype", "5"), ("tid", str(tid)), ("page", str(pg))] + params
-            qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in all_parts)
+            # 有筛选 / 翻页 → search.php
+            # 关键：第 1 页不带 page 参数，模仿站点真实 URL
+            parts = [("searchtype", "5"), ("tid", str(tid))]
+            parts.extend(filter_params)
+            if page_int > 1:
+                parts.append(("page", str(page_int)))
+            qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
             url = self.host + "/search.php?" + qs
 
         html = self.get(url)
         return {
-            "page": int(pg),
+            "page": page_int,
             "pagecount": 999,
             "limit": 24,
             "total": 999999,
@@ -259,11 +288,13 @@ class Spider(Spider):
     # ==================== 搜索 & 播放 ====================
 
     def searchContent(self, key, quick, pg="1"):
+        self._warm_up()
         url = self.host + "/search.php?searchword=" + quote(key) + "&page=" + str(pg)
         html = self.get(url)
         return {"list": self.parseList(html), "page": int(pg)}
 
     def playerContent(self, flag, id, vipFlags):
+        self._warm_up()
         html = self.get(id)
 
         url = self.match(html, r'var\s+now\s*=\s*["\']([^"\']+)["\']')
@@ -339,7 +370,7 @@ class Spider(Spider):
 
     def get(self, url):
         try:
-            r = requests.get(url, headers=self.headers, timeout=15, verify=False)
+            r = self._session.get(url, timeout=15)
             r.encoding = r.apparent_encoding or "utf-8"
             return r.text
         except Exception:
