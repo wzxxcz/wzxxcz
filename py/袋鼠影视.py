@@ -28,34 +28,6 @@ class Spider(Spider):
     def manualVideoCheck(self):
         return False
 
-    # ==================== 网络请求 ====================
-
-    def get(self, url):
-        """
-        优先用 TVBox 基类的 self.fetch（内部走 okhttp，能过 CF）
-        失败再退回 requests
-        """
-        try:
-            rsp = self.fetch(url, headers=self.headers, timeout=15)
-            text = ""
-            if hasattr(rsp, "text"):
-                text = rsp.text or ""
-            elif hasattr(rsp, "content"):
-                text = rsp.content.decode("utf-8", "ignore")
-            elif rsp is not None:
-                text = str(rsp)
-            if text and "Just a moment" not in text[:2000]:
-                return text
-        except Exception:
-            pass
-
-        try:
-            r = requests.get(url, headers=self.headers, timeout=15, verify=False)
-            r.encoding = r.apparent_encoding or "utf-8"
-            return r.text
-        except Exception:
-            return ""
-
     # ==================== 首页 & 筛选 ====================
 
     def homeContent(self, filter):
@@ -141,6 +113,7 @@ class Spider(Spider):
             page_int = 1
 
         user_sub_tid = str(ext.get("tid")) if valid(ext.get("tid")) else None
+        channel_tid = str(tid)
 
         other_has = False
         for k in ("area", "year", "letter", "yuyan", "jq", "order"):
@@ -148,24 +121,32 @@ class Spider(Spider):
                 other_has = True
                 break
 
-        channel_tid = str(tid)
+        # ==================== 核心策略 ====================
+        # 静态页方案：/frim/indexXX.html 是真实存在的静态文件，能过 CF
+        # 决定用哪个 tid 的静态页
+        if user_sub_tid:
+            static_tid = user_sub_tid   # 用户选了子类型，走子类型静态页
+        else:
+            static_tid = channel_tid    # 没选子类型，走频道静态页
 
-        # 场景 1：无任何筛选 + 第 1 页 → 走静态频道页
-        if not user_sub_tid and not other_has and page_int == 1:
-            url = self.host + "/frim/index" + channel_tid + ".html"
+        # 场景 1：无筛选 或 只选了类型（无其他筛选）→ 走静态页，能过 CF
+        if not other_has:
+            url = self.host + "/frim/index" + static_tid + ".html"
             html = self.get(url)
-            return {
-                "page": page_int, "pagecount": 999, "limit": 24, "total": 999999,
-                "list": self.parseList(html)
-            }
+            items = self.parseList(html)
+            if items:
+                return {
+                    "page": page_int, "pagecount": 999, "limit": 24,
+                    "total": 999999, "list": items
+                }
+            # 静态页为空，继续往下走 search.php
 
-        # 场景 2/3：走 search.php
+        # 场景 2：选了"年份/地区/语言/剧情/排序"→ 必须走 search.php（可能被 CF 拦）
+        # 确定 real_tid
         if user_sub_tid:
             real_tid = user_sub_tid
         else:
-            CHANNEL_FIRST_SUB = {
-                "2":  "13", "3":  "29", "4":  "34", "44": "28",
-            }
+            CHANNEL_FIRST_SUB = {"2": "13", "3": "29", "4": "34", "44": "28"}
             real_tid = CHANNEL_FIRST_SUB.get(channel_tid, channel_tid)
 
         parts = []
@@ -183,11 +164,18 @@ class Spider(Spider):
 
         qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
         url = self.host + "/search.php?" + qs
-
         html = self.get(url)
+        items = self.parseList(html)
+
+        # ★ 降级：search.php 空 → 退回静态页（至少出点数据）
+        if not items:
+            url2 = self.host + "/frim/index" + static_tid + ".html"
+            html2 = self.get(url2)
+            items = self.parseList(html2)
+
         return {
-            "page": page_int, "pagecount": 999, "limit": 24, "total": 999999,
-            "list": self.parseList(html)
+            "page": page_int, "pagecount": 999, "limit": 24,
+            "total": 999999, "list": items
         }
 
     # ==================== 详情 ====================
@@ -208,7 +196,6 @@ class Spider(Spider):
         desc = self.clean(self.match(html, r'<div[^>]*class="[^"]*video-plot[^"]*"[^>]*>([\s\S]*?)</div>'))
         if not desc:
             desc = self.clean(self.match(html, r'<meta\s+property="og:description"\s+content="([^"]+)"'))
-
         if desc:
             desc = self.INTRO_PREFIX + "\n" + desc
         else:
@@ -245,7 +232,6 @@ class Spider(Spider):
     def _extract_play_sources(self, html):
         play_from = []
         play_url = []
-
         for section in re.split(
             r'(?=<div[^>]+class="[^"]*panel[^"]*"[^>]+data-playlist-name=)',
             html
@@ -369,6 +355,14 @@ class Spider(Spider):
 
     def destroy(self):
         return "正在Destroy"
+
+    def get(self, url):
+        try:
+            r = requests.get(url, headers=self.headers, timeout=15, verify=False)
+            r.encoding = r.apparent_encoding or "utf-8"
+            return r.text
+        except Exception:
+            return ""
 
     def match(self, text, rule):
         m = re.search(rule, text or "", re.S)
