@@ -1,14 +1,11 @@
 # coding=utf-8
 """
-好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2.3 最终修正版)
-
-关键:
-  - 域名 www.haojuwu1.cc
-  - 播放页 JS 变量 player_aaaa 里直接就是 m3u8 直链
-  - parse=0 直链播放
-  - V2.3 修复: categoryContent 的 URL 模板
-      无页码: /vodshow/{type}-----------{year}.html       (11 个 -)
-      有页码: /vodshow/{type}--------{page}---{year}.html (8个- + page + 3个-)
+好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2.4 Cookie 预热版)
+参照豆花电影 V6.3 的调用约定：
+  - _warm_up() 先访问首页种 Cookie
+  - headers 完整（UA + Accept + Accept-Language + Cache-Control + Pragma + Referer + Upgrade-Insecure-Requests）
+  - Session 自动管理 Cookie
+  - 播放页 player_aaaa.url 直链 m3u8
 """
 import re
 import sys
@@ -136,15 +133,7 @@ _RE_CARD2 = re.compile(
     r'(?:data-original|src)="([^"]*?)"',
     re.S | re.I)
 
-_RE_CARD3 = re.compile(
-    r'<div\s+class="stui-vodlist__box">[\s\S]*?'
-    r'<a\b[^>]*?href="(/voddetail/[^"]+)"[^>]*?'
-    r'(?:title="([^"]*)")?[^>]*?>[\s\S]*?'
-    r'(?:data-original|src)="([^"]*?)"',
-    re.S | re.I)
-
 _RE_PAGENUM = re.compile(r'<a>(\d+)/(\d+)</a>')
-
 _RE_PLAYER_AA_START = re.compile(r'player_aaaa\s*=\s*(\{)', re.S)
 
 _RE_H1 = re.compile(r'<h1[^>]*class="title"[^>]*>([\s\S]*?)</h1>', re.I)
@@ -167,7 +156,6 @@ _RE_TITLE = re.compile(r'<title>(.*?)</title>', re.S | re.I)
 
 
 def _extract_js_object(html, start_pos):
-    """从 start_pos 开始（指向 '{'），匹配平衡大括号，返回完整 JSON 字符串"""
     depth = 0
     i = start_pos
     in_str = False
@@ -208,15 +196,34 @@ class Spider(Spider):
         except Exception:
             self.extend = {}
         self.site_url = (self.extend.get("site") or HOST).rstrip("/")
+
+        # ← 照豆花的写法：完整 headers
         self.headers = {
             "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
             "Referer": self.site_url + "/",
+            "Upgrade-Insecure-Requests": "1",
         }
+
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        # ← 照豆花的写法：加 _warmed 标记
+        self._warmed = False
         self.log("init: site=%s" % self.site_url)
+
+    # ← 照豆花的写法：加 _warm_up()
+    def _warm_up(self):
+        if self._warmed:
+            return
+        try:
+            self._fetch(self.site_url + "/", timeout=15)
+            self._warmed = True
+            self.log("预热完成（Cookie 已种）")
+        except Exception as e:
+            self.log("预热失败: %s" % e)
 
     def _fetch(self, url, timeout=15, headers=None, method="GET", data=None):
         try:
@@ -267,33 +274,20 @@ class Spider(Spider):
             return videos
 
         m1 = _RE_CARD.findall(html)
-        self.log("  策略1 (href→title→img): %d 条" % len(m1))
+        self.log("  策略1: %d 条" % len(m1))
 
         m2 = []
         if not m1:
             m2raw = _RE_CARD2.findall(html)
-            self.log("  策略2 (title→href→img): %d 条" % len(m2raw))
+            self.log("  策略2: %d 条" % len(m2raw))
             m2 = [(h, t, p) for (t, h, p) in m2raw]
 
-        m3 = []
-        if not m1 and not m2:
-            m3raw = _RE_CARD3.findall(html)
-            m3 = [(h, t or "", p) for (h, t, p) in m3raw]
-            self.log("  策略3 (卡片块): %d 条" % len(m3))
-
-        matches = m1 or m2 or m3
+        matches = m1 or m2
 
         if not matches:
-            self.log("  ⚠️ 三种策略都失败！")
+            self.log("  ⚠️ 正则失败!")
             self.log("  HTML 长度: %d" % len(html))
             self.log("  voddetail 出现次数: %d" % html.count("voddetail"))
-            self.log("  stui-vodlist__thumb 出现次数: %d"
-                     % html.count("stui-vodlist__thumb"))
-            self.log("  data-original 出现次数: %d" % html.count("data-original"))
-            idx = html.find("voddetail")
-            if idx >= 0:
-                self.log("  首个 voddetail 附近 600 字符:")
-                self.log(html[max(0, idx - 100):idx + 600])
             return videos
 
         for href, title, pic in matches:
@@ -301,13 +295,8 @@ class Spider(Spider):
             if href in seen:
                 continue
             seen.add(href)
-
-            title = self._clean(title).strip()
-            if not title:
-                title = href
-
+            title = self._clean(title).strip() or href
             pic = self._fix_url(pic) if pic else ""
-
             videos.append({
                 "vod_id":      href,
                 "vod_name":    title[:100],
@@ -334,21 +323,19 @@ class Spider(Spider):
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        self.log("=== homeVideoContent 开始 ===")
+        # ← 照豆花的写法：先预热
+        self._warm_up()
+        self.log("=== homeVideoContent ===")
         html = self._fetch(self.site_url + "/")
         self.log("HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
         self.log("=== 首页返回 %d 条 ===" % len(videos))
         return {"list": videos}
 
-    # ============================================================
-    # ← 本次修复: categoryContent 的 URL 模板
-    # 苹果CMS v10 URL 格式:
-    #   无页码: /vodshow/{type}-----------{year}.html        (type + 11个- + year)
-    #   有页码: /vodshow/{type}--------{page}---{year}.html  (type + 8个- + page + 3个- + year)
-    #   带筛选: /vodshow/{type}-{area}-{by}------{page}---{year}.html  (用空格占位)
-    # ============================================================
     def categoryContent(self, tid, pg, filter, extend):
+        # ← 照豆花的写法：先预热
+        self._warm_up()
+
         page = int(pg) if pg else 1
         if isinstance(extend, str):
             try:
@@ -362,28 +349,23 @@ class Spider(Spider):
         sort_field = extend.get("sort_field") or ""
         year = extend.get("year") or ""
 
-        # 有筛选条件: 用完整的 6 字段模板
-        if area or sort_field:
-            # /vodshow/{type}-{area}-{by}-{class}-{lang}-{letter}---{page}---{year}.html
-            url = "%s/vodshow/%s-%s-%s-%s-%s-%s---%s---%s.html" % (
-                self.site_url,
-                sub, area, sort_field, "", "", "",
-                page if page > 1 else "",
-                year,
-            )
-        elif page <= 1:
-            # 第一页无筛选: 用网站自己的"全部"链接格式
-            # /vodshow/{type}-----------{year}.html
+        # 无筛选 + 第1页：用网站自己的"全部"链接
+        if not area and not sort_field and page <= 1:
             url = "%s/vodshow/%s-----------%s.html" % (
                 self.site_url, sub, year)
-        else:
-            # 第 N 页无筛选: /vodshow/{type}--------{page}---{year}.html
+        # 无筛选 + 第N页
+        elif not area and not sort_field:
             url = "%s/vodshow/%s--------%s---%s.html" % (
                 self.site_url, sub, page, year)
+        # 有筛选
+        else:
+            url = "%s/vodshow/%s-%s-%s-%s-%s-%s---%s---%s.html" % (
+                self.site_url, sub, area, sort_field, "", "", "",
+                page if page > 1 else "", year)
 
         self.log("category: %s" % url)
-
         html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
         pagecount = self._page_count(html, 1)
         self.log("  -> %d 条, 共 %d 页" % (len(videos), pagecount))
@@ -394,16 +376,21 @@ class Spider(Spider):
         }
 
     def searchContent(self, key, quick, pg="1"):
+        # ← 照豆花的写法：先预热
+        self._warm_up()
+
         page = int(pg) if pg else 1
         url = "%s/vodsearch/-------------.html" % self.site_url
 
-        html = self._fetch(url, method="POST", data={"wd": key, "submit": ""})
+        html = self._fetch(url, method="POST",
+                           data={"wd": key, "submit": ""})
         self.log("search POST: %s (%d 字节)" % (key, len(html)))
 
         if html.count("voddetail") < 2:
-            self.log("  POST 无效，切换 GET")
+            self.log("  POST 无效, 试 GET")
             enc = urllib.parse.quote(key)
-            get_url = "%s/vodsearch/%s-------------.html" % (self.site_url, enc)
+            get_url = "%s/vodsearch/%s-------------.html" % (
+                self.site_url, enc)
             html = self._fetch(get_url)
             self.log("search GET: %s (%d 字节)" % (get_url, len(html)))
 
@@ -423,6 +410,9 @@ class Spider(Spider):
         vod_id = str(ids[0])
         url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
         self.log("detail: %s" % url)
+
+        # ← 照豆花的写法：先预热
+        self._warm_up()
 
         html = self._fetch(url)
         if not html:
@@ -466,7 +456,7 @@ class Spider(Spider):
         if m:
             director = self._clean(m.group(1))
 
-        # 剧集（按 sid 分组）
+        # 剧集
         groups = {}
         for m in _RE_EPISODE_LI.finditer(html):
             play_path = m.group(1)
@@ -475,20 +465,20 @@ class Spider(Spider):
             if not mm:
                 continue
             sid = mm.group(2)
-            groups.setdefault(sid, []).append((ep_name, self._fix_url(play_path)))
+            groups.setdefault(sid, []).append(
+                (ep_name, self._fix_url(play_path)))
 
         if not groups:
             self.log("  ⚠️ 没抓到剧集")
             return {"list": []}
 
-        # 线路名映射
+        # 线路名
         line_name_map = {}
         for pl_id, pl_name in _RE_PLAYLIST_TAB.findall(html):
             mm = re.match(r'playlist(\d+)', pl_id)
             if mm:
                 line_name_map[mm.group(1)] = pl_name
 
-        # 排序：有名字的线优先
         sorted_sids = sorted(groups.keys(),
                              key=lambda s: (0 if s in line_name_map else 1, s))
 
@@ -532,6 +522,9 @@ class Spider(Spider):
             ts, res = self._play_cache[play_page]
             if now - ts < 600:
                 return res
+
+        # ← 照豆花的写法：先预热
+        self._warm_up()
 
         html = self._fetch(play_page)
         real_url = ""
