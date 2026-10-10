@@ -33,8 +33,7 @@ except ImportError:
             return self._session
 
         def fetch(self, url, headers=None, **kw):
-            timeout = kw.pop('timeout', 15)
-            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
+            r = self._sess.get(url, headers=headers, timeout=kw.get('timeout', 15))
             r.encoding = 'utf-8'
             return r
 
@@ -74,19 +73,24 @@ class Spider(Spider):
         self.site_url = (self.extend.get("site") or HOST).rstrip("/")
         self.headers = {
             "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9",
             "Referer": self.site_url + "/",
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
 
+    # ===== 唯一改动：兼容 fetch 的 timeout 参数 =====
     def _fetch(self, url, timeout=15, headers=None):
         try:
             h = dict(self.headers)
             if headers:
                 h.update(headers)
-            rsp = self.fetch(url, headers=h, timeout=timeout)
+            try:
+                rsp = self.fetch(url, headers=h, timeout=timeout)
+            except TypeError:
+                # 该壳的 fetch 不接受 timeout，去掉再试
+                rsp = self.fetch(url, headers=h)
             if hasattr(rsp, "text"):
                 return rsp.text or ""
             if hasattr(rsp, "content"):
