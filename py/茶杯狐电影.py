@@ -1,4 +1,7 @@
 # coding=utf-8
+"""
+茶杯狐电影 cupfoxdy.com | TVBox Python 爬虫
+"""
 import re
 import sys
 import json
@@ -33,7 +36,8 @@ except ImportError:
             return self._session
 
         def fetch(self, url, headers=None, **kw):
-            r = self._sess.get(url, headers=headers, timeout=kw.get('timeout', 15))
+            timeout = kw.pop('timeout', 15)
+            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
             r.encoding = 'utf-8'
             return r
 
@@ -59,6 +63,8 @@ CLASSES = [
     {"type_id": "25", "type_name": "短剧"},
 ]
 
+FILTERS = {}
+
 
 class Spider(Spider):
 
@@ -73,44 +79,46 @@ class Spider(Spider):
         self.site_url = (self.extend.get("site") or HOST).rstrip("/")
         self.headers = {
             "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
             "Referer": self.site_url + "/",
+            "Upgrade-Insecure-Requests": "1",
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        self.log("init: site=%s" % self.site_url)
 
-    # ===== 唯一改动：兼容 fetch 的 timeout 参数 =====
-    def _fetch(self, url, timeout=15, headers=None):
+    def _fetch(self, url, timeout=60, headers=None):
         try:
             h = dict(self.headers)
             if headers:
                 h.update(headers)
-            try:
-                rsp = self.fetch(url, headers=h, timeout=timeout)
-            except TypeError:
-                # 该壳的 fetch 不接受 timeout，去掉再试
-                rsp = self.fetch(url, headers=h)
+            rsp = self.fetch(url, headers=h, timeout=timeout)
+            text = ""
             if hasattr(rsp, "text"):
-                return rsp.text or ""
-            if hasattr(rsp, "content"):
-                return rsp.content.decode("utf-8", "ignore")
-            return str(rsp)
+                text = rsp.text or ""
+            elif hasattr(rsp, "content"):
+                text = rsp.content.decode("utf-8", "ignore")
+            else:
+                text = str(rsp)
+            return text
         except Exception as e:
             self.log("fetch FAIL %s -> %s" % (url, e))
             return ""
 
-    def _fix_url(self, u):
-        if not u:
+    def _fix_url(self, url):
+        if not url:
             return ""
-        u = u.strip()
-        if u.startswith("//"):
-            return "https:" + u
-        if u.startswith("http"):
-            return u
-        if u.startswith("/"):
-            return self.site_url + u
-        return urllib.parse.urljoin(self.site_url + "/", u)
+        url = url.strip()
+        if url.startswith("//"):
+            return "https:" + url
+        if url.startswith("http"):
+            return url
+        if url.startswith("/"):
+            return self.site_url + url
+        return urllib.parse.urljoin(self.site_url + "/", url)
 
     def _clean(self, s):
         if not s:
@@ -126,9 +134,11 @@ class Spider(Spider):
 
     def _extract_videos(self, html):
         videos = []
-        if not html:
-            return videos
         seen = set()
+        if not html:
+            self.log("  HTML 为空")
+            return videos
+
         pattern = re.compile(
             r'<a class="stui-vodlist__thumb lazyload" '
             r'href="([^"]+)" '
@@ -143,11 +153,12 @@ class Spider(Spider):
             if href.startswith("/"):
                 href = self.site_url + href
             videos.append({
-                "vod_id": href,
-                "vod_name": self._clean(title),
-                "vod_pic": pic.strip() or self.default_pic,
+                "vod_id":      href,
+                "vod_name":    self._clean(title)[:100],
+                "vod_pic":     pic.strip() or self.default_pic,
                 "vod_remarks": "",
             })
+        self.log("  抓到: %d 条" % len(videos))
         return videos
 
     def _page_count(self, html):
@@ -162,182 +173,173 @@ class Spider(Spider):
         return 1
 
     def homeContent(self, filter=False):
-        return {"class": CLASSES, "filters": {}}
+        return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        try:
-            html = self._fetch(self.site_url + "/")
-            self.log("home html len: %d" % len(html))
-            videos = self._extract_videos(html)
-            self.log("home videos: %d" % len(videos))
-            return {"list": videos}
-        except Exception as e:
-            self.log("home fail: %s" % e)
-            return {"list": []}
+        url = "%s/" % self.site_url
+        html = self._fetch(url)
+        self.log("home HTML 长度: %d" % len(html))
+        videos = self._extract_videos(html)
+        return {"list": videos}
 
     def categoryContent(self, tid, pg, filter, extend):
-        try:
-            page = int(pg) if pg else 1
-            url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (
-                self.site_url, tid, page)
-            self.log("category: %s" % url)
-            html = self._fetch(url)
-            self.log("category html len: %d" % len(html))
-            videos = self._extract_videos(html)
-            pc = self._page_count(html)
-            self.log("category videos: %d, pages: %d" % (len(videos), pc))
-            return {"list": videos, "page": page, "pagecount": pc,
-                    "limit": 24, "total": pc * 24}
-        except Exception as e:
-            self.log("category fail: %s" % e)
-            return {"list": [], "page": 1, "pagecount": 1,
-                    "limit": 24, "total": 24}
+        page = int(pg) if pg else 1
+        url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (
+            self.site_url, tid, page)
+        self.log("category: %s" % url)
+        html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
+        videos = self._extract_videos(html)
+        pagecount = self._page_count(html)
+        self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
+        return {
+            "list": videos, "page": page, "pagecount": pagecount,
+            "limit": 24, "total": pagecount * 24,
+        }
 
     def searchContent(self, key, quick, pg="1"):
-        try:
-            page = int(pg) if pg else 1
-            url = "%s/search.php?searchword=%s&page=%d" % (
-                self.site_url, urllib.parse.quote(key), page)
-            self.log("search: %s" % url)
-            html = self._fetch(url)
-            self.log("search html len: %d" % len(html))
-            videos = self._extract_videos(html)
-            self.log("search videos: %d" % len(videos))
-            return {"list": videos, "page": page, "pagecount": 1,
-                    "limit": 24, "total": 999}
-        except Exception as e:
-            self.log("search fail: %s" % e)
-            return {"list": [], "page": 1, "pagecount": 1,
-                    "limit": 24, "total": 24}
+        page = int(pg) if pg else 1
+        keyword = urllib.parse.quote(key)
+        url = "%s/search.php?searchword=%s&page=%d" % (
+            self.site_url, keyword, page)
+        self.log("search: %s" % url)
+        html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
+        videos = self._extract_videos(html)
+        return {
+            "list": videos, "page": page,
+            "pagecount": 1,
+            "limit": 24, "total": 999,
+        }
 
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
     def detailContent(self, ids):
-        try:
-            if not ids:
-                return {"list": []}
-            vid = str(ids[0])
-            url = vid if vid.startswith("http") else self._fix_url(vid)
-            self.log("detail: %s" % url)
-            html = self._fetch(url)
-            if not html:
-                return {"list": []}
+        if not ids:
+            return {"list": []}
+        vod_id = str(ids[0])
+        url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
+        self.log("detail: %s" % url)
 
-            name = ""
-            m = re.search(r'<h1 class="title">([^<]+)</h1>', html)
-            if m:
-                name = self._clean(m.group(1))
-            if not name:
-                m = re.search(r"<title>(.*?)</title>", html, re.S)
-                if m:
-                    name = self._clean(m.group(1).split("_")[0].split("-")[0])
-            name = name or vid
-
-            pic = self.default_pic
-            m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
-            if m:
-                pic = m.group(1).strip()
-
-            content = ""
-            m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
-            if m:
-                content = self._clean(m.group(1))
-            if not content:
-                m = re.search(r'<span class="detail-sketch">([\s\S]*?)</span>', html)
-                if m:
-                    content = self._clean(m.group(1))
-
-            actor = ""
-            m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
-            if m:
-                actor = self._clean(m.group(1))
-
-            director = ""
-            m = re.search(r'导演[：:]\s*([\s\S]*?)</span>', html)
-            if m:
-                director = self._clean(m.group(1))
-
-            play_from = []
-            play_url = []
-            for panel in re.finditer(
-                    r'<h3>([^<]+)</h3>[\s\S]{0,500}?'
-                    r'<ul class="stui-content__playlist clearfix">([\s\S]*?)</ul>',
-                    html):
-                line = panel.group(1).strip()
-                eps = []
-                for a in re.finditer(
-                        r'<a\s+title="([^"]+)"\s+href="([^"]+)"', panel.group(2)):
-                    ep_name = a.group(1).strip()
-                    href = a.group(2)
-                    if href.startswith("/"):
-                        href = self.site_url + href
-                    eps.append("%s$%s" % (ep_name, href))
-                if eps:
-                    play_from.append(line)
-                    play_url.append("#".join(eps))
-
-            self.log("detail froms: %s" % play_from)
-            if not play_from:
-                return {"list": []}
-
-            return {"list": [{
-                "vod_id": vid,
-                "vod_name": name,
-                "vod_pic": pic,
-                "vod_content": content,
-                "vod_actor": actor,
-                "vod_director": director,
-                "vod_play_from": "$$$".join(play_from),
-                "vod_play_url":  "$$$".join(play_url),
-            }]}
-        except Exception as e:
-            self.log("detail fail: %s" % e)
+        html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
+        if not html:
             return {"list": []}
 
-    def playerContent(self, flag, id, vipFlags):
-        try:
-            url = id if id.startswith("http") else self._fix_url(id)
-            self.log("player: %s" % url)
-
-            now = int(time.time())
-            if url in self._play_cache:
-                ts, res = self._play_cache[url]
-                if now - ts < 600:
-                    return res
-
-            html = self._fetch(url)
-            m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
+        # 标题
+        name = ""
+        m = re.search(r'<h1 class="title">([^<]+)</h1>', html)
+        if m:
+            name = self._clean(m.group(1))
+        if not name:
+            m = re.search(r"<title>(.*?)</title>", html, re.S)
             if m:
-                now_url = m.group(1).strip()
-                mm = re.search(r'/play/([^/]+)/?$', now_url)
-                if mm:
-                    play_id = mm.group(1)
-                    m3u8_url = "https://hd.kuktxu.com/play/%s/index.m3u8" % play_id
-                    self.log("m3u8: %s" % m3u8_url)
-                    res = {
-                        "parse": 0,
-                        "playUrl": "",
-                        "url": m3u8_url,
-                        "header": {
-                            "User-Agent": UA,
-                            "Referer": "https://hd.kuktxu.com/",
-                        },
-                    }
-                    self._play_cache[url] = (now, res)
-                    return res
+                name = self._clean(m.group(1).split("_")[0].split("-")[0])
+        name = name or vod_id
 
-            self.log("fallback sniff: %s" % url)
-            res = {"parse": 1, "playUrl": "", "url": url,
-                   "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
-            self._play_cache[url] = (now, res)
-            return res
-        except Exception as e:
-            self.log("player fail: %s" % e)
-            return {"parse": 1, "playUrl": "", "url": id, "header": {}}
+        # 封面
+        pic = self.default_pic
+        m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
+        if m:
+            pic = m.group(1).strip()
+
+        # 简介
+        content = ""
+        m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
+        if m:
+            content = self._clean(m.group(1))
+        if not content:
+            m = re.search(r'<span class="detail-sketch">([\s\S]*?)</span>', html)
+            if m:
+                content = self._clean(m.group(1))
+
+        # 主演/导演
+        actor = ""
+        m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
+        if m:
+            actor = self._clean(m.group(1))
+        director = ""
+        m = re.search(r'导演[：:]\s*([\s\S]*?)</span>', html)
+        if m:
+            director = self._clean(m.group(1))
+
+        # 剧集（多线路支持）
+        groups = {}
+        for panel in re.finditer(
+                r'<h3>([^<]+)</h3>[\s\S]{0,500}?'
+                r'<ul class="stui-content__playlist clearfix">([\s\S]*?)</ul>',
+                html):
+            origin = panel.group(1).strip()
+            ul = panel.group(2)
+            for a in re.finditer(
+                    r'<a\s+title="([^"]+)"\s+href="([^"]+)"', ul):
+                ep_name = a.group(1).strip()
+                href = a.group(2)
+                if href.startswith("/"):
+                    href = self.site_url + href
+                groups.setdefault(origin, []).append((ep_name, href))
+
+        self.log("  剧集: %s" % {k: len(v) for k, v in groups.items()})
+
+        if not groups:
+            return {"list": []}
+
+        play_from = []
+        play_url = []
+        for origin, eps in groups.items():
+            play_from.append(origin)
+            play_url.append("#".join("%s$%s" % (n, h) for n, h in eps))
+
+        return {"list": [{
+            "vod_id": vod_id,
+            "vod_name": name,
+            "vod_pic": pic,
+            "vod_content": content,
+            "vod_actor": actor,
+            "vod_director": director,
+            "vod_play_from": "$$$".join(play_from),
+            "vod_play_url":  "$$$".join(play_url),
+        }]}
+
+    def playerContent(self, flag, id, vipFlags):
+        play_page = id if id.startswith("http") else self._fix_url(id)
+        self.log("player: %s" % play_page)
+
+        now = int(time.time())
+        if play_page in self._play_cache:
+            ts, res = self._play_cache[play_page]
+            if now - ts < 600:
+                return res
+
+        html = self._fetch(play_page)
+        m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
+        if m:
+            now_url = m.group(1).strip()
+            mm = re.search(r'/play/([^/]+)/?$', now_url)
+            if mm:
+                play_id = mm.group(1)
+                m3u8_url = "https://hd.kuktxu.com/play/%s/index.m3u8" % play_id
+                self.log("  => m3u8: %s" % m3u8_url)
+                res = {
+                    "parse": 0,
+                    "playUrl": "",
+                    "url": m3u8_url,
+                    "header": {
+                        "User-Agent": UA,
+                        "Referer": "https://hd.kuktxu.com/",
+                    },
+                }
+                self._play_cache[play_page] = (now, res)
+                return res
+
+        res = {"parse": 1, "playUrl": "", "url": play_page,
+               "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
+        self._play_cache[play_page] = (now, res)
+        return res
 
     def isVideoFormat(self, url):
-        return bool(url) and (".m3u8" in url or ".mp4" in url)
+        return ".m3u8" in url or ".mp4" in url or url.startswith("http")
 
     def manualVideoCheck(self):
         return False
