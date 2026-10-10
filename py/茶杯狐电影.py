@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 茶杯狐电影 cupfoxdy.com | TVBox Python 爬虫
-结构参照豆花电影模板，解析规则基于茶杯狐实际 HTML
+所有解析规则均来自网站实际 HTML 源码
 """
 import re
 import sys
@@ -18,7 +18,7 @@ except ImportError:
     try:
         import urllib3
         urllib3.disable_warnings()
-    except:
+    except Exception:
         pass
 
     class _BaseSpider:
@@ -45,7 +45,7 @@ except ImportError:
         def log(self, *a, **kw):
             try:
                 print("[cupfox]", *a)
-            except:
+            except Exception:
                 pass
 
     Spider = _BaseSpider
@@ -56,6 +56,7 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/templets/cupfoxdy/images/img/load.png"
 
+# 分类 ID 对应网站 /cup/N.html 和 search.php?tid=N
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
     {"type_id": "2",  "type_name": "电视剧"},
@@ -73,7 +74,7 @@ class Spider(Spider):
     def init(self, extend=""):
         try:
             self.extend = json.loads(extend) if extend else {}
-        except:
+        except Exception:
             self.extend = {}
         self.site_url = (self.extend.get("site") or HOST).rstrip("/")
         self.headers = {
@@ -84,6 +85,8 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+
+    # ==================== 网络 ====================
 
     def _fetch(self, url, timeout=15, headers=None):
         try:
@@ -96,7 +99,8 @@ class Spider(Spider):
             if hasattr(rsp, "content"):
                 return rsp.content.decode("utf-8", "ignore")
             return str(rsp)
-        except:
+        except Exception as e:
+            self.log("fetch FAIL %s -> %s" % (url, e))
             return ""
 
     def _fix_url(self, u):
@@ -123,7 +127,13 @@ class Spider(Spider):
         s = re.sub(r"\n{2,}", "\n", s)
         return s.strip()
 
+    # ==================== 列表解析 ====================
+
     def _extract_videos(self, html):
+        """解析视频卡片列表，对应 HTML:
+        <a class="stui-vodlist__thumb lazyload" href="/mov/100213.html"
+           title="..." data-original="...">
+        """
         videos = []
         if not html:
             return videos
@@ -147,70 +157,93 @@ class Spider(Spider):
                 "vod_pic": pic.strip() or self.default_pic,
                 "vod_remarks": "",
             })
+        self.log("  抓到: %d 条" % len(videos))
         return videos
 
     def _page_count(self, html):
+        """对应 HTML: <li class="active num"><a>1/3105</a></li>"""
         if not html:
             return 1
         m = re.search(r'<li class="active num"><a>\d+/(\d+)</a></li>', html)
         if m:
             try:
                 return int(m.group(1))
-            except:
+            except Exception:
                 pass
         return 1
+
+    # ==================== 首页 ====================
 
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": {}}
 
     def homeVideoContent(self):
+        """解析首页热门推荐"""
         try:
             html = self._fetch(self.site_url + "/")
             return {"list": self._extract_videos(html)}
-        except:
+        except Exception:
             return {"list": []}
 
+    # ==================== 分类 ====================
+
     def categoryContent(self, tid, pg, filter, extend):
+        """分类页 URL: /search.php?searchtype=5&tid=1&page=1
+        对应 HTML 分页链接: ?page=1&searchtype=5&tid=1&
+        """
         try:
             page = int(pg) if pg else 1
             url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (
                 self.site_url, tid, page)
+            self.log("category: %s" % url)
             html = self._fetch(url)
             videos = self._extract_videos(html)
             pc = self._page_count(html)
+            self.log("  -> %d items, %d pages" % (len(videos), pc))
             return {
                 "list": videos, "page": page, "pagecount": pc,
                 "limit": 24, "total": pc * 24,
             }
-        except:
-            return {"list": [], "page": 1, "pagecount": 1, "limit": 24, "total": 24}
+        except Exception:
+            return {"list": [], "page": 1, "pagecount": 1,
+                    "limit": 24, "total": 24}
+
+    # ==================== 搜索 ====================
 
     def searchContent(self, key, quick, pg="1"):
+        """搜索页 URL: /search.php?searchword=关键词&page=1"""
         try:
             page = int(pg) if pg else 1
             url = "%s/search.php?searchword=%s&page=%d" % (
                 self.site_url, urllib.parse.quote(key), page)
+            self.log("search: %s" % url)
             html = self._fetch(url)
             return {
                 "list": self._extract_videos(html), "page": page,
                 "pagecount": 1, "limit": 24, "total": 999,
             }
-        except:
-            return {"list": [], "page": 1, "pagecount": 1, "limit": 24, "total": 24}
+        except Exception:
+            return {"list": [], "page": 1, "pagecount": 1,
+                    "limit": 24, "total": 24}
 
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
+    # ==================== 详情 ====================
+
     def detailContent(self, ids):
+        """详情页解析"""
         try:
             if not ids:
                 return {"list": []}
             vid = str(ids[0])
             url = vid if vid.startswith("http") else self._fix_url(vid)
+            self.log("detail: %s" % url)
             html = self._fetch(url)
             if not html:
                 return {"list": []}
 
+            # 标题: <h1 class="title">老舅</h1>
             name = ""
             m = re.search(r'<h1 class="title">([^<]+)</h1>', html)
             if m:
@@ -221,26 +254,37 @@ class Spider(Spider):
                     name = self._clean(m.group(1).split("_")[0].split("-")[0])
             name = name or vid
 
+            # 海报: <img ... id="js-poster-img" ... data-original="...">
             pic = self.default_pic
             m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
             if m:
                 pic = m.group(1).strip()
 
+            # 简介: <span class="detail-content" ...>...</span>
             content = ""
             m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
             if m:
                 content = self._clean(m.group(1))
+            if not content:
+                m = re.search(r'<span class="detail-sketch">([\s\S]*?)</span>', html)
+                if m:
+                    content = self._clean(m.group(1))
 
+            # 主演: 主演：...</span>
             actor = ""
             m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
             if m:
                 actor = self._clean(m.group(1))
 
+            # 导演: 导演：...</span>
             director = ""
             m = re.search(r'导演[：:]\s*([\s\S]*?)</span>', html)
             if m:
                 director = self._clean(m.group(1))
 
+            # 播放列表: <h3>foxyun</h3> ...
+            #   <ul class="stui-content__playlist clearfix">
+            #     <li id="00"><a title="第1集" href="/fox/17111-0-0.html">第1集</a></li>
             play_from = []
             play_url = []
             for panel in re.finditer(
@@ -260,6 +304,7 @@ class Spider(Spider):
                     play_from.append(line)
                     play_url.append("#".join(eps))
 
+            self.log("  lines: %s" % play_from)
             if not play_from:
                 return {"list": []}
 
@@ -273,12 +318,21 @@ class Spider(Spider):
                 "vod_play_from": "$$$".join(play_from),
                 "vod_play_url":  "$$$".join(play_url),
             }]}
-        except:
+        except Exception as e:
+            self.log("detail FAIL: %s" % e)
             return {"list": []}
 
+    # ==================== 播放 ====================
+
     def playerContent(self, flag, id, vipFlags):
+        """播放页解析:
+        播放页: <script>var now="https://1080p.huyall.com/play/en5QEn4d";</script>
+        iframe 内: const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
+        """
         try:
             url = id if id.startswith("http") else self._fix_url(id)
+            self.log("player: %s" % url)
+
             now = int(time.time())
             if url in self._play_cache:
                 ts, res = self._play_cache[url]
@@ -286,12 +340,16 @@ class Spider(Spider):
                     return res
 
             html = self._fetch(url)
+            # 从播放页提取 var now
             m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
             if m:
                 now_url = m.group(1).strip()
                 mm = re.search(r'/play/([^/]+)/?$', now_url)
                 if mm:
-                    m3u8_url = "https://hd.kuktxu.com/play/%s/index.m3u8" % mm.group(1)
+                    play_id = mm.group(1)
+                    # iframe 内真实 m3u8 地址
+                    m3u8_url = "https://hd.kuktxu.com/play/%s/index.m3u8" % play_id
+                    self.log("  m3u8: %s" % m3u8_url)
                     res = {
                         "parse": 0,
                         "playUrl": "",
@@ -304,12 +362,23 @@ class Spider(Spider):
                     self._play_cache[url] = (now, res)
                     return res
 
-            res = {"parse": 1, "playUrl": "", "url": url,
-                   "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
+            # 兜底: 嗅探
+            self.log("  fallback sniff")
+            res = {
+                "parse": 1,
+                "playUrl": "",
+                "url": url,
+                "header": {
+                    "User-Agent": UA,
+                    "Referer": self.site_url + "/",
+                },
+            }
             self._play_cache[url] = (now, res)
             return res
-        except:
+        except Exception:
             return {"parse": 1, "playUrl": "", "url": id, "header": {}}
+
+    # ==================== 其它 ====================
 
     def isVideoFormat(self, url):
         return bool(url) and (".m3u8" in url or ".mp4" in url)
