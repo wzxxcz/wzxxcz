@@ -49,7 +49,6 @@ class Spider(Spider):
               ("历史", "历史"), ("西部", "西部"), ("奇幻", "奇幻"), ("冒险", "冒险"), ("灾难", "灾难"),
               ("武侠", "武侠"), ("情色", "情色"), ("旅游", "旅游")]
 
-        # 每个频道的子类型（从 HTML 真实提取）
         SUB_MOVIE = [("全部", ""), ("动作片", "5"), ("科幻片", "7"), ("恐怖片", "8"),
                      ("战争片", "9"), ("喜剧片", "10"), ("动画片", "41"),
                      ("剧情片", "12"), ("爱情片", "6"), ("纪录片", "11")]
@@ -92,7 +91,7 @@ class Spider(Spider):
         return {"list": self.parseList(self.get(self.host + "/"))}
 
     def categoryContent(self, tid, pg, filter, extend):
-        # 兼容各种 extend 格式
+        # extend 兼容处理
         ext = extend
         if isinstance(ext, str):
             try:
@@ -112,7 +111,7 @@ class Spider(Spider):
         except Exception:
             page_int = 1
 
-        # 是否带有效筛选
+        # 判断是否有筛选
         has_filter = False
         for k in ("tid", "area", "year", "letter", "yuyan", "jq", "order"):
             if valid(ext.get(k)):
@@ -120,21 +119,28 @@ class Spider(Spider):
                 break
 
         if not has_filter and page_int == 1:
-            # 无筛选 + 第 1 页 → 走静态分类页（原版能跑通的路径）
+            # 无筛选 + 第 1 页 → 走静态分类页
             url = self.host + "/frim/index" + str(tid) + ".html"
         else:
-            # 有筛选/翻页 → 走 search.php
-            # 用户选的子类型 tid 覆盖频道 tid
+            # 有筛选/翻页 → 走 search.php，严格照抄站点参数顺序
+            # 站点真实格式（从 HTML 提取）：
+            #   ?page=2&searchtype=5&order=weekhit&tid=13&year=2026
+            #   ?searchtype=5&order=weekhit&tid=13&year=2026
+            # 顺序：page → searchtype → order → tid → year → area → letter → yuyan → jq
             real_tid = str(ext.get("tid")) if valid(ext.get("tid")) else str(tid)
 
-            # 严格按站点真实 URL 顺序：searchtype → tid → area → year → letter → yuyan → jq → order → page
-            parts = [("searchtype", "5"), ("tid", real_tid)]
-            for k in ("area", "year", "letter", "yuyan", "jq", "order"):
+            order_val = ext.get("order") if valid(ext.get("order")) else "weekhit"
+
+            parts = []
+            if page_int > 1:
+                parts.append(("page", str(page_int)))
+            parts.append(("searchtype", "5"))
+            parts.append(("order", str(order_val)))
+            parts.append(("tid", real_tid))
+            for k in ("year", "area", "letter", "yuyan", "jq"):
                 v = ext.get(k)
                 if valid(v):
                     parts.append((k, str(v)))
-            if page_int > 1:
-                parts.append(("page", str(page_int)))
 
             qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
             url = self.host + "/search.php?" + qs
@@ -152,8 +158,7 @@ class Spider(Spider):
 
     def detailContent(self, ids):
         vid = str(ids[0])
-        url = self.host + "/movie/index" + vid + ".html"
-        html = self.get(url)
+        html = self.get(self.host + "/movie/index" + vid + ".html")
 
         # 标题
         name = self.clean(self.match(html, r'<h1[^>]*>([\s\S]*?)</h1>'))
@@ -204,9 +209,7 @@ class Spider(Spider):
         }
 
     def _extract_play_sources(self, html):
-        """从详情页提取播放线路，每条线路一个 panel"""
         panels = []
-        # 按 <div class="panel" data-playlist-name=...> 切分
         for section in re.split(
             r'(?=<div[^>]+class="[^"]*panel[^"]*"[^>]+data-playlist-name=)',
             html
@@ -218,7 +221,6 @@ class Spider(Spider):
             idx_m = re.search(r'data-playlist-index="(\d+)"', section)
             idx = int(idx_m.group(1)) if idx_m else 0
 
-            # 找 ul 里的剧集
             ul_m = re.search(r'<ul[^>]+class="[^"]*playlistlink[^"]*"[^>]*>([\s\S]*?)</ul>', section)
             if not ul_m:
                 ul_m = re.search(r'<ul[^>]*>([\s\S]*?)</ul>', section)
@@ -228,7 +230,6 @@ class Spider(Spider):
             ul_content = ul_m.group(1)
             eps = []
             seen = set()
-            # 剧集：<a title="第01集" href="/play/xxx">第01集</a>
             for m in re.finditer(r'<a\s+title="([^"]+)"[^>]*href="(/play/[^"]+)"', ul_content):
                 t = self.clean(m.group(1))
                 u = self.fix(m.group(2))
@@ -239,7 +240,6 @@ class Spider(Spider):
             if eps:
                 panels.append((idx, name, eps))
 
-        # 按 data-playlist-index 排序
         panels.sort(key=lambda x: x[0])
         play_from = [p[1] for p in panels]
         play_url = ["#".join(p[2]) for p in panels]
@@ -286,7 +286,6 @@ class Spider(Spider):
         if not html:
             return res
 
-        # 主匹配：<a class="videopic" href="/movie/indexXXXX.html" title="XXX" ...>...</a>
         pattern = r'<a[^>]*class="[^"]*videopic[^"]*"[^>]*href="(/movie/index\d+\.html)"[^>]*title="([^"]+)"[^>]*>([\s\S]*?)</a>'
         for m in re.finditer(pattern, html):
             href = m.group(1)
@@ -302,14 +301,12 @@ class Spider(Spider):
             seen.add(vid)
 
             if not name:
-                # 用 aria-label 兜底
                 am = re.search(r'aria-label="《([^》]+)》', m.group(0))
                 if am:
                     name = self.clean(am.group(1))
             if not name:
                 continue
 
-            # 封面
             pic = ""
             pm = re.search(r'data-original="([^"]+)"', inner)
             if pm:
@@ -319,7 +316,6 @@ class Spider(Spider):
                 if pm and "load.gif" not in pm.group(1):
                     pic = self.fix(pm.group(1))
 
-            # 备注
             remarks = ""
             rm = re.search(r'<span\s+class="note textbg">([^<]*)</span>', inner)
             if rm:
