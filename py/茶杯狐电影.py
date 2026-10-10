@@ -1,6 +1,7 @@
 # coding=utf-8
 """
 茶杯狐电影 cupfoxdy.com | TVBox Python 爬虫
+结构完全参照用户提供的模板，只替换网站相关内容
 """
 import re
 import sys
@@ -53,10 +54,7 @@ except ImportError:
 HOST = "https://www.cupfoxdy.com"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-
-# 播放地址替换规则
-PLAY_HOST_FROM = "1080p.huyall.com"
-PLAY_HOST_TO = "hd.kuktxu.com"
+DEFAULT_PIC = "https://www.cupfoxdy.com/templets/cupfoxdy/images/img/load.png"
 
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
@@ -65,6 +63,11 @@ CLASSES = [
     {"type_id": "4",  "type_name": "动漫"},
     {"type_id": "25", "type_name": "短剧"},
 ]
+
+FILTERS = {}
+
+# 播放地址来源 / 目标主机
+PLAY_HOST_TO = "hd.kuktxu.com"
 
 
 class Spider(Spider):
@@ -80,16 +83,20 @@ class Spider(Spider):
         self.site_url = (self.extend.get("site") or HOST).rstrip("/")
         self.headers = {
             "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
-                      "image/webp,*/*;q=0.8",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
             "Referer": self.site_url + "/",
+            "Upgrade-Insecure-Requests": "1",
         }
+        self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        self.log("init: site=%s" % self.site_url)
 
-    # ==================== 网络 ====================
+    # ==================== 基础 ====================
 
-    def _fetch(self, url, timeout=15, headers=None):
+    def _fetch(self, url, timeout=60, headers=None):
         try:
             h = dict(self.headers)
             if headers:
@@ -97,7 +104,7 @@ class Spider(Spider):
             rsp = self.fetch(url, headers=h, timeout=timeout)
             if hasattr(rsp, "text"):
                 return rsp.text or ""
-            if hasattr(rsp, "content"):
+            elif hasattr(rsp, "content"):
                 return rsp.content.decode("utf-8", "ignore")
             return str(rsp)
         except Exception as e:
@@ -128,14 +135,56 @@ class Spider(Spider):
         s = re.sub(r"\n{2,}", "\n", s)
         return s.strip()
 
+    def _extract_videos(self, html):
+        videos = []
+        if not html:
+            return videos
+        seen = set()
+        pattern = re.compile(
+            r'<a class="stui-vodlist__thumb lazyload" '
+            r'href="([^"]+)" '
+            r'title="([^"]*)" '
+            r'data-original="([^"]*)"',
+            re.S)
+        for m in pattern.finditer(html):
+            href, title, pic = m.groups()
+            if href in seen:
+                continue
+            seen.add(href)
+            if href.startswith("/"):
+                href = self.site_url + href
+            videos.append({
+                "vod_id": href,
+                "vod_name": self._clean(title),
+                "vod_pic": pic.strip() or self.default_pic,
+                "vod_remarks": "",
+            })
+        return videos
+
+    def _page_count(self, html):
+        if not html:
+            return 1
+        m = re.search(r'<li class="active num"><a>\d+/(\d+)</a></li>', html)
+        if m:
+            try:
+                return int(m.group(1))
+            except Exception:
+                pass
+        return 1
+
     # ==================== 首页 ====================
 
     def homeContent(self, filter=False):
-        return {"class": CLASSES, "filters": {}}
+        return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        html = self._fetch(self.site_url + "/")
-        return {"list": self._extract_videos(html)}
+        url = "%s/" % self.site_url
+        self.log("home: %s" % url)
+        html = self._fetch(url)
+        self.log("home HTML 长度: %d" % len(html))
+        videos = self._extract_videos(html)
+        self.log("home 抓到: %d" % len(videos))
+        return {"list": videos}
 
     # ==================== 分类 ====================
 
@@ -145,16 +194,10 @@ class Spider(Spider):
             self.site_url, tid, page)
         self.log("category: %s" % url)
         html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
-
-        pc = 1
-        m = re.search(r'<li class="active num"><a>\d+/(\d+)</a></li>', html)
-        if m:
-            try:
-                pc = int(m.group(1))
-            except Exception:
-                pc = 1
-
+        pc = self._page_count(html)
+        self.log("  最终: %d 条, 总页数: %d" % (len(videos), pc))
         return {
             "list": videos,
             "page": page,
@@ -167,12 +210,15 @@ class Spider(Spider):
 
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
-        kw = urllib.parse.quote(key)
-        url = "%s/search.php?searchword=%s&page=%d" % (self.site_url, kw, page)
+        keyword = urllib.parse.quote(key)
+        url = "%s/search.php?searchword=%s&page=%d" % (
+            self.site_url, keyword, page)
         self.log("search: %s" % url)
         html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
+        videos = self._extract_videos(html)
         return {
-            "list": self._extract_videos(html),
+            "list": videos,
             "page": page,
             "pagecount": 1,
             "limit": 24,
@@ -182,47 +228,17 @@ class Spider(Spider):
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
-    # ==================== 列表解析 ====================
-
-    def _extract_videos(self, html):
-        videos = []
-        if not html:
-            return videos
-
-        seen = set()
-        pattern = re.compile(
-            r'<a class="stui-vodlist__thumb lazyload" '
-            r'href="([^"]+)" '
-            r'title="([^"]*)" '
-            r'data-original="([^"]*)"',
-            re.S)
-
-        for m in pattern.finditer(html):
-            href, title, pic = m.groups()
-            if href in seen:
-                continue
-            seen.add(href)
-            if href.startswith("/"):
-                href = self.site_url + href
-            videos.append({
-                "vod_id": href,
-                "vod_name": self._clean(title),
-                "vod_pic": pic.strip(),
-                "vod_remarks": "",
-            })
-
-        return videos
-
     # ==================== 详情 ====================
 
     def detailContent(self, ids):
         if not ids:
             return {"list": []}
-        vid = str(ids[0])
-        url = vid if vid.startswith("http") else self._fix_url(vid)
+        vod_id = str(ids[0])
+        url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
         self.log("detail: %s" % url)
 
         html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
         if not html:
             return {"list": []}
 
@@ -232,13 +248,13 @@ class Spider(Spider):
         if m:
             name = self._clean(m.group(1))
         if not name:
-            m = re.search(r'<title>(.*?)</title>', html, re.S)
+            m = re.search(r"<title>(.*?)</title>", html, re.S)
             if m:
                 name = self._clean(m.group(1).split("_")[0].split("-")[0])
-        name = name or vid
+        name = name or vod_id
 
         # 海报
-        pic = ""
+        pic = self.default_pic
         m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
         if m:
             pic = m.group(1).strip()
@@ -249,13 +265,12 @@ class Spider(Spider):
         if m:
             content = self._clean(m.group(1))
 
-        # 主演
+        # 主演 / 导演
         actor = ""
         m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
         if m:
             actor = self._clean(m.group(1))
 
-        # 导演
         director = ""
         m = re.search(r'导演[：:]\s*([\s\S]*?)</span>', html)
         if m:
@@ -286,14 +301,14 @@ class Spider(Spider):
             return {"list": []}
 
         return {"list": [{
-            "vod_id": vid,
+            "vod_id": vod_id,
             "vod_name": name,
             "vod_pic": pic,
             "vod_content": content,
             "vod_actor": actor,
             "vod_director": director,
             "vod_play_from": "$$$".join(play_from),
-            "vod_play_url": "$$$".join(play_url),
+            "vod_play_url":  "$$$".join(play_url),
         }]}
 
     # ==================== 播放 ====================
@@ -302,30 +317,25 @@ class Spider(Spider):
         play_page = id if id.startswith("http") else self._fix_url(id)
         self.log("player: %s" % play_page)
 
-        now_ts = int(time.time())
+        now = int(time.time())
         if play_page in self._play_cache:
             ts, res = self._play_cache[play_page]
-            if now_ts - ts < 600:
+            if now - ts < 600:
                 return res
 
         html = self._fetch(play_page)
 
-        # 播放页里有:
-        #   var now="https://1080p.huyall.com/play/en5QEn4d";
-        # 真实 m3u8 在 iframe 里:
-        #   const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
-        # 也就是把 1080p.huyall.com 换成 hd.kuktxu.com，再拼 /index.m3u8
+        # 播放页: var now="https://1080p.huyall.com/play/en5QEn4d";
+        # iframe:  const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
         m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
         if m:
             now_url = m.group(1).strip()
-            # 提取 /play/xxxxx 里的 xxxxx
             mm = re.search(r'/play/([^/]+)/?$', now_url)
             if mm:
                 play_id = mm.group(1)
                 m3u8_url = "https://%s/play/%s/index.m3u8" % (PLAY_HOST_TO, play_id)
-                self.log("  now=%s" % now_url)
-                self.log("  m3u8=%s" % m3u8_url)
-
+                self.log("  now: %s" % now_url)
+                self.log("  m3u8: %s" % m3u8_url)
                 res = {
                     "parse": 0,
                     "playUrl": "",
@@ -335,11 +345,10 @@ class Spider(Spider):
                         "Referer": "https://%s/" % PLAY_HOST_TO,
                     },
                 }
-                self._play_cache[play_page] = (now_ts, res)
+                self._play_cache[play_page] = (now, res)
                 return res
 
-        # 兜底: 嗅探
-        self.log("  兜底嗅探: %s" % play_page)
+        self.log("  兜底嗅探")
         res = {
             "parse": 1,
             "playUrl": "",
@@ -349,7 +358,7 @@ class Spider(Spider):
                 "Referer": self.site_url + "/",
             },
         }
-        self._play_cache[play_page] = (now_ts, res)
+        self._play_cache[play_page] = (now, res)
         return res
 
     # ==================== 其它 ====================
