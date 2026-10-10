@@ -1,12 +1,12 @@
 # coding=utf-8
 """
-好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2.1 兼容修复版)
+好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2.2 修正分类URL版)
 
 关键:
   - 域名 www.haojuwu1.cc
   - 播放页 JS 变量 player_aaaa 里直接就是 m3u8 直链
   - parse=0 直链播放
-  - V2.1 修复: 列表页正则放宽 + home/search 加 debug 日志
+  - V2.2 修复: categoryContent 的 URL 模板 (苹果CMS v10 标准 6 字段)
 """
 import re
 import sys
@@ -73,7 +73,8 @@ CLASSES = [
     {"type_id": "43", "type_name": "体育"},
 ]
 
-_SORTS = [{"n": "时间", "v": "time"},
+_SORTS = [{"n": "默认", "v": ""},
+          {"n": "时间", "v": "time"},
           {"n": "人气", "v": "hits"},
           {"n": "评分", "v": "score"}]
 
@@ -121,7 +122,6 @@ for c in CLASSES:
 
 
 # ===================== 正则 =====================
-# ← 改动一: 3 个正则全部放宽，属性顺序无关
 _RE_CARD = re.compile(
     r'<a\b[^>]*?href="(/voddetail/[^"]+)"[^>]*?title="([^"]*)"[^>]*?>'
     r'[\s\S]{0,600}?'
@@ -257,7 +257,6 @@ class Spider(Spider):
         return s.strip()
 
     # -------- 列表解析 --------
-    # ← 改动二: 3 策略 + debug 日志
     def _extract_videos(self, html):
         videos = []
         seen = set()
@@ -265,18 +264,15 @@ class Spider(Spider):
             self.log("  HTML 为空")
             return videos
 
-        # 策略 1
         m1 = _RE_CARD.findall(html)
         self.log("  策略1 (href→title→img): %d 条" % len(m1))
 
-        # 策略 2
         m2 = []
         if not m1:
             m2raw = _RE_CARD2.findall(html)
             self.log("  策略2 (title→href→img): %d 条" % len(m2raw))
             m2 = [(h, t, p) for (t, h, p) in m2raw]
 
-        # 策略 3
         m3 = []
         if not m1 and not m2:
             m3raw = _RE_CARD3.findall(html)
@@ -285,7 +281,6 @@ class Spider(Spider):
 
         matches = m1 or m2 or m3
 
-        # 全部失败 → 打印现场
         if not matches:
             self.log("  ⚠️ 三种策略都失败！")
             self.log("  HTML 长度: %d" % len(html))
@@ -299,7 +294,6 @@ class Spider(Spider):
                 self.log(html[max(0, idx - 100):idx + 600])
             return videos
 
-        # 组装
         for href, title, pic in matches:
             href = href.replace("&amp;", "&").strip()
             if href in seen:
@@ -337,7 +331,6 @@ class Spider(Spider):
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": FILTERS}
 
-    # ← 改动三: 加日志
     def homeVideoContent(self):
         self.log("=== homeVideoContent 开始 ===")
         html = self._fetch(self.site_url + "/")
@@ -346,6 +339,13 @@ class Spider(Spider):
         self.log("=== 首页返回 %d 条 ===" % len(videos))
         return {"list": videos}
 
+    # ============================================================
+    # ← 改动点: categoryContent 的 URL 模板
+    # 苹果CMS v10 标准格式:
+    #   /vodshow/{type}-{area}-{by}-{class}-{lang}-{letter}---{page}---{year}.html
+    #   共 6 个字段用 5 个 "-" 分隔, 后面用 "---" 接页码, 再用 "---" 接年份
+    # 空字段用 "" 占位, 连续 "-" 会连在一起
+    # ============================================================
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
         if isinstance(extend, str):
@@ -356,13 +356,22 @@ class Spider(Spider):
         extend = extend or {}
 
         sub = extend.get("sub") or tid
-        sort_field = extend.get("sort_field") or "time"
+        sort_field = extend.get("sort_field") or ""
         area = extend.get("area") or ""
         year = extend.get("year") or ""
 
-        # /vodshow/{sub}-{area}-{sort}--------{page}---{year}.html
-        url = "%s/vodshow/%s-%s-%s--------%s---%s.html" % (
-            self.site_url, sub, area, sort_field, page, year)
+        # /vodshow/{type}-{area}-{by}-{class}-{lang}-{letter}---{page}---{year}.html
+        url = "%s/vodshow/%s-%s-%s-%s-%s-%s---%s---%s.html" % (
+            self.site_url,
+            sub,          # type_id
+            area,         # area   (地区)
+            sort_field,   # by     (排序)
+            "",           # class  (剧情)
+            "",           # lang   (语言)
+            "",           # letter (字母)
+            page,         # page
+            year,         # year
+        )
         self.log("category: %s" % url)
 
         html = self._fetch(url)
@@ -375,7 +384,6 @@ class Spider(Spider):
             "limit": 24, "total": pagecount * 24,
         }
 
-    # ← 改动四: POST/GET 兼容
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
         url = "%s/vodsearch/-------------.html" % self.site_url
