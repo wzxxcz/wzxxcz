@@ -91,7 +91,6 @@ class Spider(Spider):
         return {"list": self.parseList(self.get(self.host + "/"))}
 
     def categoryContent(self, tid, pg, filter, extend):
-        # extend 兼容处理
         ext = extend
         if isinstance(ext, str):
             try:
@@ -111,32 +110,54 @@ class Spider(Spider):
         except Exception:
             page_int = 1
 
-        # 判断是否有筛选
-        has_filter = False
-        for k in ("tid", "area", "year", "letter", "yuyan", "jq", "order"):
+        # 用户是否选了"类型"（子类型覆盖频道）
+        user_sub_tid = ext.get("tid") if valid(ext.get("tid")) else None
+
+        # 用户是否选了除类型外的其他筛选
+        other_filter = False
+        for k in ("area", "year", "letter", "yuyan", "jq", "order"):
             if valid(ext.get(k)):
-                has_filter = True
+                other_filter = True
                 break
 
-        if not has_filter and page_int == 1:
-            # 无筛选 + 第 1 页 → 走静态分类页
-            url = self.host + "/frim/index" + str(tid) + ".html"
+        channel_tid = str(tid)
+
+        # 场景 A：无筛选 + 第 1 页 → 静态分类页
+        if not user_sub_tid and not other_filter and page_int == 1:
+            url = self.host + "/frim/index" + channel_tid + ".html"
         else:
-            # 有筛选/翻页 → 走 search.php，严格照抄站点参数顺序
-            # 站点真实格式（从 HTML 提取）：
-            #   ?page=2&searchtype=5&order=weekhit&tid=13&year=2026
-            #   ?searchtype=5&order=weekhit&tid=13&year=2026
-            # 顺序：page → searchtype → order → tid → year → area → letter → yuyan → jq
-            real_tid = str(ext.get("tid")) if valid(ext.get("tid")) else str(tid)
+            # 场景 B/C/D：走 search.php
+            # 确定 real_tid
+            if user_sub_tid:
+                # 用户选了类型，用用户的
+                real_tid = str(user_sub_tid)
+            else:
+                # 用户没选类型但选了其他筛选 → 映射到该频道首个子类型
+                # 这是站点自己的逻辑：如"电视剧+2026"实际请求 tid=13
+                CHANNEL_FIRST_SUB = {
+                    "2":  "13",   # 电视剧 → 国产剧
+                    "3":  "29",   # 综艺 → 内地综艺
+                    "4":  "34",   # 动漫 → 国产动漫
+                    "44": "28",   # 短剧 → 短剧
+                }
+                real_tid = CHANNEL_FIRST_SUB.get(channel_tid, channel_tid)
 
-            order_val = ext.get("order") if valid(ext.get("order")) else "weekhit"
-
+            # 拼 URL，严格模仿站点真实链接
+            # 分页链接格式：?page=2&searchtype=5&order=weekhit&tid=13&year=2026
+            # 切类型链接：  ?searchtype=5&tid=13
+            # 切筛选链接：  ?searchtype=5&order=weekhit&tid=13&year=2026&...
             parts = []
             if page_int > 1:
                 parts.append(("page", str(page_int)))
             parts.append(("searchtype", "5"))
-            parts.append(("order", str(order_val)))
+
+            # ★关键：只有选了非类型筛选时才带 order=weekhit
+            if other_filter:
+                order_val = ext.get("order") if valid(ext.get("order")) else "weekhit"
+                parts.append(("order", str(order_val)))
+
             parts.append(("tid", real_tid))
+
             for k in ("year", "area", "letter", "yuyan", "jq"):
                 v = ext.get(k)
                 if valid(v):
@@ -160,7 +181,6 @@ class Spider(Spider):
         vid = str(ids[0])
         html = self.get(self.host + "/movie/index" + vid + ".html")
 
-        # 标题
         name = self.clean(self.match(html, r'<h1[^>]*>([\s\S]*?)</h1>'))
         if not name:
             name = self.clean(self.match(html, r'<meta\s+property="og:title"\s+content="([^"]+)"'))
@@ -168,17 +188,12 @@ class Spider(Spider):
         name = re.sub(r'\s*全集在线观看.*$', '', name)
         name = re.sub(r'\s*[-|·]\s*袋鼠影视.*$', '', name).strip()
 
-        # 封面
         pic = self.fix(self.match(html, r'<meta\s+property="og:image"\s+content="([^"]+)"'))
-        if not pic:
-            pic = self.fix(self.match(html, r'<a[^>]+class="[^"]*videopic[^"]*"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"'))
 
-        # 简介
         desc = self.clean(self.match(html, r'<div[^>]*class="[^"]*video-plot[^"]*"[^>]*>([\s\S]*?)</div>'))
         if not desc:
             desc = self.clean(self.match(html, r'<meta\s+property="og:description"\s+content="([^"]+)"'))
 
-        # 元信息
         actor = self.clean(self.match(html, r'<li[^>]*data-video-meta="([^"]*)"[^>]*>\s*<span class="text-muted">主演：</span>'))
         director = self.clean(self.match(html, r'<li[^>]*data-video-meta="([^"]*)"[^>]*>\s*<span class="text-muted">导演：</span>'))
         year = self.clean(self.match(html, r'年份：</span>([^<]+)'))
@@ -187,7 +202,6 @@ class Spider(Spider):
         cate = self.clean(self.match(html, r'类型：</span><a[^>]*>([^<]+)</a>'))
         remarks = self.clean(self.match(html, r'<span class="note textbg">([^<]*)</span>'))
 
-        # 播放线路
         play_from, play_url = self._extract_play_sources(html)
 
         return {
