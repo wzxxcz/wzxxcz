@@ -14,23 +14,7 @@ class Spider(Spider):
             "User-Agent": "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Mobile Safari/537.36",
             "Referer": self.host + "/",
             "Origin": self.host,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
         }
-        self._session = requests.Session()
-        self._session.headers.update(self.headers)
-        self._session.verify = False
-        self._warmed = False
-
-    def _warm_up(self):
-        """首访预热，让 CF 下发 cookie"""
-        if self._warmed:
-            return
-        try:
-            self._session.get(self.host + "/", timeout=15)
-            self._warmed = True
-        except Exception:
-            pass
 
     def getName(self):
         return "袋鼠影视"
@@ -40,8 +24,6 @@ class Spider(Spider):
 
     def manualVideoCheck(self):
         return False
-
-    # ==================== 首页 & 筛选 ====================
 
     def _common_filters(self):
         AREA = [("全部", ""), ("大陆", "大陆"), ("香港", "香港"), ("台湾", "台湾"),
@@ -92,12 +74,9 @@ class Spider(Spider):
         }
 
     def homeVideoContent(self):
-        self._warm_up()
         return {"list": self.parseList(self.get(self.host + "/"))}
 
     def categoryContent(self, tid, pg, filter, extend):
-        self._warm_up()
-
         ext = extend or {}
         if isinstance(ext, str):
             try:
@@ -111,39 +90,32 @@ class Spider(Spider):
                 return False
             return str(v).strip() not in ("", "全部", "0", "None")
 
-        # 按站点真实 URL 顺序收集有效筛选参数
-        filter_params = []
-        for k in ("year", "area", "yuyan", "letter", "order", "jq"):
+        # 用户选的排序，没选就默认 weekhit（站点默认排序）
+        order = ext.get("order")
+        if not valid(order):
+            order = "weekhit"
+
+        # 完全模仿站点真实 URL 顺序：searchtype → order → tid → area → year → letter → yuyan → jq → page
+        parts = [("searchtype", "5"), ("order", str(order)), ("tid", str(tid))]
+        for k in ("area", "year", "letter", "yuyan", "jq"):
             v = ext.get(k)
             if valid(v):
-                filter_params.append((k, str(v)))
+                parts.append((k, str(v)))
+        # 第 1 页不带 page，翻页才带（和站点一致）
+        if int(pg) > 1:
+            parts.append(("page", str(pg)))
 
-        has_filter = len(filter_params) > 0
-        page_int = int(pg)
-
-        if not has_filter and page_int == 1:
-            # 无筛选 + 第 1 页 → 走原始路径（能过 CF）
-            url = self.host + "/frim/index" + str(tid) + ".html"
-        else:
-            # 有筛选 / 翻页 → search.php
-            # 关键：第 1 页不带 page 参数，模仿站点真实 URL
-            parts = [("searchtype", "5"), ("tid", str(tid))]
-            parts.extend(filter_params)
-            if page_int > 1:
-                parts.append(("page", str(page_int)))
-            qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
-            url = self.host + "/search.php?" + qs
+        qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
+        url = self.host + "/search.php?" + qs
 
         html = self.get(url)
         return {
-            "page": page_int,
+            "page": int(pg),
             "pagecount": 999,
             "limit": 24,
             "total": 999999,
             "list": self.parseList(html)
         }
-
-    # ==================== 详情（保持原样） ====================
 
     def detailContent(self, ids):
         vid = ids[0]
@@ -285,16 +257,12 @@ class Spider(Spider):
 
         return eps
 
-    # ==================== 搜索 & 播放 ====================
-
     def searchContent(self, key, quick, pg="1"):
-        self._warm_up()
         url = self.host + "/search.php?searchword=" + quote(key) + "&page=" + str(pg)
         html = self.get(url)
         return {"list": self.parseList(html), "page": int(pg)}
 
     def playerContent(self, flag, id, vipFlags):
-        self._warm_up()
         html = self.get(id)
 
         url = self.match(html, r'var\s+now\s*=\s*["\']([^"\']+)["\']')
@@ -313,8 +281,6 @@ class Spider(Spider):
             "url": url,
             "header": self.headers
         }
-
-    # ==================== 列表解析 ====================
 
     def parseList(self, html):
         res = []
@@ -360,8 +326,6 @@ class Spider(Spider):
                 })
         return res
 
-    # ==================== 工具方法 ====================
-
     def localProxy(self, param):
         return [404, "text/plain", "", ""]
 
@@ -370,7 +334,7 @@ class Spider(Spider):
 
     def get(self, url):
         try:
-            r = self._session.get(url, timeout=15)
+            r = requests.get(url, headers=self.headers, timeout=15, verify=False)
             r.encoding = r.apparent_encoding or "utf-8"
             return r.text
         except Exception:
