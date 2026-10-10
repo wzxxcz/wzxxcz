@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 茶杯狐电影 cupfoxdy.com | TVBox Python 爬虫
-结构完全参照用户提供的模板，只替换网站相关内容
+所有解析规则均来自网站实际 HTML 源码
 """
 import re
 import sys
@@ -66,9 +66,6 @@ CLASSES = [
 
 FILTERS = {}
 
-# 播放地址来源 / 目标主机
-PLAY_HOST_TO = "hd.kuktxu.com"
-
 
 class Spider(Spider):
 
@@ -92,7 +89,6 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
-        self.log("init: site=%s" % self.site_url)
 
     # ==================== 基础 ====================
 
@@ -135,11 +131,15 @@ class Spider(Spider):
         s = re.sub(r"\n{2,}", "\n", s)
         return s.strip()
 
+    # ==================== 列表解析 ====================
+
     def _extract_videos(self, html):
         videos = []
         if not html:
             return videos
         seen = set()
+        # 网站实际卡片格式:
+        # <a class="stui-vodlist__thumb lazyload" href="/mov/100213.html" title="..." data-original="...">
         pattern = re.compile(
             r'<a class="stui-vodlist__thumb lazyload" '
             r'href="([^"]+)" '
@@ -179,11 +179,8 @@ class Spider(Spider):
 
     def homeVideoContent(self):
         url = "%s/" % self.site_url
-        self.log("home: %s" % url)
         html = self._fetch(url)
-        self.log("home HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
-        self.log("home 抓到: %d" % len(videos))
         return {"list": videos}
 
     # ==================== 分类 ====================
@@ -192,12 +189,9 @@ class Spider(Spider):
         page = int(pg) if pg else 1
         url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (
             self.site_url, tid, page)
-        self.log("category: %s" % url)
         html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
         pc = self._page_count(html)
-        self.log("  最终: %d 条, 总页数: %d" % (len(videos), pc))
         return {
             "list": videos,
             "page": page,
@@ -211,11 +205,10 @@ class Spider(Spider):
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
         keyword = urllib.parse.quote(key)
+        # 网站实际搜索 URL: /search.php?searchword=关键词&page=1
         url = "%s/search.php?searchword=%s&page=%d" % (
             self.site_url, keyword, page)
-        self.log("search: %s" % url)
         html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
         return {
             "list": videos,
@@ -235,14 +228,12 @@ class Spider(Spider):
             return {"list": []}
         vod_id = str(ids[0])
         url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
-        self.log("detail: %s" % url)
 
         html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
         if not html:
             return {"list": []}
 
-        # 标题
+        # 标题: <h1 class="title">老舅</h1>
         name = ""
         m = re.search(r'<h1 class="title">([^<]+)</h1>', html)
         if m:
@@ -253,30 +244,33 @@ class Spider(Spider):
                 name = self._clean(m.group(1).split("_")[0].split("-")[0])
         name = name or vod_id
 
-        # 海报
+        # 海报: <img ... id="js-poster-img" ... data-original="...">
         pic = self.default_pic
         m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
         if m:
             pic = m.group(1).strip()
 
-        # 简介
+        # 简介: <span class="detail-content" ...>...</span>
         content = ""
         m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
         if m:
             content = self._clean(m.group(1))
 
-        # 主演 / 导演
+        # 主演: 主演：...</span>
         actor = ""
         m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
         if m:
             actor = self._clean(m.group(1))
 
+        # 导演: 导演：...</span>
         director = ""
         m = re.search(r'导演[：:]\s*([\s\S]*?)</span>', html)
         if m:
             director = self._clean(m.group(1))
 
-        # 播放列表
+        # 播放列表:
+        # <h3>foxyun</h3> ... <ul class="stui-content__playlist clearfix">
+        #   <li id="00"><a title="第1集" href="/fox/17111-0-0.html" target="_self">第1集</a></li>
         play_from = []
         play_url = []
         for panel in re.finditer(
@@ -296,7 +290,6 @@ class Spider(Spider):
                 play_from.append(line)
                 play_url.append("#".join(eps))
 
-        self.log("  lines: %s" % play_from)
         if not play_from:
             return {"list": []}
 
@@ -315,7 +308,6 @@ class Spider(Spider):
 
     def playerContent(self, flag, id, vipFlags):
         play_page = id if id.startswith("http") else self._fix_url(id)
-        self.log("player: %s" % play_page)
 
         now = int(time.time())
         if play_page in self._play_cache:
@@ -325,30 +317,30 @@ class Spider(Spider):
 
         html = self._fetch(play_page)
 
-        # 播放页: var now="https://1080p.huyall.com/play/en5QEn4d";
-        # iframe:  const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
+        # 播放页: <script>var now="https://1080p.huyall.com/play/en5QEn4d";</script>
+        # iframe 内: const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
         m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
         if m:
             now_url = m.group(1).strip()
             mm = re.search(r'/play/([^/]+)/?$', now_url)
             if mm:
                 play_id = mm.group(1)
-                m3u8_url = "https://%s/play/%s/index.m3u8" % (PLAY_HOST_TO, play_id)
-                self.log("  now: %s" % now_url)
-                self.log("  m3u8: %s" % m3u8_url)
+                # 根据 iframe 源码，真实 m3u8 地址为:
+                # https://hd.kuktxu.com/play/{play_id}/index.m3u8
+                m3u8_url = "https://hd.kuktxu.com/play/%s/index.m3u8" % play_id
                 res = {
                     "parse": 0,
                     "playUrl": "",
                     "url": m3u8_url,
                     "header": {
                         "User-Agent": UA,
-                        "Referer": "https://%s/" % PLAY_HOST_TO,
+                        "Referer": "https://hd.kuktxu.com/",
                     },
                 }
                 self._play_cache[play_page] = (now, res)
                 return res
 
-        self.log("  兜底嗅探")
+        # 兜底：如果页面中没有 var now，交回给 TVBox 嗅探
         res = {
             "parse": 1,
             "playUrl": "",
