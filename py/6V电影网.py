@@ -1,8 +1,7 @@
 # coding=utf-8
 """
-茶杯狐电影 cupfoxdy.com | TVBox Python 爬虫
-- 优先使用 requests 直连（绕过 TVBox fetch 签名差异）
-- 所有解析规则来自网站真实 HTML
+6V电影网 6vdyw.com | TVBox Python 爬虫
+所有解析规则来自你提供的真实 HTML
 """
 import re
 import sys
@@ -30,25 +29,33 @@ except ImportError:
             pass
 
 
-HOST = "https://www.cupfoxdy.com"
+HOST = "https://www.6vdyw.com"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-DEFAULT_PIC = HOST + "/templets/cupfoxdy/images/img/load.png"
 
-# 完全按网站源码：/cup/1.html 电影 /cup/2.html 电视剧 /cup/3.html 综艺 /cup/4.html 动漫 /cup/25.html 短剧
+# 按网站导航栏 HTML 原文：
+# /html/1.html 电影  /html/6.html 美剧  /html/13.html 韩剧
+# /html/2.html 泰剧  /html/7.html 中剧  /html/14.html 日剧
+# /html/3.html 短剧  /html/8.html 港剧  /html/15.html 纪录片
+# /html/4.html 综艺
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
-    {"type_id": "2",  "type_name": "电视剧"},
-    {"type_id": "3",  "type_name": "综艺"},
-    {"type_id": "4",  "type_name": "动漫"},
-    {"type_id": "25", "type_name": "短剧"},
+    {"type_id": "6",  "type_name": "美剧"},
+    {"type_id": "13", "type_name": "韩剧"},
+    {"type_id": "2",  "type_name": "泰剧"},
+    {"type_id": "7",  "type_name": "中剧"},
+    {"type_id": "14", "type_name": "日剧"},
+    {"type_id": "3",  "type_name": "短剧"},
+    {"type_id": "8",  "type_name": "港剧"},
+    {"type_id": "15", "type_name": "纪录片"},
+    {"type_id": "4",  "type_name": "综艺"},
 ]
 
 
 class Spider(Spider):
 
     def getName(self):
-        return "茶杯狐电影"
+        return "6V电影网"
 
     def init(self, extend=""):
         try:
@@ -62,12 +69,10 @@ class Spider(Spider):
             "Accept-Language": "zh-CN,zh;q=0.9",
             "Referer": self.site_url + "/",
         }
-        self.default_pic = DEFAULT_PIC
         self._play_cache = {}
 
-    # ============ 网络：requests 优先，TVBox fetch 回退 ============
+    # ============ 网络：requests 优先，TVBox fetch 兜底 ============
     def _fetch(self, url):
-        # 1) 优先 requests（最稳定，不受 TVBox fetch 签名差异影响）
         if _HAS_REQUESTS:
             try:
                 r = requests.get(url, headers=self.headers, timeout=15, verify=False)
@@ -76,7 +81,6 @@ class Spider(Spider):
                     return r.text
             except Exception:
                 pass
-        # 2) 回退 TVBox fetch（尝试多种签名，防止 TypeError）
         for call in (
             lambda: self.fetch(url, headers=self.headers, timeout=15),
             lambda: self.fetch(url, headers=self.headers),
@@ -92,14 +96,9 @@ class Spider(Spider):
                 return rsp.text
             if hasattr(rsp, "content"):
                 c = rsp.content
-                if isinstance(c, bytes):
-                    return c.decode("utf-8", "ignore")
-                return str(c)
+                return c.decode("utf-8", "ignore") if isinstance(c, bytes) else str(c)
             if isinstance(rsp, bytes):
                 return rsp.decode("utf-8", "ignore")
-            s = str(rsp)
-            if s and s != "None":
-                return s
         return ""
 
     def _fix_url(self, url):
@@ -117,49 +116,51 @@ class Spider(Spider):
     def _clean(self, s):
         if not s:
             return ""
-        s = re.sub(r"<br\s*/?>", "\n", s, flags=re.I)
         s = re.sub(r"<[^>]+>", "", s)
-        s = (s.replace("&nbsp;", " ").replace("\xa0", " ")
-              .replace("&amp;", "&").replace("&quot;", '"')
-              .replace("&#39;", "'").replace("&lt;", "<").replace("&gt;", ">"))
-        s = re.sub(r"[ \t\r\f\v]+", " ", s)
-        s = re.sub(r"\n{2,}", "\n", s)
-        return s.strip()
+        return s.replace("&nbsp;", " ").replace("\xa0", " ").strip()
 
+    # ============ 列表解析 ============
     def _extract_videos(self, html):
+        """
+        你给的 HTML 原文：
+        <a href="/mov/100491.html" title="假面骑士零一真实×时间劇場版" class="vod-link">
+          <div class="vod-cover">
+            <img src="https://hongniuzyimage.com/cover/xxx.jpg" alt="..."
+        """
         videos = []
         seen = set()
         if not html:
             return videos
-        # 源码卡片：<a class="stui-vodlist__thumb lazyload" href="/mov/868.html" title="..." data-original="...">
         pattern = re.compile(
-            r'<a class="stui-vodlist__thumb lazyload" '
-            r'href="([^"]+)" '
-            r'title="([^"]*)" '
-            r'data-original="([^"]*)"', re.S)
+            r'<a href="([^"]+)" title="([^"]*)" class="vod-link">'
+            r'<div class="vod-cover"><img src="([^"]*)"',
+            re.S)
         for m in pattern.finditer(html):
             href, title, pic = m.groups()
             if href in seen:
                 continue
             seen.add(href)
-            if href.startswith("/"):
+            if not href.startswith("http"):
                 href = self.site_url + href
             videos.append({
                 "vod_id": href,
-                "vod_name": self._clean(title)[:100],
-                "vod_pic": pic.strip() or self.default_pic,
+                "vod_name": self._clean(title),
+                "vod_pic": pic.strip(),
                 "vod_remarks": "",
             })
         return videos
 
-    def _page_count(self, html):
-        # 源码：<li class="active num"><a>1/3105</a></li>
+    def _page_count(self, html, tid):
+        """
+        你给的 HTML 原文：
+        <a href="/html/1-1464.html" class="page-item" >尾页</a>
+        """
         if not html:
             return 1
-        m = re.search(r'<li class="active num"><a>\d+/(\d+)</a></li>', html)
-        if m:
+        nums = re.findall(r'/html/%s-(\d+)\.html' % re.escape(tid), html)
+        if nums:
             try:
-                return int(m.group(1))
+                return max(int(x) for x in nums)
             except Exception:
                 pass
         return 1
@@ -174,23 +175,31 @@ class Spider(Spider):
 
     # ============ 分类 ============
     def categoryContent(self, tid, pg, filter, extend):
-        # 源码分页链接：?page=1&searchtype=5&tid=1&
         page = int(pg) if pg else 1
-        url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (self.site_url, tid, page)
+        # 你给的 HTML 原文：
+        # 第一页：/html/1.html
+        # 第二页起：/html/1-2.html
+        if page == 1:
+            url = "%s/html/%s.html" % (self.site_url, tid)
+        else:
+            url = "%s/html/%s-%d.html" % (self.site_url, tid, page)
         html = self._fetch(url)
         videos = self._extract_videos(html)
-        pc = self._page_count(html)
+        pc = self._page_count(html, tid)
         return {"list": videos, "page": page, "pagecount": pc,
                 "limit": 24, "total": pc * 24}
 
     # ============ 搜索 ============
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
-        url = "%s/search.php?searchword=%s&page=%d" % (
-            self.site_url, urllib.parse.quote(key), page)
+        # 你给的 canonical：
+        # https://www.6vdyw.com/vodsearch/%E8%80%81%E8%88%85-------------.html
+        keyword = urllib.parse.quote(key)
+        url = "%s/vodsearch/%s-------------.html" % (self.site_url, keyword)
         html = self._fetch(url)
-        return {"list": self._extract_videos(html), "page": page,
-                "pagecount": 1, "limit": 24, "total": 999}
+        videos = self._extract_videos(html)
+        return {"list": videos, "page": page, "pagecount": 1,
+                "limit": 24, "total": 999}
 
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
@@ -205,58 +214,83 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
+        # 标题：<h1 class="detail-title">《老舅》免费在线观看</h1>
         name = ""
-        m = re.search(r'<h1 class="title">([^<]+)</h1>', html)
+        m = re.search(r'<h1 class="detail-title">([^<]+)</h1>', html)
         if m:
             name = self._clean(m.group(1))
+            name = (name.replace("《", "").replace("》", "")
+                        .replace("免费在线观看", "").strip())
         if not name:
             m = re.search(r"<title>(.*?)</title>", html, re.S)
             if m:
-                name = self._clean(m.group(1).split("_")[0].split("-")[0])
+                name = self._clean(m.group(1).split("-")[0].split("_")[0]).strip()
         name = name or vid
 
-        pic = self.default_pic
-        m = re.search(r'id="js-poster-img"[^>]*data-original="([^"]+)"', html)
+        # 封面：<div class="detail-cover"><img src="..." alt="...">
+        pic = ""
+        m = re.search(r'<div class="detail-cover"><img src="([^"]*)"', html)
         if m:
             pic = m.group(1).strip()
 
+        # 简介：<div class="detail-content"><h2>...</h2><p>...</p></div>
         content = ""
-        m = re.search(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', html)
+        m = re.search(r'<div class="detail-content">[\s\S]*?<p>([\s\S]*?)</p>', html)
         if m:
             content = self._clean(m.group(1))
-        if not content:
-            m = re.search(r'<span class="detail-sketch">([\s\S]*?)</span>', html)
-            if m:
-                content = self._clean(m.group(1))
 
+        # 主演：<strong>主演：</strong><span>...</span>
         actor = ""
-        m = re.search(r'主演[：:]\s*([\s\S]*?)</span>', html)
+        m = re.search(r'<strong>主演：</strong><span>([\s\S]*?)</span>', html)
         if m:
-            actor = self._clean(m.group(1))
-        director = ""
-        m = re.search(r'导演[：:]\s*([\s\S]*?)</span>', html)
-        if m:
-            director = self._clean(m.group(1))
+            actor = self._clean(re.sub(r'<[^>]+>', '', m.group(1)))
+            actor = re.sub(r'\s+', ' ', actor).strip()
 
-        # 源码：<h3>foxyun</h3> ... <ul class="stui-content__playlist clearfix">
-        #       <li id="00"><a title="第1集" href="/fox/17111-0-0.html">第1集</a></li>
+        # 导演：<strong>导演：</strong><span>...</span>
+        director = ""
+        m = re.search(r'<strong>导演：</strong><span>([\s\S]*?)</span>', html)
+        if m:
+            director = self._clean(re.sub(r'<[^>]+>', '', m.group(1)))
+            director = re.sub(r'\s+', ' ', director).strip()
+
+        # 播放列表
+        # 你给的 HTML 原文：
+        # <div class="episode-tabs"><div class="episode-tab active" data-index="1">6vyun</div></div>
+        # <div class="episode-list" data-tab="1">
+        #   <a href="/vod/18973-1-1.html" class="episode-item" target="_self" title="第1集">第1集</a>
+        #   ...
+        # </div>
         play_from = []
         play_url = []
-        for panel in re.finditer(
-                r'<h3>([^<]+)</h3>[\s\S]{0,500}?'
-                r'<ul class="stui-content__playlist clearfix">([\s\S]*?)</ul>',
+        for tab in re.finditer(
+                r'<div class="episode-tab[^"]*"[^>]*data-index="(\d+)"[^>]*>([^<]+)</div>',
                 html):
-            origin = panel.group(1).strip()
+            idx = tab.group(1)
+            line_name = tab.group(2).strip()
+
+            # 找对应的 episode-list
+            marker = 'data-tab="%s"' % idx
+            start = html.find(marker, tab.end())
+            if start == -1:
+                continue
+            # 结束位置：下一个 episode-list 或 </section>
+            next_list = html.find('<div class="episode-list"', start + 1)
+            end_sec = html.find('</section>', start)
+            ends = [e for e in (next_list, end_sec) if e != -1]
+            end = min(ends) if ends else len(html)
+            block = html[start:end]
+
             eps = []
             for a in re.finditer(
-                    r'<a\s+title="([^"]+)"\s+href="([^"]+)"', panel.group(2)):
-                ep_name = a.group(1).strip()
-                href = a.group(2)
-                if href.startswith("/"):
+                    r'<a href="([^"]+)" class="episode-item[^"]*"[^>]*title="([^"]+)"',
+                    block):
+                href = a.group(1)
+                ep_name = a.group(2)
+                if not href.startswith("http"):
                     href = self.site_url + href
                 eps.append("%s$%s" % (ep_name, href))
             if eps:
-                play_from.append(origin)
+                play_from.append(line_name)
                 play_url.append("#".join(eps))
 
         if not play_from:
@@ -283,17 +317,22 @@ class Spider(Spider):
                 return res
 
         html = self._fetch(play_page)
-        # 源码：<script>var now="https://1080p.huyall.com/play/en5QEn4d";</script>
-        # iframe 内: const vid = 'https://hd.kuktxu.com/play/en5QEn4d/index.m3u8';
-        m = re.search(r'var\s+now\s*=\s*"([^"]+)"', html)
+        # 你给的 HTML 原文：
+        # <script>var player_aaaa={..., "url":"https:\/\/hn.bfvvs.com\/play\/bkRQA9xa", ...}</script>
+        m = re.search(r'"url":"([^"]+)"', html)
         if m:
-            mm = re.search(r'/play/([^/]+)/?$', m.group(1).strip())
-            if mm:
-                m3u8_url = "https://hd.kuktxu.com/play/%s/index.m3u8" % mm.group(1)
-                res = {"parse": 0, "playUrl": "", "url": m3u8_url,
-                       "header": {"User-Agent": UA, "Referer": "https://hd.kuktxu.com/"}}
-                self._play_cache[play_page] = (now, res)
-                return res
+            play_url = m.group(1).replace("\\/", "/")
+            res = {
+                "parse": 1,           # maccms 的 /play/xxx 是播放页，交给 TVBox 嗅探
+                "playUrl": "",
+                "url": play_url,
+                "header": {
+                    "User-Agent": UA,
+                    "Referer": self.site_url + "/",
+                },
+            }
+            self._play_cache[play_page] = (now, res)
+            return res
 
         res = {"parse": 1, "playUrl": "", "url": play_page,
                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
