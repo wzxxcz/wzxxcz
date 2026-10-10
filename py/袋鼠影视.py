@@ -26,8 +26,6 @@ class Spider(Spider):
     def manualVideoCheck(self):
         return False
 
-    # ==================== 首页 & 筛选 ====================
-
     def homeContent(self, filter):
         def V(items):
             return [{"n": str(n), "v": str(v)} for n, v in items]
@@ -110,69 +108,90 @@ class Spider(Spider):
         except Exception:
             page_int = 1
 
-        # 用户是否选了"类型"（子类型覆盖频道）
-        user_sub_tid = ext.get("tid") if valid(ext.get("tid")) else None
+        # 用户选的子类型
+        user_sub_tid = str(ext.get("tid")) if valid(ext.get("tid")) else None
 
-        # 用户是否选了除类型外的其他筛选
-        other_filter = False
+        # 除 tid 外的其他筛选
+        other_has = False
         for k in ("area", "year", "letter", "yuyan", "jq", "order"):
             if valid(ext.get(k)):
-                other_filter = True
+                other_has = True
                 break
 
         channel_tid = str(tid)
 
-        # 场景 A：无筛选 + 第 1 页 → 静态分类页
-        if not user_sub_tid and not other_filter and page_int == 1:
+        # ==== 决定静态页 tid ====
+        # 如果用户选了子类型，静态页用子类型 tid；否则用频道 tid
+        static_tid = user_sub_tid if user_sub_tid else channel_tid
+
+        # ==== 决定请求策略 ====
+        # 场景 1：无任何筛选 + 第 1 页 → 只走静态页
+        if not user_sub_tid and not other_has and page_int == 1:
             url = self.host + "/frim/index" + channel_tid + ".html"
-        else:
-            # 场景 B/C/D：走 search.php
-            # 确定 real_tid
-            if user_sub_tid:
-                # 用户选了类型，用用户的
-                real_tid = str(user_sub_tid)
-            else:
-                # 用户没选类型但选了其他筛选 → 映射到该频道首个子类型
-                # 这是站点自己的逻辑：如"电视剧+2026"实际请求 tid=13
-                CHANNEL_FIRST_SUB = {
-                    "2":  "13",   # 电视剧 → 国产剧
-                    "3":  "29",   # 综艺 → 内地综艺
-                    "4":  "34",   # 动漫 → 国产动漫
-                    "44": "28",   # 短剧 → 短剧
+            html = self.get(url)
+            return {
+                "page": page_int, "pagecount": 999, "limit": 24, "total": 999999,
+                "list": self.parseList(html)
+            }
+
+        # 场景 2：只选了子类型（无其他筛选）+ 第 1 页 → 走静态子类型页
+        if user_sub_tid and not other_has and page_int == 1:
+            url = self.host + "/frim/index" + user_sub_tid + ".html"
+            html = self.get(url)
+            items = self.parseList(html)
+            if items:
+                return {
+                    "page": page_int, "pagecount": 999, "limit": 24, "total": 999999,
+                    "list": items
                 }
-                real_tid = CHANNEL_FIRST_SUB.get(channel_tid, channel_tid)
+            # 静态子类型页没数据 → 降级到 search.php
+            # 继续往下走
 
-            # 拼 URL，严格模仿站点真实链接
-            # 分页链接格式：?page=2&searchtype=5&order=weekhit&tid=13&year=2026
-            # 切类型链接：  ?searchtype=5&tid=13
-            # 切筛选链接：  ?searchtype=5&order=weekhit&tid=13&year=2026&...
-            parts = []
-            if page_int > 1:
-                parts.append(("page", str(page_int)))
-            parts.append(("searchtype", "5"))
+        # 场景 3：有其他筛选 → 走 search.php（严格照抄站点参数顺序）
+        # 频道 tid 到首个子类型的映射（站点逻辑：选筛选时自动替换）
+        CHANNEL_FIRST_SUB = {
+            "2":  "13", "3":  "29", "4":  "34", "44": "28",
+        }
+        if user_sub_tid:
+            real_tid = user_sub_tid
+        else:
+            real_tid = CHANNEL_FIRST_SUB.get(channel_tid, channel_tid)
 
-            # ★关键：只有选了非类型筛选时才带 order=weekhit
-            if other_filter:
-                order_val = ext.get("order") if valid(ext.get("order")) else "weekhit"
-                parts.append(("order", str(order_val)))
+        parts = []
+        if page_int > 1:
+            parts.append(("page", str(page_int)))
+        parts.append(("searchtype", "5"))
+        # 只在有其他筛选时才带 order
+        if other_has:
+            order_val = ext.get("order") if valid(ext.get("order")) else "weekhit"
+            parts.append(("order", str(order_val)))
+        parts.append(("tid", real_tid))
+        for k in ("year", "area", "letter", "yuyan", "jq"):
+            v = ext.get(k)
+            if valid(v):
+                parts.append((k, str(v)))
 
-            parts.append(("tid", real_tid))
-
-            for k in ("year", "area", "letter", "yuyan", "jq"):
-                v = ext.get(k)
-                if valid(v):
-                    parts.append((k, str(v)))
-
-            qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
-            url = self.host + "/search.php?" + qs
-
+        qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
+        url = self.host + "/search.php?" + qs
         html = self.get(url)
+        items = self.parseList(html)
+
+        # ★ 降级：search.php 失败 → 走静态页
+        if not items:
+            fallback_url = self.host + "/frim/index" + static_tid + ".html"
+            if page_int > 1:
+                # 静态页有分页 → 用 search.php 但 tid 换成子类型
+                # 这里只能用第 1 页数据
+                fallback_url = self.host + "/frim/index" + static_tid + ".html"
+            html2 = self.get(fallback_url)
+            items = self.parseList(html2)
+
         return {
             "page": page_int,
             "pagecount": 999,
             "limit": 24,
             "total": 999999,
-            "list": self.parseList(html)
+            "list": items
         }
 
     # ==================== 详情 ====================
@@ -259,8 +278,6 @@ class Spider(Spider):
         play_url = ["#".join(p[2]) for p in panels]
         return play_from, play_url
 
-    # ==================== 搜索 ====================
-
     def searchContent(self, key, quick, pg="1"):
         try:
             page_int = int(pg)
@@ -269,8 +286,6 @@ class Spider(Spider):
         url = self.host + "/search.php?searchword=" + quote(key) + "&page=" + str(page_int)
         html = self.get(url)
         return {"list": self.parseList(html), "page": page_int}
-
-    # ==================== 播放 ====================
 
     def playerContent(self, flag, id, vipFlags):
         url = id if id.startswith("http") else self.fix(id)
@@ -291,8 +306,6 @@ class Spider(Spider):
             "url": m3u8,
             "header": self.headers,
         }
-
-    # ==================== 列表解析 ====================
 
     def parseList(self, html):
         res = []
@@ -343,8 +356,6 @@ class Spider(Spider):
             })
 
         return res
-
-    # ==================== 工具方法 ====================
 
     def localProxy(self, param):
         return [404, "text/plain", "", ""]
