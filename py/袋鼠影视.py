@@ -13,7 +13,7 @@ class Spider(Spider):
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Mobile Safari/537.36",
             "Referer": self.host + "/",
-            "Origin": self.host,
+            "Origin": self.host
         }
 
     def getName(self):
@@ -25,7 +25,9 @@ class Spider(Spider):
     def manualVideoCheck(self):
         return False
 
-    def _common_filters(self):
+    # ==================== 首页 & 筛选 ====================
+
+    def homeContent(self, filter):
         AREA = [("全部", ""), ("大陆", "大陆"), ("香港", "香港"), ("台湾", "台湾"),
                 ("日本", "日本"), ("韩国", "韩国"), ("美国", "美国"), ("英国", "英国"),
                 ("法国", "法国"), ("泰国", "泰国"), ("印度", "印度"),
@@ -46,7 +48,7 @@ class Spider(Spider):
         def V(items):
             return [{"n": n, "v": v} for n, v in items]
 
-        return [
+        common = [
             {"key": "jq",     "name": "剧情", "value": V(JQ)},
             {"key": "area",   "name": "地区", "value": V(AREA)},
             {"key": "year",   "name": "年份", "value": V(YEAR)},
@@ -55,7 +57,6 @@ class Spider(Spider):
             {"key": "order",  "name": "排序", "value": V(ORDER)},
         ]
 
-    def homeContent(self, filter):
         return {
             "class": [
                 {"type_id": "1",  "type_name": "电影"},
@@ -65,11 +66,11 @@ class Spider(Spider):
                 {"type_id": "44", "type_name": "短剧"},
             ],
             "filters": {
-                "1":  self._common_filters(),
-                "2":  self._common_filters(),
-                "3":  self._common_filters(),
-                "4":  self._common_filters(),
-                "44": self._common_filters(),
+                "1":  common,
+                "2":  common,
+                "3":  common,
+                "4":  common,
+                "44": common,
             }
         }
 
@@ -86,13 +87,10 @@ class Spider(Spider):
                 ext = {}
 
         def valid(v):
-            if v is None:
-                return False
-            return str(v).strip() not in ("", "全部", "0", "None")
+            return v is not None and str(v).strip() not in ("", "全部", "0", "None")
 
-        # 收集有效筛选（不含 tid）
         filter_params = []
-        for k in ("area", "year", "letter", "yuyan", "jq"):
+        for k in ("area", "year", "letter", "yuyan", "jq", "order"):
             v = ext.get(k)
             if valid(v):
                 filter_params.append((k, str(v)))
@@ -101,14 +99,13 @@ class Spider(Spider):
         page_int = int(pg)
 
         if not has_filter and page_int == 1:
-            # 关键分支：无筛选 + 第 1 页 → 走原始能过的路径
+            # 无筛选 + 第 1 页 → 走站点静态分类路径（原版能跑的路径）
             url = self.host + "/frim/index" + str(tid) + ".html"
         else:
-            # 有筛选 或 翻页 → 走 search.php，模仿站点真实 URL
-            order = ext.get("order")
-            if not valid(order):
-                order = "weekhit"
-            parts = [("searchtype", "5"), ("order", str(order)), ("tid", str(tid))]
+            # 有筛选 或 翻页 → 走 search.php，完全模仿站点 HTML 里的真实 URL
+            # 单筛选真实 URL: search.php?searchtype=5&tid=2&area=大陆
+            # 第 1 页不带 page，翻页才带 page
+            parts = [("searchtype", "5"), ("tid", str(tid))]
             parts.extend(filter_params)
             if page_int > 1:
                 parts.append(("page", str(page_int)))
@@ -123,6 +120,8 @@ class Spider(Spider):
             "total": 999999,
             "list": self.parseList(html)
         }
+
+    # ==================== 详情 ====================
 
     def detailContent(self, ids):
         vid = ids[0]
@@ -264,6 +263,8 @@ class Spider(Spider):
 
         return eps
 
+    # ==================== 搜索 & 播放 ====================
+
     def searchContent(self, key, quick, pg="1"):
         url = self.host + "/search.php?searchword=" + quote(key) + "&page=" + str(pg)
         html = self.get(url)
@@ -288,6 +289,8 @@ class Spider(Spider):
             "url": url,
             "header": self.headers
         }
+
+    # ==================== 列表解析 ====================
 
     def parseList(self, html):
         res = []
@@ -332,6 +335,8 @@ class Spider(Spider):
                     "vod_remarks": ""
                 })
         return res
+
+    # ==================== 工具方法 ====================
 
     def localProxy(self, param):
         return [404, "text/plain", "", ""]
