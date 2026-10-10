@@ -1,12 +1,12 @@
 # coding=utf-8
 """
-好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2 直链播放版)
+好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2.1 兼容修复版)
 
 关键:
-  - 域名已更新为 www.haojuwu1.cc
-  - 播放页 JS 变量 player_aaaa 里直接就是 m3u8 直链 (v.lzcdn27.com)
-  - 无需走 MacPlayer.Parse 的第三方解析
+  - 域名 www.haojuwu1.cc
+  - 播放页 JS 变量 player_aaaa 里直接就是 m3u8 直链
   - parse=0 直链播放
+  - V2.1 修复: 列表页正则放宽 + home/search 加 debug 日志
 """
 import re
 import sys
@@ -121,26 +121,28 @@ for c in CLASSES:
 
 
 # ===================== 正则 =====================
+# ← 改动一: 3 个正则全部放宽，属性顺序无关
 _RE_CARD = re.compile(
-    r'<a[^>]*class="[^"]*stui-vodlist__thumb[^"]*"[^>]*'
-    r'href="(/voddetail/[^"]+)"[^>]*'
-    r'title="([^"]*)"[^>]*'
-    r'data-original="([^"]*)"',
+    r'<a\b[^>]*?href="(/voddetail/[^"]+)"[^>]*?title="([^"]*)"[^>]*?>'
+    r'[\s\S]{0,600}?'
+    r'(?:data-original|src)="([^"]*?)"',
     re.S | re.I)
 
 _RE_CARD2 = re.compile(
-    r'<a[^>]*href="(/voddetail/[^"]+)"[^>]*title="([^"]*)"[^>]*'
-    r'data-original="([^"]*)"',
+    r'<a\b[^>]*?title="([^"]*)"[^>]*?href="(/voddetail/[^"]+)"[^>]*?>'
+    r'[\s\S]{0,600}?'
+    r'(?:data-original|src)="([^"]*?)"',
     re.S | re.I)
 
-_RE_PIC_ALT = re.compile(
-    r'<a[^>]*href="(/voddetail/[^"]+)"[^>]*title="([^"]*)"[\s\S]{0,400}?'
-    r'<img[^>]*data-original="([^"]*)"',
+_RE_CARD3 = re.compile(
+    r'<div\s+class="stui-vodlist__box">[\s\S]*?'
+    r'<a\b[^>]*?href="(/voddetail/[^"]+)"[^>]*?'
+    r'(?:title="([^"]*)")?[^>]*?>[\s\S]*?'
+    r'(?:data-original|src)="([^"]*?)"',
     re.S | re.I)
 
 _RE_PAGENUM = re.compile(r'<a>(\d+)/(\d+)</a>')
 
-# 播放页 player_aaaa —— 用平衡括号方式匹配最外层 { }
 _RE_PLAYER_AA_START = re.compile(r'player_aaaa\s*=\s*(\{)', re.S)
 
 _RE_H1 = re.compile(r'<h1[^>]*class="title"[^>]*>([\s\S]*?)</h1>', re.I)
@@ -255,30 +257,69 @@ class Spider(Spider):
         return s.strip()
 
     # -------- 列表解析 --------
+    # ← 改动二: 3 策略 + debug 日志
     def _extract_videos(self, html):
         videos = []
         seen = set()
         if not html:
+            self.log("  HTML 为空")
             return videos
 
-        matches = _RE_CARD.findall(html)
-        if not matches:
-            matches = _RE_CARD2.findall(html)
-        if not matches:
-            matches = _RE_PIC_ALT.findall(html)
+        # 策略 1
+        m1 = _RE_CARD.findall(html)
+        self.log("  策略1 (href→title→img): %d 条" % len(m1))
 
-        self.log("  卡片: %d 条" % len(matches))
+        # 策略 2
+        m2 = []
+        if not m1:
+            m2raw = _RE_CARD2.findall(html)
+            self.log("  策略2 (title→href→img): %d 条" % len(m2raw))
+            m2 = [(h, t, p) for (t, h, p) in m2raw]
+
+        # 策略 3
+        m3 = []
+        if not m1 and not m2:
+            m3raw = _RE_CARD3.findall(html)
+            m3 = [(h, t or "", p) for (h, t, p) in m3raw]
+            self.log("  策略3 (卡片块): %d 条" % len(m3))
+
+        matches = m1 or m2 or m3
+
+        # 全部失败 → 打印现场
+        if not matches:
+            self.log("  ⚠️ 三种策略都失败！")
+            self.log("  HTML 长度: %d" % len(html))
+            self.log("  voddetail 出现次数: %d" % html.count("voddetail"))
+            self.log("  stui-vodlist__thumb 出现次数: %d"
+                     % html.count("stui-vodlist__thumb"))
+            self.log("  data-original 出现次数: %d" % html.count("data-original"))
+            idx = html.find("voddetail")
+            if idx >= 0:
+                self.log("  首个 voddetail 附近 600 字符:")
+                self.log(html[max(0, idx - 100):idx + 600])
+            return videos
+
+        # 组装
         for href, title, pic in matches:
-            href = href.replace("&amp;", "&")
+            href = href.replace("&amp;", "&").strip()
             if href in seen:
                 continue
             seen.add(href)
+
+            title = self._clean(title).strip()
+            if not title:
+                title = href
+
+            pic = self._fix_url(pic) if pic else ""
+
             videos.append({
                 "vod_id":      href,
-                "vod_name":    self._clean(title)[:100],
-                "vod_pic":     self._fix_url(pic) or self.default_pic,
+                "vod_name":    title[:100],
+                "vod_pic":     pic or self.default_pic,
                 "vod_remarks": "",
             })
+
+        self.log("  ✅ 最终: %d 条" % len(videos))
         return videos
 
     def _page_count(self, html, default=1):
@@ -296,9 +337,14 @@ class Spider(Spider):
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": FILTERS}
 
+    # ← 改动三: 加日志
     def homeVideoContent(self):
+        self.log("=== homeVideoContent 开始 ===")
         html = self._fetch(self.site_url + "/")
-        return {"list": self._extract_videos(html)}
+        self.log("HTML 长度: %d" % len(html))
+        videos = self._extract_videos(html)
+        self.log("=== 首页返回 %d 条 ===" % len(videos))
+        return {"list": videos}
 
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
@@ -329,12 +375,21 @@ class Spider(Spider):
             "limit": 24, "total": pagecount * 24,
         }
 
+    # ← 改动四: POST/GET 兼容
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
         url = "%s/vodsearch/-------------.html" % self.site_url
-        data = {"wd": key, "submit": ""}
-        html = self._fetch(url, method="POST", data=data)
-        self.log("search: %s (%d 字节)" % (key, len(html)))
+
+        html = self._fetch(url, method="POST", data={"wd": key, "submit": ""})
+        self.log("search POST: %s (%d 字节)" % (key, len(html)))
+
+        if html.count("voddetail") < 2:
+            self.log("  POST 无效，切换 GET")
+            enc = urllib.parse.quote(key)
+            get_url = "%s/vodsearch/%s-------------.html" % (self.site_url, enc)
+            html = self._fetch(get_url)
+            self.log("search GET: %s (%d 字节)" % (get_url, len(html)))
+
         videos = self._extract_videos(html)
         pagecount = self._page_count(html, 1)
         return {
@@ -406,6 +461,7 @@ class Spider(Spider):
             groups.setdefault(sid, []).append((ep_name, self._fix_url(play_path)))
 
         if not groups:
+            self.log("  ⚠️ 没抓到剧集")
             return {"list": []}
 
         # 线路名映射
@@ -423,7 +479,6 @@ class Spider(Spider):
         play_url = []
         for sid in sorted_sids:
             eps = groups[sid]
-            # 去重
             seen = set()
             uniq = []
             for n, u in eps:
@@ -434,6 +489,9 @@ class Spider(Spider):
             alias = line_name_map.get(sid, "线路%s" % sid)
             play_from.append(alias)
             play_url.append("#".join("%s$%s" % (n, u) for n, u in uniq))
+
+        self.log("  线路: %d, 集数: %s"
+                 % (len(groups), {k: len(v) for k, v in groups.items()}))
 
         return {"list": [{
             "vod_id": vod_id,
@@ -447,21 +505,8 @@ class Spider(Spider):
             "vod_play_url":  "$$$".join(play_url),
         }]}
 
-    # -------- 播放（核心改动）--------
+    # -------- 播放 --------
     def playerContent(self, flag, id, vipFlags):
-        """
-        从播放页 HTML 里提取 player_aaaa.url
-        player_aaaa 结构 (实测):
-        {
-          "flag":"play","encrypt":0,"trysee":0,"points":0,
-          "link":"/vodplay/217562-1-1.html",
-          "link_next":"...","link_pre":"",
-          "url":"https://v.lzcdn27.com/20261002/18068_ea813819/index.m3u8",
-          "url_next":"https://v.lzcdn27.com/20261002/18070_38722954/index.m3u8",
-          "from":"lzm3u8","server":"no","note":"",
-          "id":"217562","sid":2,"nid":2
-        }
-        """
         play_page = id if id.startswith("http") else self._fix_url(id)
         self.log("player: %s" % play_page)
 
@@ -484,12 +529,10 @@ class Spider(Spider):
                         self.log("  player_aaaa.url = %s" % real_url[:160])
                     except Exception as e:
                         self.log("  JSON 解析失败: %s" % e)
-                        # 兜底正则
                         mm = re.search(r'"url"\s*:\s*"([^"]+)"', obj_str)
                         if mm:
                             real_url = mm.group(1).replace("\\/", "/")
 
-        # 判断直链
         if real_url:
             low = real_url.lower()
             if (".m3u8" in low) or (".mp4" in low):
@@ -506,7 +549,6 @@ class Spider(Spider):
                 self.log("  => 直链: %s" % real_url[:160])
                 return res
 
-        # 兜底：交给 TVBox 嗅探
         res = {
             "parse": 1,
             "playUrl": "",
