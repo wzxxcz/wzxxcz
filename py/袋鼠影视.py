@@ -90,27 +90,34 @@ class Spider(Spider):
                 return False
             return str(v).strip() not in ("", "全部", "0", "None")
 
-        # 用户选的排序，没选就默认 weekhit（站点默认排序）
-        order = ext.get("order")
-        if not valid(order):
-            order = "weekhit"
-
-        # 完全模仿站点真实 URL 顺序：searchtype → order → tid → area → year → letter → yuyan → jq → page
-        parts = [("searchtype", "5"), ("order", str(order)), ("tid", str(tid))]
+        # 收集有效筛选（不含 tid）
+        filter_params = []
         for k in ("area", "year", "letter", "yuyan", "jq"):
             v = ext.get(k)
             if valid(v):
-                parts.append((k, str(v)))
-        # 第 1 页不带 page，翻页才带（和站点一致）
-        if int(pg) > 1:
-            parts.append(("page", str(pg)))
+                filter_params.append((k, str(v)))
 
-        qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
-        url = self.host + "/search.php?" + qs
+        has_filter = len(filter_params) > 0
+        page_int = int(pg)
+
+        if not has_filter and page_int == 1:
+            # 关键分支：无筛选 + 第 1 页 → 走原始能过的路径
+            url = self.host + "/frim/index" + str(tid) + ".html"
+        else:
+            # 有筛选 或 翻页 → 走 search.php，模仿站点真实 URL
+            order = ext.get("order")
+            if not valid(order):
+                order = "weekhit"
+            parts = [("searchtype", "5"), ("order", str(order)), ("tid", str(tid))]
+            parts.extend(filter_params)
+            if page_int > 1:
+                parts.append(("page", str(page_int)))
+            qs = "&".join("{0}={1}".format(k, quote(str(v))) for k, v in parts)
+            url = self.host + "/search.php?" + qs
 
         html = self.get(url)
         return {
-            "page": int(pg),
+            "page": page_int,
             "pagecount": 999,
             "limit": 24,
             "total": 999999,
