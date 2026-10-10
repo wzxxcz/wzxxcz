@@ -25,6 +25,9 @@ except Exception:
     pass
 
 
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
+
+
 class Spider(Spider):
 
     def __init__(self):
@@ -361,6 +364,11 @@ class Spider(Spider):
             if desc:
                 content = self._txt(desc[0])
             content = re.sub(r'\s*展开\s*$', '', content).strip()
+            # 简介加前缀
+            if content:
+                content = INTRO_PREFIX + content
+            else:
+                content = INTRO_PREFIX
 
             # 线路名: data-dropdown-value 或 span
             froms = root.xpath('//div[contains(@class,"module-tab-item")]/@data-dropdown-value')
