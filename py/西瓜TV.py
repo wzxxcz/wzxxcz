@@ -1,13 +1,14 @@
 # coding=utf-8
 """
-西瓜TV TVBox 爬虫 - 完整版
-加密: AES-CTR + Base64
+西瓜TV TVBox 爬虫 - 最终版
+加密: AES-256-CTR (Web Crypto API 兼容, counter length=64)
 密钥: wK05tMq7sH2aP1cQ6eB9rV3fG4hL8nDx
 """
 import re
 import sys
 import json
 import time
+import uuid
 import base64
 import hashlib
 import urllib.parse
@@ -45,7 +46,7 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 DEFAULT_PIC = HOST + "/logo.png"
 
 # ★★★ 已验证的 AES 密钥 ★★★
-AES_KEY = "wK05tMq7sH2aP1cQ6eB9rV3fG4hL8nDx"
+AES_KEY = b"wK05tMq7sH2aP1cQ6eB9rV3fG4hL8nDx"
 
 try:
     from Crypto.Cipher import AES
@@ -56,29 +57,18 @@ except ImportError:
     print("[xigua] 请先安装: pip install pycryptodome")
 
 
-# ==================== AES-CTR 加密/解密 ====================
-def _key_bytes(key=AES_KEY):
-    kb = key.encode('utf-8')
-    if len(kb) < 32:
-        kb = kb.ljust(32, b'\0')
-    return kb[:32]
-
-
-def _make_iv():
-    """生成 16 字节随机 IV"""
-    return hashlib.md5(
-        (str(time.time()) + str(id(object()))).encode()
-    ).digest()
-
-
+# ==================== AES-CTR (Web Crypto API 兼容) ====================
 def aes_ctr_encrypt(plain_text: str, key=AES_KEY):
     """AES-CTR 加密, 返回 {data, iv}"""
     if not HAS_PYCRYPTO:
         return None
-    key_b = _key_bytes(key)
-    iv = _make_iv()
-    ctr = Counter.new(128, initial_value=int.from_bytes(iv, 'big'))
-    cipher = AES.new(key_b, AES.MODE_CTR, counter=ctr)
+    # 生成 16 字节 IV
+    iv = hashlib.md5((str(time.time()) + str(uuid.uuid4())).encode()).digest()
+    # 高 64 位作为 nonce, 低 64 位作为 counter (Web Crypto API length=64)
+    prefix = iv[:8]
+    initial = int.from_bytes(iv[8:], 'big')
+    ctr = Counter.new(64, prefix=prefix, initial_value=initial)
+    cipher = AES.new(key, AES.MODE_CTR, counter=ctr)
     ct = cipher.encrypt(plain_text.encode('utf-8'))
     return {
         "data": base64.b64encode(ct).decode(),
@@ -91,11 +81,12 @@ def aes_ctr_decrypt(data_b64: str, iv_b64: str, key=AES_KEY):
     if not HAS_PYCRYPTO:
         return None
     try:
-        key_b = _key_bytes(key)
         iv = base64.b64decode(iv_b64)
         ct = base64.b64decode(data_b64)
-        ctr = Counter.new(128, initial_value=int.from_bytes(iv, 'big'))
-        cipher = AES.new(key_b, AES.MODE_CTR, counter=ctr)
+        prefix = iv[:8]
+        initial = int.from_bytes(iv[8:], 'big')
+        ctr = Counter.new(64, prefix=prefix, initial_value=initial)
+        cipher = AES.new(key, AES.MODE_CTR, counter=ctr)
         pt = cipher.decrypt(ct)
         return pt.decode('utf-8')
     except Exception as e:
@@ -127,6 +118,10 @@ class Spider(Spider):
         except Exception:
             self.extend = {}
 
+        # 生成一个固定的 deviceId（每个爬虫实例一个）
+        self.device_id = hashlib.md5(str(uuid.uuid4()).encode()).hexdigest()
+        self.log("deviceId = %s" % self.device_id)
+
         self.headers = {
             "User-Agent": UA,
             "Accept": "application/json, text/plain, */*",
@@ -136,33 +131,36 @@ class Spider(Spider):
             "Referer": HOST + "/",
         }
         self._play_cache = {}
-        self.log("init ok, key=%s" % AES_KEY[:8])
+        self.log("init ok")
 
     def _post(self, path: str, body: dict = None, lang="zh_cn"):
         """POST 加密请求, 自动解密返回"""
         if body is None:
             body = {}
+        # 关键：每个请求都要带 deviceId
+        body["deviceId"] = self.device_id
         body["lang"] = lang
 
-        enc = aes_ctr_encrypt(json.dumps(body, ensure_ascii=False))
+        enc = aes_ctr_encrypt(json.dumps(body, ensure_ascii=False, separators=(',', ':')))
         if not enc:
             return {}
 
-        url = f"{API}{path}"
+        url = f"{API}{path}?lang={lang}"
         try:
             r = self.fetch(url, headers=self.headers, method="POST",
-                           data=json.dumps(enc), timeout=15)
+                           data=json.dumps(enc, separators=(',', ':')),
+                           timeout=15)
             text = r.text
+            self.log("POST %s -> %s" % (path, text[:120]))
             try:
                 resp = json.loads(text)
-                # 响应是 {data, iv} 加密的
                 if isinstance(resp, dict) and "data" in resp and "iv" in resp:
                     plain = aes_ctr_decrypt(resp["data"], resp["iv"])
                     if plain:
                         return json.loads(plain)
                 return resp
             except Exception as e:
-                self.log("json parse fail:", e, text[:200])
+                self.log("json parse fail:", e)
                 return {}
         except Exception as e:
             self.log("post fail:", e)
@@ -181,7 +179,6 @@ class Spider(Spider):
         page = int(pg) if pg else 1
         body = {
             "type_id": tid,
-            "type": tid,
             "page": page,
         }
         if extend and isinstance(extend, dict):
@@ -205,7 +202,6 @@ class Spider(Spider):
         page = int(pg) if pg else 1
         data = self._post("/search", {
             "keyword": key,
-            "wd": key,
             "page": page,
         })
         videos = self._parse_list(data)
@@ -244,7 +240,6 @@ class Spider(Spider):
         episodes = (info.get("episodes")
                     or info.get("play_list")
                     or info.get("playlist")
-                    or info.get("playUrls")
                     or info.get("urls")
                     or [])
 
@@ -252,7 +247,6 @@ class Spider(Spider):
         play_url_list = []
 
         if isinstance(episodes, dict):
-            all_lines = []
             for line_name, eps in episodes.items():
                 line_list = []
                 if isinstance(eps, list):
@@ -268,16 +262,13 @@ class Spider(Spider):
                         if ep_url:
                             line_list.append(f"{ep_name}${ep_url}")
                 if line_list:
-                    all_lines.append("#".join(line_list))
-            if all_lines:
-                play_url_list = all_lines
-                play_from = "$$$".join(episodes.keys())
+                    play_url_list.append("#".join(line_list))
         elif isinstance(episodes, list):
             line = []
             for ep in episodes:
                 if isinstance(ep, dict):
                     ep_name = ep.get("name") or ep.get("title") or ""
-                    ep_url = ep.get("url") or ep.get("play_url") or ep.get("link") or ""
+                    ep_url = ep.get("url") or ep.get("play_url") or ""
                 elif isinstance(ep, list) and len(ep) >= 2:
                     ep_name, ep_url = ep[0], ep[1]
                 else:
@@ -307,14 +298,12 @@ class Spider(Spider):
         if not play_url.startswith("http"):
             play_url = HOST + play_url
 
-        # 缓存
         now = int(time.time())
         if play_url in self._play_cache:
             ts, res = self._play_cache[play_url]
             if now - ts < 600:
                 return res
 
-        # 1. 从 URL 提取 vid 调 /video/play
         m = re.search(r'/(\d+)', play_url)
         if m:
             vid = int(m.group(1))
@@ -330,7 +319,6 @@ class Spider(Spider):
                     self._play_cache[play_url] = (now, res)
                     return res
 
-        # 2. 尝试从页面抓 m3u8
         try:
             r = self.fetch(play_url, headers=self.headers, timeout=15)
             m = re.search(r'(https?://[^\s"\'<>]+\.m3u8[^\s"\'<>]*)', r.text)
@@ -345,7 +333,6 @@ class Spider(Spider):
         except Exception as e:
             self.log("fetch play fail:", e)
 
-        # 3. 兜底
         res = {
             "parse": 1, "playUrl": "", "url": play_url,
             "header": {"User-Agent": UA, "Referer": HOST + "/"},
