@@ -6,6 +6,8 @@ from urllib.parse import quote, unquote
 sys.path.append('..')
 from base.spider import Spider
 
+requests.packages.urllib3.disable_warnings()
+
 
 class Spider(Spider):
     def init(self, extend=""):
@@ -25,23 +27,78 @@ class Spider(Spider):
     def manualVideoCheck(self):
         return False
 
+    # ==================== 首页 & 筛选 ====================
+
     def homeContent(self, filter):
+        AREA = [("全部", ""), ("大陆", "大陆"), ("香港", "香港"), ("台湾", "台湾"), ("日本", "日本"),
+                ("韩国", "韩国"), ("美国", "美国"), ("英国", "英国"), ("法国", "法国"), ("泰国", "泰国"),
+                ("印度", "印度"), ("加拿大", "加拿大"), ("西班牙", "西班牙")]
+        YUYAN = [("全部", ""), ("国语", "国语"), ("粤语", "粤语"), ("英语", "英语"), ("日语", "日语"),
+                 ("韩语", "韩语"), ("泰语", "泰语"), ("法语", "法语"), ("西班牙语", "西班牙语")]
+        YEAR = [("全部", "")] + [(str(y), str(y)) for y in range(2026, 2011, -1)] + \
+               [("其他年份", "more"), ("年份未知", "unknown")]
+        LETTER = [("全部", "")] + [(c, c) for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"] + [("0-9", "0-9")]
+        ORDER = [("按时间", "time"), ("按人气", "hit"), ("按推荐", "commend"), ("按评分", "douban")]
+        JQ = [("全部", ""), ("剧情", "剧情"), ("喜剧", "喜剧"), ("动作", "动作"), ("爱情", "爱情"),
+              ("科幻", "科幻"), ("动画", "动画"), ("悬疑", "悬疑"), ("惊悚", "惊悚"), ("恐怖", "恐怖"),
+              ("犯罪", "犯罪"), ("同性", "同性"), ("音乐", "音乐"), ("歌舞", "歌舞"), ("传记", "传记"),
+              ("历史", "历史"), ("西部", "西部"), ("奇幻", "奇幻"), ("冒险", "冒险"), ("灾难", "灾难"),
+              ("武侠", "武侠"), ("情色", "情色"), ("旅游", "旅游")]
+
+        def V(items):
+            return [{"n": n, "v": v} for n, v in items]
+
+        def build(type_items):
+            return [
+                {"key": "tid",    "name": "类型", "value": V(type_items)},
+                {"key": "jq",     "name": "剧情", "value": V(JQ)},
+                {"key": "area",   "name": "地区", "value": V(AREA)},
+                {"key": "year",   "name": "年份", "value": V(YEAR)},
+                {"key": "yuyan",  "name": "语言", "value": V(YUYAN)},
+                {"key": "letter", "name": "字母", "value": V(LETTER)},
+                {"key": "order",  "name": "排序", "value": V(ORDER)},
+            ]
+
+        MOVIE = [("全部", ""), ("动作片", "5"), ("科幻片", "7"), ("恐怖片", "8"), ("战争片", "9"),
+                 ("喜剧片", "10"), ("动画片", "41"), ("剧情片", "12"), ("爱情片", "6"), ("纪录片", "11")]
+        TV = [("全部", ""), ("国产剧", "13"), ("港台剧", "14"), ("欧美剧", "15"), ("日韩剧", "16"), ("海外剧", "42")]
+        ZY = [("全部", ""), ("内地综艺", "29"), ("港台综艺", "30"), ("欧美综艺", "32"), ("日韩综艺", "33")]
+        DM = [("全部", ""), ("国产动漫", "34"), ("日韩动漫", "35"), ("欧美动漫", "36")]
+        DJ = [("全部", ""), ("短剧", "28"), ("微电影", "39"), ("AI漫剧", "45")]
+
         return {
             "class": [
-                {"type_id": "1", "type_name": "电影"},
-                {"type_id": "2", "type_name": "电视剧"},
-                {"type_id": "3", "type_name": "综艺"},
-                {"type_id": "4", "type_name": "动漫"},
-                {"type_id": "44", "type_name": "短剧"}
-            ]
+                {"type_id": "1",  "type_name": "电影"},
+                {"type_id": "2",  "type_name": "电视剧"},
+                {"type_id": "3",  "type_name": "综艺"},
+                {"type_id": "4",  "type_name": "动漫"},
+                {"type_id": "44", "type_name": "短剧"},
+            ],
+            "filters": {
+                "1":  build(MOVIE),
+                "2":  build(TV),
+                "3":  build(ZY),
+                "4":  build(DM),
+                "44": build(DJ),
+            }
         }
 
     def homeVideoContent(self):
         return {"list": self.parseList(self.get(self.host + "/"))}
 
     def categoryContent(self, tid, pg, filter, extend):
-        url = self.host + ("/frim/index" + str(tid) + ".html" if str(pg) == "1" else "/search.php?searchtype=5&tid=" + str(tid) + "&page=" + str(pg))
-        html = self.get(url)
+        ext = extend or {}
+        # 「类型」选中的子类会覆盖频道 tid
+        real_tid = str(ext.get("tid") or tid)
+
+        parts = [("searchtype", "5"), ("tid", real_tid), ("page", str(pg))]
+        for k in ("jq", "area", "year", "yuyan", "letter", "order"):
+            v = ext.get(k)
+            if v:
+                parts.append((k, str(v)))
+
+        qs = "&".join("{0}={1}".format(k, quote(v)) for k, v in parts)
+        html = self.get(self.host + "/search.php?" + qs)
         return {
             "page": int(pg),
             "pagecount": 999,
@@ -50,15 +107,20 @@ class Spider(Spider):
             "list": self.parseList(html)
         }
 
+    # ==================== 详情 ====================
+
     def detailContent(self, ids):
         vid = ids[0]
         html = self.get(self.host + "/movie/index" + vid + ".html")
 
+        # 标题：h1 优先，og:title 兜底，正则清尾巴
         name = self.clean(
             self.match(html, r'<h1[^>]*>(.*?)</h1>') or
             self.match(html, r'<meta property="og:title" content="(.*?)"')
         )
-        name = name.replace("全集在线观看 - 国产剧 | 袋鼠影视", "").replace("全集在线观看 - 袋鼠影视", "").replace("《", "").replace("》", "").strip()
+        name = re.sub(r'《|》', '', name)
+        name = re.sub(r'\s*全集在线观看.*$', '', name)
+        name = re.sub(r'\s*[-|·]\s*袋鼠影视.*$', '', name).strip()
 
         pic = self.fix(
             self.match(html, r'<meta property="og:image" content="(.*?)"') or
@@ -105,65 +167,49 @@ class Spider(Spider):
     def extractPlaySources(self, html, vid):
         """
         从详情页提取多条播放线路。
-        网站结构: 每个 panel div 带 data-playlist-name 属性，
-        内部包含 <a class="option"> 标签(线路名)和 <ul>(剧集列表)。
+        真实结构: <div class="panel" data-playlist-index="N" data-playlist-name="线路名" ...>
+                      <ul class="playlistlink-N" data-playlist-url="/playlist.php?id=X&line=Y">...</ul>
+                  </div>
         """
         play_from = []
         play_url = []
 
-        # 方法1: 按 data-playlist-name 切分，逐个解析 panel 块
-        panel_sections = re.split(
+        # 按 panel 切分，收集 (index, name, eps)
+        panels = []
+        for section in re.split(
             r'(?=<div[^>]+class=["\'][^"\']*panel[^"\']*["\'][^>]+data-playlist-name=)',
             html
-        )
-        for section in panel_sections:
+        ):
             name = self.match(section, r'data-playlist-name=["\']([^"\']+)["\']')
             if not name:
                 continue
             name = self.clean(name)
+            idx = self.match(section, r'data-playlist-index=["\'](\d+)["\']') or "0"
 
-            # 优先匹配带 playlistlink class 的 ul，再回退到任意 ul
             ul_content = (
                 self.match(section, r'<ul[^>]+class=["\'][^"\']*playlistlink[^"\']*["\'][^>]*>([\s\S]*?)</ul>') or
                 self.match(section, r'<ul[^>]*>([\s\S]*?)</ul>')
             )
-            eps = self.extractEpisodes(ul_content, vid) if ul_content else []
+            eps = self.extractEpisodes(ul_content) if ul_content else []
 
-            # 如果 HTML 中没有剧集(懒加载)，通过 data-playlist-url 异步获取
+            # ul 为空时走异步接口
             if not eps:
                 playlist_url = self.match(section, r'data-playlist-url=["\']([^"\']+)["\']')
                 if playlist_url:
                     playlist_url = self.fix(playlist_url.replace('&amp;', '&'))
-                    eps = self.extractEpisodes(self.get(playlist_url), vid)
+                    eps = self.extractEpisodes(self.get(playlist_url))
 
             if eps:
-                key = name if name not in play_from else name + str(len(play_from) + 1)
-                play_from.append(key)
-                play_url.append("#".join(eps))
+                panels.append((int(idx), name, eps))
 
-        # 方法2: 回退 - 按 playlist class div 切分
-        if not play_url:
-            playlist_sections = re.split(
-                r'(?=<div[^>]+class=["\'][^"\']*playlist[^"\']*["\'][^>]*>)',
-                html
-            )
-            for i, section in enumerate(playlist_sections):
-                ul_content = self.match(section, r'<ul[^>]*>([\s\S]*?)</ul>')
-                if not ul_content:
-                    continue
-                eps = self.extractEpisodes(ul_content, vid)
-                if not eps:
-                    continue
-                name = self.clean(
-                    self.match(section, r'data-playlist-name=["\']([^"\']+)["\']') or
-                    self.match(section, r'<a[^>]+class=["\'][^"\']*option[^"\']*["\'][^>]*title=["\']([^"\']+)["\']') or
-                    self.match(section, r'<span class="playlist-line-name">([^<]+)</span>')
-                ) or ("线路" + str(i + 1))
-                key = name if name not in play_from else name + str(len(play_from) + 1)
-                play_from.append(key)
-                play_url.append("#".join(eps))
+        # 按 data-playlist-index 排序
+        panels.sort(key=lambda x: x[0])
+        for _idx, name, eps in panels:
+            key = name if name not in play_from else name + str(len(play_from) + 1)
+            play_from.append(key)
+            play_url.append("#".join(eps))
 
-        # 方法3: 最终回退 - 按 vid 搜索所有 play 链接
+        # 回退：按 vid 搜所有 /play/ 链接
         if not play_url:
             eps = []
             seen = set()
@@ -179,8 +225,8 @@ class Spider(Spider):
 
         return play_from, play_url
 
-    def extractEpisodes(self, html, vid=""):
-        """从包含 <a> 标签的 HTML 中提取剧集列表，自动去重。"""
+    def extractEpisodes(self, html):
+        """从 <a> 标签 HTML 中提取剧集，自动去重。"""
         eps = []
         seen = set()
         if not html:
@@ -208,41 +254,33 @@ class Spider(Spider):
     # ==================== 搜索 & 播放 ====================
 
     def searchContent(self, key, quick, pg="1"):
-        html = ""
-        try:
-            r = requests.post(self.host + "/search.php", headers=self.headers, data={"searchword": key}, timeout=15)
-            r.encoding = r.apparent_encoding or "utf-8"
-            html = r.text
-        except Exception:
-            html = ""
-        data = self.parseList(html)
-        if not data:
-            html = self.get(self.host + "/search.php?searchword=" + quote(key) + "&page=" + str(pg))
-            data = self.parseList(html)
-        return {"list": data, "page": int(pg)}
+        url = self.host + "/search.php?searchword=" + quote(key) + "&page=" + str(pg)
+        html = self.get(url)
+        return {"list": self.parseList(html), "page": int(pg)}
 
     def playerContent(self, flag, id, vipFlags):
         html = self.get(id)
 
-        # 多模式提取视频地址
+        # 真实播放页: var now="https://.../index.m3u8";
         url = self.match(html, r'var\s+now\s*=\s*["\']([^"\']+)["\']')
-
         if not url:
             url = self.match(html, r'player_aaaa\s*=\s*\{[^}]*"url"\s*:\s*"([^"]+)"')
-
         if not url:
             url = self.match(html, r'["\']([^"\']+(?:m3u8|mp4|flv|avi|mkv|mov|ts)[^"\']*)["\']')
-
         if not url:
             url = self.match(html, r'<(?:iframe|embed|source|video)[^>]+src=["\']([^"\']+)["\']')
 
         url = unquote(url) if url else id
 
+        headers = dict(self.headers)
+        # 播放页 URL 作为 Referer，提高第三方 m3u8 源成功率
+        headers["Referer"] = id if id.startswith("http") else self.host + id
+
         return {
             "parse": 0 if self.isVideoFormat(url) else 1,
             "playUrl": "",
             "url": url,
-            "header": self.headers
+            "header": headers
         }
 
     # ==================== 列表解析 ====================
@@ -250,45 +288,49 @@ class Spider(Spider):
     def parseList(self, html):
         res = []
         seen = set()
-        for m in re.finditer(r'<a[^>]+class=["\'][^"\']*videopic[^"\']*["\'][^>]+href=["\']/movie/index(\d+)\.html["\'][^>]*title=["\']([^"\']+)["\']([\s\S]{0,1200}?)</a>', html or "", re.S):
-            vid = m.group(1)
+        if not html:
+            return res
+
+        # 先切 <a class="...videopic...">...</a> 块，再逐属性抽
+        for m in re.finditer(r'<a\s[^>]*class=["\'][^"\']*videopic[^"\']*["\'][^>]*>[\s\S]*?</a>', html, re.S):
+            block = m.group(0)
+
+            vid_m = re.search(r'href=["\']/movie/index(\d+)\.html["\']', block)
+            if not vid_m:
+                continue
+            vid = vid_m.group(1)
             if vid in seen:
                 continue
             seen.add(vid)
-            item = m.group(0)
-            name = self.clean(m.group(2))
-            pics = re.findall(r'(?:data-original|data-src)=["\']([^"\']+\.(?:jpg|jpeg|png|webp|gif)[^"\']*)["\']', item, re.I)
+
+            name = self.match(block, r'title=["\']([^"\']+)["\']')
+            if not name:
+                name = self.match(block, r'aria-label=["\']《?([^"\'》]+)》?["\']')
+            name = self.clean(name)
+            if not name:
+                continue
+
+            pics = re.findall(r'(?:data-original|data-src)=["\']([^"\']+\.(?:jpg|jpeg|png|webp|gif)[^"\']*)["\']', block, re.I)
             if not pics:
-                pics = re.findall(r'src=["\']([^"\']+\.(?:jpg|jpeg|png|webp|gif)[^"\']*)["\']', item, re.I)
+                pics = re.findall(r'src=["\']([^"\']+\.(?:jpg|jpeg|png|webp|gif)[^"\']*)["\']', block, re.I)
             pic = ""
             for p in pics:
                 if "load.gif" not in p and "nopic" not in p and "logo" not in p and "templets" not in p:
                     pic = self.fix(p)
                     break
-            remarks = self.clean(self.match(item, r'<span[^>]+class=["\'][^"\']*note[^"\']*["\'][^>]*>(.*?)</span>') or self.match(item, r'<span[^>]+class=["\'][^"\']*textbg[^"\']*["\'][^>]*>(.*?)</span>'))
-            if name:
-                res.append({
-                    "vod_id": vid,
-                    "vod_name": name,
-                    "vod_pic": pic,
-                    "vod_remarks": remarks
-                })
-        if not res:
-            for m in re.finditer(r'href=["\']/movie/index(\d+)\.html["\'][^>]*title=["\']([^"\']+)["\'][\s\S]{0,1200}?<img[^>]+([^>]+)>', html or "", re.S):
-                vid = m.group(1)
-                if vid in seen:
-                    continue
-                seen.add(vid)
-                img = m.group(3)
-                pic = self.match(img, r'(?:data-original|data-src)=["\']([^"\']+)["\']') or self.match(img, r'src=["\']([^"\']+)["\']')
-                if "load.gif" in pic or "templets" in pic:
-                    pic = ""
-                res.append({
-                    "vod_id": vid,
-                    "vod_name": self.clean(m.group(2)),
-                    "vod_pic": self.fix(pic),
-                    "vod_remarks": ""
-                })
+
+            remarks = self.clean(
+                self.match(block, r'<span[^>]+class=["\'][^"\']*note[^"\']*["\'][^>]*>(.*?)</span>') or
+                self.match(block, r'<span[^>]+class=["\'][^"\']*textbg[^"\']*["\'][^>]*>(.*?)</span>')
+            )
+
+            res.append({
+                "vod_id": vid,
+                "vod_name": name,
+                "vod_pic": pic,
+                "vod_remarks": remarks
+            })
+
         return res
 
     # ==================== 工具方法 ====================
