@@ -9,6 +9,8 @@ from base.spider import Spider
 
 
 class Spider(Spider):
+    INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
+
     def init(self, extend=""):
         self.host = "https://dsystv.com"
         self.headers = {
@@ -110,10 +112,8 @@ class Spider(Spider):
         except Exception:
             page_int = 1
 
-        # 用户选的子类型
         user_sub_tid = str(ext.get("tid")) if valid(ext.get("tid")) else None
 
-        # 除 tid 外是否还有其他筛选
         other_has = False
         for k in ("area", "year", "letter", "yuyan", "jq", "order"):
             if valid(ext.get(k)):
@@ -122,7 +122,7 @@ class Spider(Spider):
 
         channel_tid = str(tid)
 
-        # 场景 1：无任何筛选 + 第 1 页 → 走静态频道页（唯一能跑的静态路径）
+        # 场景 1：无任何筛选 + 第 1 页 → 走静态频道页
         if not user_sub_tid and not other_has and page_int == 1:
             url = self.host + "/frim/index" + channel_tid + ".html"
             html = self.get(url)
@@ -131,7 +131,7 @@ class Spider(Spider):
                 "list": self.parseList(html)
             }
 
-        # 场景 2/3：都走 search.php
+        # 场景 2/3：走 search.php
         if user_sub_tid:
             real_tid = user_sub_tid
         else:
@@ -140,12 +140,10 @@ class Spider(Spider):
             }
             real_tid = CHANNEL_FIRST_SUB.get(channel_tid, channel_tid)
 
-        # 拼 URL：严格照抄站点真实链接顺序
         parts = []
         if page_int > 1:
             parts.append(("page", str(page_int)))
         parts.append(("searchtype", "5"))
-        # order 只在有其他筛选（非纯切类型）时才带
         if other_has:
             order_val = ext.get("order") if valid(ext.get("order")) else "weekhit"
             parts.append(("order", str(order_val)))
@@ -183,6 +181,12 @@ class Spider(Spider):
         if not desc:
             desc = self.clean(self.match(html, r'<meta\s+property="og:description"\s+content="([^"]+)"'))
 
+        # ★ 简介前面加固定前缀
+        if desc:
+            desc = self.INTRO_PREFIX + "\n" + desc
+        else:
+            desc = self.INTRO_PREFIX
+
         actor = self.clean(self.match(html, r'<li[^>]*data-video-meta="([^"]*)"[^>]*>\s*<span class="text-muted">主演：</span>'))
         director = self.clean(self.match(html, r'<li[^>]*data-video-meta="([^"]*)"[^>]*>\s*<span class="text-muted">导演：</span>'))
         year = self.clean(self.match(html, r'年份：</span>([^<]+)'))
@@ -212,7 +216,10 @@ class Spider(Spider):
         }
 
     def _extract_play_sources(self, html):
-        panels = []
+        # 保持文档原始顺序
+        play_from = []
+        play_url = []
+
         for section in re.split(
             r'(?=<div[^>]+class="[^"]*panel[^"]*"[^>]+data-playlist-name=)',
             html
@@ -221,8 +228,6 @@ class Spider(Spider):
             if not name_m:
                 continue
             name = self.clean(name_m.group(1))
-            idx_m = re.search(r'data-playlist-index="(\d+)"', section)
-            idx = int(idx_m.group(1)) if idx_m else 0
 
             ul_m = re.search(r'<ul[^>]+class="[^"]*playlistlink[^"]*"[^>]*>([\s\S]*?)</ul>', section)
             if not ul_m:
@@ -241,11 +246,9 @@ class Spider(Spider):
                     eps.append("%s$%s" % (t, u))
 
             if eps:
-                panels.append((idx, name, eps))
+                play_from.append(name)
+                play_url.append("#".join(eps))
 
-        panels.sort(key=lambda x: x[0])
-        play_from = [p[1] for p in panels]
-        play_url = ["#".join(p[2]) for p in panels]
         return play_from, play_url
 
     # ==================== 搜索 ====================
