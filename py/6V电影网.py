@@ -1,7 +1,6 @@
 # coding=utf-8
 """
 6V电影网 6vdyw.com | TVBox Python 爬虫
-所有解析规则来自你提供的真实 HTML
 """
 import re
 import sys
@@ -33,23 +32,41 @@ HOST = "https://www.6vdyw.com"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
-# 按网站导航栏 HTML 原文：
-# /html/1.html 电影  /html/6.html 美剧  /html/13.html 韩剧
-# /html/2.html 泰剧  /html/7.html 中剧  /html/14.html 日剧
-# /html/3.html 短剧  /html/8.html 港剧  /html/15.html 纪录片
-# /html/4.html 综艺
+# 首页顶部分类栏只放 5 个大类（前端渲染上限）。
+# 电影=1 电视剧=7（中剧） 综艺=4 动漫=9 短剧=3
 CLASSES = [
-    {"type_id": "1",  "type_name": "电影"},
-    {"type_id": "6",  "type_name": "美剧"},
-    {"type_id": "13", "type_name": "韩剧"},
-    {"type_id": "2",  "type_name": "泰剧"},
-    {"type_id": "7",  "type_name": "中剧"},
-    {"type_id": "14", "type_name": "日剧"},
-    {"type_id": "3",  "type_name": "短剧"},
-    {"type_id": "8",  "type_name": "港剧"},
-    {"type_id": "15", "type_name": "纪录片"},
-    {"type_id": "4",  "type_name": "综艺"},
+    {"type_id": "1", "type_name": "电影"},
+    {"type_id": "7", "type_name": "电视剧"},
+    {"type_id": "4", "type_name": "综艺"},
+    {"type_id": "9", "type_name": "动漫"},
+    {"type_id": "3", "type_name": "短剧"},
 ]
+
+# 每个大类至少有 1 个 filter，否则前端不给下拉箭头
+FILTERS = {
+    "1": [
+        {"key": "tid", "name": "类型", "value": [{"n": "电影", "v": "1"}]},
+    ],
+    "7": [
+        {"key": "tid", "name": "类型", "value": [
+            {"n": "中剧", "v": "7"},
+            {"n": "美剧", "v": "6"},
+            {"n": "韩剧", "v": "13"},
+            {"n": "泰剧", "v": "2"},
+            {"n": "日剧", "v": "14"},
+            {"n": "港剧", "v": "8"},
+        ]},
+    ],
+    "4": [
+        {"key": "tid", "name": "类型", "value": [{"n": "综艺", "v": "4"}]},
+    ],
+    "9": [
+        {"key": "tid", "name": "类型", "value": [{"n": "动漫", "v": "9"}]},
+    ],
+    "3": [
+        {"key": "tid", "name": "类型", "value": [{"n": "短剧", "v": "3"}]},
+    ],
+}
 
 
 class Spider(Spider):
@@ -71,7 +88,6 @@ class Spider(Spider):
         }
         self._play_cache = {}
 
-    # ============ 网络：requests 优先，TVBox fetch 兜底 ============
     def _fetch(self, url):
         if _HAS_REQUESTS:
             try:
@@ -119,14 +135,7 @@ class Spider(Spider):
         s = re.sub(r"<[^>]+>", "", s)
         return s.replace("&nbsp;", " ").replace("\xa0", " ").strip()
 
-    # ============ 列表解析 ============
     def _extract_videos(self, html):
-        """
-        你给的 HTML 原文：
-        <a href="/mov/100491.html" title="假面骑士零一真实×时间劇場版" class="vod-link">
-          <div class="vod-cover">
-            <img src="https://hongniuzyimage.com/cover/xxx.jpg" alt="..."
-        """
         videos = []
         seen = set()
         if not html:
@@ -151,10 +160,6 @@ class Spider(Spider):
         return videos
 
     def _page_count(self, html, tid):
-        """
-        你给的 HTML 原文：
-        <a href="/html/1-1464.html" class="page-item" >尾页</a>
-        """
         if not html:
             return 1
         nums = re.findall(r'/html/%s-(\d+)\.html' % re.escape(tid), html)
@@ -165,35 +170,38 @@ class Spider(Spider):
                 pass
         return 1
 
-    # ============ 首页 ============
     def homeContent(self, filter=False):
-        return {"class": CLASSES, "filters": {}}
+        return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
         html = self._fetch(self.site_url + "/")
         return {"list": self._extract_videos(html)}
 
-    # ============ 分类 ============
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
-        # 你给的 HTML 原文：
-        # 第一页：/html/1.html
-        # 第二页起：/html/1-2.html
+
+        # 处理 filters 传来的子分类 tid
+        real_tid = tid
+        if isinstance(extend, str):
+            try:
+                extend = json.loads(extend)
+            except Exception:
+                extend = {}
+        if extend and extend.get("tid"):
+            real_tid = extend["tid"]
+
         if page == 1:
-            url = "%s/html/%s.html" % (self.site_url, tid)
+            url = "%s/html/%s.html" % (self.site_url, real_tid)
         else:
-            url = "%s/html/%s-%d.html" % (self.site_url, tid, page)
+            url = "%s/html/%s-%d.html" % (self.site_url, real_tid, page)
         html = self._fetch(url)
         videos = self._extract_videos(html)
-        pc = self._page_count(html, tid)
+        pc = self._page_count(html, real_tid)
         return {"list": videos, "page": page, "pagecount": pc,
                 "limit": 24, "total": pc * 24}
 
-    # ============ 搜索 ============
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
-        # 你给的 canonical：
-        # https://www.6vdyw.com/vodsearch/%E8%80%81%E8%88%85-------------.html
         keyword = urllib.parse.quote(key)
         url = "%s/vodsearch/%s-------------.html" % (self.site_url, keyword)
         html = self._fetch(url)
@@ -204,7 +212,6 @@ class Spider(Spider):
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
-    # ============ 详情 ============
     def detailContent(self, ids):
         if not ids:
             return {"list": []}
@@ -214,7 +221,6 @@ class Spider(Spider):
         if not html:
             return {"list": []}
 
-        # 标题：<h1 class="detail-title">《老舅》免费在线观看</h1>
         name = ""
         m = re.search(r'<h1 class="detail-title">([^<]+)</h1>', html)
         if m:
@@ -227,39 +233,28 @@ class Spider(Spider):
                 name = self._clean(m.group(1).split("-")[0].split("_")[0]).strip()
         name = name or vid
 
-        # 封面：<div class="detail-cover"><img src="..." alt="...">
         pic = ""
         m = re.search(r'<div class="detail-cover"><img src="([^"]*)"', html)
         if m:
             pic = m.group(1).strip()
 
-        # 简介：<div class="detail-content"><h2>...</h2><p>...</p></div>
         content = ""
         m = re.search(r'<div class="detail-content">[\s\S]*?<p>([\s\S]*?)</p>', html)
         if m:
             content = self._clean(m.group(1))
 
-        # 主演：<strong>主演：</strong><span>...</span>
         actor = ""
         m = re.search(r'<strong>主演：</strong><span>([\s\S]*?)</span>', html)
         if m:
             actor = self._clean(re.sub(r'<[^>]+>', '', m.group(1)))
             actor = re.sub(r'\s+', ' ', actor).strip()
 
-        # 导演：<strong>导演：</strong><span>...</span>
         director = ""
         m = re.search(r'<strong>导演：</strong><span>([\s\S]*?)</span>', html)
         if m:
             director = self._clean(re.sub(r'<[^>]+>', '', m.group(1)))
             director = re.sub(r'\s+', ' ', director).strip()
 
-        # 播放列表
-        # 你给的 HTML 原文：
-        # <div class="episode-tabs"><div class="episode-tab active" data-index="1">6vyun</div></div>
-        # <div class="episode-list" data-tab="1">
-        #   <a href="/vod/18973-1-1.html" class="episode-item" target="_self" title="第1集">第1集</a>
-        #   ...
-        # </div>
         play_from = []
         play_url = []
         for tab in re.finditer(
@@ -267,13 +262,10 @@ class Spider(Spider):
                 html):
             idx = tab.group(1)
             line_name = tab.group(2).strip()
-
-            # 找对应的 episode-list
             marker = 'data-tab="%s"' % idx
             start = html.find(marker, tab.end())
             if start == -1:
                 continue
-            # 结束位置：下一个 episode-list 或 </section>
             next_list = html.find('<div class="episode-list"', start + 1)
             end_sec = html.find('</section>', start)
             ends = [e for e in (next_list, end_sec) if e != -1]
@@ -307,7 +299,6 @@ class Spider(Spider):
             "vod_play_url":  "$$$".join(play_url),
         }]}
 
-    # ============ 播放 ============
     def playerContent(self, flag, id, vipFlags):
         play_page = id if id.startswith("http") else self._fix_url(id)
         now = int(time.time())
@@ -317,13 +308,11 @@ class Spider(Spider):
                 return res
 
         html = self._fetch(play_page)
-        # 你给的 HTML 原文：
-        # <script>var player_aaaa={..., "url":"https:\/\/hn.bfvvs.com\/play\/bkRQA9xa", ...}</script>
         m = re.search(r'"url":"([^"]+)"', html)
         if m:
             play_url = m.group(1).replace("\\/", "/")
             res = {
-                "parse": 1,           # maccms 的 /play/xxx 是播放页，交给 TVBox 嗅探
+                "parse": 1,
                 "playUrl": "",
                 "url": play_url,
                 "header": {
