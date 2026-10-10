@@ -1,12 +1,14 @@
 # coding=utf-8
 """
-好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2.2 修正分类URL版)
+好剧屋 www.haojuwu1.cc | TVBox Python 爬虫 (V2.3 最终修正版)
 
 关键:
   - 域名 www.haojuwu1.cc
   - 播放页 JS 变量 player_aaaa 里直接就是 m3u8 直链
   - parse=0 直链播放
-  - V2.2 修复: categoryContent 的 URL 模板 (苹果CMS v10 标准 6 字段)
+  - V2.3 修复: categoryContent 的 URL 模板
+      无页码: /vodshow/{type}-----------{year}.html       (11 个 -)
+      有页码: /vodshow/{type}--------{page}---{year}.html (8个- + page + 3个-)
 """
 import re
 import sys
@@ -340,11 +342,11 @@ class Spider(Spider):
         return {"list": videos}
 
     # ============================================================
-    # ← 改动点: categoryContent 的 URL 模板
-    # 苹果CMS v10 标准格式:
-    #   /vodshow/{type}-{area}-{by}-{class}-{lang}-{letter}---{page}---{year}.html
-    #   共 6 个字段用 5 个 "-" 分隔, 后面用 "---" 接页码, 再用 "---" 接年份
-    # 空字段用 "" 占位, 连续 "-" 会连在一起
+    # ← 本次修复: categoryContent 的 URL 模板
+    # 苹果CMS v10 URL 格式:
+    #   无页码: /vodshow/{type}-----------{year}.html        (type + 11个- + year)
+    #   有页码: /vodshow/{type}--------{page}---{year}.html  (type + 8个- + page + 3个- + year)
+    #   带筛选: /vodshow/{type}-{area}-{by}------{page}---{year}.html  (用空格占位)
     # ============================================================
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
@@ -356,22 +358,29 @@ class Spider(Spider):
         extend = extend or {}
 
         sub = extend.get("sub") or tid
-        sort_field = extend.get("sort_field") or ""
         area = extend.get("area") or ""
+        sort_field = extend.get("sort_field") or ""
         year = extend.get("year") or ""
 
-        # /vodshow/{type}-{area}-{by}-{class}-{lang}-{letter}---{page}---{year}.html
-        url = "%s/vodshow/%s-%s-%s-%s-%s-%s---%s---%s.html" % (
-            self.site_url,
-            sub,          # type_id
-            area,         # area   (地区)
-            sort_field,   # by     (排序)
-            "",           # class  (剧情)
-            "",           # lang   (语言)
-            "",           # letter (字母)
-            page,         # page
-            year,         # year
-        )
+        # 有筛选条件: 用完整的 6 字段模板
+        if area or sort_field:
+            # /vodshow/{type}-{area}-{by}-{class}-{lang}-{letter}---{page}---{year}.html
+            url = "%s/vodshow/%s-%s-%s-%s-%s-%s---%s---%s.html" % (
+                self.site_url,
+                sub, area, sort_field, "", "", "",
+                page if page > 1 else "",
+                year,
+            )
+        elif page <= 1:
+            # 第一页无筛选: 用网站自己的"全部"链接格式
+            # /vodshow/{type}-----------{year}.html
+            url = "%s/vodshow/%s-----------%s.html" % (
+                self.site_url, sub, year)
+        else:
+            # 第 N 页无筛选: /vodshow/{type}--------{page}---{year}.html
+            url = "%s/vodshow/%s--------%s---%s.html" % (
+                self.site_url, sub, page, year)
+
         self.log("category: %s" % url)
 
         html = self._fetch(url)
