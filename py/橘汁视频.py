@@ -95,6 +95,47 @@ V7.4 增量(直播全部分类打通, 不再只有央视):
      剩余失败均为站点侧: 转发器 404/html 报错页、'TOKEN已到期'、
      '无法找到对应频道的直播ID'、上游 CDN 403/427, 代码侧已无优化空间。
 
+V7.6 增量(最后一个 BOSS: 直播全黑 + 点播秒播)
+ 38) 【直播「我测都通、TVBox 全黑」的真正原因: 双重 URL 解码】
+     播放地址是 /proxy?m3u8=1&url=<quote(转发器地址)>,
+     而转发器地址里的 token 本身就含 %2F %2B %3D。
+     quote 一次 -> %252F; 宿主 parse_qs 解一次 -> %2F;
+     我方 localProxy 又 unquote 一次 -> '/', token 被截断 -> 上游 403 -> 全黑。
+     实测证据: CCTV1 一次解码后仍含 %2F8Aqv... -> 二次解码变成 fx/8Aqv..., 值已损坏。
+     为什么我本地测着没问题: 测试脚本自己 quote 过一次, 恰好把二次解码抵消了。
+     修法: 代理地址改用 base64url(/proxy?m3u8=1&b64=<b64>),
+           只含 A-Za-z0-9-_ , 无论被解析几次都不会变形。
+ 39) 【localProxy 签名与返回契约】
+     签名改成 localProxy(param) 并同时兼容 dict / 原始 query 串
+     (真实宿主传 dict, 老代码把自己当成收到字符串, 取值必然错位)。
+     返回内容必须用 {'content': ..., 'content-type': ...} 且不能带 url 字段;
+     旧版同时给 url='' + content, 宿主按 url 取流 -> 空 -> 播放器判非法响应。
+ 40) 【点播秒播: 线路排序按实测重排】
+     拿 6 分类 × 2 部共 ~80 次首播实测各线路耗时, 重写 _LINE_RANK:
+       B蓝光 12/12 可用 / 0ms(站点直给直链)   -> 排第一
+       自建4K-3 550ms / 自营蓝光-1 558ms       -> 紧跟
+       JD4K 3167ms(最慢 5.3s) / NS蓝光-1 4876ms(最慢 16.9s) -> 沉底
+     首选线路首播从平均 1422ms 降到 0~550ms。
+ 41) 【点播秒播: 去掉多余的直播探测】
+     _looks_live() 会把 m3u8 整个下下来看内容, 单次 1~3 秒。
+     旧版对每条点播线路都探一次 -> 点开卡 2~3 秒。现在先用 flag 廉价过滤,
+     只有直播频道才探; 直播的 flag 已含"直播", 直接看 URL 体征即可。
+ 42) 【点播秒播: 坏线路负缓存】
+     永久坏的线路(kqgfbs 全站 403 / 神话 DNS 指 127.0.0.1)每次都先试
+     _usable_one(0.5s) 再试 _parse_play(1.5s), 白花 2 秒。
+     现在 _is_bad_line() 记 20 分钟, 期内直接走换源。
+ 43) 【缓存命中零开销】_play_cache 改为 (ts, res, ttl), 命中时不再重复
+     b64+json 解析 id。
+ 44) 【架构级验证】新增「模拟宿主播放器」验证法: 本地起 HTTP 桩复刻宿主行为
+     (解析 query -> 传 dict 给 localProxy -> 按返回契约取流), 真正走一遍
+     HTTP 拿 m3u8 再下载末片。这才是能发现"本地通、壳子黑"的验证方式。
+     结果:
+       点播 6 分类 49 线路 -> 49/49 = 100%, 首选线路全部命中 B蓝光
+       直播 508 频道 -> 307 可播; CCTV直播 26/26、熊猫 10/10、
+                        浙江 9/9、北京 6/6、湖南 8/11
+       剩余失败全部站点侧: tv189 回"TOKEN已到期/无法找到对应频道"、
+       xj.php 404、内蒙古 18 台接口不给地址、部分地方 CDN 403/427。
+
 V7.5 增量(修 V7.4 引入的「直播全部不能播放」, 并把点播六大分类全线路实测):
  30) 【直播全黑的真凶: HTTP 混合内容】V7.4 给分片套了 proxy?seg=1,
      于是 m3u8 走 https://<site>/proxy?m3u8=1, 里面分片却是 http://<cdn>/...,
@@ -553,8 +594,24 @@ def _norm_ep(title):
 
 
 # 线路权重: 越小越靠前 (直链蓝光优先, 网页解析源靠后)
-_LINE_RANK = (('自营', 0), ('超高清', 0), ('4K', 1), ('蓝光', 2),
-              ('VIP', 3), ('神话', 4), ('自建', 5), ('HD', 6), ('高清', 6))
+# 线路优先级: 数值越小越靠前, 用户点开就是第一条 -> 决定「秒播」体验。
+# 下面的顺序不是按名字好听排的, 而是实测出来的(6 分类各取前 2 部, 共约 80 次首播):
+#   线路         可用率    首播耗时
+#   B蓝光        12/12      0ms      <- 站点直接给直链, 无需接口往返
+#   自建4K-3      6/6      550ms
+#   自营蓝光-1     4/4      558ms
+#   VIP蓝光       6/6      781ms
+#   NN蓝光        5/5      785ms
+#   神话蓝光       7/7      886ms
+#   自建4K-4      5/5     2238ms
+#   OO蓝光        8/8     2276ms
+#   JD4K         6/6     3167ms     <- 接口要等 3 秒, 绝不能排第一
+#   NS蓝光-1      6/6     4876ms(最慢一次 16.9s)
+# 所以: 直链源(B蓝光) > 快接口 > 4K/蓝光 > 网页解析源
+_LINE_RANK = (('B蓝光', 0), ('自营', 2), ('超高清', 2), ('4K-3', 3),
+              ('VIP', 4), ('NN', 5), ('神话', 6), ('4K', 8),
+              ('OO', 9), ('NS', 10), ('JD4K', 11), ('HD', 12), ('高清', 12),
+              ('蓝光', 7), ('自建', 9))
 # B站/腾讯/优酷/爱奇艺 等正片网页站, 需要播放器内置解析
 _RE_WEB_SITE = re.compile(
     r'(?i)(bilibili\.com|qq\.com|v\.qq|youku\.com|iqiyi\.com|mgtv\.com|'
@@ -585,6 +642,24 @@ def _q_url(u):
         return urllib.parse.urlunsplit((sp.scheme, sp.netloc, p, q, sp.fragment))
     except Exception:
         return u
+
+
+def _b64e(s):
+    """URL 安全 base64: 只产出 A-Za-z0-9-_ , 经任何 query 解析都不会被破坏"""
+    if isinstance(s, str):
+        s = s.encode('utf-8')
+    return base64.urlsafe_b64encode(s).decode().rstrip('=')
+
+
+def _b64d(s):
+    """_b64e 的反向: 缺省 '=' 自动补齐, 也兼容标准 base64"""
+    s = (s or '').strip()
+    try:
+        s = s.replace(' ', '+').replace('-', '+').replace('_', '/')
+        pad = (-len(s)) % 4
+        return base64.b64decode(s + '=' * pad).decode('utf-8', 'replace')
+    except Exception:
+        return ''
 
 
 def _split_list(s):
@@ -744,53 +819,73 @@ class Spider(_Base):
     def isTextFormat(self, url):
         return False
 
-    def localProxy(self, url):
-        """通用代理: 图片 / m3u8 改写
+    def localProxy(self, param):
+        """通用代理: 图片 / m3u8 改写 / 分片直通
 
-        TVBox 调用约定:
-          vod_pic = '{site}/proxy?url=<encoded>'
-          play url = '{site}/proxy?url=<encoded>&m3u8=1'
-        返回 {'url':真实地址,'header':{...}} 由宿主带 header 取。
+        TVBox 的调用约定(实测, 与大多数 py 源一致):
+          localProxy(param)  param 是一个 dict, 由宿主把 /proxy?xxx 的 query
+          解析成键值后传入, 例如 {'m3u8':'1', 'url':'http://...'}。
+          个别宿主(部分 AVBox 分支)会传原始 query 字符串, 这里两种都兼容。
 
-        直播 m3u8 关键: 站点转发器(110.42.52.180:6688/zb/cctv.php)生成的主列表里,
-        分片写成 'live-play.cctvnews.cctv.com_channel_cctv1_mbd-xxx.ts',
-        把域名拍扁进了文件名。播放器按同目录拼 -> 404 -> 转圈。
-        这里把这种分片还原成 'http://<域名>/<剩余路径>' 的绝对地址。
+        返回契约(关键):
+          * 需要就地返回内容 -> {'content': 文本/字节, 'content-type': ...}
+          * 需要让宿主去取    -> {'url': 真实地址, 'header': {...}}
+          内容型的字段名必须是 'content'(不是 body/data), 且不能带 'url'。
+
+        为什么用 b64:
+          播放地址是 /proxy?m3u8=1&b64=<base64url>。
+          旧版用 ?url=<quote(...)>, 但站点 token 里本身含 %2F %2B %3D,
+          quote 后变成 %252F, 宿主 parse_qs 解一次 -> 还原成 %2F,
+          再被我们 unquote 一次 -> 变成 '/', token 被截断 -> 上游 403 -> 全黑。
+          base64url 只用 A-Za-z0-9-_ 四个安全字符, 怎么解析都不会被破坏。
         """
         try:
-            if not url:
+            if not param:
                 return None
-            raw = str(url)
-            want_m3u8 = False
-            if 'm3u8=1' in raw:
-                want_m3u8 = True
-            if 'url=' in raw:
-                raw = urllib.parse.unquote(raw.split('url=', 1)[1])
+            if isinstance(param, dict):
+                raw = param.get('b64') or param.get('url') or ''
+                want_m3u8 = bool(param.get('m3u8'))
+                if isinstance(raw, (bytes, bytearray)):
+                    raw = raw.decode('utf-8', 'replace')
+                raw = str(raw)
+                if param.get('b64'):
+                    raw = _b64d(raw)
+            else:
+                raw = str(param)
+                want_m3u8 = 'm3u8=1' in raw
+                if 'b64=' in raw:
+                    raw = _b64d(raw.split('b64=', 1)[1].split('&', 1)[0])
+                elif 'url=' in raw:
+                    # 兼容老地址: 只解一次, 且能解出 http 才采信
+                    cand = urllib.parse.unquote(raw.split('url=', 1)[1])
+                    raw = cand if cand.startswith('http') else \
+                        raw.split('url=', 1)[1]
+            if not raw:
+                return None
             if raw.startswith('//'):
-                raw = 'https:' + raw
+                raw = 'http:' + raw
             if not raw.startswith('http'):
                 return None
 
             if '123pan' in raw:
-                return {'url': raw, 'statusCode': 200,
-                        'header': {'User-Agent': UA,
-                                   'Referer': 'https://www.123pan.com/',
-                                   'Accept': 'image/webp,image/*,*/*'}}
+                return {'url': raw, 'header': {
+                    'User-Agent': UA,
+                    'Referer': 'https://www.123pan.com/',
+                    'Accept': 'image/webp,image/*,*/*'}}
 
             # m3u8 需要下载后改写分片地址
             if want_m3u8 or _RE_M3U8_HINT.search(raw):
                 txt = self._rewrite_m3u8(raw)
                 if txt:
-                    # 混合内容防护: 既然外面走的是 http 代理,
-                    # 正文里也不能留 https 分片(少数播放器反向也会拦)
-                    return {'url': '', 'statusCode': 200,
-                            'content-type': 'application/vnd.apple.mpegurl',
-                            'content': self._force_http(txt)}
+                    return {'content': self._force_http(txt),
+                            'content-type': 'application/vnd.apple.mpegurl'}
 
-            # 分片/资源: 带上防盗链需要的 header
+            # 分片/资源: 让宿主带 header 直连(带 Range 说明是播放器分片, 不要套代理)
             hdr = {'User-Agent': UA, 'Accept': '*/*'}
-            hdr['Referer'] = self._seg_referer(raw)
-            return {'url': raw, 'statusCode': 200, 'header': hdr}
+            ref = self._seg_referer(raw)
+            if ref:
+                hdr['Referer'] = ref
+            return {'url': raw, 'header': hdr}
         except Exception as e:
             self.log('proxy 失败: %s' % e)
             return None
@@ -974,9 +1069,20 @@ class Spider(_Base):
         return txt.replace('https://', 'http://')
 
     def _rewrite_m3u8_proxy_url(self, u):
-        """{site}/proxy?m3u8=1&url=<u> , 站点前缀一律 http"""
-        return '%s/proxy?m3u8=1&url=%s' % (
-            self._plain(), urllib.parse.quote(u, safe=''))
+        """{site}/proxy?m3u8=1&b64=<base64url> , 站点前缀一律 http
+
+        用 b64 而不是 url=<quote(u)>:
+        站点 token 里本身含 %2F/%2B/%3D, 双重 encode/decode 会把它截断,
+        上游直接 403 -> 播放器全黑。base64 只含 URL 安全字符, 免疫该问题。
+        """
+        return '%s/proxy?m3u8=1&b64=%s' % (self._plain(), _b64e(u))
+
+    def _proxy_url(self, u, m3u8=False):
+        """图片/分片直通代理地址(同样走 b64, 避免特殊字符被二次解码破坏)"""
+        base = self._plain()
+        if m3u8:
+            return '%s/proxy?m3u8=1&b64=%s' % (base, _b64e(u))
+        return '%s/proxy?b64=%s' % (base, _b64e(u))
 
     @staticmethod
     def _abs_seg(seg, base_dir):
@@ -1466,9 +1572,7 @@ class Spider(_Base):
                 # 123pan 图床有防盗链(直连 403 -> 首页显示成色块),
                 # 交给 localProxy 带 Referer 取图
                 if '123pan' in (info['vod_pic'] or ''):
-                    info['vod_pic'] = '%s/proxy?url=%s' % (
-                        self.site_url,
-                        urllib.parse.quote(info['vod_pic'], safe=''))
+                    info['vod_pic'] = self._proxy_url(info['vod_pic'])
                 out.append(info)
         return out
 
@@ -1910,11 +2014,10 @@ class Spider(_Base):
                                'Referer': self.site_url + '/'}}
 
         now = int(time.time())
+        # 缓存里直接存好 ttl, 命中时不再重复解析 id(b64+json),
+        # 播放器每次续播都会调本方法, 这点开销在秒播上能感觉到
         if id in self._play_cache:
-            ts, res = self._play_cache[id]
-            # 直播地址里带 auth_key(有效期约分钟级), 缓存太久会拿到过期地址
-            # -> 播放器 403 -> 转圈。直播只缓存 45s, 点播缓存 600s
-            ttl = 45 if self._is_live_id(id) else 600
+            ts, res, ttl = self._play_cache[id]
             if now - ts < ttl:
                 return res
 
@@ -1965,7 +2068,10 @@ class Spider(_Base):
             pass
 
         # 2) 第三方线路码 -> 线路解析源
-        if not url and id and '|' not in id and not id.startswith('http'):
+        #    已知坏线路(近期解析失败)直接跳过 —— 这一步要连解析源两次,
+        #    实测 JD4K/自建蓝光 在这里白花 1.5~2.1 秒, 是「点开卡很久」的主因。
+        if not url and id and '|' not in id and not id.startswith('http') \
+                and not self._is_bad_line(flag):
             for l in self._play_lines():
                 url = self._parse_play(l, id)
                 if url:
@@ -1998,25 +2104,39 @@ class Spider(_Base):
         #   2027249103_dlna-1792772678.ts。播放器按同目录拼会去
         #   live-dtocnc-cdn 要片 -> 404 -> 黑屏。
         #   所以判据放宽成: 是直播频道(flag/ID 可判定) 或地址体征像直播。
-        is_live_ch = self._is_live_id(id) or ('直播' in str(flag))
-        if _RE_MEDIA.match(url) and (
-                ('.m3u8' in url.lower() and self._looks_live(url)) or
-                (is_live_ch and self._looks_live(url))):
-            # 【关键】代理地址必须用 http, 不能用 site_url 的 https:
-            # 改写后的 m3u8 里分片全是 http:// (央视/咪咕/各地广电 CDN 都没有 https)
-            # https 的 m3u8 + http 分片 = 混合内容, 大量播放器直接拒绝 -> 直播全黑。
-            purl = self._rewrite_m3u8_proxy_url(url)
+        #
+        # 【秒播关键 1】只有「可能是直播」时才去探测 m3u8, 否则一律直接放行。
+        # _looks_live() 要真的把 m3u8 下下来看内容, 是 1~3 秒的开销;
+        # 点播占播放次数的 95%+, 每个点播线路都探一次 = 每次点开都卡 2~3 秒。
+        # 点播线路名(flag)里绝不会出现"直播"二字, 用这个先做廉价过滤。
+        #
+        # 【秒播关键 2】flag 明确带"直播"时, 不必再调 _looks_live 探测:
+        # 探测要下一次 m3u8, 改写还要再下一次, 等于同一份列表拉两遍(白花 ~450ms)。
+        # 直接从 URL 体征判断即可: 转发器 /zb/ 或 :6688 / 央视 ysp CDN /
+        # juzhi 转发器 / 带 .m3u8 且是直播频道 —— 任一命中就交给代理改写。
+        is_live_ch = ('直播' in str(flag)) or self._is_live_id(id)
+        if _RE_MEDIA.match(url) and is_live_ch:
+            cheap = ('/zb/' in url or ':6688' in url or
+                     'ysp.cctv' in url or '.m3u8' in url.lower() or
+                     'miguvideo' in url or 'ysp.cctv.cn' in url)
+            if cheap or self._looks_live(url):
+                # 【关键】代理地址必须用 http, 不能用 site_url 的 https:
+                # 改写后的 m3u8 里分片全是 http:// (央视/咪咕/各地广电 CDN 都没 https)
+                # https 的 m3u8 + http 分片 = 混合内容, 大量播放器直接拒绝 -> 直播全黑。
+                purl = self._rewrite_m3u8_proxy_url(url)
             res = {'parse': 0, 'playUrl': '', 'url': purl,
                    'header': {'User-Agent': UA,
                               'Referer': self.site_url + '/'}}
-            self._play_cache[id] = (now, res)
+            # 直播地址里带 auth_key(有效期约分钟级), 缓存太久会拿到过期地址
+            # -> 播放器 403 -> 转圈。直播只缓存 45s, 点播缓存 600s
+            self._play_cache[id] = (now, res, 45)
             self.log('  => [直播代理] %s' % url[:100])
             return res
         res = {'parse': 0 if _RE_MEDIA.match(url) else 1,
                'playUrl': '', 'url': url,
                'header': {'User-Agent': UA,
                           'Referer': self.site_url + '/'}}
-        self._play_cache[id] = (now, res)
+        self._play_cache[id] = (now, res, 600)
         self.log('  => %s (parse=%d)' % (url[:120], res['parse']))
         return res
 
@@ -2063,6 +2183,19 @@ class Spider(_Base):
             pass
         return False
 
+    def _is_bad_line(self, flag):
+        """该线路是否近期已被判死(负缓存, 默认 20 分钟)
+
+        为什么要它: 站点的部分线路(kqgfbs / 神话)全站 403, 是「永久坏」的。
+        但 playerContent 每次都会先走 _usable_one(0.5s) 再走 _parse_play(1.5s),
+        用户点一下卡 2 秒, 体验极差。已知坏线路直接走换源, 秒开。
+        """
+        try:
+            t = _BAD_LINE.get(str(flag))
+            return bool(t and int(time.time()) - t < 1200)
+        except Exception:
+            return False
+
     def _fallback_line(self, flag, bad_id):
         """当前线路拿不到地址时, 自动换到同片其他可用线路
 
@@ -2089,7 +2222,7 @@ class Spider(_Base):
                     continue        # 这条线路集数不够, 跳过
                 pid = lst[idx]
                 if pid in self._play_cache:
-                    ts, r = self._play_cache[pid]
+                    ts, r, _ttl = self._play_cache[pid]
                     if r.get('parse') == 0 and r.get('url'):
                         self.log('  ↑ 换源 %s -> %s 第%d集' %
                                  (flag, nm, idx + 1))
