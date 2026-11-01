@@ -15,7 +15,7 @@
   3) init 只做本地初始化; 登录/取二级公钥改懒加载, 失败 60s 后可重试
   4) 简介统一加 INTRO_PREFIX; 集名 "第01集"->"01"; 线路按 _line_rank 排序
 
- 增量(短剧/筛选/地址编码):
+V7.1 增量(短剧/筛选/地址编码):
   5) 短剧 fn=29 结构: 一条记录 = 一条线路的一个播放位置。单条线路(短剧"全集"、
      单片) 统一显示为「正片」, 避免 TVBox 显示成 "1"; 备注优先用站点原文(全47集)
   6) 列表条目补全 vod_year(fn14)/vod_area(fn1)/vod_director(fn7)/vod_actor(fn12),
@@ -25,6 +25,20 @@
   9) 解析源回传图床封面(~image.image / tplv-xxx-image)判定失败, 不再当播放地址
  10) 首页分类只剔除「文章」(id=27), 保留 电影/剧集/综艺/动漫/短剧/直播/漫剧;
      不再追加「最近在看」入口 (history 分支保留, 只是不挂首页)
+
+V7.2 增量(线路可用性 + 直播):
+ 11) 【转圈根因】旧版在解析源失败时把 base64 参数串当 url 返回, 播放器拿它去
+     connect 永不返回 -> 永久转圈。现在返回空 url 并自动换源。
+ 12) _fallback_line(): 当前线路解析失败时自动切到同片可用线路,
+     按「第几集」对齐(第50集换源后仍是第50集), 集数不足的线路跳过
+ 13) _BAD_LINE: 彻底救不回来的线路记 30 分钟, 详情页把它排到最后(不删,
+     用户仍可手选), 减少踩坑
+ 14) 直播脏数据清洗: 站点把直播聚合页写成 地区=美国 / 年份=2018 /
+     导演演员=未知, 全部清空, 备注改「N个频道」
+ 15) 直播频道用频道名(CCTV1综合)而非序号(1)显示, 26 台直链实测全部可用
+ 16) localProxy() 实装: 123pan 图床防盗链直连 403 -> 首页显示色块,
+     改写为 {site}/proxy?url=... 由宿主带 Referer 取图
+ 17) liveContent() 实装: 返回直播聚合分组, TVBox 直播入口可用
 """
 import re
 import sys
@@ -323,6 +337,7 @@ _RE_IMG_EXT = re.compile(
 # 文章 id=27, 另有 29 为隐藏类目
 _SKIP_CAT_ID = ('27', '29')
 _SKIP_CAT_NAME = ('文章',)
+LIVE_TID = '25'
 
 
 def _cat_skip(tid, name):
@@ -356,6 +371,10 @@ _DEF_FILTERS = {
 _CAT_CACHE = {'ts': 0, 'data': None}
 _HIST_CACHE = {'ts': 0, 'data': []}
 _LINE_CACHE = {'ts': 0, 'data': None}
+# 片名/ID -> {线路名: [各集播放项]}, 供 playerContent 自动换源
+_PLAY_MAP = {}
+# 已知解析失败的线路名(跨请求记忆): 详情页优先剔除, 减少用户踩坑
+_BAD_LINE = {}
 
 
 # ============================================================ 工具
@@ -572,12 +591,62 @@ class Spider(_Base):
         return False
 
     def localProxy(self, url):
+        """图片/资源本地代理
+
+        TVBox 调用约定: vod_pic 写成 '{base}/proxy?url=xxx' 形式,
+        这里返回 {'url': 真实地址, 'header': {...}} 让宿主带 header 去取。
+        123pan 图床有防盗链, 必须带 Referer, 否则 403 显示成色块。
+        """
         try:
-            return url
+            if not url:
+                return None
+            raw = str(url)
+            # 兼容 ?url=xxx 与直接传地址两种写法
+            if 'url=' in raw:
+                raw = urllib.parse.unquote(raw.split('url=', 1)[1])
+            if raw.startswith('//'):
+                raw = 'https:' + raw
+            if not raw.startswith('http'):
+                return None
+            hdr = {'User-Agent': UA, 'Accept': 'image/webp,image/*,*/*'}
+            if '123pan' in raw:
+                hdr['Referer'] = 'https://www.123pan.com/'
+            else:
+                hdr['Referer'] = self.site_url + '/'
+            return {'url': raw, 'header': hdr,
+                    'content-type': 'image/jpeg', 'statusCode': 200}
         except Exception:
             return None
 
     def liveContent(self, filter=False):
+        """直播面板: 返回站点直播分类下的频道聚合页
+
+        TVBox 直播入口走这里。橘汁的直播是「聚合剧集」形式
+        (一个详情页 26 个频道), 所以列成 group 让用户点进去选台。
+        """
+        try:
+            if not self._ensure():
+                return {'list': []}
+            vids = self._list('page=1&pagesize=40&typeId1=%s' % LIVE_TID)
+            chans = {}
+            for it in vids:
+                nm = it.get('vod_name') or ''
+                chans[nm] = it
+            groups = []
+            for nm, it in chans.items():
+                groups.append({
+                    'group': nm,
+                    'channels': [{
+                        'name': nm,
+                        'urls': ['%s/detail?id=%s' % (self.site_url,
+                                                      it.get('vod_id'))],
+                    }],
+                })
+            if groups:
+                self.log('直播面板: %d 个聚合频道' % len(groups))
+                return {'list': groups}
+        except Exception as e:
+            self.log('liveContent 失败: %s' % e)
         return {'list': []}
 
     def log(self, *a):
@@ -961,6 +1030,12 @@ class Spider(_Base):
                     info['vod_actor'] = _clean(
                         v2.decode('utf-8', 'replace')).lstrip(' ,')
             if info['vod_id'] and info['vod_name']:
+                # 123pan 图床有防盗链(直连 403 -> 首页显示成色块),
+                # 交给 localProxy 带 Referer 取图
+                if '123pan' in (info['vod_pic'] or ''):
+                    info['vod_pic'] = '%s/proxy?url=%s' % (
+                        self.site_url,
+                        urllib.parse.quote(info['vod_pic'], safe=''))
                 out.append(info)
         return out
 
@@ -1085,10 +1160,22 @@ class Spider(_Base):
                         t, u = lines[nm][0].split('$', 1)
                         if t in ('1', '', '正片'):
                             lines[nm][0] = '正片$' + u
-                order.sort(key=lambda nm: (_line_rank(nm), len(nm), nm))
+                # 排序: 权重 -> 近期解析失败的线路沉底(仍可选, 不删)
+                now_ts = int(time.time())
+
+                def _ok(nm):
+                    t = _BAD_LINE.get(nm)
+                    return 1 if (t and now_ts - t < 1800) else 0
+                order.sort(key=lambda nm: (_ok(nm), _line_rank(nm),
+                                           len(nm), nm))
                 out['vod_play_from'] = '$$$'.join(order)
                 out['vod_play_url'] = '$$$'.join('#'.join(lines[nm])
                                                  for nm in order)
+                # 记录每条线路的完整分集列表, 供 playerContent 自动换源
+                # 换源时按「第几集」对齐, 避免第50集跳到第1集
+                _PLAY_MAP[vod_id] = {
+                    nm: [x.split('$', 1)[-1] for x in lines[nm]]
+                    for nm in order}
                 # 备注: 优先站点原始备注, 缺失时才用解析到的条数推算
                 if not out.get('vod_remarks'):
                     mx = max([len(lines[nm]) for nm in order] or [0])
@@ -1115,8 +1202,16 @@ class Spider(_Base):
         return {'list': [out]}
 
     def _parse_detail(self, data, out):
-        """fn 映射: 1地区 2图 6简介 9名 12导演 16/25主演 18年份 26备注 28注 29分集"""
+        """fn 映射: 1地区 2图 3时间 6简介 9名 12导演 16/25主演 18年份
+                   26备注 28注 29分集
+
+        直播聚合页(fn29 子项 fn4 带 zb- 前缀) 特殊处理:
+          - 站点会把地区填成「美国」、年份 2018、导演演员「未知」,
+            这些是脏数据, 直播页面不该显示, 统一清空
+          - 备注用「N个频道」而不是「共N集」
+        """
         eps = []
+        is_live = False
         for fn, wt, v in _pb(data):
             if wt == 2 and fn == 29:
                 ep = {}
@@ -1125,6 +1220,9 @@ class Spider(_Base):
                         ep[f3] = v3.decode('utf-8', 'replace')
                 if ep.get(4):
                     eps.append(ep)
+                    if str(ep.get(4)).startswith('zb-') or \
+                            str(ep.get(9)).lower() == 'cctv':
+                        is_live = True
                 continue
             if wt != 2:
                 if fn == 18 and 'vod_year' not in out:
@@ -1163,7 +1261,25 @@ class Spider(_Base):
                 ep_url = base64.b64encode(json.dumps(
                     {'vodPlayFrom': src, 'playUrl': pth},
                     separators=(',', ':')).encode()).decode()
+            # 直播频道用频道名(CCTV1综合), 比 "1" 直观
+            if is_live:
+                title = ep.get(3) or title
             result.append((line, title, ep_url))
+
+        if is_live:
+            # 直播没有地区/年份/导演/演员, 清掉站点脏数据
+            out['vod_area'] = ''
+            out['vod_year'] = ''
+            out['vod_director'] = ''
+            out['vod_actor'] = ''
+            out.pop('vod_note', None)
+            out['vod_remarks'] = '%d个频道' % len(result)
+            if not out.get('vod_content'):
+                out['vod_content'] = (
+                    '📺 橘汁直播 · 共%d个频道：%s。'
+                    '直接选台即可，切台无需退出。' % (
+                        len(result),
+                        '、'.join([t for _, t, _ in result[:6]]) + '等'))
         return result
 
     def _detail_history(self, vod_id):
@@ -1413,7 +1529,20 @@ class Spider(_Base):
                     break
 
         if not url:
-            url = id or 'http://'
+            # 关键: 绝不能把 base64 参数串当播放地址丢给播放器
+            # (播放器会当成 http 去连 -> 永久转圈)
+            # 解析源故障时, 优先回落到同片的其他可用线路
+            url = self._fallback_line(flag, id)
+        if not url:
+            # 记住这条线路是坏的, 下次详情页优先把它排到后面
+            try:
+                _BAD_LINE[str(flag)] = int(time.time())
+            except Exception:
+                pass
+            self.log('  !! 该线路无可用地址, 播放器将提示换源')
+            return {'parse': 1, 'playUrl': '', 'url': '',
+                    'header': {'User-Agent': UA,
+                               'Referer': self.site_url + '/'}}
         url = _q_url(url)
         res = {'parse': 0 if _RE_MEDIA.match(url) else 1,
                'playUrl': '', 'url': url,
@@ -1422,3 +1551,63 @@ class Spider(_Base):
         self._play_cache[id] = (now, res)
         self.log('  => %s (parse=%d)' % (url[:120], res['parse']))
         return res
+
+    def _fallback_line(self, flag, bad_id):
+        """当前线路拿不到地址时, 自动换到同片其他可用线路
+
+        _PLAY_MAP[vod_id] = {线路: [各集播放项...]}
+        按「第几集」对齐: 用户播第50集, 换源后仍是第50集。
+        集数不足的线路直接跳过, 避免错集。
+        """
+        try:
+            rec = _PLAY_MAP.get(self._cur_id) or {}
+            if not rec:
+                return ''
+            my = rec.get(flag) or []
+            idx = -1
+            for i, pid in enumerate(my):
+                if pid == bad_id:
+                    idx = i
+                    break
+            if idx < 0:
+                idx = 0
+            cands = sorted([(nm, lst) for nm, lst in rec.items() if nm != flag],
+                           key=lambda x: _line_rank(x[0]))
+            for nm, lst in cands:
+                if idx >= len(lst):
+                    continue        # 这条线路集数不够, 跳过
+                pid = lst[idx]
+                if pid in self._play_cache:
+                    ts, r = self._play_cache[pid]
+                    if r.get('parse') == 0 and r.get('url'):
+                        self.log('  ↑ 换源 %s -> %s 第%d集' %
+                                 (flag, nm, idx + 1))
+                        return r['url']
+                u = self._usable_one(pid)
+                if u and _RE_MEDIA.match(u):
+                    self.log('  ↑ 换源 %s -> %s 第%d集' % (flag, nm, idx + 1))
+                    return u
+        except Exception as e:
+            self.log('  换源失败: %s' % e)
+        return ''
+
+    def _usable_one(self, pid):
+        """单次 videoUsableUrl, 返回直链或空"""
+        try:
+            if not pid or pid.startswith('http') or '|' in pid:
+                return ''
+            jm = json.loads(base64.b64decode(pid))
+            qs = 'vodPlayFrom=%s&playUrl=%s' % (
+                urllib.parse.quote(jm.get('vodPlayFrom', '')),
+                urllib.parse.quote(jm.get('playUrl', ''), safe=''))
+            code, data = self._proto('/api/proto/v5/videoUsableUrl', qs)
+            if code != 200 or not data:
+                return ''
+            for fn, wt, v in _pb(data):
+                if wt == 2 and fn in (1, 6, 7):
+                    t = v.decode('utf-8', 'replace')
+                    if t.startswith('http') and not _RE_IMG_EXT.search(t):
+                        return t
+        except Exception:
+            pass
+        return ''
