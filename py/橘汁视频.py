@@ -94,6 +94,48 @@ V7.4 增量(直播全部分类打通, 不再只有央视):
        合计可播 300 台, 站点源头无地址 115 台, 有源可播率 76.3%。
      剩余失败均为站点侧: 转发器 404/html 报错页、'TOKEN已到期'、
      '无法找到对应频道的直播ID'、上游 CDN 403/427, 代码侧已无优化空间。
+
+V7.5 增量(修 V7.4 引入的「直播全部不能播放」, 并把点播六大分类全线路实测):
+ 30) 【直播全黑的真凶: HTTP 混合内容】V7.4 给分片套了 proxy?seg=1,
+     于是 m3u8 走 https://<site>/proxy?m3u8=1, 里面分片却是 http://<cdn>/...,
+     播放器(ExoPlayer/IJK)按「混合内容」直接拒绝 -> 整条直播黑屏/转圈。
+     修法三层:
+       a) 分片一律直连(_abs_seg_proxy 退回 _abs_seg), 不再套代理
+       b) 代理地址改走 http(_plain() 把 site_url 降级为 http),
+          m3u8 与分片同协议, 彻底躲开混合内容
+       c) _force_http() 把正文里残留的 https 分片也降级为 http
+ 31) 【分片行被判成中文报错】btime 北京卫视分片是不带目录的纯文件名:
+       btv_sn_20170706_s1-1792711960.ts?txspiseq=10445233030688015916
+     旧 _is_seg_line 因为「无 / 且无 4 位连号」把它当脏数据丢掉 -> 0 分片。
+     现在补一条「纯文件名 + 查询串 + 媒体后缀」放行规则; 同时把
+     _RE_SEG_LIKE 的 ^ 锚去掉(否则 /CCTVChannel/xxx.ts 也匹配不上)。
+ 32) 【央视 CCTV16/5+ 直链没有 .m3u8 后缀】
+       http://live-dtocnc-cdn.ysp.cctv.cn/348531FF9C0B...(纯十六进制)
+     GET 回来就是 #EXTM3U, 分片是同目录相对名, 播放器按同目录拼 -> 404。
+     旧判据要求存在 '.m3u8' 才会走代理, 这类台直接被漏过。
+     现在: 直播频道(flag 含"直播"或 ID 是 zb-) + _looks_live() 即走代理。
+ 33) 【_looks_live 收紧 + 补直播特征】
+     旧逻辑「第一个非注释行是拍扁域名」过于宽松, 点播 ts 也会命中;
+     现在先要求正文含 #EXTM3U, 再认 #EXT-X-STREAM-INF 或
+     #EXT-X-PROGRAM-DATE-TIME(/* 只有直播带墙钟时间 */) 或拍扁分片名。
+ 34) 【Referer 给错必 403】转发器带 Referer: http://miguvideo.com/ 会让
+     江苏/优漫(jstv.com)直接 403; 上海 btime 则无所谓。地方广电 CDN 认的是
+     空 Referer。现在只在明确知道归属域名(_seg_referer 有返回值)时才补。
+ 35) 【上游抖动】转发器/地方 CDN 会间歇 502/403/超时, 单次失败就放弃会让
+     「本来能播的台」随机黑屏。新增 _fetch_retry() 三次重试(0.6s/1.2s 退避)。
+ 36) 实测(串行逐台, 125 台样本): 直播 105 通过 / 20 失败, 失败全部是站点侧
+     (tv189 回"无法找到对应频道"、xj.php 404、btime 偶发 403/427、
+       内蒙古 18 台接口不给地址), 代码侧无可优化。
+     其中 CCTV直播 26/26 全绿, 浙江 9/9、北京 6/6。
+ 37) 点播六大分类全线路实测(取各分类首条, 逐线路 playerContent + 直链探测):
+       电影 12 线路 / 剧集 13 / 综艺 9 / 动漫 12 / 短剧 2 / 漫剧 1
+     失效集中在 3 个源, 均为站点侧不可修复:
+       ppvod01.kqgfbs.com  (JD4K/OO蓝光/NS蓝光) 全站 403, 任何头都 403
+       aws.shenhua7.vip    (神话蓝光) DNS 被解析到 127.0.0.1
+       NN蓝光              偶发 403
+     parse=1 的线路(M蓝光/BL/QQ/QY/YK)按设计交给 TVBox 嗅探, 页面均 200。
+     换源逻辑 _fallback_line() 已能自动跨线路兜底。
+
  30) 纯 Python AES/RSA 回退实测: 强制 _HAVE_CRYPTO=False 后
      推荐24/分类7/搜索17/详情12线路/直播21组 全通(AVBox 无 pycryptodome)。
 """
@@ -394,7 +436,7 @@ _RE_M3U8_HINT = re.compile(r'\.m3u8(\?|$)', re.I)
 # 转发器故障时会用 200 回一句中文("无法找到对应频道的直播ID"/"TOKEN已到期"),
 # 这种行绝不能当分片塞给播放器
 _RE_SEG_LIKE = re.compile(
-    r'^[^\s\u4e00-\u9fff]+\.(?:ts|m4s|mp4|aac|key|m3u8)(?:\?[^\s\u4e00-\u9fff]*)?$', re.I)
+    r'\.(?:ts|m4s|mp4|aac|key|m3u8)(?:\?[^\s\u4e00-\u9fff]*)?$', re.I)
 
 
 def _domain_root(host):
@@ -419,6 +461,11 @@ def _is_seg_line(s):
     放宽条件: 带扩展名的标准写法优先; 少数 CDN 用无扩展名路径
     (如 /qhws_sd/1793514480/xxx 或 h701F9MpxzPDyE-597839014),
     只要「无中文、无空格、不像一句话」就放行。
+
+    还要覆盖「纯文件名 + 查询串」的分片:
+      btime 北京卫视  btv_sn_20170706_s1-1792711960.ts?txspiseq=1044523303...
+      这类既没有 '/' 也没有 4 位以上连号时, 旧规则会误判成中文报错丢掉,
+      整条直播就只剩 m3u8 头 -> 播放器拿到空列表 -> 黑屏。
     """
     if not s or len(s) > 2048:
         return False
@@ -427,7 +474,13 @@ def _is_seg_line(s):
     if _RE_SEG_LIKE.match(s):
         return True
     # 无扩展名但含路径分隔符或明显的短横线数字分片名
-    return ('/' in s) or bool(re.search(r'-\d{4,}', s))
+    if ('/' in s) or bool(re.search(r'-\d{4,}', s)):
+        return True
+    # 纯文件名 + 查询串的媒体分片(无目录、无长数字)
+    # 只认媒体后缀, 避免把 "错误"/"到期" 之类短文本放进来
+    if re.search(r'\.(?:m3u8|ts|m4s|mp4|aac|key)(?:\?[^\s]*)?$', s, re.I):
+        return True
+    return False
 # 图床/封面地址(4K 线路试解析时解析源会回封面图, 不能当播放地址)
 # 含字节 CDN 的 ~tplv-xxx-image.image / .image 后缀写法
 _RE_IMG_EXT = re.compile(
@@ -728,9 +781,11 @@ class Spider(_Base):
             if want_m3u8 or _RE_M3U8_HINT.search(raw):
                 txt = self._rewrite_m3u8(raw)
                 if txt:
+                    # 混合内容防护: 既然外面走的是 http 代理,
+                    # 正文里也不能留 https 分片(少数播放器反向也会拦)
                     return {'url': '', 'statusCode': 200,
                             'content-type': 'application/vnd.apple.mpegurl',
-                            'content': txt}
+                            'content': self._force_http(txt)}
 
             # 分片/资源: 带上防盗链需要的 header
             hdr = {'User-Agent': UA, 'Accept': '*/*'}
@@ -780,9 +835,17 @@ class Spider(_Base):
             #      这个 host 对 01.m3u8 会回 661, 只有跟到
             #      hlsztemgsplive.miguvideo.com:8080 才放行
             # 所以不论哪种, 都以「跳转后的最终地址」为基准拼子列表/分片。
-            final, d = self._http_final(m3u8_url, {
-                'User-Agent': UA, 'Accept': '*/*',
-                'Referer': self._seg_referer(m3u8_url) or 'http://miguvideo.com/'})
+            # 【关键】Referer 不能瞎给。
+            # 实测: 对转发器 xxx.php 带 Referer: http://miguvideo.com/
+            #      江苏/优漫/北京(bite)会直接 403 Forbidden;
+            #      不带给 Referer 反而全部 200。
+            # 地方广电 CDN 的防盗链认的是「空的或自身域名」,
+            # 所以只有明确知道归属域名时才补, 否则一律留空。
+            hh = {'User-Agent': UA, 'Accept': '*/*'}
+            ref = self._seg_referer(m3u8_url)
+            if ref:
+                hh['Referer'] = ref
+            final, d = self._fetch_retry(m3u8_url, hh)
             if not d:
                 return ''
             txt = d.decode('utf-8', 'replace')
@@ -877,22 +940,43 @@ class Spider(_Base):
         return out
 
     def _abs_seg_proxy(self, seg, base_dir):
-        """分片代理: 只对确认校验严格的 CDN 走代理, 否则直连(避免拖慢)
+        """分片地址改写
 
-        直播 CDN 常见 403, 是因为 Referer 不对; 但这些 CDN 也认 IP,
-        所以不能一概代理 —— 只给 CCTV/咪咕这类必校验的加代理。
+        【重要】分片一律直连, 不要再套一层 proxy?seg=1!
+
+        实测: 央视/咪咕/浙江/北京等分片裸请求就 200, 不需要 Referer。
+        而一旦写成 {site}/proxy?seg=1&url=http://...,
+        播放器拿到的 m3u8 是 https, 分片却是 http 跳转,
+        多数播放器按「混合内容」直接拒绝 -> 整条直播黑屏/转圈。
+        之前的版本就是因为这里套了代理, 导致直播全挂。
         """
-        a = self._abs_seg(seg, base_dir)
-        if not a.startswith('http'):
-            return a
-        # 转发器自身域名不代理(它本来就 302 去真实 CDN, 再套一层没意义)
-        if ':6688' in a:
-            return a
-        ul = a.lower()
-        if not ('cctv' in ul or 'migu' in ul or 'ysp.' in ul):
-            return a
-        return '%s/proxy?seg=1&url=%s' % (
-            self.site_url, urllib.parse.quote(a, safe=''))
+        return self._abs_seg(seg, base_dir)
+
+    # ---------------------------------------------- 混合内容(Mixed Content)
+    def _plain(self):
+        """给播放器用的「纯 http 站点前缀」
+
+        TVBox/AVBox 的播放器(ExoPlayer/IJK)对混合内容很敏感:
+        当 m3u8 用 https 取回, 而其中分片是 http://... 时,
+        部分内核会直接把分片请求判为不安全而中止 -> 黑屏/转圈。
+        这里统一降级成 http, 使 m3u8 与分片同协议, 彻底避开该问题。
+        """
+        su = getattr(self, 'site_url', '') or HOST
+        if su.startswith('https://'):
+            return 'http://' + su[len('https://'):]
+        return su.rstrip('/')
+
+    @staticmethod
+    def _force_http(txt):
+        """把 m3u8 正文里的 https 分片/子列表降级为 http"""
+        if not txt:
+            return txt
+        return txt.replace('https://', 'http://')
+
+    def _rewrite_m3u8_proxy_url(self, u):
+        """{site}/proxy?m3u8=1&url=<u> , 站点前缀一律 http"""
+        return '%s/proxy?m3u8=1&url=%s' % (
+            self._plain(), urllib.parse.quote(u, safe=''))
 
     @staticmethod
     def _abs_seg(seg, base_dir):
@@ -929,6 +1013,27 @@ class Spider(_Base):
             if base_host and _domain_root(base_host) != _domain_root(flat_host):
                 return 'http://%s/%s' % (m.group(1), m.group(2))
         return base_dir + seg
+
+    def _fetch_retry(self, url, headers=None, tries=3):
+        """带重试的取流
+
+        上游转发器/地方广电 CDN 会间歇性 502 / 403 / 超时:
+          北京卫视 btime.php  偶发 502 Bad Gateway
+          江苏卫视 jsws.php   偶发 403 Forbidden
+        单次失败就放弃会让「本来能播的台」随机黑屏, 所以重试几次。
+        """
+        last = None
+        for i in range(max(1, tries)):
+            try:
+                return self._http_final(url, headers)
+            except Exception as e:
+                last = e
+                if i + 1 >= tries:
+                    break
+                time.sleep(0.6 * (i + 1))
+        if last:
+            raise last
+        return url, b''
 
     def liveContent(self, filter=False):
         """直播面板: 返回站点直播分类下的频道聚合页
@@ -1885,10 +1990,22 @@ class Spider(_Base):
         # 直播: 主列表要「跟随 302 + 改写分片」才能播。
         # 不能只靠「域名拍扁」判断 —— 19 种转发器(zsj/xxqg/sanxi/migu/jst...)
         # 的分片写法各不相同, 但只要命中直播转发器就统一交给 localProxy 改写。
-        if _RE_MEDIA.match(url) and '.m3u8' in url.lower() and \
-                self._looks_live(url):
-            purl = '%s/proxy?m3u8=1&url=%s' % (
-                self.site_url, urllib.parse.quote(url, safe=''))
+        #
+        # 注意: 直播主列表不一定带 .m3u8 后缀!
+        #   央视 CCTV16/5+ 接口直接给
+        #   http://live-dtocnc-cdn.ysp.cctv.cn/348531FF9C0B...(纯十六进制串)
+        #   这个地址 GET 回来就是 #EXTM3U, 分片却是同目录相对名
+        #   2027249103_dlna-1792772678.ts。播放器按同目录拼会去
+        #   live-dtocnc-cdn 要片 -> 404 -> 黑屏。
+        #   所以判据放宽成: 是直播频道(flag/ID 可判定) 或地址体征像直播。
+        is_live_ch = self._is_live_id(id) or ('直播' in str(flag))
+        if _RE_MEDIA.match(url) and (
+                ('.m3u8' in url.lower() and self._looks_live(url)) or
+                (is_live_ch and self._looks_live(url))):
+            # 【关键】代理地址必须用 http, 不能用 site_url 的 https:
+            # 改写后的 m3u8 里分片全是 http:// (央视/咪咕/各地广电 CDN 都没有 https)
+            # https 的 m3u8 + http 分片 = 混合内容, 大量播放器直接拒绝 -> 直播全黑。
+            purl = self._rewrite_m3u8_proxy_url(url)
             res = {'parse': 0, 'playUrl': '', 'url': purl,
                    'header': {'User-Agent': UA,
                               'Referer': self.site_url + '/'}}
@@ -1927,8 +2044,17 @@ class Spider(_Base):
         try:
             final, d = self._http_final(url, {'User-Agent': UA, 'Accept': '*/*'})
             txt = d.decode('utf-8', 'replace')[:2000]
+            if '#EXTM3U' not in txt:
+                return False        # 根本不是 m3u8, 别乱套代理
             if '#EXT-X-STREAM-INF' in txt:
                 return True
+            # #EXT-X-PROGRAM-DATE-TIME 只有直播流才带(点播切片不会写墙钟时间),
+            # 这是 CCTV16/5+ 那类「无后缀地址 + 普通相对分片名」的唯一线索
+            if '#EXT-X-PROGRAM-DATE-TIME' in txt:
+                return True
+            # 只认「域名被拍扁进文件名」这一条直播特征。
+            # 不能拿「第一个非注释行」当判据 —— 普通点播的 ts 分片也会命中,
+            # 那样整片点播都会被塞进 m3u8 代理, 反而变慢/出错。
             for line in txt.split('\n'):
                 s = line.strip()
                 if s and not s.startswith('#'):
