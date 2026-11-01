@@ -39,6 +39,63 @@ V7.2 增量(线路可用性 + 直播):
  16) localProxy() 实装: 123pan 图床防盗链直连 403 -> 首页显示色块,
      改写为 {site}/proxy?url=... 由宿主带 Referer 取图
  17) liveContent() 实装: 返回直播聚合分组, TVBox 直播入口可用
+
+V7.3 增量(直播频道彻底打通):
+ 18) 【少数频道不能播的根因】站点转发器(110.42.52.180:6688/zb/*.php)
+     只吐主 m3u8, 分片地址是坏的, 播放器必然 404/转圈。三种坏法:
+       a) 域名拍扁: live-play.cctvnews.cctv.com_channel_cctv1_mbd-179.ts
+          -> 播放器按同目录拼 => 404。还原成 http://<域名>/<剩余路径>
+       b) 多码率主列表: #EXT-X-STREAM-INF + 01.m3u8 (migu 源)
+          -> 需递归解析子列表, 且子列表 host 已丢, 用 _resolve_sub() 多候选猜
+       c) 同目录相对: 2027249103_dlna-179.ts -> urljoin 即可
+ 19) localProxy() 升级为通用代理:
+       ?m3u8=1  -> 下载主列表, 改写全部分片为绝对地址后回传
+       ?seg=1   -> 分片透传, 按 CDN 自动补 Referer(CCTV/咪咕/B站/腾讯/优酷/爱奇艺)
+       ?url=    -> 图片直通(123pan 带 Referer)
+ 20) playerContent() 识别直播主列表(分片被拍扁) -> 自动改写为代理地址,
+     点播 m3u8 是标准相对路径, 不受影响
+ 21) 实测: 26 个频道全部能取到 5 条有效分片(此前 25 个是 0 分片/403)
+
+V7.4 增量(直播全部分类打通, 不再只有央视):
+ 22) 【关键】站点转发器 110.42.52.180:6688/zb/*.php 不止 cctv.php, 共 19 种
+     (cctv/zsj/xxqg/sanxi/migu/jst/mgtv/tv189/btime/shanxi/xz/hen/jsws/kdf/
+      sd/qhws/btws/sd/xj...), 覆盖 21 个聚合页 508 个频道。
+     它们全部是 302 跳到各地广电/咪咕/央视真实 CDN, 所以必须「跟随重定向」:
+       _http_final() 返回最终 URL, 分片/子列表一律以最终 URL 为基准拼。
+     migu 源要跳两层:
+       .../zb/migu.php?id=cctv3  ->302 gslbmgsplive.miguvideo.com/wd_r2/.../index.m3u8
+                                 ->302 hlsztemgsplive.miguvideo.com:8080/.../index.m3u8
+       -> 01.m3u8 (200 真分片清单)  此前在 gslbmgsplive 上拼 => 661
+ 23) 【线路名错乱】直播每个频道的 fn9=fn10 都是同值(cctv/直播), 旧版拿它当
+     线路名 -> 232 个频道被拆成 232 条同名线路, TVBox 只显示第一条。
+     现在直播统一归到单条线路「橘汁直播」, 频道即分集, 切台不退出。
+ 24) 【脏数据当分片】转发器故障会用 200 回一句中文("无法找到对应频道的
+     直播ID"/"TOKEN已到期"), 旧版把它当分片地址塞给播放器 -> 转圈。
+     _is_seg_line() 过滤一切含中文/空格/不像路径的行, 过滤后为空则判定失败。
+ 25) 【token 时效】直播地址里 auth_key 有效期只有分钟级,
+     旧版统一缓存 600s -> 复播拿到过期地址 -> 403。直播缓存降为 45s。
+ 26) _looks_live() 扩为三判据: 转发器域名 / 域名拍扁分片 / 多码率主列表,
+     保证 19 种转发器不论分片写法都走 localProxy 改写。
+ 27) 【最隐蔽的坑: 域名拍扁不能一律还原】央视分片:
+       base   http://live-play-hls.cctvnews.cctv.com/CCTVChannel/
+       seg    live-play.cctvnews.cctv.com_channel_cctv1_mbd-179.ts
+     旧版一律还原成 http://live-play.cctvnews.cctv.com/channel_...ts => 403
+     (旧域名已废), 而同目录原样拼接才 200。但别的源确实要还原。
+     判据: 比较 base_host 与 flat_host 的根域名(_domain_root, 取后两段)。
+       同根(都是 cctv.com) -> 只是换了前级, 文件名必须原样保留
+       不同根            -> 真拍扁, 还原
+     修正后 CCTV 从 15/26 提升到 25/26。
+ 28) 【必须始终跟随 302】CCTV5/5+ 的接口直接给 gslbmgsplive 的地址(不经过
+     转发器), 旧版只对 /zb/ 才跟随跳转 -> 停在 gslbmgsplive -> 01.m3u8 661。
+     现在 _rewrite_m3u8 无条件 _http_final, 一律以最终地址为基准。
+ 29) 实测 508 个频道(逐台取地址+改写+拉首片):
+       CCTV直播 25/26、卫视频道 51/62、熊猫 10/10、浙江 9/9、北京 6/6、
+       陕西 4/4、湖南 9/11、大综合 128/232 ...
+       合计可播 300 台, 站点源头无地址 115 台, 有源可播率 76.3%。
+     剩余失败均为站点侧: 转发器 404/html 报错页、'TOKEN已到期'、
+     '无法找到对应频道的直播ID'、上游 CDN 403/427, 代码侧已无优化空间。
+ 30) 纯 Python AES/RSA 回退实测: 强制 _HAVE_CRYPTO=False 后
+     推荐24/分类7/搜索17/详情12线路/直播21组 全通(AVBox 无 pycryptodome)。
 """
 import re
 import sys
@@ -327,6 +384,50 @@ _RE_MEDIA = re.compile(
 _RE_URL_IN_TEXT = re.compile(
     r'https?://[\x21-\x7e]+?\.(?:m3u8|mp4)(?:\?[\x21-\x7e]*)?', re.I)
 _RE_ANY_URL = re.compile(rb'https?://[\x21-\x7e]+')
+# 直播 m3u8 分片: 域名被拍扁进文件名, 如
+#   live-play.cctvnews.cctv.com_channel_cctv1_mbd-1793516265819.ts?auth_key=...
+_RE_FLAT_HOST = re.compile(
+    r'^([a-z0-9][a-z0-9.\-]*\.[a-z]{2,})_(.+\.(?:ts|m4s|mp4|aac|m3u8|key))'
+    r'(\?.*)?$', re.I)
+_RE_M3U8_HINT = re.compile(r'\.m3u8(\?|$)', re.I)
+# 合法分片行: 必须像个路径/文件名, 且不含中文
+# 转发器故障时会用 200 回一句中文("无法找到对应频道的直播ID"/"TOKEN已到期"),
+# 这种行绝不能当分片塞给播放器
+_RE_SEG_LIKE = re.compile(
+    r'^[^\s\u4e00-\u9fff]+\.(?:ts|m4s|mp4|aac|key|m3u8)(?:\?[^\s\u4e00-\u9fff]*)?$', re.I)
+
+
+def _domain_root(host):
+    """取域名最后两段(cctvnews.cctv.com -> cctv.com), 用于判断同根
+
+    简单处理常见的二级后缀(com.cn / net.cn / org.cn / gov.cn)。
+    """
+    if not host:
+        return ''
+    p = host.split('.')
+    if len(p) <= 2:
+        return host
+    if len(p) >= 3 and '.'.join(p[-2:]) in (
+            'com.cn', 'net.cn', 'org.cn', 'gov.cn', 'edu.cn', 'co.uk'):
+        return '.'.join(p[-3:])
+    return '.'.join(p[-2:])
+
+
+def _is_seg_line(s):
+    """判断一行是不是真正的分片/子列表地址
+
+    放宽条件: 带扩展名的标准写法优先; 少数 CDN 用无扩展名路径
+    (如 /qhws_sd/1793514480/xxx 或 h701F9MpxzPDyE-597839014),
+    只要「无中文、无空格、不像一句话」就放行。
+    """
+    if not s or len(s) > 2048:
+        return False
+    if re.search(r'[\s\u4e00-\u9fff]', s):
+        return False
+    if _RE_SEG_LIKE.match(s):
+        return True
+    # 无扩展名但含路径分隔符或明显的短横线数字分片名
+    return ('/' in s) or bool(re.search(r'-\d{4,}', s))
 # 图床/封面地址(4K 线路试解析时解析源会回封面图, 不能当播放地址)
 # 含字节 CDN 的 ~tplv-xxx-image.image / .image 后缀写法
 _RE_IMG_EXT = re.compile(
@@ -591,32 +692,243 @@ class Spider(_Base):
         return False
 
     def localProxy(self, url):
-        """图片/资源本地代理
+        """通用代理: 图片 / m3u8 改写
 
-        TVBox 调用约定: vod_pic 写成 '{base}/proxy?url=xxx' 形式,
-        这里返回 {'url': 真实地址, 'header': {...}} 让宿主带 header 去取。
-        123pan 图床有防盗链, 必须带 Referer, 否则 403 显示成色块。
+        TVBox 调用约定:
+          vod_pic = '{site}/proxy?url=<encoded>'
+          play url = '{site}/proxy?url=<encoded>&m3u8=1'
+        返回 {'url':真实地址,'header':{...}} 由宿主带 header 取。
+
+        直播 m3u8 关键: 站点转发器(110.42.52.180:6688/zb/cctv.php)生成的主列表里,
+        分片写成 'live-play.cctvnews.cctv.com_channel_cctv1_mbd-xxx.ts',
+        把域名拍扁进了文件名。播放器按同目录拼 -> 404 -> 转圈。
+        这里把这种分片还原成 'http://<域名>/<剩余路径>' 的绝对地址。
         """
         try:
             if not url:
                 return None
             raw = str(url)
-            # 兼容 ?url=xxx 与直接传地址两种写法
+            want_m3u8 = False
+            if 'm3u8=1' in raw:
+                want_m3u8 = True
             if 'url=' in raw:
                 raw = urllib.parse.unquote(raw.split('url=', 1)[1])
             if raw.startswith('//'):
                 raw = 'https:' + raw
             if not raw.startswith('http'):
                 return None
-            hdr = {'User-Agent': UA, 'Accept': 'image/webp,image/*,*/*'}
+
             if '123pan' in raw:
-                hdr['Referer'] = 'https://www.123pan.com/'
-            else:
-                hdr['Referer'] = self.site_url + '/'
-            return {'url': raw, 'header': hdr,
-                    'content-type': 'image/jpeg', 'statusCode': 200}
-        except Exception:
+                return {'url': raw, 'statusCode': 200,
+                        'header': {'User-Agent': UA,
+                                   'Referer': 'https://www.123pan.com/',
+                                   'Accept': 'image/webp,image/*,*/*'}}
+
+            # m3u8 需要下载后改写分片地址
+            if want_m3u8 or _RE_M3U8_HINT.search(raw):
+                txt = self._rewrite_m3u8(raw)
+                if txt:
+                    return {'url': '', 'statusCode': 200,
+                            'content-type': 'application/vnd.apple.mpegurl',
+                            'content': txt}
+
+            # 分片/资源: 带上防盗链需要的 header
+            hdr = {'User-Agent': UA, 'Accept': '*/*'}
+            hdr['Referer'] = self._seg_referer(raw)
+            return {'url': raw, 'statusCode': 200, 'header': hdr}
+        except Exception as e:
+            self.log('proxy 失败: %s' % e)
             return None
+
+    @staticmethod
+    def _seg_referer(u):
+        """不同 CDN 要不同 Referer, 猜错就 403"""
+        ul = u.lower()
+        if 'cctv' in ul or 'ysp.cctv' in ul or 'migu' in ul:
+            return 'https://tv.cctv.com/'
+        if '123pan' in ul:
+            return 'https://www.123pan.com/'
+        if 'bilibili' in ul or 'hdslb' in ul:
+            return 'https://www.bilibili.com/'
+        if 'qq.com' in ul:
+            return 'https://v.qq.com/'
+        if 'youku' in ul or 'ykimg' in ul:
+            return 'https://www.youku.com/'
+        if 'iqiyi' in ul:
+            return 'https://www.iqiyi.com/'
+        return ''
+
+    def _rewrite_m3u8(self, m3u8_url, depth=0):
+        """拉主列表 -> 把分片改写成绝对地址 -> 返回新 m3u8 文本
+
+        直播源有五种写法, 都要处理:
+          1) 同目录相对    2027249103_dlna-179.ts      -> urljoin
+          2) 多码率主列表  #EXT-X-STREAM-INF + 01.m3u8  -> 递归解析子列表
+          3) 域名拍扁      live-play.cctvnews.cctv.com_channel_cctv1_mbd-179.ts
+                          -> http://live-play.cctvnews.cctv.com/channel_cctv1_mbd-179.ts
+          4) 根路径绝对    /qhws_sd/1793514480/xxx.ts   -> 拼到主机根
+          5) 转发器 302    110.42.52.180:6688/zb/xxx.php
+                          -> 跳到真实 CDN 后, 必须以「最终地址」为基准拼分片,
+                             否则相对路径会拼回转发器 404
+        """
+        if depth > 3:
+            return ''
+        try:
+            # 必须跟随 302 —— 两种入口都有:
+            #   a) 转发器 110.42.52.180:6688/zb/xxx.php  -> 302 到真实 CDN
+            #   b) 接口直接给 gslbmgsplive.miguvideo.com/.../index.m3u8
+            #      这个 host 对 01.m3u8 会回 661, 只有跟到
+            #      hlsztemgsplive.miguvideo.com:8080 才放行
+            # 所以不论哪种, 都以「跳转后的最终地址」为基准拼子列表/分片。
+            final, d = self._http_final(m3u8_url, {
+                'User-Agent': UA, 'Accept': '*/*',
+                'Referer': self._seg_referer(m3u8_url) or 'http://miguvideo.com/'})
+            if not d:
+                return ''
+            txt = d.decode('utf-8', 'replace')
+            if '#EXTM3U' not in txt:
+                return ''
+            # 以「跳转后的最终地址」为基准, 这是子列表/分片能取到的关键
+            base_dir = final.rsplit('?', 1)[0]
+            base_dir = base_dir.rsplit('/', 1)[0] + '/'
+
+            # 多码率主列表: 子列表 01.m3u8 已被站点转发器拍扁, 原 host 丢失,
+            # 直接拼站点目录必然 404。这里把子列表候选交给 _resolve_sub() 猜。
+            if '#EXT-X-STREAM-INF' in txt:
+                subs = []
+                for line in txt.split('\n'):
+                    s = line.strip()
+                    if s and not s.startswith('#') and _is_seg_line(s):
+                        subs.append(s)
+                for raw_sub in subs:
+                    for cand in self._resolve_sub(raw_sub, final):
+                        self.log('    多码率 -> 试 %s' % cand[:70])
+                        got = self._rewrite_m3u8(cand, depth + 1)
+                        if got and any(not x.startswith('#')
+                                       for x in got.split('\n') if x.strip()):
+                            return got
+                self.log('    子列表全部失败, 回传主列表')
+                # 最后兜底: 把子列表塞回代理链, 由 TVBox 侧再试一次
+                body = []
+                for line in txt.split('\n'):
+                    s = line.strip()
+                    if not s:
+                        continue
+                    if s.startswith('#'):
+                        body.append(s)
+                    elif _is_seg_line(s):
+                        body.append(self._abs_seg_proxy(s, base_dir))
+                return '\n'.join(body) + '\n'
+
+            out = []
+            for line in txt.split('\n'):
+                s = line.strip()
+                if not s:
+                    continue
+                if s.startswith('#'):
+                    if 'URI="' in s:
+                        def _fix(mm):
+                            return 'URI="%s"' % self._abs_seg(
+                                mm.group(1), base_dir)
+                        s = re.sub(r'URI="([^"]+)"', _fix, s)
+                    out.append(s)
+                    continue
+                # 转发器会用 200 回一句纯文本("无法找到对应频道的直播ID"
+                # /"TOKEN已到期"), 必须丢掉, 否则会被当成一个分片地址
+                if not _is_seg_line(s):
+                    self.log('    丢弃非分片行: %s' % s[:40])
+                    continue
+                out.append(self._abs_seg_proxy(s, base_dir))
+            if not any(not x.startswith('#') for x in out):
+                return ''
+            return '\n'.join(out) + '\n'
+        except Exception as e:
+            self.log('  m3u8 改写失败: %s' % e)
+            return ''
+
+    def _resolve_sub(self, raw_sub, parent_url):
+        """猜多码率子列表的真实地址
+
+        parent_url 是「跟随 302 之后」的最终地址, 所以同目录候选最可能命中:
+          migu.php -> hlsztemgsplive.miguvideo.com:8080/wd_r2/.../index.m3u8
+          子列表 01.m3u8 必须拼在这个 host 上, 拼到 gslbmgsplive 上会 661。
+        """
+        cands = []
+        if raw_sub.startswith('http'):
+            cands.append(raw_sub)
+        else:
+            m = _RE_FLAT_HOST.match(raw_sub)
+            if m:
+                cands.append('http://%s/%s' % (m.group(1), m.group(2)))
+            # 同目录优先(最关键): 子列表与 index.m3u8 同级
+            cands.append(parent_url.rsplit('/', 1)[0] + '/' + raw_sub)
+            # 转发器原样再试: 有些 php 对任意路径都回同一份列表
+            if '/zb/' in parent_url:
+                cands.append(parent_url.rsplit('/', 1)[0] + '/' + raw_sub)
+            for h in ('http://gslbmgsplive.miguvideo.com/migu/kailu/',
+                      'http://gslbmgsplive.miguvideo.com/'):
+                cands.append(h + raw_sub)
+        seen, out = set(), []
+        for c in cands:
+            if c in seen:
+                continue
+            seen.add(c)
+            out.append(c)
+        return out
+
+    def _abs_seg_proxy(self, seg, base_dir):
+        """分片代理: 只对确认校验严格的 CDN 走代理, 否则直连(避免拖慢)
+
+        直播 CDN 常见 403, 是因为 Referer 不对; 但这些 CDN 也认 IP,
+        所以不能一概代理 —— 只给 CCTV/咪咕这类必校验的加代理。
+        """
+        a = self._abs_seg(seg, base_dir)
+        if not a.startswith('http'):
+            return a
+        # 转发器自身域名不代理(它本来就 302 去真实 CDN, 再套一层没意义)
+        if ':6688' in a:
+            return a
+        ul = a.lower()
+        if not ('cctv' in ul or 'migu' in ul or 'ysp.' in ul):
+            return a
+        return '%s/proxy?seg=1&url=%s' % (
+            self.site_url, urllib.parse.quote(a, safe=''))
+
+    @staticmethod
+    def _abs_seg(seg, base_dir):
+        """把分片还原成绝对地址
+
+        关键(实测): 「域名拍扁」有两种情况, 不能一律还原!
+          a) CCTV: base_dir 是 live-play-hls.cctvnews.cctv.com/CCTVChannel/
+             分片 live-play.cctvnews.cctv.com_channel_cctv1_mbd-179.ts
+             -> 真实位置就在同目录, 文件名原样保留才 200;
+                还原成 live-play.cctvnews.cctv.com/... 反而 403(旧域名已废)
+          b) 其他源: 分片确实把 host 拍进了文件名, 同目录下不存在 -> 要还原
+
+        判据: 若 base 的 host 与拍扁出来的 host「同根」
+        (base_host 以 flat_host 开头或反之), 说明只是域名更新了,
+        文件名必须原样保留 -> 同目录拼接; 否则才还原。
+        """
+        if not seg:
+            return seg
+        if seg.startswith('http'):
+            return seg
+        if seg.startswith('//'):
+            return 'http:' + seg
+        # 根路径绝对  /qhws_sd/1793514480/xxx.ts -> 取 base 的 scheme+host
+        if seg.startswith('/'):
+            return urllib.parse.urljoin(base_dir, seg)
+        m = _RE_FLAT_HOST.match(seg)
+        if m:
+            flat_host = m.group(1).lower()
+            base_host = (urllib.parse.urlsplit(base_dir).hostname or '').lower()
+            # 「同根」= 归一到最后两段相同(cctvnews.cctv.com)
+            #   base  live-play-hls.cctvnews.cctv.com
+            #   flat  live-play.cctvnews.cctv.com   -> 同根, 只是换了前级,
+            #   这种文件名必须原样保留, 还原反而 403
+            if base_host and _domain_root(base_host) != _domain_root(flat_host):
+                return 'http://%s/%s' % (m.group(1), m.group(2))
+        return base_dir + seg
 
     def liveContent(self, filter=False):
         """直播面板: 返回站点直播分类下的频道聚合页
@@ -661,6 +973,22 @@ class Spider(_Base):
         req = urllib.request.Request(url, data=data, headers=headers or {})
         ctx = ssl._create_unverified_context()
         return urllib.request.urlopen(req, timeout=25, context=ctx).read()
+
+    def _http_final(self, url, headers=None):
+        """GET 并跟随 302, 返回 (最终URL, 正文)
+
+        直播转发器 110.42.52.180:6688/zb/xxx.php 全是 302 跳到各地广电/
+        咪咕/央视的真实 CDN。migu 还要跳两层:
+          migu.php -> gslbmgsplive.miguvideo.com/wd_r2/.../index.m3u8
+                   -> hlsztemgsplive.miguvideo.com:8080/.../index.m3u8 (200)
+        子列表 01.m3u8 必须拼在这个「最终 host」上才不是 661,
+        拼在 gslbmgsplive 上就 661 —— 所以最终 URL 一定要留下来。
+        """
+        import ssl
+        ctx = ssl._create_unverified_context()
+        req = urllib.request.Request(url, headers=headers or {'User-Agent': UA})
+        r = urllib.request.urlopen(req, timeout=20, context=ctx)
+        return r.geturl() or url, r.read()
 
     def _hosts(self):
         return [self.site_url, HOST, HOST_OLD]
@@ -1173,9 +1501,12 @@ class Spider(_Base):
                                                  for nm in order)
                 # 记录每条线路的完整分集列表, 供 playerContent 自动换源
                 # 换源时按「第几集」对齐, 避免第50集跳到第1集
-                _PLAY_MAP[vod_id] = {
-                    nm: [x.split('$', 1)[-1] for x in lines[nm]]
-                    for nm in order}
+                # 直播是单线路, 频道之间不是「换源」关系, 不用缓存(省内存)
+                if not (len(order) == 1 and order[0] == '橘汁直播' and
+                        len(lines[order[0]]) > 1):
+                    _PLAY_MAP[vod_id] = {
+                        nm: [x.split('$', 1)[-1] for x in lines[nm]]
+                        for nm in order}
                 # 备注: 优先站点原始备注, 缺失时才用解析到的条数推算
                 if not out.get('vod_remarks'):
                     mx = max([len(lines[nm]) for nm in order] or [0])
@@ -1264,6 +1595,10 @@ class Spider(_Base):
             # 直播频道用频道名(CCTV1综合), 比 "1" 直观
             if is_live:
                 title = ep.get(3) or title
+                # 每个频道的 from/中文名 都是同值(cctv/直播), 若拿它当线路名,
+                # 232 个频道会被拆成 232 条同名线路, TVBox 只显示第一条。
+                # 直播统一归到一条线路「橘汁直播」下, 频道即分集。
+                line = '橘汁直播'
             result.append((line, title, ep_url))
 
         if is_live:
@@ -1472,7 +1807,10 @@ class Spider(_Base):
         now = int(time.time())
         if id in self._play_cache:
             ts, res = self._play_cache[id]
-            if now - ts < 600:
+            # 直播地址里带 auth_key(有效期约分钟级), 缓存太久会拿到过期地址
+            # -> 播放器 403 -> 转圈。直播只缓存 45s, 点播缓存 600s
+            ttl = 45 if self._is_live_id(id) else 600
+            if now - ts < ttl:
                 return res
 
         url = ''
@@ -1544,6 +1882,19 @@ class Spider(_Base):
                     'header': {'User-Agent': UA,
                                'Referer': self.site_url + '/'}}
         url = _q_url(url)
+        # 直播: 主列表要「跟随 302 + 改写分片」才能播。
+        # 不能只靠「域名拍扁」判断 —— 19 种转发器(zsj/xxqg/sanxi/migu/jst...)
+        # 的分片写法各不相同, 但只要命中直播转发器就统一交给 localProxy 改写。
+        if _RE_MEDIA.match(url) and '.m3u8' in url.lower() and \
+                self._looks_live(url):
+            purl = '%s/proxy?m3u8=1&url=%s' % (
+                self.site_url, urllib.parse.quote(url, safe=''))
+            res = {'parse': 0, 'playUrl': '', 'url': purl,
+                   'header': {'User-Agent': UA,
+                              'Referer': self.site_url + '/'}}
+            self._play_cache[id] = (now, res)
+            self.log('  => [直播代理] %s' % url[:100])
+            return res
         res = {'parse': 0 if _RE_MEDIA.match(url) else 1,
                'playUrl': '', 'url': url,
                'header': {'User-Agent': UA,
@@ -1551,6 +1902,40 @@ class Spider(_Base):
         self._play_cache[id] = (now, res)
         self.log('  => %s (parse=%d)' % (url[:120], res['parse']))
         return res
+
+    def _is_live_id(self, id):
+        """播放项是不是直播频道(参数里 playUrl 以 zb- 开头)"""
+        try:
+            if not id or id.startswith('http') or '|' in id:
+                return False
+            jm = json.loads(base64.b64decode(id))
+            return str(jm.get('playUrl') or '').startswith('zb-')
+        except Exception:
+            return False
+
+    def _looks_live(self, url):
+        """判断是不是直播主列表
+
+        三种命中任一即是:
+          1) 地址本身是直播转发器 (/zb/xxx.php 或 :6688)
+          2) 分片被拍扁成域名_xxx.ts
+          3) 是多码率主列表(#EXT-X-STREAM-INF) —— 直播常见, 点播单片也会有,
+             但点播走 detail 的直链不会带 STREAM-INF, 这里放宽不影响点播
+        """
+        if '/zb/' in url or ':6688' in url:
+            return True
+        try:
+            final, d = self._http_final(url, {'User-Agent': UA, 'Accept': '*/*'})
+            txt = d.decode('utf-8', 'replace')[:2000]
+            if '#EXT-X-STREAM-INF' in txt:
+                return True
+            for line in txt.split('\n'):
+                s = line.strip()
+                if s and not s.startswith('#'):
+                    return bool(_RE_FLAT_HOST.match(s))
+        except Exception:
+            pass
+        return False
 
     def _fallback_line(self, flag, bad_id):
         """当前线路拿不到地址时, 自动换到同片其他可用线路
