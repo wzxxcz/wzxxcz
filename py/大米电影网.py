@@ -25,35 +25,9 @@ EXTRA_HEADERS = {}
 INTRO_PREFIX = '🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！'
 CLASSES = [
     {"type_id": '1', "type_name": '电影'},
-    {"type_id": '6', "type_name": '动作电影'},
-    {"type_id": '7', "type_name": '喜剧电影'},
-    {"type_id": '8', "type_name": '爱情电影'},
-    {"type_id": '9', "type_name": '科幻电影'},
-    {"type_id": '10', "type_name": '恐怖电影'},
-    {"type_id": '11', "type_name": '剧情电影'},
-    {"type_id": '12', "type_name": '战争电影'},
-    {"type_id": '21', "type_name": '纪录电影'},
-    {"type_id": '26', "type_name": '动漫电影'},
     {"type_id": '2', "type_name": '电视剧'},
-    {"type_id": '13', "type_name": '国产剧'},
-    {"type_id": '14', "type_name": '港剧'},
-    {"type_id": '15', "type_name": '台剧'},
-    {"type_id": '16', "type_name": '日剧'},
-    {"type_id": '22', "type_name": '韩剧'},
-    {"type_id": '23', "type_name": '泰剧'},
-    {"type_id": '24', "type_name": '美剧'},
-    {"type_id": '25', "type_name": '海外剧'},
     {"type_id": '3', "type_name": '综艺'},
-    {"type_id": '27', "type_name": '大陆综艺'},
-    {"type_id": '28', "type_name": '日韩综艺'},
-    {"type_id": '29', "type_name": '港台综艺'},
-    {"type_id": '30', "type_name": '欧美综艺'},
     {"type_id": '4', "type_name": '动漫'},
-    {"type_id": '31', "type_name": '国产动漫'},
-    {"type_id": '32', "type_name": '日韩动漫'},
-    {"type_id": '33', "type_name": '港台动漫'},
-    {"type_id": '34', "type_name": '欧美动漫'},
-    {"type_id": '35', "type_name": '海外动漫'},
 ]
 YEARS = ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2007']
 AREAS = ['中国大陆', '美国', '日本', '韩国', '中国香港', '中国台湾', '英国', '法国']
@@ -145,7 +119,7 @@ _RE_PIC = re.compile(
     r'(?:data-original|data-src|data-lazy-src|src)=["\']([^"\']+\.(?:jpg|jpeg|png|webp|gif)[^"\']*)["\']',
     re.I)
 _RE_REMARK = re.compile(
-    r'class="[^"]*(?:note|remarks|remark|score|time|info)[^"]*"[^>]*>([^<]{1,20})<')
+    r'class="[^"]*(?:note|remarks|remark|score|time|info|video-title|pic-text)[^"]*"[^>]*>([^<]{1,20})<')
 _RE_NOISE = re.compile(r"登录|注册|APP|下载|专题|排行|公告|更多|首页|全部|求片|反馈")
 
 
@@ -289,11 +263,11 @@ class Spider(_Base):
         name, pic, content = "", "", ""
         m = _RE_H1.search(html)
         if m:
-            name = _strip(m.group(1))
+            name = _strip(m.group(1)).strip("《》")
         if not name:
             m = re.search(r"<title>([^<]+)</title>", html)
             if m:
-                name = _clean(m.group(1).split("_")[0].split("-")[0])
+                name = _clean(m.group(1).split("_")[0].split("-")[0]).strip("《》")
         m = re.search(r'(?:data-original|data-src|src)=["\']([^"\']+\.(?:jpg|jpeg|png|webp)[^"\']*)["\']',
                       html, re.I)
         if m:
