@@ -195,6 +195,96 @@ class Spider(Spider):
             out.append(chr(ord(ch) ^ s[(s[i] + s[j]) % 256]))
         return ''.join(out)
 
+    @staticmethod
+    def _png_to_gray(data):
+        """纯 Python 解码 PNG 为灰度二维列表 (无 PIL/numpy 依赖)"""
+        import struct, zlib
+        if data[:8] != b'\x89PNG\r\n\x1a\n':
+            return None
+        pos = 8
+        width = height = bitdepth = ctype = None
+        plte = None
+        idat = b''
+        while pos + 8 <= len(data):
+            ln, = struct.unpack('>I', data[pos:pos + 4])
+            typ = data[pos + 4:pos + 8]
+            chunk = data[pos + 8:pos + 8 + ln]
+            pos += 12 + ln
+            if typ == b'IHDR':
+                width, height, bitdepth, ctype = struct.unpack('>IIBB', chunk[:10])
+            elif typ == b'PLTE':
+                plte = chunk
+            elif typ == b'IDAT':
+                idat += chunk
+            elif typ == b'IEND':
+                break
+        if width is None or bitdepth != 8:
+            return None
+        raw = zlib.decompress(idat)
+        channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(ctype, 3)
+        stride = width * channels
+        # 反滤波
+        out = []
+        prev = [0] * stride
+        p = 0
+        for y in range(height):
+            f = raw[p]; p += 1
+            line = list(raw[p:p + stride]); p += stride
+            if f == 1:
+                for i in range(channels, stride):
+                    line[i] = (line[i] + line[i - channels]) & 0xFF
+            elif f == 2:
+                for i in range(stride):
+                    line[i] = (line[i] + prev[i]) & 0xFF
+            elif f == 3:
+                for i in range(stride):
+                    left = line[i - channels] if i >= channels else 0
+                    line[i] = (line[i] + ((left + prev[i]) >> 1)) & 0xFF
+            elif f == 4:
+                for i in range(stride):
+                    a_ = line[i - channels] if i >= channels else 0
+                    b_ = prev[i]
+                    c_ = prev[i - channels] if i >= channels else 0
+                    pp = a_ + b_ - c_
+                    pa, pb, pc = abs(pp - a_), abs(pp - b_), abs(pp - c_)
+                    pr = a_ if (pa <= pb and pa <= pc) else (b_ if pb <= pc else c_)
+                    line[i] = (line[i] + pr) & 0xFF
+            out.append(line)
+            prev = line
+        # 转灰度
+        gray = []
+        for y in range(height):
+            row = out[y]
+            g = []
+            if ctype == 3 and plte:
+                for x in range(width):
+                    idx = row[x] * 3
+                    g.append(int(0.299 * plte[idx] + 0.587 * plte[idx + 1] + 0.114 * plte[idx + 2]))
+            elif ctype == 0:
+                g = list(row[:width])
+            elif ctype == 2:
+                for x in range(width):
+                    i = x * 3
+                    g.append(int(0.299 * row[i] + 0.587 * row[i + 1] + 0.114 * row[i + 2]))
+            elif ctype == 6:
+                for x in range(width):
+                    i = x * 4
+                    if row[i + 3] < 40:
+                        g.append(255)  # 透明→白(绿底近似)
+                    else:
+                        g.append(int(0.299 * row[i] + 0.587 * row[i + 1] + 0.114 * row[i + 2]))
+            elif ctype == 4:
+                for x in range(width):
+                    i = x * 2
+                    if row[i + 1] < 40:
+                        g.append(255)
+                    else:
+                        g.append(row[i])
+            else:
+                return None
+            gray.append(g)
+        return gray
+
     def _solve_guard(self):
         """破解 _guard 滑块验证, 成功返回 True"""
         try:
@@ -211,20 +301,40 @@ class Spider(Spider):
             word = int(word)
 
             try:
-                from PIL import Image
-                import numpy as np
-                import io
+                gray = self._png_to_gray(rsp.content)
+                if gray is None:
+                    # 兜底: PIL+numpy
+                    from PIL import Image
+                    import numpy as np
+                    import io
+                    arr = np.array(Image.open(io.BytesIO(rsp.content)).convert('L')).astype(float)
+                    gray = arr.tolist()
                 # 缺口 = 半透明暗块, 顶部 y = guardword
                 # 在 y∈[word+2, word+42] 检测"比同列上下文暗"的列 → 缺口暗带
-                a = np.array(Image.open(io.BytesIO(rsp.content)).convert('L')).astype(float)
-                band = a[word + 2:word + 42, :340]
-                ref_top = a[max(0, word - 25):max(1, word - 5), :340].mean(axis=0)
+                a = gray
+                W = len(a[0])
+                # 列均值
+                def colmean(r0, r1):
+                    r0 = max(0, r0); r1 = min(len(a), r1)
+                    if r1 <= r0:
+                        return [0.0] * W
+                    out = []
+                    for x in range(W):
+                        s = 0.0
+                        for y in range(r0, r1):
+                            s += a[y][x]
+                        out.append(s / (r1 - r0))
+                    return out
+                band = colmean(word + 2, word + 42)
+                ref_top = colmean(max(0, word - 25), max(1, word - 5))
                 bot0, bot1 = min(word + 50, 170), min(word + 80, 200)
-                ref_bot = a[bot0:bot1, :340].mean(axis=0)
-                ref = (ref_top + ref_bot) / 2
-                d = ref - band.mean(axis=0)
-                cols = np.where(d > 20)[0]
-                if len(cols) == 0:
+                ref_bot = colmean(bot0, bot1)
+                cols = []
+                for x in range(340):
+                    ref = (ref_top[x] + ref_bot[x]) / 2
+                    if ref - band[x] > 20:
+                        cols.append(x)
+                if not cols:
                     self.log("guard: 未检测到缺口暗带")
                     return False
                 # 连续段
