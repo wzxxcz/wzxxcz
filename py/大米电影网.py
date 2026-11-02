@@ -33,13 +33,13 @@ INTRO_PREFIX = '🍊小橙子为您介绍剧情👉请不要相信视频中的�
 DETAIL_PREFIX = '/vod/'
 # 分类路径模板：粘贴了哪个分类页就写死哪个；没贴的走 DEFAULT_CAT_TPL 兜底
 CAT_TPLS = {
-    '7': 'https://www.hn-ntm.com/vodshow/7--------2---{page}.html',
+    '7': '/vodshow/7--------2---{page}.html',
     '13': '/vodshow/13--------2---{page}.html',
     '27': '/vodshow/27--------2---{page}.html',
     '31': '/vodshow/31--------2---{page}.html',
 }
-DEFAULT_CAT_TPL = '/vodshow/{tid}-{page}.html'
-SEARCH_TPL = '/vodsearch/-------------.html?wd={wd}&page={page}'
+DEFAULT_CAT_TPL = '/vodshow/{tid}--------2---{page}.html'
+SEARCH_TPL = '/vodsearch/{wd}----------{page}---.html'
 
 CLASSES = [
     {"type_id": '1', "type_name": '电影'},
@@ -188,14 +188,14 @@ class Spider(Spider):
         content = ''
         md = page.css('meta[name=description]')
         if md: content = (md[0].attrib.get('content') or '').strip()
-        m = page.find_by_text('导演', partial=True)
-        if m is not None: 导演_txt = m.parent.text if m.parent is not None else ''
-        m = page.find_by_text('主演', partial=True)
-        if m is not None: 主演_txt = m.parent.text if m.parent is not None else ''
-        m = page.find_by_text('年份', partial=True)
-        if m is not None: 年份_txt = m.parent.text if m.parent is not None else ''
-        m = page.find_by_text('地区', partial=True)
-        if m is not None: 地区_txt = m.parent.text if m.parent is not None else ''
+        all_text = page.get_all_text()
+        def _grab(k):
+            m = re.search(k + r'\s*[:：]\s*([^,，。;；\n]{1,80})', all_text)
+            return m.group(1).strip() if m else ''
+        director, actor = _grab('导演'), _grab('主演')
+        year_m = re.search(r'年份\s*[:：]\s*\D*((?:19|20)\d{2})', all_text)
+        year = year_m.group(1) if year_m else ''
+        area = _grab('地区')
         groups, seen = {}, set()
         for a in page.css('a'):
             href = a.attrib.get('href', '')
@@ -211,8 +211,12 @@ class Spider(Spider):
         for o, eps in groups.items():
             play_from.append(o if o != 'default' else '默认线路')
             play_url.append('#'.join('%s$%s' % (n, h) for n, h in eps))
+        full_content = (INTRO_PREFIX + chr(10) + content) if (content and INTRO_PREFIX) else (content or INTRO_PREFIX)
         vod = {'vod_id': vod_id, 'vod_name': name, 'vod_pic': pic,
-               'vod_content': INTRO_PREFIX + '\\n' + content if content else content,
+               'vod_content': full_content,
+               'vod_director': director, 'vod_actor': actor,
+               'vod_year': year, 'vod_area': area,
+               'vod_remarks': '%d条线路' % len(groups),
                'vod_play_from': '$$$'.join(play_from) or '默认线路',
                'vod_play_url': '$$$'.join(play_url)}
         return {'list': [vod] if play_url else []}
