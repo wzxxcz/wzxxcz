@@ -16,29 +16,27 @@ except Exception:
         def log(self, *args):
             pass
 
-WARN_TEXT = """"""
+WARN_TEXT = """生成器提示（上线前请人工核查）:
+  - 未填搜索页网址，搜索模板使用苹果CMS默认形态，可能需手改"""
 
 NAME = '大米电影网'
 HOST = 'https://www.hn-ntm.com'
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
 EXTRA_HEADERS = {}
-INTRO_PREFIX = '🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！'
+INTRO_PREFIX = ''
 CLASSES = [
-    {"type_id": '1', "type_name": '电影'},
-    {"type_id": '2', "type_name": '电视剧'},
-    {"type_id": '3', "type_name": '综艺'},
-    {"type_id": '4', "type_name": '动漫'},
+    {'type_id': '1', 'type_name': '电影'},
+    {'type_id': '2', 'type_name': '电视剧'},
+    {'type_id': '3', 'type_name': '综艺'},
+    {'type_id': '4', 'type_name': '动漫'},
+    {'type_id': '20', 'type_name': '短剧'},
 ]
 YEARS = ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008', '2007']
 AREAS = ['中国大陆', '美国', '日本', '韩国', '中国香港', '中国台湾', '英国', '法国']
 CAT_TPLS = {
-    '7': '/vodshow/7--------2---{page}.html',
-    '13': '/vodshow/13--------2---{page}.html',
-    '27': '/vodshow/27--------2---{page}.html',
-    '31': '/vodshow/31--------2---{page}.html',
-    '20': '/vodshow/20--------2---{page}.html',
+    '1': '/vodtype/1-{page}.html',
 }
-DEFAULT_TPL = '/vodshow/{tid}--------2---{page}.html'
+DEFAULT_TPL = '/vodtype/{tid}-{page}.html'
 SEARCH_TPL = '/vodsearch/{wd}----------{page}---.html'
 
 # ---------- 抓取引擎：Scrapling 可用则用，不可用自动降级 ----------
@@ -256,6 +254,24 @@ class Spider(_Base):
 
     # ---------------- 详情 ----------------
     def detailContent(self, ids):
+        try:
+            return self._detail(ids)
+        except Exception as e:
+            try:
+                self.log("detailContent error: %s" % e)
+            except Exception:
+                pass
+            vid = ids[0] if isinstance(ids, list) else ids
+            if "$" in vid:
+                vid = vid.split("$")[-1]
+            m = re.search(r"/voddetail/(\d+)", vid)
+            ep = (HOST + "/vodplay/%s-1-1.html" % m.group(1)) if m else vid
+            return {"vod_id": vid, "vod_name": "详情解析失败", "vod_pic": "",
+                    "type_name": "", "vod_year": "", "vod_area": "", "vod_remarks": "",
+                    "vod_actor": "", "vod_director": "", "vod_content": "",
+                    "vod_play_from": "线路1", "vod_play_url": "第1集$%s" % ep}
+
+    def _detail(self, ids):
         vid = ids[0] if isinstance(ids, list) else ids
         if "$" in vid:
             vid = vid.split("$")[-1]
@@ -327,6 +343,17 @@ class Spider(_Base):
                     continue
                 seen.add(ep_url)
                 buckets.setdefault("默认线路", []).append((ep, ep_url))
+        if not buckets:
+            m = re.search(r"/voddetail/(\d+)", vid)
+            if m:
+                base_id = m.group(1)
+                for n in range(1, 4):
+                    u2 = "%s/vodplay/%s-1-%d.html" % (HOST, base_id, n)
+                    r2 = _get(self, u2)
+                    if r2 and "<" in r2[:600]:
+                        buckets.setdefault("线路1", []).append(("第%d集" % n, u2))
+                    else:
+                        break
         lines = list(buckets.items()) or [("默认线路", [("第1集", vid)])]
         names, urls = [], []
         for line, eps in lines:
@@ -357,9 +384,28 @@ class Spider(_Base):
                     if m2:
                         url = m2.group(1).replace("\\/", "/")
             if not url:
+                m2 = re.search(r'"urls"\s*:\s*\[\s*"([^"]+)"', html)
+                if m2:
+                    url = m2.group(1).replace("\\/", "/")
+            if not url:
                 m = _RE_M3U8.search(html.replace("\\/", "/"))
                 if m:
                     url = m.group(1)
+        if not url and "/vodplay/" in pid:
+            m = re.search(r"/vodplay/(\d+)-(\d+)-(\d+)", pid)
+            if m:
+                for alt in ("2", "3"):
+                    u3 = "%s/vodplay/%s-%s-%s.html" % (HOST, m.group(1), alt, m.group(3))
+                    h3 = _get(self, u3)
+                    if h3:
+                        m3 = _RE_M3U8.search(h3.replace("\\/", "/"))
+                        if m3:
+                            url = m3.group(1)
+                            break
+        try:
+            self.log("player -> %s" % (url or ("parse1:" + pid)))
+        except Exception:
+            pass
         if not url:
             return {"parse": 1, "playUrl": "", "url": pid, "header": headers}
         url = _abs(url, pid)
