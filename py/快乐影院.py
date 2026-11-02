@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-快乐影院 tspnd.cc | TVBox Python 爬虫
+快乐影院 tspnd.cc | TVBox Python 爬虫 
 关键:
   - 网络层 100% Python 标准库 (urllib), 零第三方依赖, TVBox 任何环境可跑
   - 模块级初始化全部防御式+懒加载, 任何环境均可加载成功 (分类永不丢失)
@@ -199,23 +199,30 @@ for c in CLASSES:
 
 
 # ===================== 正则 =====================
-# 分类/搜索/首页列表卡片
+# img 标签先整段抓取, 再优先取 data-src (站点懒加载: src="" data-src=真图)
 _RE_CARD = re.compile(
-    r'<a href="(/tspnbd/\d+\.html)">\s*'
-    r'<img[^>]*?(?:data-src|src)="([^"]*)"[^>]*?alt="([^"]*)"',
+    r'<a href="(/tspnbd/\d+\.html)">\s*(<img[^>]*>)',
     re.S | re.I)
 # 首页推荐卡 (ys-poster)
 _RE_HOME_CARD = re.compile(
     r'<a href="(/tspnbd/\d+\.html)">\s*'
-    r'<div class="ys-poster">\s*'
-    r'<img[^>]*?(?:data-src|src)="([^"]*)"[^>]*?alt="([^"]*)"',
+    r'<div class="ys-poster">\s*(<img[^>]*>)',
     re.S | re.I)
 # 首页轮播
 _RE_SWIPER = re.compile(
-    r'<a href="(/tspnbd/\d+\.html)">\s*'
-    r'<img[^>]*?(?:data-src|src)="([^"]*)"[^>]*?alt="([^"]*)"[^>]*>\s*'
+    r'<a href="(/tspnbd/\d+\.html)">\s*(<img[^>]*>)\s*'
     r'<div class="filmName">([^<]*)</div>',
     re.S | re.I)
+
+
+def _img_pic(tag):
+    """从 img 标签取图片地址: data-src 优先, src 兜底"""
+    if not tag:
+        return ""
+    m = re.search(r'data-src="([^"]*)"', tag, re.I)
+    if not m or not m.group(1):
+        m = re.search(r'src="([^"]*)"', tag, re.I)
+    return m.group(1) if m else ""
 # 详情页线路块: 线路名 + 其后剧集
 _RE_LINE_BLOCK = re.compile(
     r'name17">(线路\d+)</div>\s*</div>\s*</div>\s*'
@@ -574,14 +581,18 @@ class Spider(Spider):
             return videos
         matches = _RE_CARD.findall(html)
         self.log("  卡片: %d 条" % len(matches))
-        for href, pic, alt in matches:
+        for href, img_tag in matches:
             if href in seen:
                 continue
             seen.add(href)
+            alt = ""
+            m = re.search(r'alt="([^"]*)"', img_tag, re.I)
+            if m:
+                alt = m.group(1)
             videos.append({
                 "vod_id":      href,
                 "vod_name":    self._clean(alt)[:100],
-                "vod_pic":     self._fix_url(pic) or self.default_pic,
+                "vod_pic":     self._fix_url(_img_pic(img_tag)) or self.default_pic,
                 "vod_remarks": (remarks_map or {}).get(href, ""),
             })
         return videos
@@ -606,25 +617,29 @@ class Spider(Spider):
         videos = []
         seen = set()
         # 轮播
-        for href, pic, alt, name in _RE_SWIPER.findall(html):
+        for href, img_tag, name in _RE_SWIPER.findall(html):
             if href in seen:
                 continue
             seen.add(href)
             videos.append({
                 "vod_id":      href,
                 "vod_name":    self._clean(name)[:100],
-                "vod_pic":     self._fix_url(pic) or self.default_pic,
+                "vod_pic":     self._fix_url(_img_pic(img_tag)) or self.default_pic,
                 "vod_remarks": "推荐",
             })
         # 各板块推荐
-        for href, pic, alt in _RE_HOME_CARD.findall(html):
+        for href, img_tag in _RE_HOME_CARD.findall(html):
             if href in seen:
                 continue
             seen.add(href)
+            alt = ""
+            m = re.search(r'alt="([^"]*)"', img_tag, re.I)
+            if m:
+                alt = m.group(1)
             videos.append({
                 "vod_id":      href,
                 "vod_name":    self._clean(alt)[:100],
-                "vod_pic":     self._fix_url(pic) or self.default_pic,
+                "vod_pic":     self._fix_url(_img_pic(img_tag)) or self.default_pic,
                 "vod_remarks": "",
             })
         return {"list": videos}
