@@ -1,8 +1,9 @@
 # coding=utf-8
 """
-快乐影院 tspnd.cc | TVBox Python 爬虫 
+快乐影院 tspnd.cc | TVBox Python 爬虫
 关键:
   - 网络层 100% Python 标准库 (urllib), 零第三方依赖, TVBox 任何环境可跑
+  - 模块级初始化全部防御式+懒加载, 任何环境均可加载成功 (分类永不丢失)
   - 自动破解 _guard 滑块验证 (RC4 + guardret cookie), 手动管理 cookie
   - 分类筛选: 子分类 / 类型 / 年份 / 首字母 / 语言 (与站点 tspnbdshow 一致)
   - 详情页: 导演/主演/类型/地区/更新时间/剧情介绍
@@ -16,54 +17,47 @@ import os
 import json
 import time
 import base64
-import ssl
 import struct
 import zlib
-import tempfile
 import urllib.parse
-import urllib.request
-import http.cookiejar
 
 sys.path.append('..')
 
 try:
     from base.spider import Spider
-except ImportError:
-    class _BaseSpider:
+except Exception:
+    class _BaseSpider(object):
         pass
     Spider = _BaseSpider
 
-
-# ===================== 零依赖网络层 (标准库 urllib) =====================
+# 其余标准库逐一防御导入 (任何一项失败都不影响模块加载)
+ssl = None
+tempfile = None
+urllib_request = None
+http_cookiejar = None
 try:
-    _SSL_CTX = ssl._create_unverified_context()
+    import ssl as ssl
 except Exception:
-    _SSL_CTX = None
-
-_COOKIE_JAR = http.cookiejar.CookieJar()
-_OPENER = urllib.request.build_opener(
-    urllib.request.HTTPCookieProcessor(_COOKIE_JAR),
-    urllib.request.HTTPRedirectHandler())
-if _SSL_CTX is not None:
-    try:
-        _opener_https = urllib.request.HTTPSHandler(context=_SSL_CTX)
-        _OPENER.add_handler(_opener_https)
-    except Exception:
-        pass
-
-# ===================== 调试日志 =====================
-_LOG_PATH = None
-for _p in ("/sdcard/快乐影院_debug.log", os.path.join(tempfile.gettempdir(), "kuaile_debug.log")):
-    try:
-        with open(_p, "a", encoding="utf-8") as f:
-            f.write("==== %s 爬虫加载 ====\n" % time.strftime("%Y-%m-%d %H:%M:%S"))
-        _LOG_PATH = _p
-        break
-    except Exception:
-        continue
-
+    pass
+try:
+    import tempfile as tempfile
+except Exception:
+    pass
+try:
+    import urllib.request as urllib_request
+except Exception:
+    pass
+try:
+    import http.cookiejar as http_cookiejar
+except Exception:
+    pass
 
 HOST = "https://tspnd.cc"
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+DEFAULT_PIC = HOST + "/style/26/static/images/load7.png"
+
+INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
 
 class _Rsp(object):
@@ -75,30 +69,88 @@ class _Rsp(object):
         self.url = url
 
 
-def _cookie_get(name, domain="tspnd.cc"):
+# ===================== 懒加载: 日志 / cookie / opener =====================
+_LOG_PATH = None
+_LOG_CHECKED = False
+_COOKIE_JAR = None
+_OPENER = None
+
+
+def _get_log_path():
+    """懒定位日志文件, 找不到就放弃, 绝不抛异常"""
+    global _LOG_PATH, _LOG_CHECKED
+    if _LOG_CHECKED:
+        return _LOG_PATH
+    _LOG_CHECKED = True
+    cands = []
     try:
-        for c in _COOKIE_JAR:
-            if c.name == name and (not domain or domain in (c.domain or "")):
+        if tempfile is not None:
+            cands.append(os.path.join(tempfile.gettempdir(), "kuaile_debug.log"))
+    except Exception:
+        pass
+    cands.append("/sdcard/快乐影院_debug.log")
+    cands.append("kuaile_debug.log")
+    for _p in cands:
+        try:
+            with open(_p, "a", encoding="utf-8") as f:
+                f.write("==== %s 爬虫加载 V2.1 ====\n" % time.strftime("%Y-%m-%d %H:%M:%S"))
+            _LOG_PATH = _p
+            break
+        except Exception:
+            continue
+    return _LOG_PATH
+
+
+def _get_jar():
+    global _COOKIE_JAR
+    if _COOKIE_JAR is None:
+        if http_cookiejar is None:
+            raise RuntimeError("http.cookiejar 不可用")
+        _COOKIE_JAR = http_cookiejar.CookieJar()
+    return _COOKIE_JAR
+
+
+def _get_opener():
+    global _OPENER
+    if _OPENER is None:
+        handlers = []
+        try:
+            handlers.append(urllib_request.HTTPCookieProcessor(_get_jar()))
+        except Exception:
+            pass
+        try:
+            handlers.append(urllib_request.HTTPRedirectHandler())
+        except Exception:
+            pass
+        try:
+            if ssl is not None:
+                handlers.append(urllib_request.HTTPSHandler(
+                    context=ssl._create_unverified_context()))
+        except Exception:
+            pass
+        _OPENER = urllib_request.build_opener(*handlers)
+    return _OPENER
+
+
+def _cookie_get(name):
+    try:
+        for c in _get_jar():
+            if c.name == name:
                 return c.value
     except Exception:
         pass
     return None
 
 
-def _cookie_set(name, value, domain="tspnd.cc", path="/"):
+def _cookie_set(name, value):
     try:
-        ck = http.cookiejar.Cookie(
-            0, name, value, None, False, domain, True, domain.startswith("."),
-            path, True, secure=False, expires=None, discard=True,
+        ck = http_cookiejar.Cookie(
+            0, name, value, None, False, "tspnd.cc", True, False,
+            "/", True, secure=False, expires=None, discard=True,
             comment=None, comment_url=None, rest={}, rfc2109=False)
-        _COOKIE_JAR.set_cookie(ck)
+        _get_jar().set_cookie(ck)
     except Exception:
         pass
-UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-DEFAULT_PIC = HOST + "/style/26/static/images/load7.png"
-
-INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
@@ -201,8 +253,9 @@ class Spider(Spider):
             line = "[%s] %s" % (time.strftime("%H:%M:%S"),
                                 " ".join(str(a) for a in args))
             print("[快乐影院]", line)
-            if _LOG_PATH:
-                with open(_LOG_PATH, "a", encoding="utf-8") as f:
+            lp = _get_log_path()
+            if lp:
+                with open(lp, "a", encoding="utf-8") as f:
                     f.write(line + "\n")
         except Exception:
             pass
@@ -213,10 +266,13 @@ class Spider(Spider):
              "Accept-Language": "zh-CN,zh;q=0.9"}
         if headers:
             h.update(headers)
-        req = urllib.request.Request(url, headers=h)
-        rsp = _OPENER.open(req, timeout=timeout)
+        req = urllib_request.Request(url, headers=h)
+        rsp = _get_opener().open(req, timeout=timeout)
         data = rsp.read()
-        charset = rsp.headers.get_content_charset() or "utf-8"
+        try:
+            charset = rsp.headers.get_content_charset() or "utf-8"
+        except Exception:
+            charset = "utf-8"
         try:
             text = data.decode(charset, "ignore")
         except Exception:
@@ -224,22 +280,26 @@ class Spider(Spider):
         return _Rsp(text, data, rsp.headers, rsp.geturl())
 
     def init(self, extend=""):
+        self.log("init 开始, extend=%s" % (extend or ""))
         try:
             self.extend = json.loads(extend) if extend else {}
         except Exception:
             self.extend = {}
-
-        self.site_url = (self.extend.get("site") or HOST).rstrip("/")
-        self.headers = {
-            "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Referer": self.site_url + "/",
-        }
-        self.default_pic = DEFAULT_PIC
-        self._play_cache = {}
-        self._warmed = False
-        self.log("init: site=%s" % self.site_url)
+        try:
+            self.site_url = (self.extend.get("site") or HOST).rstrip("/")
+            self.headers = {
+                "User-Agent": UA,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Referer": self.site_url + "/",
+            }
+            self.default_pic = DEFAULT_PIC
+            self._play_cache = {}
+            self._warmed = False
+        except Exception as e:
+            self.log("init 异常: %s" % e)
+        self.log("init: site=%s, 日志文件=%s" % (
+            getattr(self, "site_url", HOST), _get_log_path() or "不可用"))
 
     # ===================== 滑块破解 =====================
     @staticmethod
