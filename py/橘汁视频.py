@@ -136,41 +136,6 @@ V7.6 增量(最后一个 BOSS: 直播全黑 + 点播秒播)
        剩余失败全部站点侧: tv189 回"TOKEN已到期/无法找到对应频道"、
        xj.php 404、内蒙古 18 台接口不给地址、部分地方 CDN 403/427。
 
-V7.8 增量(NS蓝光秒切 + 转发器/换聚合页三处硬坑, 覆盖 V7.7)
- 52) 【NS蓝光 = 第三方 pan 加密码, 代码侧无解 -> 秒切换源】
-     用户点 NS蓝光-1 提示「线路未找到播放地址」。实测站点下发
-     vodPlayFrom=PAN1, playUrl=PAN1-pBTFch38... 是一段密文,
-     videoUsableUrl 原样回吐, 两个解析源都回"不支持的解析", 站点也没有
-     下发解析配置接口(base64 解出来仍是密文)。这**不是**代码漏判断。
-     处理: _is_dead_line() 认出整条解析不出来的线路(只认 NS 前缀),
-     playerContent 第 0 步直接走 _fallback_line, 4002ms -> 0ms。
-     注意 OO蓝光**不能**划进来: 实测它能出(346ms), 划进来会误伤。
- 53) 【转发器必须「无头」请求】
-     山东卫视 sd.php 同一个地址: 带 User-Agent 一律 403,
-     **完全不带 UA** 才 302 -> iqilu CDN -> 200。这批转发器
-     (110.42.52.180:6688/zb/)是裸 nginx, 只按 UA 挡爬虫。
-     现在 _http_final 对 /zb/ 链路一律摘掉 UA 和 Referer,
-     _fetch_retry 在 403 时也会摘 Referer 重试一次。
-     实测 山东卫视 21004ms(走代理兜底, 不开) -> 1333ms 直连。
- 54) 【换聚合页的 12 秒黑洞 -> 后台预热索引】
-     换聚合页要遍历 21 个详情(实测 12 秒)。第一版写成「用到时才现场建」,
-     结果点一个死台要干等 15.9 秒(东方卫视)。现在:
-       a) 打开任意直播聚合页时, detailContent 后台线程预建索引(不阻塞),
-          建好后复用 30 分钟(246 个频道)
-       b) 已知死源(_LIVE_BROKEN / _LIVE_DEAD)命中直接短路, 0 请求
-       c) 无源结果也进 _play_cache(300 秒), 二刷 0ms 报无源
-       d) _live_entry_broken 用 2.5 秒超时 + Range 探一次, 先判死活
-          再决定跟不跟流(那批死源跟流要 15~40 秒)
- 55) 【实测(V7.8)】
-     CCTV直播 26/26、浙江 9/9、北京 6/6、陕西 4/4、戏曲 2/2、熊猫 10/10、
-     河南 5/5、江苏 11/12、卫视频道 52/62
-     点播仙逆 12 条线路: 10 条直接出地址(B蓝光 0ms 秒开, NS蓝光-1 0ms 换源),
-     神话蓝光/OO蓝光 是站点 CDN 本身挂了(aws.shenhua7.vip DNS 失效、
-     ppvod021 回 403), 与代码无关。
-     站点侧确实无解: 东方卫视/江西卫视(migu.php 回 302 空跳)、
-     广东 5 台(只给 zb- 代号, cctv.php 回"无效的频道ID")、
-     内蒙古 18 台、新疆 6 台、湖南茶频道/先锋乒羽/长沙女性(mgtv.php 404)。
-
 V7.7 增量(直播彻底不再依赖 localProxy —— V7.6 之后用户仍反馈全黑)
  45) 【根因: 宿主根本没接线 localProxy】
      实测结论(多份宿主源码 + 现象对齐): ATV / atv-player / 多数 TVBox 分支
@@ -278,8 +243,6 @@ import random
 import hashlib
 import urllib.parse
 import urllib.request
-import http.client
-import threading
 
 sys.path.append('..')
 
@@ -670,11 +633,6 @@ _LIVE_TOKEN = ''
 _MIGU_LAST = [0.0]
 # 上次去 CCTV 页「借 token」的时间(失败后 30 秒才能再试, 避免反复打接口)
 _TOKEN_BOOT_TS = 0.0
-# vod_id -> 最近一次播成功的线路名(换源时优先复用它, 命中缓存即 0ms)
-_LAST_OK_LINE = {}
-_LIVE_BROKEN = {}      # 直播「站点原始地址」-> 判定已废的时刻(30 分钟)
-_LIVE_DEAD = {}        # 直播频道名 -> 确认无源的时刻(30 分钟), 避免反复白跑
-_LIVE_WARM_TS = 0.0    # 上次触发后台预热索引的时间, 防止反复起线程
 
 
 # ============================================================ 工具
@@ -1005,11 +963,7 @@ class Spider(_Base):
 
     @staticmethod
     def _seg_referer(u):
-        """不同 CDN 要不同 Referer, 猜错就 403
-
-        转发器 110.42.52.180:6688/zb/*.php 一律不给 Referer ——
-        实测带上本站 Referer 会被 403, 空的反而全部 200。
-        """
+        """不同 CDN 要不同 Referer, 猜错就 403"""
         ul = u.lower()
         if 'cctv' in ul or 'ysp.cctv' in ul or 'migu' in ul:
             return 'https://tv.cctv.com/'
@@ -1247,31 +1201,11 @@ class Spider(_Base):
           咪咕 / 河南            偶发 427
         单次失败就放弃会让「本来能播的台」随机黑屏, 所以重试几次。
         退避 0.4 / 0.8 / 1.2 秒: 抖动是瞬时的, 不必等太久。
-
-        【为什么要两条取流通道】
-          实测 山东卫视 sd.php: 同一个地址, http.client 100% 403,
-          换 urllib.request 却是 302 -> iqilu CDN -> 200。
-          差别在两者默认请求头不同(Accept / Accept-Encoding), 有的转发器
-          就按这个挡人。只留一条路会让「本可以播的台」永久变黑。
-          所以: urllib 先上, 失败再让 http.client 快速补几次。
         """
         last = None
-        try:
-            return self._http_final(url, headers)
-        except Exception as e:
-            last = e
-            # 403 时把 Referer 摘掉再试一次:
-            # 转发器/地方 CDN 常常「带 Referer 就挡, 空的就放」
-            if '403' in str(e) and headers and 'Referer' in headers:
-                hh2 = dict(headers)
-                hh2.pop('Referer', None)
-                try:
-                    return self._http_final(url, hh2)
-                except Exception as e2:
-                    last = e2
-        for i in range(max(1, tries) - 1):
+        for i in range(max(1, tries)):
             try:
-                return self._http_final_hc(url, headers)
+                return self._http_final(url, headers)
             except Exception as e:
                 last = e
                 if i + 1 >= tries:
@@ -1280,41 +1214,6 @@ class Spider(_Base):
         if last:
             raise last
         return url, b''
-
-    def _http_final_hc(self, url, headers=None):
-        """用 http.client 手工跟随 302 取流(与 _http_final 互补的第二通道)"""
-        import ssl
-        hh = dict(headers or {'User-Agent': UA})
-        cur = url
-        for _ in range(6):
-            p = urllib.parse.urlsplit(cur)
-            if p.scheme == 'https':
-                conn = http.client.HTTPSConnection(
-                    p.netloc, timeout=20,
-                    context=ssl._create_unverified_context())
-            else:
-                conn = http.client.HTTPConnection(p.netloc, timeout=20)
-            try:
-                conn.request('GET', p.path + ('?' + p.query if p.query else ''),
-                             headers=hh)
-                r = conn.getresponse()
-                if r.status in (301, 302, 303, 307, 308):
-                    loc = (r.getheader('Location') or '').strip()
-                    r.read()
-                    if not loc:
-                        raise IOError('302 无 Location')
-                    cur = urllib.parse.urljoin(cur, loc)
-                    continue
-                body = r.read()
-                if r.status >= 400:
-                    raise IOError('HTTP %d' % r.status)
-                return cur, body
-            finally:
-                try:
-                    conn.close()
-                except Exception:
-                    pass
-        raise IOError('跳转过多')
 
     def liveContent(self, filter=False):
         """直播面板: 返回站点直播分类下的频道聚合页
@@ -1369,19 +1268,10 @@ class Spider(_Base):
                    -> hlsztemgsplive.miguvideo.com:8080/.../index.m3u8 (200)
         子列表 01.m3u8 必须拼在这个「最终 host」上才不是 661,
         拼在 gslbmgsplive 上就 661 —— 所以最终 URL 一定要留下来。
-
-        【为什么转发器不给 User-Agent】
-        实测 山东卫视 sd.php: 带 UA 一律 403, **完全不带 UA** 才 302 -> iqilu
-        并一路 200。这批转发器(110.42.52.180:6688/zb/)是裸 nginx,
-        只按 UA 挡爬虫。所以转发器请求一律走「无头」。
         """
         import ssl
         ctx = ssl._create_unverified_context()
-        hh = dict(headers or {'User-Agent': UA})
-        if '6688/zb/' in url:
-            hh.pop('User-Agent', None)
-            hh.pop('Referer', None)
-        req = urllib.request.Request(url, headers=hh)
+        req = urllib.request.Request(url, headers=headers or {'User-Agent': UA})
         r = urllib.request.urlopen(req, timeout=20, context=ctx)
         return r.geturl() or url, r.read()
 
@@ -1902,14 +1792,6 @@ class Spider(_Base):
                         nm: [x.split('$', 1)[-1] for x in lines[nm]]
                         for nm in order}
                 else:
-                    # 打开任意直播聚合页 = 用户在用直播。
-                    # 后台提前把「频道名 -> 播放项」索引建好(21 页, ~12 秒),
-                    # 这样点到死台时能**立刻**换聚合页, 而不是让用户干等 12 秒。
-                    # 只在确实是直播页时触发, 点播详情不会走到这里。
-                    try:
-                        self._warm_start()
-                    except Exception:
-                        pass
                     # 直播页单独记下「本页各频道的播放入口」:
                     # 站点对少数频道只给代号, 需要借本页其他频道的 token
                     # 才能拼出真地址 —— 见 _live_code_probe / _live_seeds
@@ -2226,21 +2108,6 @@ class Spider(_Base):
             if now - ts < ttl:
                 return res
 
-        # 0) 「整条解析不出来」的线路(NS蓝光 = PAN1 加密码)直接换源
-        #    不必先花 0.4~0.5 秒去问 videoUsableUrl —— 它只会把 PAN1-xxx
-        #    原样回吐, 再花 1~2 秒问两个解析源也只会得到"不支持的解析"。
-        #    实测这一步让 NS蓝光-1 从 4002ms 降到 ~1000ms, 秒切到好线路。
-        if self._is_dead_line(flag) and not _RE_MEDIA.match(str(id or '')):
-            alt = self._fallback_line(flag, id)
-            if alt:
-                res = {'parse': 0 if _RE_MEDIA.match(alt) else 1,
-                       'playUrl': '', 'url': _q_url(alt),
-                       'header': {'User-Agent': UA,
-                                  'Referer': self.site_url + '/'}}
-                self._play_cache[id] = (now, res, 600)
-                return res
-            self.log('  !! %s 无可用替代线路' % flag)
-
         url = ''
         need_parse = 1
         # 记录「站点下发的代号」(zb-xxx), 代号解析不出来时用它去别处找同频道
@@ -2375,11 +2242,7 @@ class Spider(_Base):
                      'ysp.cctv' in url or '.m3u8' in url.lower() or
                      'miguvideo' in url or 'ysp.cctv.cn' in url)
             if cheap or self._looks_live(url):
-                # 先花 ~0.2 秒确认「站点入口本身」是不是已经彻底死了。
-                # 死了就别再花 15~40 秒跟重试(实测东方卫视/江西卫视会卡 40 秒),
-                # 直接进下面的换源逻辑。这一步只对 /zb/ 转发器生效。
-                entry_dead = self._live_entry_broken(url)
-                final = '' if entry_dead else self._live_direct(url)
+                final = self._live_direct(url)
                 if final:
                     res = {'parse': 0, 'playUrl': '', 'url': final,
                            'header': {'User-Agent': UA,
@@ -2387,77 +2250,7 @@ class Spider(_Base):
                     self._play_cache[id] = (now, res, 45)
                     self.log('  => [直播直连] %s' % final[:100])
                     return res
-                # 【拿不到直连时的三层补救, 顺序不能乱】
-                #
-                # ① 回源要新签名
-                #    实测 migu.php 对 东方卫视/江西卫视 这类会回一个
-                #    location 为空的 302, 但再问一次站点拿到的就是能跳的。
-                #    绝大多数「偶发黑台」在这一步就好了, 而且只花一次接口钱。
-                #
-                # ② 换聚合页
-                #    同一频道常挂在多个聚合页, 一页给死号、另一页给好号。
-                #    这一步要遍历 21 个页建索引, 是几十秒级开销, 所以放在 ① 之后,
-                #    并且「已判定为死源」的直接跳过(第二次点同一台就是 0ms)。
-                #
-                # ③ 都不行 -> 明确报无源
-                #    不能退到 /proxy 让播放器去撞站点登录页, 那是黑屏转圈。
-                cn = self._live_name_of(id) or ''
-                # 这个台 30 分钟内已确认「站点侧没有活入口」, 直接报无源。
-                # 直播只有一条线路, 不能记 _BAD_LINE(会把整页连坐),
-                # 所以单独用按频道名的 _LIVE_DEAD。
-                if cn and _LIVE_DEAD.get(cn):
-                    self.log('  ×× %s 已确认无源(缓存)' % cn)
-                    res = {'parse': 1, 'playUrl': '', 'url': '',
-                           'header': {'User-Agent': UA,
-                                      'Referer': self.site_url + '/'}}
-                    self._play_cache[id] = (now, res, 300)
-                    return res
-                fresh = self._live_refresh(url)
-                if fresh and fresh != url \
-                        and not _LIVE_BROKEN.get(fresh) \
-                        and self._live_entry_broken(fresh):
-                    # 重取来的签名当场就是废的(migu.php 对东方卫视/江西卫视
-                    # 会连续给 302 空跳)。再跟流就是白等 15 秒, 直接换源。
-                    self.log('    重取签名仍为死入口, 直接换源')
-                    fresh = ''
-                if fresh and fresh != url:
-                    got = self._live_direct(fresh)
-                    if got:
-                        res = {'parse': 0, 'playUrl': '', 'url': got,
-                               'header': {'User-Agent': UA,
-                                          'Referer': 'https://tv.cctv.com/'}}
-                        self._play_cache[id] = (now, res, 45)
-                        self.log('  => [重取签名] %s' % got[:90])
-                        return res
-                dead = bool(_LIVE_BROKEN.get(url))
-                if not dead:
-                    alt = self._live_find_alt(cn, id) if cn else ''
-                    if alt and alt != url:
-                        alt2 = self._live_direct(alt)
-                        if alt2:
-                            res = {'parse': 0, 'playUrl': '', 'url': alt2,
-                                   'header': {'User-Agent': UA,
-                                              'Referer': 'https://tv.cctv.com/'}}
-                            self._play_cache[id] = (now, res, 45)
-                            self.log('  ⇄ [换聚合页] %s -> %s' % (cn, alt2[:80]))
-                            return res
-                    dead = bool(_LIVE_BROKEN.get(url))
-                if dead:
-                    self.log('  ×× %s 源站已废且无替代入口' % (cn or id[:8]))
-                    try:
-                        if cn:
-                            _LIVE_DEAD[cn] = int(time.time())
-                    except Exception:
-                        pass
-                    # 无源结果也缓存(5 分钟): 用户会反复点同一个台试运气,
-                    # 每次重跑换源那 12 秒纯属折磨。缓存后二刷 0ms 报无源。
-                    res = {'parse': 1, 'playUrl': '', 'url': '',
-                           'header': {'User-Agent': UA,
-                                      'Referer': self.site_url + '/'}}
-                    self._play_cache[id] = (now, res, 300)
-                    return res
-                # 走到这里说明站点入口是活的, 但这次取流没成(网络抖/限流/多档失败)。
-                # 退到代理改写, 宿主若接了 localProxy 还能靠它救回来。
+                # 拿不到可直接播放的地址, 退到代理改写(宿主若接线则可用)
                 purl = self._rewrite_m3u8_proxy_url(url)
                 res = {'parse': 0, 'playUrl': '', 'url': purl,
                        'header': {'User-Agent': UA,
@@ -2516,87 +2309,7 @@ class Spider(_Base):
             pass
         return False
 
-    def _warm_start(self):
-        """后台预热直播索引(不阻塞当前详情页)
-
-        为什么值得单独开线程:
-          建索引 = 21 个详情请求 ≈ 12 秒。放在 playerContent 里同步做,
-          用户点到一个站点侧没源的台就要干等 12 秒(实测东方卫视 15.9 秒)。
-          而用户打开直播面板后, 一般会连着点好几个台 —— 打开面板那一刻
-          就把索引在后台建好, 后面每个台都是查表, 0 秒。
-
-        只在直播聚合页的 detailContent 里触发, 点播路径完全不碰。
-        """
-        global _LIVE_WARM_TS
-        now = time.time()
-        if _LIVE_INDEX or now - _LIVE_WARM_TS < 300:
-            return
-        _LIVE_WARM_TS = now
-
-        def _run():
-            try:
-                c = Spider()
-                c.init()
-                c._ensure()
-                c._live_index_build()
-            except Exception:
-                pass
-        try:
-            t = threading.Thread(target=_run)
-            t.setDaemon(True)
-            t.start()
-            self.log('  直播索引后台预热已启动')
-        except Exception:
-            pass
-
-    def _live_index_build(self):
-        """建「频道名 -> 播放项」全局索引(30 分钟有效)
-
-        遍历 21 个聚合页各调一次详情, 是直播里唯一的重操作。
-        调用方必须在拿到索引后自己再做严匹配, 不能直接按名字取。
-        """
-        global _LIVE_INDEX, _LIVE_INDEX_TS
-        now = int(time.time())
-        if _LIVE_INDEX and now - _LIVE_INDEX_TS <= 1800:
-            return
-        idx = {}
-        # 建索引会连着调 detailContent, 把「当前正在播的那一页」的
-        # _live_page_ids / _cur_id 全冲掉 -> 之后点同页频道借不到 token。
-        # 先存档, 建完立刻还原。
-        keep = (getattr(self, '_live_page_ids', []),
-                getattr(self, '_live_name_map', {}),
-                getattr(self, '_live_raws', []),
-                getattr(self, '_cur_id', ''),
-                getattr(self, '_cur_live_name', ''))
-        try:
-            for v in self._list('page=1&pagesize=40&typeId1=%s' % LIVE_TID):
-                try:
-                    d = self.detailContent([v.get('vod_id')])['list']
-                except Exception:
-                    continue
-                for one in d:
-                    for seg in (one.get('vod_play_url') or '').split('$$$'):
-                        for kv in seg.split('#'):
-                            if '$' not in kv:
-                                continue
-                            cn = kv.split('$')[0].strip()
-                            pid = kv.split('$')[-1]
-                            if cn and pid and cn not in idx:
-                                idx[cn] = pid
-        except Exception as e:
-            self.log('  直播索引构建失败: %s' % e)
-        finally:
-            try:
-                (self._live_page_ids, self._live_name_map,
-                 self._live_raws, self._cur_id,
-                 self._cur_live_name) = keep
-            except Exception:
-                pass
-        if idx:
-            _LIVE_INDEX, _LIVE_INDEX_TS = idx, now
-            self.log('  直播索引: %d 个频道' % len(idx))
-
-    def _live_find_alt(self, name, bad_id='', deep=False):
+    def _live_find_alt(self, name, bad_id=''):
         """同一频道出现在多个聚合页时, 换一个聚合页的播放入口
 
         【为什么需要】
@@ -2613,18 +2326,48 @@ class Spider(_Base):
         实测踩过坑: 用「子串包含」去找 江苏综艺频道, 会被播成 徐州新闻综合
         (index 里先命中谁就返回谁) —— 用户点江苏综艺结果出来徐州台,
         比放不出来更糟。宁可判失败, 也不能播错台。
-
-        【为什么用索引而不是现场遍历详情】
-        建一次索引 = 21 个详情请求 ≈ 15 秒。第一版是「现场遍历」写的,
-        结果点一个坏台要等 15 秒(实测东方卫视 16.7 秒), 而建好的索引
-        能复用 30 分钟、246 个频道全在里面, 后续每台只是查表 + 取一次地址。
         """
+        global _LIVE_INDEX, _LIVE_INDEX_TS
         name = (name or '').strip()
         if not name or name in ('橘汁直播', '直播'):
             return ''
-        self._live_index_build()
-        if not _LIVE_INDEX:
-            return ''
+        now = int(time.time())
+        if not _LIVE_INDEX or now - _LIVE_INDEX_TS > 1800:
+            idx = {}
+            # 建索引要遍历 21 个聚合页, 期间会调 detailContent,
+            # 把「当前正在播的那个页」的 _live_page_ids / _cur_id 冲掉。
+            # 先存档, 建完立刻还原 —— 否则下一次点同页频道就借不到 token 了。
+            keep = (getattr(self, '_live_page_ids', []),
+                    getattr(self, '_live_name_map', {}),
+                    getattr(self, '_live_raws', []),
+                    getattr(self, '_cur_id', ''),
+                    getattr(self, '_cur_live_name', ''))
+            try:
+                for v in self._list('page=1&pagesize=40&typeId1=%s' % LIVE_TID):
+                    try:
+                        d = self.detailContent([v.get('vod_id')])['list']
+                    except Exception:
+                        continue
+                    for one in d:
+                        for seg in (one.get('vod_play_url') or '').split('$$$'):
+                            for kv in seg.split('#'):
+                                if '$' not in kv:
+                                    continue
+                                cn = kv.split('$')[0].strip()
+                                pid = kv.split('$')[-1]
+                                if cn and pid and cn not in idx:
+                                    idx[cn] = pid
+            except Exception as e:
+                self.log('  直播索引构建失败: %s' % e)
+            finally:
+                try:
+                    (self._live_page_ids, self._live_name_map,
+                     self._live_raws, self._cur_id,
+                     self._cur_live_name) = keep
+                except Exception:
+                    pass
+            if idx:
+                _LIVE_INDEX, _LIVE_INDEX_TS = idx, now
 
         def _norm(x):
             x = re.sub(r'\s+', '', x or '')
@@ -2654,15 +2397,16 @@ class Spider(_Base):
                 best, best_score = pid, score
         if not best:
             return ''
-        # 二次校验: 索引里的这个名字, 规范化后必须真的对上。
-        # 点内蒙古却出 CGTN 这种事故, 比放不出来严重得多, 宁可判失败。
+        # 二次校验: 索引里的这个名字, 规范化后必须真的对上
+        # (防止大小写/全角混入导致播错台 —— 点内蒙古却出 CGTN 这种事故
+        #  比放不出来严重得多, 宁可判失败)
         if _norm(best) == '' or (_norm(best) != want and
                                  not _norm(best).startswith(want) and
                                  not want.startswith(_norm(best))):
             return ''
         raw, _pf = self._live_raw(best)
         if raw and _RE_MEDIA.match(raw):
-            self.log('  ⇄ 同频道换聚合页: %s -> %s' % (name, raw[:30]))
+            self.log('  ⇄ 同频道换聚合页: %s -> %s' % (name, best[:20]))
             return raw
         return ''
 
@@ -2672,12 +2416,7 @@ class Spider(_Base):
     #   浙江 / 北京 / 新疆       -> zsj/btime/xj
     # 这里按「同聚合页里已给真地址的那条」反推出脚本名与 token, 再拼代号。
     _CODE_SCRIPT_GUESS = ('migu.php', 'zsj.php', 'btime.php', 'tv189.php',
-                          'sanxi.php', 'jst.php', 'xxqg.php',
-                          # 广东/安徽这批(亳州/韶关/河源/湛江/揭阳)用的是
-                          # 央视系脚本, 站点把 vodPlayFrom 也标成了 cctv。
-                          # 实测 cctv.php 认这个 token, 只是这批 id 没配 -> 仍失败,
-                          # 但留着它, 站点哪天补上 id 就能直接出。
-                          'cctv.php')
+                          'sanxi.php', 'jst.php', 'xxqg.php')
 
     def _live_code_probe(self, code, bad_id=''):
         """代号(zb-xxx) 解析不出地址时, 借同聚合页其他频道的 token 拼入口
@@ -2779,7 +2518,6 @@ class Spider(_Base):
         if not cid:
             return ''
         try:
-            # a) 先在「当前这页」找(最快, 零额外请求)
             for pid in list(getattr(self, '_live_page_ids', []) or []):
                 try:
                     jm = json.loads(base64.b64decode(pid))
@@ -2791,33 +2529,8 @@ class Spider(_Base):
                 if fresh.startswith('http') and fresh != url:
                     self.log('    602 -> 重新取签名: %s' % cid)
                     return fresh
-            # b) 当前页找不到(用户点的刚好是别的页), 走全局索引
-            return self._live_refresh_by_id(cid, url)
         except Exception:
-            return ''
-
-    def _live_refresh_by_id(self, cid, old=''):
-        """按站点频道 id 去全局直播索引里重新要一条入口
-
-        站点把「同一个频道」挂在多个聚合页时, 其中一页给的 token 过期了,
-        另一页给的往往还是好的。这里直接问详情接口要最新的地址。
-        """
-        global _LIVE_INDEX, _LIVE_INDEX_TS
-        try:
-            self._live_index_build()
-        except Exception:
-            return ''
-        for nm, pid in list(_LIVE_INDEX.items()):
-            try:
-                jm = json.loads(base64.b64decode(pid))
-            except Exception:
-                continue
-            if str(jm.get('playUrl') or '') != 'zb-' + cid:
-                continue
-            fresh, _pf = self._live_raw(pid)
-            if fresh.startswith('http') and fresh != old:
-                self.log('    602 -> 索引取新签名: %s (%s)' % (cid, nm))
-                return fresh
+            pass
         return ''
 
     def _direct_once(self, url):
@@ -2995,10 +2708,6 @@ class Spider(_Base):
         但 playerContent 每次都会先走 _usable_one(0.5s) 再走 _parse_play(1.5s),
         用户点一下卡 2 秒, 体验极差。已知坏线路直接走换源, 秒开。
         """
-        # NS / OO 这两条是「解析体系拿不到」的, 不必等失败再记 ——
-        # 直接命中原生判据, 省掉第一次的 1~2 秒
-        if self._is_dead_line(flag):
-            return True
         try:
             t = _BAD_LINE.get(str(flag))
             return bool(t and int(time.time()) - t < 1200)
@@ -3006,99 +2715,6 @@ class Spider(_Base):
             return False
 
     # ---------------------------------------------- 直播: 不依赖 localProxy 的直连
-    @staticmethod
-    def _live_broken_url(url):
-        t = _LIVE_BROKEN.get(url)
-        return bool(t and int(time.time()) - t < 1800)
-
-    def _live_raw_broken(self, url, final, body):
-        """站点原始地址本身是不是「永久取不到」
-
-        返回 True 时调用方应当**直接换源**, 而不是退到 /proxy 让播放器去撞墙。
-
-        实测判据(两类, 都跟转发器 110.42.52.180:6688/zb/*.php 有关):
-          a) 正文是「TOKEN已到期,请重新获取」
-             说明该频道在站点侧根本没配 (山东卫视 sd.php / 新疆 xj.php),
-             无论怎么重试都拿不到 —— 站点接口已经把 token 给了, 是转发器没了。
-          b) HTTP 404 且正文是 nginx 的 404 页
-             说明这个脚本文件已经被删(mgtv.php: 先锋乒羽/湖南茶频道/长沙女性),
-             换成任何参数都是死路。
-        """
-        if not (url and '6688/zb/' in url):
-            return False
-        txt = (body or b'').decode('utf-8', 'replace')[:400]
-        if 'TOKEN' in txt and '到期' in txt:
-            return True
-        if '404 Not Found' in txt and 'nginx' in txt:
-            return True
-        # c) 302 但 location 是空的(migu.php 对 东方卫视/江西卫视 这种)
-        #    跟着跟不动, 播放器会无限循环 302 或直接黑屏
-        if '302' in str(final or '') or not (final or '').startswith('http'):
-            return True
-        return False
-
-    def _live_entry_broken(self, raw):
-        """站点下发的原始入口是不是已经彻底取不到
-
-        只对转发器(/zb/*.php)生效, 其它源一律返回 False 不干预。
-
-        实测三类死法:
-          a) TOKEN已到期   (sd.php 山东卫视 / xj.php 新疆)
-          b) 404 Not Found (mgtv.php 先锋乒羽/湖南茶频道/长沙女性)
-          c) 302 但 location 为空 (migu.php 东方卫视/江西卫视)
-        这三种重试一万次也一样, 早点认出来就能秒切, 不让用户干等。
-
-        注意: 只认「响应体明确说死」或「302 无 Location」, 不能因为
-              偶尔一次超时就判死 —— 直播源本来就抖。
-              超时也只能给 2.5 秒: 这是每次点台都要走的一步, 给 5 秒会让
-              本来 0.8 秒就能播的台变成 5.8 秒(实测卫视频道整体慢了一倍)。
-        """
-        if not (raw and '6688/zb/' in raw and not _LIVE_BROKEN.get(raw)):
-            return False
-        p = urllib.parse.urlsplit(raw)
-        cls = http.client.HTTPConnection if p.scheme == 'http' \
-            else http.client.HTTPSConnection
-        try:
-            c = cls(p.netloc, timeout=2.5)
-            # 用 Range 只取几字节: 这批转发器在「不带 Range」时会一直往
-            # 客户端灌流(实测东方卫视能拖 150 秒), 带了 Range 立刻回空包。
-            c.request('GET', p.path + ('?' + p.query if p.query else ''),
-                      headers={'User-Agent': UA, 'Range': 'bytes=0-64'})
-            r = c.getresponse()
-            body = r.read(400)
-            txt = (body or b'').decode('utf-8', 'replace')
-            bad = False
-            if 'TOKEN' in txt and '到期' in txt:
-                bad = True
-            elif '404 Not Found' in txt:
-                bad = True
-            elif r.status in (301, 302, 303, 307, 308) and \
-                    not (r.getheader('Location') or '').strip():
-                bad = True
-            if bad:
-                _LIVE_BROKEN[raw] = int(time.time())
-                self.log('    ⇢ 入口已死: %s' %
-                         ('TOKEN到期' if 'TOKEN' in txt else
-                          ('404' if '404' in txt else '302空跳')))
-            return bad
-        except Exception:
-            return False
-
-    def _live_has_alt(self, name, bad_id='', raw=''):
-        """这个频道在别的聚合页是否还有一条「看起来能取到」的入口
-
-        只用于「本站地址永久坏掉」时判断值不值得换源。
-        必须严判, 否则会把用户从山东卫视换成山东教育卫视之类。
-        """
-        try:
-            alt = self._live_find_alt(name, bad_id)
-        except Exception:
-            return False
-        if not alt or alt == raw:
-            return False
-        # 换来的入口得是真地址(带 token 的转发器或 CDN 直链), 不能还是代号
-        return alt.startswith('http') and ('token=' in alt or '.m3u8' in alt)
-
     def _live_direct(self, url, depth=0):
         """把转发器地址还原成「播放器能直接放的 m3u8 地址」
 
@@ -3120,9 +2736,6 @@ class Spider(_Base):
         返回可直接播放的 URL; 全失败返回 ''。
         """
         if depth > 3:
-            return ''
-        # 已知死入口直接放弃(0 请求), 上层会走「重取签名 / 换聚合页」
-        if _LIVE_BROKEN.get(url):
             return ''
         try:
             if 'miguvideo' in url:
@@ -3156,16 +2769,6 @@ class Spider(_Base):
                     final, body = self._fetch_retry(fresh, hh)
             txt = (body or b'').decode('utf-8', 'replace')
             if '#EXTM3U' not in txt:
-                # 源站自己坏了(TOKEN已到期 / 脚本 404)时记一笔, 让上层换源时
-                # 优先换掉、并判断值不值得换(见 _live_raw_broken)。
-                # 这里不 return —— 后面的 /proxy 兜底照旧, 万一宿主接了线还能看。
-                if self._live_raw_broken(url, final, body):
-                    try:
-                        _LIVE_BROKEN[url] = int(time.time())
-                    except Exception:
-                        pass
-                    self.log('    源站已废(%s)' %
-                             ('TOKEN到期' if 'TOKEN' in txt else '404'))
                 return ''
             base_dir = final.rsplit('?', 1)[0].rsplit('/', 1)[0] + '/'
 
@@ -3258,17 +2861,6 @@ class Spider(_Base):
         _PLAY_MAP[vod_id] = {线路: [各集播放项...]}
         按「第几集」对齐: 用户播第50集, 换源后仍是第50集。
         集数不足的线路直接跳过, 避免错集。
-
-        【换源必须秒切, 不能挨个试】
-        站点有两条「永远解析不出来」的线路: NS蓝光(PAN1/PAN2 加密码,
-        第三方 pan 解析体系, 我方拿不到密钥) 和 OO蓝光(站点侧空壳)。
-        用户点 NS蓝光-1 时, 旧逻辑会从 rank 第一名开始挨个 _usable_one,
-        每条 0.4~0.5 秒, 撞上另一个坏线路就白等 -> 实测 4 秒才出画。
-
-        现在两层提速:
-          a) 已知整条线路都解析不出来的(_DEAD_LINE), 直接跳过
-          b) 优先复用「刚才别的频道/上一集已经播成功」的那条线路 —— 它的
-             第 N 集大概率也在缓存里, 命中即 0ms
         """
         try:
             rec = _PLAY_MAP.get(self._cur_id) or {}
@@ -3282,12 +2874,8 @@ class Spider(_Base):
                     break
             if idx < 0:
                 idx = 0
-            cands = [(nm, lst) for nm, lst in rec.items()
-                     if nm != flag and not self._is_dead_line(nm)]
-            # 有「刚播成功过」的线路就把它排到最前, 命中缓存直接返回
-            lastok = _LAST_OK_LINE.get(self._cur_id) or ''
-            cands.sort(key=lambda x: (0 if x[0] == lastok else 1,
-                                      _line_rank(x[0])))
+            cands = sorted([(nm, lst) for nm, lst in rec.items() if nm != flag],
+                           key=lambda x: _line_rank(x[0]))
             for nm, lst in cands:
                 if idx >= len(lst):
                     continue        # 这条线路集数不够, 跳过
@@ -3295,35 +2883,16 @@ class Spider(_Base):
                 if pid in self._play_cache:
                     ts, r, _ttl = self._play_cache[pid]
                     if r.get('parse') == 0 and r.get('url'):
-                        self.log('  ↑ 换源 %s -> %s 第%d集 (缓存)' %
+                        self.log('  ↑ 换源 %s -> %s 第%d集' %
                                  (flag, nm, idx + 1))
-                        _LAST_OK_LINE[self._cur_id] = nm
                         return r['url']
                 u = self._usable_one(pid)
                 if u and _RE_MEDIA.match(u):
                     self.log('  ↑ 换源 %s -> %s 第%d集' % (flag, nm, idx + 1))
-                    _LAST_OK_LINE[self._cur_id] = nm
                     return u
         except Exception as e:
             self.log('  换源失败: %s' % e)
         return ''
-
-    @staticmethod
-    def _is_dead_line(nm):
-        """这条线路是否属于「整条都解析不出来」的类型
-
-        实测: NS蓝光 的播放项是 PAN1-<加密串>, 需要第三方 pan 解析服务,
-        而我方两个解析源(Cloudhai / KZNBJX)都回"不支持的解析";
-        用户点它必然失败, 换源时应当直接跳过, 省下每条 0.4~0.5 秒的试探。
-
-        注意: 只用于「换源候选排序」和「跳过实测」。用户显式点这条线路时
-              仍会尝试(万一站点哪天修好了), 只是会很快走换源兜底。
-
-        OO蓝光 不列进来 —— 实测它是能出的(只是要 3 秒左右, 站点 CDN 慢),
-        把它踢掉会让本来能播的线路用不了。
-        """
-        n = str(nm or '').upper()
-        return n.startswith('NS')
 
     def _usable_one(self, pid):
         """单次 videoUsableUrl, 返回直链或空"""
