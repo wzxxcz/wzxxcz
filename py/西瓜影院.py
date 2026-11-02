@@ -555,19 +555,6 @@ class Spider(Spider):
         # 主线顺序：完全按站点线路 Tab 的原始顺序（TX → QY → YK → MG → BZ …）
         pairs = list(zip(play_from, play_url))
         vod_content_full = content
-        extra = []
-        if vod_type:
-            extra.append("类型：%s" % vod_type)
-        if area:
-            extra.append("地区：%s" % area)
-        if year:
-            extra.append("年份：%s" % year)
-        if lang:
-            extra.append("语言：%s" % lang)
-        if remarks:
-            extra.append("状态：%s" % remarks)
-        if extra:
-            vod_content_full = vod_content_full + "\n" + " / ".join(extra)
 
         return {"list": [{
             "vod_id": vod_id,
