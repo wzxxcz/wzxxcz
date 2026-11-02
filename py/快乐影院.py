@@ -522,6 +522,7 @@ class Spider(Spider):
             self.log("预热失败: %s" % e)
 
     def _fetch(self, url, timeout=30, headers=None):
+        text = ""
         for attempt in range(3):
             try:
                 h = dict(self.headers)
@@ -544,9 +545,13 @@ class Spider(Spider):
                     return text
                 return text
             except Exception as e:
-                self.log("fetch FAIL %s -> %s" % (url, e))
-                return ""
-        return ""
+                # 网络/限流异常: 等待后重试, 不直接放弃
+                self.log("fetch FAIL (attempt %d) %s -> %s" % (attempt + 1, url, e))
+                try:
+                    time.sleep(1.5)
+                except Exception:
+                    pass
+        return text
 
     def _fix_url(self, url):
         if not url:
@@ -610,10 +615,7 @@ class Spider(Spider):
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": FILTERS}
 
-    def homeVideoContent(self):
-        self._warm_up()
-        html = self._fetch(self.site_url + "/")
-        self.log("home HTML 长度: %d" % len(html))
+    def _parse_home(self, html):
         videos = []
         seen = set()
         # 轮播
@@ -642,6 +644,24 @@ class Spider(Spider):
                 "vod_pic":     self._fix_url(_img_pic(img_tag)) or self.default_pic,
                 "vod_remarks": "",
             })
+        return videos
+
+    def homeVideoContent(self):
+        # 空结果自动重试: 首次调用可能早于滑块破解完成, 避免 TVBox 缓存空列表
+        for attempt in range(3):
+            self._warm_up()
+            html = self._fetch(self.site_url + "/")
+            videos = self._parse_home(html)
+            self.log("home 第%d次: HTML %d 字节, %d 条" % (attempt + 1, len(html), len(videos)))
+            if videos:
+                return {"list": videos}
+            # 没拿到 → 重置预热状态, 强制重新破解滑块
+            self.log("  空结果, 重置滑块状态后重试")
+            self._warmed = False
+            try:
+                time.sleep(1)
+            except Exception:
+                pass
         return {"list": videos}
 
     def categoryContent(self, tid, pg, filter, extend):
@@ -673,12 +693,21 @@ class Spider(Spider):
         path = "-".join(slots)
         url = "%s/tspnbdshow/%s.html" % (self.site_url, urllib.parse.quote(path))
         self.log("category: %s" % url)
-        html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
-
-        videos = self._extract_videos(html)
-        pagecount = self._page_count(html)
-        self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
+        for attempt in range(3):
+            html = self._fetch(url)
+            videos = self._extract_videos(html)
+            pagecount = self._page_count(html)
+            self.log("  第%d次: HTML %d 字节, %d 条, 总页数: %d"
+                     % (attempt + 1, len(html), len(videos), pagecount))
+            if videos or not html:
+                break
+            # 有响应但没解析到内容 → 重置滑块状态重试
+            self.log("  空结果, 重置滑块状态后重试")
+            self._warmed = False
+            try:
+                time.sleep(1)
+            except Exception:
+                pass
 
         return {
             "list": videos, "page": page, "pagecount": pagecount,
@@ -695,9 +724,18 @@ class Spider(Spider):
         path = "-".join(slots)
         url = "%s/search/%s.html" % (self.site_url, urllib.parse.quote(path))
         self.log("search: %s" % url)
-        html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
-        videos = self._extract_videos(html)
+        for attempt in range(3):
+            html = self._fetch(url)
+            videos = self._extract_videos(html)
+            self.log("  第%d次: HTML %d 字节, %d 条" % (attempt + 1, len(html), len(videos)))
+            if videos or not html:
+                break
+            self.log("  空结果, 重置滑块状态后重试")
+            self._warmed = False
+            try:
+                time.sleep(1)
+            except Exception:
+                pass
         return {
             "list": videos, "page": page,
             "pagecount": self._page_count(html),
@@ -715,6 +753,14 @@ class Spider(Spider):
         self.log("detail: %s" % url)
 
         html = self._fetch(url)
+        if not html:
+            for attempt in range(2):
+                self.log("  详情空响应, 重置滑块状态后重试")
+                self._warmed = False
+                self._warm_up()
+                html = self._fetch(url)
+                if html:
+                    break
         self.log("  HTML 长度: %d" % len(html))
         if not html:
             return {"list": []}
