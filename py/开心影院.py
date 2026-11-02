@@ -81,14 +81,19 @@ CLASSES = [
     {"type_id": "24", "type_name": "纪录片"},
 ]
 
-# 影视类型（真实 "影视类型" 面板，电影页实测）
-_TYPES = ["科幻", "剧情", "惊悚", "爱情", "古装", "动作", "悬疑", "犯罪",
+# 影视类型（按真实筛选面板，每个分类不同）
+_TYPES_BY_CAT = {
+    "1": ["科幻", "剧情", "惊悚", "爱情", "古装", "动作", "悬疑", "犯罪",
           "谍战", "历史", "喜剧", "奇幻", "家庭", "青春", "冒险", "纪录",
-          "动画", "人物", "文化", "其他"]
-# 制片地区（真实 "制片地区" 面板）
+          "动画", "人物", "文化", "其他"],
+    "2": ["爱情", "古装", "悬疑", "都市", "喜剧", "战争", "剧情", "青春",
+          "历史", "网剧", "奇幻", "冒险", "励志", "犯罪", "商战", "恐怖",
+          "穿越", "农村", "人物", "商业", "生活", "其他"],
+}
+# 制片地区（电视剧页实测: 无印度/马来西亚；电影页含）
 _AREAS = ["中国大陆", "中国香港", "中国台湾", "美国", "日本", "韩国", "泰国",
           "英国", "法国", "德国", "意大利", "印度", "马来西亚"]
-# 排序（真实 "影视排序" 面板: 更新时间/近期热门/豆瓣评分，默认为空=默认排序）
+# 排序（真实面板: 更新时间/近期热门/豆瓣评分；"默认排序"=不带排序参数）
 _SORTS = [{"n": "默认排序", "v": ""},
           {"n": "更新时间", "v": "time"},
           {"n": "近期热门", "v": "hits_week"},
@@ -99,9 +104,11 @@ _YEAR_VALUES = [str(y) for y in range(2026, 1999, -1)] + \
 
 FILTERS = {}
 for _c in CLASSES:
+    _types = _TYPES_BY_CAT.get(_c["type_id"],
+                               sorted(set(_TYPES_BY_CAT["1"]) | set(_TYPES_BY_CAT["2"])))
     FILTERS[_c["type_id"]] = [
         {"key": "cls", "name": "类型",
-         "value": [{"n": "不限", "v": ""}] + [{"n": t, "v": t} for t in _TYPES]},
+         "value": [{"n": "不限", "v": ""}] + [{"n": t, "v": t} for t in _types]},
         {"key": "area", "name": "地区",
          "value": [{"n": "不限", "v": ""}] + [{"n": a, "v": a} for a in _AREAS]},
         {"key": "year", "name": "年份",
@@ -289,6 +296,10 @@ class Spider(Spider):
                     params = parts.group(1).split('-')
                     if len(params) >= 8 and params[7].isdigit():
                         return int(params[7])
+                    # 页码错位容错：取第一个 1~3 位数字（跳过 4 位年份）
+                    for p in params[1:]:
+                        if p.isdigit() and len(p) <= 3:
+                            return int(p)
                     # 搜索页格式: /vodsearch/{kw}----------N---.html
                     nums = re.findall(r'\d+', parts.group(1))
                     if nums:
