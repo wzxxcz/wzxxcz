@@ -11,6 +11,7 @@
   - 卡片: div.card.card-sm.card-link (a[href=/voddetail/xx.html] + img + span.badge + ribbon评分)
   - 详情: h1 标题, og:image 封面, .col.mb-2 p strong 字段, #synopsis 简介, nav-tabs 多线路(TT源/IK源)
   - 播放: player_data.url 直链 m3u8 (如 bfikuncdn.com/.../index.m3u8)
+  - 简介添加指定前缀
 """
 import re
 import sys
@@ -202,10 +203,17 @@ class Spider(Spider):
         try:
             rsp = self.fetch(url, headers=self.headers, timeout=timeout)
             if hasattr(rsp, "text"):
-                return rsp.text or ""
-            if hasattr(rsp, "content"):
-                return rsp.content.decode("utf-8", "ignore")
-            return str(rsp)
+                html = rsp.text or ""
+            elif hasattr(rsp, "content"):
+                html = rsp.content.decode("utf-8", "ignore")
+            else:
+                html = str(rsp)
+            # 站点安全验证（验证码）检测：/index.php/verify/index.html
+            if "index.php/verify/index.html" in html or "安全验证" in html:
+                self.log("CAPTCHA page returned by site: %s" % url)
+                self._captcha_hit = True
+                return ""
+            return html
         except Exception as e:
             self.log("fetch FAIL %s -> %s" % (url, e))
             return ""
@@ -353,6 +361,16 @@ class Spider(Spider):
 
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
+        key = (key or "").strip()
+        if not key:
+            # 空关键词搜索会触发站点安全验证（验证码），直接返回空
+            self.log("empty search keyword, skip")
+            return {"list": [], "page": page, "pagecount": 1,
+                    "limit": 20, "total": 0}
+        # 会话预热：先取一次首页，建立 Cookie，降低触发验证码概率
+        if not getattr(self, "_warmed", False):
+            self._warmed = True
+            self._fetch(self.site_url + "/")
         # 真实格式: /vodsearch/关键词----------1---.html
         path = "/vodsearch/%s----------%d---.html" % (
             urllib.parse.quote(key), page)
