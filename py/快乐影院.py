@@ -2,80 +2,98 @@
 """
 快乐影院 tspnd.cc | TVBox Python 爬虫 
 关键:
-  - 自动破解 _guard 滑块验证 (RC4 + guardret cookie)
+  - 网络层 100% Python 标准库 (urllib), 零第三方依赖, TVBox 任何环境可跑
+  - 自动破解 _guard 滑块验证 (RC4 + guardret cookie), 手动管理 cookie
   - 分类筛选: 子分类 / 类型 / 年份 / 首字母 / 语言 (与站点 tspnbdshow 一致)
   - 详情页: 导演/主演/类型/地区/更新时间/剧情介绍
   - 线路顺序与网站完全一致 (线路N 由站点数据顺序决定)
   - 播放页解析 player_aaaa 直取 m3u8 直链
+  - 全程写调试日志, 便于现场排查
 """
 import re
 import sys
+import os
 import json
 import time
 import base64
+import ssl
+import struct
+import zlib
+import tempfile
 import urllib.parse
+import urllib.request
+import http.cookiejar
 
 sys.path.append('..')
 
 try:
     from base.spider import Spider
 except ImportError:
-    import requests as _rq
-    try:
-        import urllib3
-        urllib3.disable_warnings()
-    except Exception:
-        pass
-
     class _BaseSpider:
-        def __init__(self):
-            self._session = None
-
-        @property
-        def _sess(self):
-            if self._session is None:
-                self._session = _rq.Session()
-                self._session.verify = False
-                adapter = _rq.adapters.HTTPAdapter(
-                    pool_connections=10, pool_maxsize=10, max_retries=0)
-                self._session.mount('https://', adapter)
-                self._session.mount('http://', adapter)
-            return self._session
-
-        def fetch(self, url, headers=None, **kw):
-            timeout = kw.pop('timeout', 15)
-            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
-            r.encoding = 'utf-8'
-            return r
-
-        def log(self, *a, **kw):
-            try:
-                print("[kuaile]", *a)
-            except Exception:
-                pass
-
+        pass
     Spider = _BaseSpider
 
 
-# 全局 session: 无条件创建, 不依赖 base.spider 基类的任何属性/方法
-import requests as _rq
+# ===================== 零依赖网络层 (标准库 urllib) =====================
 try:
-    import urllib3
-    urllib3.disable_warnings()
+    _SSL_CTX = ssl._create_unverified_context()
 except Exception:
-    pass
+    _SSL_CTX = None
 
-_SESSION = _rq.Session()
-_SESSION.verify = False
-try:
-    _ad = _rq.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10, max_retries=0)
-    _SESSION.mount('https://', _ad)
-    _SESSION.mount('http://', _ad)
-except Exception:
-    pass
+_COOKIE_JAR = http.cookiejar.CookieJar()
+_OPENER = urllib.request.build_opener(
+    urllib.request.HTTPCookieProcessor(_COOKIE_JAR),
+    urllib.request.HTTPRedirectHandler())
+if _SSL_CTX is not None:
+    try:
+        _opener_https = urllib.request.HTTPSHandler(context=_SSL_CTX)
+        _OPENER.add_handler(_opener_https)
+    except Exception:
+        pass
+
+# ===================== 调试日志 =====================
+_LOG_PATH = None
+for _p in ("/sdcard/快乐影院_debug.log", os.path.join(tempfile.gettempdir(), "kuaile_debug.log")):
+    try:
+        with open(_p, "a", encoding="utf-8") as f:
+            f.write("==== %s 爬虫加载 ====\n" % time.strftime("%Y-%m-%d %H:%M:%S"))
+        _LOG_PATH = _p
+        break
+    except Exception:
+        continue
 
 
 HOST = "https://tspnd.cc"
+
+
+class _Rsp(object):
+    """轻量响应对象 (兼容 .text/.content/.headers 用法)"""
+    def __init__(self, text, content, headers, url):
+        self.text = text
+        self.content = content
+        self.headers = headers
+        self.url = url
+
+
+def _cookie_get(name, domain="tspnd.cc"):
+    try:
+        for c in _COOKIE_JAR:
+            if c.name == name and (not domain or domain in (c.domain or "")):
+                return c.value
+    except Exception:
+        pass
+    return None
+
+
+def _cookie_set(name, value, domain="tspnd.cc", path="/"):
+    try:
+        ck = http.cookiejar.Cookie(
+            0, name, value, None, False, domain, True, domain.startswith("."),
+            path, True, secure=False, expires=None, discard=True,
+            comment=None, comment_url=None, rest={}, rfc2109=False)
+        _COOKIE_JAR.set_cookie(ck)
+    except Exception:
+        pass
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/style/26/static/images/load7.png"
@@ -180,15 +198,30 @@ class Spider(Spider):
 
     def log(self, *args, **kw):
         try:
-            print("[快乐影院]", *args)
+            line = "[%s] %s" % (time.strftime("%H:%M:%S"),
+                                " ".join(str(a) for a in args))
+            print("[快乐影院]", line)
+            if _LOG_PATH:
+                with open(_LOG_PATH, "a", encoding="utf-8") as f:
+                    f.write(line + "\n")
         except Exception:
             pass
 
     def _http_get(self, url, headers=None, timeout=15, **kw):
-        """自带 HTTP GET: 完全不依赖 base.spider 基类的 fetch/_sess"""
-        r = _SESSION.get(url, headers=headers, timeout=timeout, **kw)
-        r.encoding = 'utf-8'
-        return r
+        """自带 HTTP GET: 纯标准库 urllib, 零第三方依赖"""
+        h = {"User-Agent": UA, "Accept": "*/*",
+             "Accept-Language": "zh-CN,zh;q=0.9"}
+        if headers:
+            h.update(headers)
+        req = urllib.request.Request(url, headers=h)
+        rsp = _OPENER.open(req, timeout=timeout)
+        data = rsp.read()
+        charset = rsp.headers.get_content_charset() or "utf-8"
+        try:
+            text = data.decode(charset, "ignore")
+        except Exception:
+            text = data.decode("utf-8", "ignore")
+        return _Rsp(text, data, rsp.headers, rsp.geturl())
 
     def init(self, extend=""):
         try:
@@ -319,12 +352,12 @@ class Spider(Spider):
         """破解 _guard 滑块验证, 成功返回 True"""
         try:
             st = time.time()
-            rsp = _SESSION.get(
+            rsp = self._http_get(
                 self.site_url + "/_guard/easy_slide.png?t=%d" % (time.time() * 1000),
                 headers={"User-Agent": UA, "Referer": self.site_url + "/"},
                 timeout=20)
-            guard = _SESSION.cookies.get("guard")
-            word = _SESSION.cookies.get("guardword")
+            guard = _cookie_get("guard")
+            word = _cookie_get("guardword")
             if not guard or not word:
                 self.log("guard: 缺少 cookie")
                 return False
@@ -395,7 +428,7 @@ class Spider(Spider):
                 for off in (0, -1, 1, -2, 2):
                     enc = base64.b64encode(
                         self._rc4("%dx%d" % (gx + off, word), guard[:8]).encode('latin-1')).decode()
-                    _SESSION.cookies.set("guardret", enc, domain="tspnd.cc", path="/")
+                    _cookie_set("guardret", enc)
                     rsp2 = self._http_get(self.site_url + "/")
                     if len(rsp2.text) > 1000:
                         self.log("guard: 破解成功 x=%d" % (gx + off))
