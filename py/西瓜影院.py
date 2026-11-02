@@ -573,13 +573,34 @@ class Spider(Spider):
         }]}
 
     # ---------------- 播放 ----------------
+    def _alive(self, url):
+        """直链活性探测：签名类 m3u8/mp4 过期会 403，需重新解析"""
+        if not url or not url.startswith("http"):
+            return True
+        try:
+            body = self._fetch(url, timeout=10, headers={
+                "User-Agent": UA,
+                "Referer": "https://hls.xiguadh.com/",
+                "Range": "bytes=0-63",
+            })
+            if not body:
+                return False
+            # m3u8 要求 #EXTM3U 头；mp4/flv 有任意响应体即视为存活
+            if ".m3u8" in url.lower():
+                return body.lstrip().startswith("#EXTM3U")
+            return True
+        except Exception:
+            return False
+
     def playerContent(self, flag, id, vipFlags):
         play_page = id if str(id).startswith("http") else self._fix_url(str(id))
         now = int(time.time())
+        # 站点解析出的直链带时间戳签名（短时效），缓存过久会 403
         if play_page in self._play_cache:
             ts, res = self._play_cache[play_page]
-            if now - ts < 300:
+            if now - ts < 30 and (res.get("parse") == 1 or self._alive(res.get("url", ""))):
                 return res
+            self.log("缓存直链已失效, 重新解析")
 
         html = self._fetch(play_page)
         info = self._parse_player(html)
@@ -592,11 +613,18 @@ class Spider(Spider):
         if re.search(r"\.(m3u8|mp4|flv)(\?|$)", src_url, re.I):
             res = self._direct(src_url, play_page)
 
-        # 2) 走站点解析接口
-        if res is None and src_url:
-            real = self._resolve(src_url, play_page)
-            if real:
-                res = self._direct(real, play_page)
+        # 2) 走站点解析接口（失败/失效自动重试一次）
+        for attempt in range(2):
+            if res is not None and res.get("parse") == 0 and self._alive(res.get("url", "")):
+                break
+            if src_url:
+                real = self._resolve(src_url, play_page)
+                if real:
+                    res = self._direct(real, play_page)
+                    if self._alive(res.get("url", "")):
+                        break
+            if attempt == 0:
+                time.sleep(1)
 
         # 3) 兜底：交给 TVBox 嗅探
         if res is None:
