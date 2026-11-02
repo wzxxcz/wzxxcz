@@ -57,6 +57,24 @@ except ImportError:
     Spider = _BaseSpider
 
 
+# 全局 session: 无条件创建, 不依赖 base.spider 基类的任何属性/方法
+import requests as _rq
+try:
+    import urllib3
+    urllib3.disable_warnings()
+except Exception:
+    pass
+
+_SESSION = _rq.Session()
+_SESSION.verify = False
+try:
+    _ad = _rq.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10, max_retries=0)
+    _SESSION.mount('https://', _ad)
+    _SESSION.mount('http://', _ad)
+except Exception:
+    pass
+
+
 HOST = "https://tspnd.cc"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
@@ -159,6 +177,18 @@ class Spider(Spider):
 
     def getName(self):
         return "快乐影院"
+
+    def log(self, *args, **kw):
+        try:
+            print("[快乐影院]", *args)
+        except Exception:
+            pass
+
+    def _http_get(self, url, headers=None, timeout=15, **kw):
+        """自带 HTTP GET: 完全不依赖 base.spider 基类的 fetch/_sess"""
+        r = _SESSION.get(url, headers=headers, timeout=timeout, **kw)
+        r.encoding = 'utf-8'
+        return r
 
     def init(self, extend=""):
         try:
@@ -289,12 +319,12 @@ class Spider(Spider):
         """破解 _guard 滑块验证, 成功返回 True"""
         try:
             st = time.time()
-            rsp = self._sess.get(
+            rsp = _SESSION.get(
                 self.site_url + "/_guard/easy_slide.png?t=%d" % (time.time() * 1000),
                 headers={"User-Agent": UA, "Referer": self.site_url + "/"},
                 timeout=20)
-            guard = self._sess.cookies.get("guard")
-            word = self._sess.cookies.get("guardword")
+            guard = _SESSION.cookies.get("guard")
+            word = _SESSION.cookies.get("guardword")
             if not guard or not word:
                 self.log("guard: 缺少 cookie")
                 return False
@@ -365,8 +395,8 @@ class Spider(Spider):
                 for off in (0, -1, 1, -2, 2):
                     enc = base64.b64encode(
                         self._rc4("%dx%d" % (gx + off, word), guard[:8]).encode('latin-1')).decode()
-                    self._sess.cookies.set("guardret", enc, domain="tspnd.cc", path="/")
-                    rsp2 = self.fetch(self.site_url + "/")
+                    _SESSION.cookies.set("guardret", enc, domain="tspnd.cc", path="/")
+                    rsp2 = self._http_get(self.site_url + "/")
                     if len(rsp2.text) > 1000:
                         self.log("guard: 破解成功 x=%d" % (gx + off))
                         return True
@@ -380,7 +410,7 @@ class Spider(Spider):
         if self._warmed:
             return
         try:
-            rsp = self.fetch(self.site_url + "/")
+            rsp = self._http_get(self.site_url + "/")
             if len(rsp.text) > 1000:
                 self._warmed = True
                 self.log("预热完成")
@@ -397,7 +427,7 @@ class Spider(Spider):
                 h = dict(self.headers)
                 if headers:
                     h.update(headers)
-                rsp = self.fetch(url, headers=h, timeout=timeout)
+                rsp = self._http_get(url, headers=h, timeout=timeout)
                 text = ""
                 if hasattr(rsp, "text"):
                     text = rsp.text or ""
@@ -751,7 +781,7 @@ class Spider(Spider):
                 return [200, "image/jpeg", b"", ""]
             url = urllib.parse.unquote(url) if "%" in url else url
             url = self._fix_url(url)
-            rsp = self.fetch(url, headers={
+            rsp = self._http_get(url, headers={
                 "User-Agent": UA, "Referer": self.site_url + "/"}, timeout=15)
             content = rsp.content
             ctype = rsp.headers.get("Content-Type", "image/jpeg")
