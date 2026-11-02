@@ -11,7 +11,6 @@
   - 卡片: div.card.card-sm.card-link (a[href=/voddetail/xx.html] + img + span.badge + ribbon评分)
   - 详情: h1 标题, og:image 封面, .col.mb-2 p strong 字段, #synopsis 简介, nav-tabs 多线路(TT源/IK源)
   - 播放: player_data.url 直链 m3u8 (如 bfikuncdn.com/.../index.m3u8)
-  - 简介添加指定前缀
 """
 import re
 import sys
@@ -142,7 +141,10 @@ _RE_H1 = re.compile(r'<h1[^>]*>([\s\S]*?)</h1>', re.I)
 _RE_BADGE_ANY = re.compile(r'<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]*)</span>', re.I)
 _RE_META_P = re.compile(r'<p[^>]*>([\s\S]*?)</p>', re.I)
 _RE_STRONG = re.compile(r'<strong[^>]*>([\s\S]*?)</strong>', re.I)
-_RE_A_TEXT = re.compile(r'<a[^>]*>([\s\S]*?)</a>', re.I)
+# 导演/主演: 站内人物搜索链接 /vodsearch/（避免误抓导航等其他 <a>）
+_RE_A_TEXT = re.compile(r'<a[^>]*href="[^"]*/vodsearch/[^"]*"[^>]*>([\s\S]*?)</a>', re.I)
+# 类型: 筛选链接 /vodshow/
+_RE_A_TYPE = re.compile(r'<a[^>]*href="[^"]*/vodshow/[^"]*"[^>]*>([\s\S]*?)</a>', re.I)
 _RE_SYNOPSIS = re.compile(
     r'id="synopsis"[\s\S]*?<div class="card-body">([\s\S]*?)</div>', re.I)
 _RE_TEXT_ORANGE = re.compile(r'<span class="text-orange">([^<]*)</span>', re.I)
@@ -486,7 +488,7 @@ class Spider(Spider):
                 names = [_strip_tags(x) for x in _RE_A_TEXT.findall(p)]
                 vod["vod_actor"] = ",".join(x for x in names if x) or rest
             elif label == "类型":
-                names = [_strip_tags(x) for x in _RE_A_TEXT.findall(p)]
+                names = [_strip_tags(x) for x in _RE_A_TYPE.findall(p)]
                 vod["type_name"] = ",".join(x for x in names if x) or rest
             elif label in ("制片国家/地区", "地区"):
                 vod["vod_area"] = re.sub(r'[\[\]]', '', rest)
