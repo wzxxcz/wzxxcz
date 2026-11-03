@@ -632,8 +632,14 @@ class Spider(Spider):
             if attempt == 0:
                 time.sleep(1)
 
-        # 3) 慢速 CDN（Cloudflare 系）分片 -> 走 localProxy 代理+预取，消灭"连接超时"
-        if res is not None and res.get("parse") == 0 and \
+        # 3) 慢速 CDN（Cloudflare 系）分片 -> localProxy 代理+预取（可选）
+        #    默认关闭：部分内核不支持 proxy:// 会导致无法播放；
+        #    需要时在配置 ext 传 {"proxy": 1} 开启
+        try:
+            proxy_on = int(self.extend.get("proxy", 0))
+        except Exception:
+            proxy_on = 0
+        if proxy_on and res is not None and res.get("parse") == 0 and \
                 self._need_proxy(res.get("url", "")):
             mu = res["url"]
             res = {
@@ -770,16 +776,12 @@ class Spider(Spider):
                     self._seg_pending.discard(u)
 
     def _direct(self, url, referer):
-        """m3u8 统一带上站点 header，TVBox 系播放器可直出"""
+        """直链输出（实测签名 CDN 对 Referer/Origin 不敏感，仅带 UA 最稳）"""
         return {
             "parse": 0,
             "playUrl": "",
             "url": url,
-            "header": {
-                "User-Agent": UA,
-                "Referer": referer,
-                "Origin": self.site_url,
-            },
+            "header": {"User-Agent": UA},
         }
 
     def _parse_player(self, html):
