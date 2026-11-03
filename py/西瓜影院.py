@@ -662,17 +662,13 @@ class Spider(Spider):
                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
             self.log("  => 直链不可用, 回退嗅探: %s" % play_page)
 
-        # 5) 字节 CDN（byteimg）直链部分电视端网络/内核拉不动：
-        #    先自动换同片其他线路拿可播直链；换不到则回退嗅探（网页行为，内核webview可播）
+        # 5) 字节 CDN（byteimg）直链电视端拉不动：立即回退嗅探（快速返回，不拖时间）。
+        #    实测：嗅探=webview加载站点播放页，网页内播放器可正常播放（与网页行为一致）；
+        #    换源重试耗时过长会被 TVBox 判超时，故不做
         if res.get("parse") == 0 and "byteimg.com" in str(res.get("url", "")):
-            alt = self._swap_source(play_page, res.get("url", ""))
-            if alt:
-                res = {"parse": 0, "playUrl": "", "url": alt,
-                       "header": {"User-Agent": UA}}
-            else:
-                res = {"parse": 1, "playUrl": "", "url": play_page,
-                       "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
-                self.log("  => byteimg换源失败, 回退嗅探: %s" % play_page)
+            res = {"parse": 1, "playUrl": "", "url": play_page,
+                   "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
+            self.log("  => byteimg直链, 回退嗅探: %s" % play_page)
 
         self._play_cache[play_page] = (now, res)
         return res
@@ -899,10 +895,13 @@ class Spider(Spider):
             return url
         if re.search(r"\.(m3u8|mp4|flv)(\?|$)", url, re.I):
             return url
-        body = self._fetch(url, timeout=18, headers={
+        body = self._fetch(url, timeout=10, headers={
             "User-Agent": UA,
             "Referer": "https://hls.xiguadh.com/",
             "Accept": "*/*",
+            # 关键：只取前 4KB。有些"跳转页"其实是视频直链（如字节CDN mp4），
+            # 无 Range 会狂拉整个视频流导致解析卡死几十秒
+            "Range": "bytes=0-4095",
         })
         if not body:
             return url
@@ -926,38 +925,38 @@ class Spider(Spider):
     def _resolve(self, src_url, referer):
         """调站点解析接口 hls.xiguadh.com -> apiToken -> api/resolve.php -> m3u8
         解析接口偶发抖动（连接超时/空响应），快速失败 + 重试 3 次，避免播放器干等"""
-        for attempt in range(3):
+        for attempt in range(2):
             try:
                 page = PARSE_API + urllib.parse.quote(src_url, safe="")
-                h = self._fetch(page, timeout=10, headers={
+                h = self._fetch(page, timeout=5, headers={
                     "User-Agent": UA,
                     "Referer": self.site_url + "/",
                     "Accept": "text/html,*/*",
                 })
                 if not h:
                     self.log("  解析页空 (尝试%d)" % (attempt + 1))
-                    time.sleep(0.8)
+                    time.sleep(0.3)
                     continue
                 mt = _RE_TOKEN.search(h)
                 if not mt:
                     self.log("  未取到 apiToken (尝试%d)" % (attempt + 1))
-                    time.sleep(0.8)
+                    time.sleep(0.3)
                     continue
                 token = mt.group(1)
                 api = "https://hls.xiguadh.com/api/resolve.php?token=" + \
                       urllib.parse.quote(token, safe="")
-                body = self._fetch(api, timeout=10, headers={
+                body = self._fetch(api, timeout=5, headers={
                     "User-Agent": UA,
                     "Referer": "https://hls.xiguadh.com/",
                     "Accept": "application/json, */*",
                 })
                 if not body:
-                    time.sleep(0.8)
+                    time.sleep(0.3)
                     continue
                 try:
                     data = json.loads(body)
                 except Exception:
-                    time.sleep(0.8)
+                    time.sleep(0.3)
                     continue
                 if str(data.get("code")) != "200":
                     self.log("  resolve 失败: %s" % body[:120])
@@ -972,7 +971,7 @@ class Spider(Spider):
                 return final
             except Exception as e:
                 self.log("  resolve 异常 (尝试%d): %s" % (attempt + 1, e))
-                time.sleep(0.8)
+                time.sleep(0.3)
         return ""
 
     def localProxy(self, param):
