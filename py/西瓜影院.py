@@ -180,6 +180,12 @@ class Spider(Spider):
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
         self._filter_cache = {}
+        # 分片代理：序列表 / 预取缓存 / m3u8正文缓存 / 线程锁
+        self._seg_seq = {}
+        self._seg_cache = {}
+        self._seg_body = {}
+        self._seg_pending = set()
+        self._seg_lock = __import__("threading").Lock()
         self.log("init: site=%s" % self.site_url)
 
     # ---------------- 基础工具 ----------------
@@ -626,13 +632,142 @@ class Spider(Spider):
             if attempt == 0:
                 time.sleep(1)
 
-        # 3) 兜底：交给 TVBox 嗅探
+        # 3) 慢速 CDN（Cloudflare 系）分片 -> 走 localProxy 代理+预取，消灭"连接超时"
+        if res is not None and res.get("parse") == 0 and \
+                self._need_proxy(res.get("url", "")):
+            mu = res["url"]
+            res = {
+                "parse": 0,
+                "playUrl": "",
+                "url": "proxy://do=py&url=%s&type=m3u8&play=%s"
+                       % (urllib.parse.quote(mu, safe=""),
+                          urllib.parse.quote(play_page, safe="")),
+                "header": {"User-Agent": UA},
+            }
+            # 预拉一次 m3u8 并缓存分片列表，同时预热第 1 个分片
+            self._proxy_m3u8(mu, play_page)
+            self.log("  => 慢速分片, 走本地代理: %s" % mu[:100])
+
+        # 4) 兜底：交给 TVBox 嗅探
         if res is None:
             res = {"parse": 1, "playUrl": "", "url": play_page,
                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
         self._play_cache[play_page] = (now, res)
         return res
+
+    # -------- 慢速 CDN 分片代理（localProxy + 预取） --------
+    SLOW_TS_PATTERNS = ["cf.003838.xyz", "003838.xyz"]
+
+    def _need_proxy(self, m3u8_url):
+        """m3u8 分片落在慢速域名（且非 BYTERANGE 源）时启用本地代理"""
+        if not m3u8_url or ".m3u8" not in m3u8_url.lower():
+            return False
+        if m3u8_url in self._seg_seq:
+            return True
+        body = self._fetch(m3u8_url, timeout=12, headers={"User-Agent": UA})
+        if not body or "#EXT-X-BYTERANGE" in body:
+            return False
+        if not any(p in body for p in self.SLOW_TS_PATTERNS):
+            return False
+        # 缓存正文：站方每次拉 m3u8 都会给分片重新签名，
+        # 检测/预热/播放必须用同一份正文，否则预取地址对不上播放器请求
+        with self._seg_lock:
+            self._seg_body[m3u8_url] = (time.time(), body)
+        return True
+
+    def _get_m3u8_body(self, m3u8_url, play_page):
+        """取 m3u8 正文：25 秒内复用同一份（保证签名一致），过期则重拉/重解析"""
+        with self._seg_lock:
+            item = self._seg_body.get(m3u8_url)
+        if item and time.time() - item[0] < 25:
+            return m3u8_url, item[1]
+        for attempt in range(2):
+            body = self._fetch(m3u8_url, timeout=12, headers={"User-Agent": UA})
+            if body.lstrip().startswith("#EXTM3U"):
+                with self._seg_lock:
+                    self._seg_body[m3u8_url] = (time.time(), body)
+                return m3u8_url, body
+            # 签名过期 -> 经播放页重新解析拿新 m3u8
+            try:
+                r = self.playerContent(None, play_page, "")
+                mu = r.get("url", "")
+                if mu.startswith("proxy://"):
+                    mu = urllib.parse.parse_qs(
+                        urllib.parse.urlparse(mu).query).get("url", [""])[0]
+                if mu and mu != m3u8_url:
+                    m3u8_url = mu
+            except Exception:
+                pass
+        return m3u8_url, body if isinstance(body, str) else ""
+
+    def _proxy_m3u8(self, m3u8_url, play_page):
+        """取 m3u8，把慢速分片改写为 proxy:// 形式，并预热前几片"""
+        m3u8_url, body = self._get_m3u8_body(m3u8_url, play_page)
+        if not body or not body.lstrip().startswith("#EXTM3U"):
+            return [404, "text/plain", b"m3u8 fetch failed", ""]
+        seq = [
+            ln.strip() for ln in body.split("\n")
+            if ln.strip() and not ln.strip().startswith("#")
+            and ln.strip().startswith("http")
+        ]
+        with self._seg_lock:
+            self._seg_seq[m3u8_url] = seq
+        out = []
+        for ln in body.split("\n"):
+            t = ln.strip()
+            if t and not t.startswith("#") and t.startswith("http"):
+                out.append("proxy://do=py&url=%s&type=ts" %
+                           urllib.parse.quote(t, safe=""))
+            else:
+                out.append(ln)
+        content = ("\n".join(out)).encode("utf-8")
+        # 同步预热第 1 片（起播前拉好，播放器请求秒回），第 2、3 片后台预取
+        if seq:
+            first = seq[0]
+            with self._seg_lock:
+                have = self._seg_cache.get(first)
+            if not have:
+                t = time.time()
+                data = self._fetch_seg(first, retries=2)
+                with self._seg_lock:
+                    self._seg_cache[first] = data
+                self.log("  首片预热完成: %dB %.1fs" % (len(data), time.time() - t))
+            self._prefetch(seq[1:4])
+        return [200, "application/vnd.apple.mpegurl", content, ""]
+
+    def _fetch_seg(self, url, retries=3):
+        """分片拉取：3 次重试 + 连接复用"""
+        for i in range(retries):
+            body = self._fetch(url, timeout=30, headers={"User-Agent": UA})
+            if body:
+                return body
+            time.sleep(0.5)
+        return b""
+
+    def _prefetch(self, urls):
+        """并行预取分片（每个 URL 独立线程，去重防重复下载）"""
+        import threading
+        for u in urls:
+            with self._seg_lock:
+                if u in self._seg_cache or u in self._seg_pending:
+                    continue
+                self._seg_pending.add(u)
+
+            def worker(url=u):
+                data = self._fetch_seg(url, retries=2)
+                with self._seg_lock:
+                    self._seg_pending.discard(url)
+                    if data:
+                        if len(self._seg_cache) > 6:
+                            for k in list(self._seg_cache.keys())[:-3]:
+                                self._seg_cache.pop(k, None)
+                        self._seg_cache[url] = data
+            try:
+                threading.Thread(target=worker, daemon=True).start()
+            except Exception:
+                with self._seg_lock:
+                    self._seg_pending.discard(u)
 
     def _direct(self, url, referer):
         """m3u8 统一带上站点 header，TVBox 系播放器可直出"""
@@ -755,16 +890,43 @@ class Spider(Spider):
             return ""
 
     def localProxy(self, param):
+        """
+        双职责：
+          1) 图片代理（原有）
+          2) 慢速 CDN 视频分片代理：type=m3u8 改写分片 -> type=ts 取缓存/拉取
+        """
         try:
-            url = ""
-            if isinstance(param, dict):
-                url = param.get("url", "")
-            else:
+            # -------- 视频代理分支 --------
+            raw = param if isinstance(param, dict) else {}
+            if not isinstance(param, dict):
                 for pair in str(param).split("&"):
                     if "=" in pair:
                         k, v = pair.split("=", 1)
-                        if k == "url":
-                            url = v
+                        raw[k] = v
+            ptype = raw.get("type", "")
+            if ptype in ("m3u8", "ts"):
+                url = urllib.parse.unquote(raw.get("url", ""))
+                if ptype == "m3u8":
+                    return self._proxy_m3u8(url, urllib.parse.unquote(raw.get("play", "")))
+                # ts：先取预取缓存，未命中同步拉，同时预取后续分片
+                with self._seg_lock:
+                    data = self._seg_cache.pop(url, None)
+                if not data:
+                    data = self._fetch_seg(url)
+                # 找到该分片在序列中的位置，预取后两片
+                for m3u8_url, seq in list(self._seg_seq.items()):
+                    try:
+                        i = seq.index(url)
+                        self._prefetch(seq[i + 1:i + 4])
+                        break
+                    except ValueError:
+                        continue
+                if data:
+                    return [200, "video/mp2t", data, ""]
+                return [404, "text/plain", b"seg failed", ""]
+
+            # -------- 图片代理分支 --------
+            url = raw.get("url", "")
             if not url:
                 return [200, "image/jpeg", b"", ""]
             url = urllib.parse.unquote(url) if "%" in url else url
