@@ -662,13 +662,17 @@ class Spider(Spider):
                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
             self.log("  => 直链不可用, 回退嗅探: %s" % play_page)
 
-        # 5) 字节 CDN（byteimg）直链电视端拉不动：立即回退嗅探（快速返回，不拖时间）。
-        #    实测：嗅探=webview加载站点播放页，网页内播放器可正常播放（与网页行为一致）；
-        #    换源重试耗时过长会被 TVBox 判超时，故不做
+        # 5) 字节 CDN（byteimg）直链电视端拉不动 -> 自动换同片其他线路（现在解析已提速，约3-5秒）
+        #    换源失败再回退嗅探兜底
         if res.get("parse") == 0 and "byteimg.com" in str(res.get("url", "")):
-            res = {"parse": 1, "playUrl": "", "url": play_page,
-                   "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
-            self.log("  => byteimg直链, 回退嗅探: %s" % play_page)
+            alt = self._swap_source(play_page, res.get("url", ""))
+            if alt:
+                res = {"parse": 0, "playUrl": "", "url": alt,
+                       "header": {"User-Agent": UA}}
+            else:
+                res = {"parse": 1, "playUrl": "", "url": play_page,
+                       "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
+                self.log("  => byteimg换源失败, 回退嗅探: %s" % play_page)
 
         self._play_cache[play_page] = (now, res)
         return res
