@@ -21,6 +21,7 @@ try:
     from base.spider import Spider
 except ImportError:
     import requests as _rq
+    _rq_stream = _rq
     try:
         import urllib3
         urllib3.disable_warnings()
@@ -654,10 +655,11 @@ class Spider(Spider):
             self._proxy_m3u8(mu, play_page)
             self.log("  => 慢速分片, 走本地代理: %s" % mu[:100])
 
-        # 4) 兜底：交给 TVBox 嗅探
-        if res is None:
+        # 4) 兜底：直链两轮均失效（解析接口给死链）-> 交给 TVBox 嗅探，与网页行为一致
+        if res is None or (res.get("parse") == 0 and not self._alive(res.get("url", ""))):
             res = {"parse": 1, "playUrl": "", "url": play_page,
                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
+            self.log("  => 直链不可用, 回退嗅探: %s" % play_page)
 
         self._play_cache[play_page] = (now, res)
         return res
@@ -775,8 +777,32 @@ class Spider(Spider):
                 with self._seg_lock:
                     self._seg_pending.discard(u)
 
+    def _follow302(self, url):
+        """302 跳转直链跟随到最终地址。
+        人人(rrmj)等 mp4 源会 302 到非标准端口(如 :20443)的 CDN 节点，
+        部分 TVBox 播放器内核不会正确跟随导致"无法播放"，
+        这里在返回前主动跟随一次，把最终地址直接交给播放器。"""
+        if not url or not url.startswith("http"):
+            return url
+        try:
+            rsp = _rq_stream.get(url, headers={"User-Agent": UA}, timeout=10,
+                                 allow_redirects=True, stream=True, verify=False)
+            final = getattr(rsp, "url", url) or url
+            try:
+                rsp.close()
+            except Exception:
+                pass
+            if final != url and final.startswith("http"):
+                self.log("302 follow: %s" % final[:150])
+                return final
+        except Exception as e:
+            self.log("302 follow FAIL: %s" % e)
+        return url
+
     def _direct(self, url, referer):
         """直链输出（实测签名 CDN 对 Referer/Origin 不敏感，仅带 UA 最稳）"""
+        if url and ".mp4" in url.lower():
+            url = self._follow302(url)
         return {
             "parse": 0,
             "playUrl": "",
