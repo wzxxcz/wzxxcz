@@ -662,8 +662,45 @@ class Spider(Spider):
                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
             self.log("  => 直链不可用, 回退嗅探: %s" % play_page)
 
+        # 5) 字节 CDN（byteimg）直链部分电视端网络/内核拉不动 -> 自动换同片其他线路
+        if res.get("parse") == 0 and "byteimg.com" in str(res.get("url", "")):
+            alt = self._swap_source(play_page, res.get("url", ""))
+            if alt:
+                res = {"parse": 0, "playUrl": "", "url": alt,
+                       "header": {"User-Agent": UA}}
+
         self._play_cache[play_page] = (now, res)
         return res
+
+    # 排查确认：byteimg(字节CDN) 直链服务器正常但部分电视端无法拉流
+    BAD_HOST_PAT = "byteimg.com"
+
+    def _swap_source(self, play_page, bad_url):
+        """同片同集自动换源：遍历其他 sid 线路，拿到非 byteimg 的直链。
+        注：不做严格 alive 检查（探测偶发误杀有效链接），失败交给播放器重试"""
+        mm = re.search(r"/vod/play/id/(\d+)/sid/(\d+)/nid/(\d+)", play_page)
+        if not mm:
+            return ""
+        vid, cur_sid, nid = mm.group(1), mm.group(2), mm.group(3)
+        for sid in ("1", "2", "3"):
+            if sid == cur_sid:
+                continue
+            alt_page = "%s/index.php/vod/play/id/%s/sid/%s/nid/%s.html" % (
+                self.site_url, vid, sid, nid)
+            html = self._fetch(alt_page, timeout=12)
+            info = self._parse_player(html)
+            src = info.get("url", "")
+            if not src:
+                continue
+            real = self._resolve(src, alt_page)
+            if real and self.BAD_HOST_PAT not in real:
+                if ".mp4" in real.lower():
+                    real = self._follow302(real)
+                else:
+                    real = self._video_fix(real)
+                self.log("  => byteimg不可播, 换源 sid=%s: %s" % (sid, real[:120]))
+                return real
+        return ""
 
     # -------- 慢速 CDN 分片代理（localProxy + 预取） --------
     SLOW_TS_PATTERNS = ["cf.003838.xyz", "003838.xyz"]
