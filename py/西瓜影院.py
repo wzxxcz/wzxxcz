@@ -662,12 +662,17 @@ class Spider(Spider):
                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
             self.log("  => 直链不可用, 回退嗅探: %s" % play_page)
 
-        # 5) 字节 CDN（byteimg）直链部分电视端网络/内核拉不动 -> 自动换同片其他线路
+        # 5) 字节 CDN（byteimg）直链部分电视端网络/内核拉不动：
+        #    先自动换同片其他线路拿可播直链；换不到则回退嗅探（网页行为，内核webview可播）
         if res.get("parse") == 0 and "byteimg.com" in str(res.get("url", "")):
             alt = self._swap_source(play_page, res.get("url", ""))
             if alt:
                 res = {"parse": 0, "playUrl": "", "url": alt,
                        "header": {"User-Agent": UA}}
+            else:
+                res = {"parse": 1, "playUrl": "", "url": play_page,
+                       "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
+                self.log("  => byteimg换源失败, 回退嗅探: %s" % play_page)
 
         self._play_cache[play_page] = (now, res)
         return res
@@ -838,35 +843,9 @@ class Spider(Spider):
         return url
 
     def _video_fix(self, url):
-        """非标准后缀直链（如字节CDN的 .image）内容探测：
-        实际是视频则追加 #.mp4 伪后缀——fragment 不参与请求、不影响签名，
-        但按后缀选解码器的内核（ijk 等）会正确按 mp4 播放"""
-        if not url or not url.startswith("http"):
-            return url
-        low = url.lower().split("?")[0].split("#")[0]
-        if low.endswith((".m3u8", ".mp4", ".flv")):
-            return url
-        try:
-            rsp = _rq_stream.get(url, headers={"User-Agent": UA, "Range": "bytes=0-63"},
-                                 timeout=8, stream=True, verify=False)
-            ct = (rsp.headers.get("Content-Type") or "").lower()
-            body = b""
-            try:
-                body = rsp.raw.read(64)
-            except Exception:
-                pass
-            try:
-                rsp.close()
-            except Exception:
-                pass
-            is_video = ("video/" in ct) or ("mpegurl" in ct) \
-                or body.find(b"ftyp") in (4, 8) or body.lstrip().startswith(b"#EXTM3U")
-            if is_video:
-                if body.lstrip().startswith(b"#EXTM3U"):
-                    return url + "#.m3u8"
-                return url + "#.mp4"
-        except Exception:
-            pass
+        """非常规后缀直链处理（如字节CDN .image）。
+        实测部分内核对 #.mp4 伪后缀处理异常（会把 fragment 发出导致403），
+        且嗅探兜底已验证可播，故这里不再加伪后缀，交由上层换源/嗅探兜底"""
         return url
 
     def _direct(self, url, referer):
