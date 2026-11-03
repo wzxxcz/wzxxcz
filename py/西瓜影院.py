@@ -584,8 +584,9 @@ class Spider(Spider):
         """直链活性探测：签名类 m3u8/mp4 过期会 403，需重新解析"""
         if not url or not url.startswith("http"):
             return True
+        probe = url.split("#")[0]  # 剥离 #.mp4 伪后缀再探测
         try:
-            body = self._fetch(url, timeout=10, headers={
+            body = self._fetch(probe, timeout=10, headers={
                 "User-Agent": UA,
                 "Referer": "https://hls.xiguadh.com/",
                 "Range": "bytes=0-63",
@@ -593,7 +594,7 @@ class Spider(Spider):
             if not body:
                 return False
             # m3u8 要求 #EXTM3U 头；mp4/flv 有任意响应体即视为存活
-            if ".m3u8" in url.lower():
+            if ".m3u8" in probe.lower():
                 return body.lstrip().startswith("#EXTM3U")
             return True
         except Exception:
@@ -799,10 +800,44 @@ class Spider(Spider):
             self.log("302 follow FAIL: %s" % e)
         return url
 
+    def _video_fix(self, url):
+        """非标准后缀直链（如字节CDN的 .image）内容探测：
+        实际是视频则追加 #.mp4 伪后缀——fragment 不参与请求、不影响签名，
+        但按后缀选解码器的内核（ijk 等）会正确按 mp4 播放"""
+        if not url or not url.startswith("http"):
+            return url
+        low = url.lower().split("?")[0].split("#")[0]
+        if low.endswith((".m3u8", ".mp4", ".flv")):
+            return url
+        try:
+            rsp = _rq_stream.get(url, headers={"User-Agent": UA, "Range": "bytes=0-63"},
+                                 timeout=8, stream=True, verify=False)
+            ct = (rsp.headers.get("Content-Type") or "").lower()
+            body = b""
+            try:
+                body = rsp.raw.read(64)
+            except Exception:
+                pass
+            try:
+                rsp.close()
+            except Exception:
+                pass
+            is_video = ("video/" in ct) or ("mpegurl" in ct) \
+                or body.find(b"ftyp") in (4, 8) or body.lstrip().startswith(b"#EXTM3U")
+            if is_video:
+                if body.lstrip().startswith(b"#EXTM3U"):
+                    return url + "#.m3u8"
+                return url + "#.mp4"
+        except Exception:
+            pass
+        return url
+
     def _direct(self, url, referer):
         """直链输出（实测签名 CDN 对 Referer/Origin 不敏感，仅带 UA 最稳）"""
         if url and ".mp4" in url.lower():
             url = self._follow302(url)
+        else:
+            url = self._video_fix(url)
         return {
             "parse": 0,
             "playUrl": "",
@@ -873,49 +908,56 @@ class Spider(Spider):
         return url
 
     def _resolve(self, src_url, referer):
-        """调站点解析接口 hls.xiguadh.com -> apiToken -> api/resolve.php -> m3u8"""
-        try:
-            page = PARSE_API + urllib.parse.quote(src_url, safe="")
-            h = self._fetch(page, timeout=20, headers={
-                "User-Agent": UA,
-                "Referer": self.site_url + "/",
-                "Accept": "text/html,*/*",
-            })
-            if not h:
-                self.log("  解析页空")
-                return ""
-            mt = _RE_TOKEN.search(h)
-            if not mt:
-                self.log("  未取到 apiToken")
-                return ""
-            token = mt.group(1)
-            api = "https://hls.xiguadh.com/api/resolve.php?token=" + \
-                  urllib.parse.quote(token, safe="")
-            body = self._fetch(api, timeout=20, headers={
-                "User-Agent": UA,
-                "Referer": "https://hls.xiguadh.com/",
-                "Accept": "application/json, */*",
-            })
-            if not body:
-                return ""
+        """调站点解析接口 hls.xiguadh.com -> apiToken -> api/resolve.php -> m3u8
+        解析接口偶发抖动（连接超时/空响应），快速失败 + 重试 3 次，避免播放器干等"""
+        for attempt in range(3):
             try:
-                data = json.loads(body)
-            except Exception:
-                return ""
-            if str(data.get("code")) != "200":
-                self.log("  resolve 失败: %s" % body[:120])
-                return ""
-            u = (data.get("url") or "").replace("\\/", "/")
-            if not u:
-                return ""
-            # 中间跳转页 -> 追到真正的 m3u8
-            final = self._follow_link(u)
-            self.log("  resolve -> %s%s" % (final[:140],
-                                            "" if final == u else "  (跟跳转)"))
-            return final
-        except Exception as e:
-            self.log("  resolve 异常: %s" % e)
-            return ""
+                page = PARSE_API + urllib.parse.quote(src_url, safe="")
+                h = self._fetch(page, timeout=10, headers={
+                    "User-Agent": UA,
+                    "Referer": self.site_url + "/",
+                    "Accept": "text/html,*/*",
+                })
+                if not h:
+                    self.log("  解析页空 (尝试%d)" % (attempt + 1))
+                    time.sleep(0.8)
+                    continue
+                mt = _RE_TOKEN.search(h)
+                if not mt:
+                    self.log("  未取到 apiToken (尝试%d)" % (attempt + 1))
+                    time.sleep(0.8)
+                    continue
+                token = mt.group(1)
+                api = "https://hls.xiguadh.com/api/resolve.php?token=" + \
+                      urllib.parse.quote(token, safe="")
+                body = self._fetch(api, timeout=10, headers={
+                    "User-Agent": UA,
+                    "Referer": "https://hls.xiguadh.com/",
+                    "Accept": "application/json, */*",
+                })
+                if not body:
+                    time.sleep(0.8)
+                    continue
+                try:
+                    data = json.loads(body)
+                except Exception:
+                    time.sleep(0.8)
+                    continue
+                if str(data.get("code")) != "200":
+                    self.log("  resolve 失败: %s" % body[:120])
+                    return ""
+                u = (data.get("url") or "").replace("\\/", "/")
+                if not u:
+                    return ""
+                # 中间跳转页 -> 追到真正的 m3u8
+                final = self._follow_link(u)
+                self.log("  resolve -> %s%s" % (final[:140],
+                                                "" if final == u else "  (跟跳转)"))
+                return final
+            except Exception as e:
+                self.log("  resolve 异常 (尝试%d): %s" % (attempt + 1, e))
+                time.sleep(0.8)
+        return ""
 
     def localProxy(self, param):
         """
