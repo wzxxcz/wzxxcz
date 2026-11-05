@@ -83,50 +83,80 @@ _SORTS = [
 _YEARS = [{"n": "全部", "v": ""}] + \
          [{"n": str(y), "v": str(y)} for y in range(2026, 1999, -1)]
 
-# 站点原始筛选项（与网站下拉完全一致，逐分类）
-_FILTERS_MAP = {
-    "1": {
-        "class": ["全部", "喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪",
-                  "犯罪", "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚", "经典",
-                  "青春", "文艺", "微电影", "古装", "历史", "运动", "农村", "儿童", "网络电影"],
-        "area": ["全部", "大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国",
-                 "德国", "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"],
-    },
-    "2": {
-        "class": ["全部", "古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻",
-                  "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"],
-        "area": ["全部", "内地", "韩国", "香港", "台湾", "日本", "美国", "泰国", "英国",
-                 "新加坡", "其他"],
-    },
-    "3": {
-        "class": ["全部", "选秀", "情感", "访谈", "播报", "旅游", "音乐", "美食", "纪实",
-                  "曲艺", "生活", "游戏互动", "财经", "求职"],
-        "area": ["全部", "内地", "港台", "日韩", "欧美"],
-    },
-    "4": {
-        "class": ["全部", "情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园",
-                  "动作", "机战", "运动", "战争", "少年", "少女", "社会", "原创", "亲子",
-                  "益智", "励志", "其他"],
-        "area": ["全部", "国产", "日本", "欧美", "其他"],
-    },
-    "34": {
-        "class": ["全部"],
-        "area": ["全部"],
-    },
+# ============================================================
+# 二级分类（网站 type 页第一行: 全部 / 国产剧 / 大陆综艺 / 国产动漫 ...）
+# 实测要点：
+#   1) 该行的值 = 苹果CMS 详情页「类型」字段(vod_class)，用 class= 传即可命中
+#   2) class 可与 area / year / by / page 任意组合，且顺序不限
+#   3) 站点 vod_class 只有单值，故 sub / genre 互斥（代码里已判优）
+#   4) 下列 v 均为线上实测有数据的值；空值项(如"港台剧")已剔除，避免点开空白
+# ============================================================
+SUB_TYPES = {
+    "1": [
+        {"n": "全部", "v": ""},
+        {"n": "动作片", "v": "动作"},
+        {"n": "喜剧片", "v": "喜剧"},
+        {"n": "爱情片", "v": "爱情"},
+        {"n": "科幻片", "v": "科幻"},
+        {"n": "恐怖片", "v": "恐怖"},
+        {"n": "剧情片", "v": "剧情"},
+        {"n": "战争片", "v": "战争"},
+        {"n": "纪录片", "v": "记录"},
+    ],
+    "2": [
+        {"n": "全部", "v": ""},
+        {"n": "国产剧", "v": "国产"},
+        {"n": "欧美剧", "v": "欧美"},
+        {"n": "海外剧", "v": "海外"},
+    ],
+    "3": [
+        {"n": "全部", "v": ""},
+        {"n": "大陆综艺", "v": "大陆综艺"},
+        {"n": "日韩综艺", "v": "日韩综艺"},
+        {"n": "港台综艺", "v": "港台综艺"},
+        {"n": "欧美综艺", "v": "欧美综艺"},
+    ],
+    "4": [
+        {"n": "全部", "v": ""},
+        {"n": "国产动漫", "v": "国产动漫"},
+        {"n": "日韩动漫", "v": "日韩动漫"},
+        {"n": "欧美动漫", "v": "欧美动漫"},
+        {"n": "海外动漫", "v": "海外动漫"},
+    ],
+    "34": [
+        {"n": "全部", "v": ""},
+    ],
 }
+
+# 地区（逐分类，与站点下拉一致；短剧无地区行）
+_AREAS = {
+    "1": ["全部", "大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国",
+          "德国", "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"],
+    "2": ["全部", "韩国", "香港", "台湾", "日本", "美国", "泰国", "英国",
+          "新加坡", "其他"],
+    "3": ["全部", "内地", "港台", "日韩", "欧美"],
+    "4": ["全部", "国产", "日本", "欧美", "其他"],
+    "34": ["全部"],
+}
+
+# 剧情题材（仅电影该行真实投放有效: 喜剧/爱情/恐怖/动作/科幻/剧情/战争）
+_MOVIE_GENRES = ["全部", "喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争"]
 
 FILTERS = {}
 for _c in CLASSES:
     _tid = _c["type_id"]
-    _m = _FILTERS_MAP.get(_tid, {"class": ["全部"], "area": ["全部"]})
-    FILTERS[_tid] = [
-        {"key": "class", "name": "分类",
-         "value": [{"n": x, "v": "" if x == "全部" else x} for x in _m["class"]]},
-        {"key": "area", "name": "地区",
-         "value": [{"n": x, "v": "" if x == "全部" else x} for x in _m["area"]]},
-        {"key": "year", "name": "年份", "value": _YEARS},
-        {"key": "by", "name": "排序", "value": _SORTS},
-    ]
+    _fl = [{"key": "sub", "name": "分类", "value": SUB_TYPES.get(_tid, [{"n": "全部", "v": ""}])}]
+
+    if _tid == "1":
+        _fl.append({"key": "genre", "name": "剧情",
+                    "value": [{"n": x, "v": "" if x == "全部" else x} for x in _MOVIE_GENRES]})
+
+    _fl.append({"key": "area", "name": "地区",
+                "value": [{"n": x, "v": "" if x == "全部" else x}
+                          for x in _AREAS.get(_tid, ["全部"])]})
+    _fl.append({"key": "year", "name": "年份", "value": _YEARS})
+    _fl.append({"key": "by", "name": "排序", "value": _SORTS})
+    FILTERS[_tid] = _fl
 
 
 # ===================== 正则 =====================
@@ -403,9 +433,20 @@ class Spider(Spider):
 
     # ------------------------------------------------------------------ 分类
     def _sort_path(self, tid, extend, page):
-        """构造 /sort/{tid}/{class}/{area}/{year}/by/{by}/page/{n}.html"""
+        """构造 /sort/{tid}/class/{c}/area/{a}/year/{y}/by/{by}/page/{n}.html
+
+        站点 vod_class 字段只存一个值，故 class 只能出现一次：
+          优先 sub（二级分类: 国产/大陆综艺/国产动漫…），
+          其次 genre（电影剧情: 喜剧/爱情…），二者互斥。
+        """
         seg = [self.site_url, "sort", str(tid)]
-        cls = (extend.get("class") or "").strip()
+
+        cls = (extend.get("sub") or "").strip()
+        if not cls or cls == "全部":
+            cls = (extend.get("genre") or "").strip()
+        if not cls or cls == "全部":
+            cls = (extend.get("class") or "").strip()
+
         area = (extend.get("area") or "").strip()
         year = (extend.get("year") or "").strip()
         by = (extend.get("by") or "").strip()
@@ -438,19 +479,35 @@ class Spider(Spider):
             extend = {}
         extend = {k: v for k, v in extend.items() if v not in ("", None, "全部")}
 
-        url = self._sort_path(tid, extend, page)
-        self.log("category: %s" % url)
-        html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
+        videos, pagecount, url = [], 1, ""
+        total_pages = 0
+        # 依次尝试：完整条件 -> 去掉 class -> 仅本期 id，保证任何组合都不空白
+        for i in range(3):
+            cur = dict(extend)
+            if i == 1:
+                cur.pop("sub", None)
+                cur.pop("genre", None)
+                cur.pop("class", None)
+            elif i == 2:
+                cur = {}
+            url = self._sort_path(tid, cur, page if i == 0 else 1)
+            self.log("category[%d]: %s" % (i, url))
+            html = self._fetch(url)
+            videos = self._extract_videos(html)
+            self.log("  HTML 长度: %d, 解析: %d 条" % (len(html), len(videos)))
+            if videos:
+                pagecount = self._page_count(html)
+                total_pages = pagecount
+                break
+        if not total_pages:
+            total_pages = 1
 
-        videos = self._extract_videos(html)
-        pagecount = self._page_count(html)
         limit = len(videos) if videos else 32
         self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
 
         return {
             "list": videos,
-            "page": page,
+            "page": page if videos else 1,
             "pagecount": pagecount,
             "limit": limit,
             "total": pagecount * limit,
