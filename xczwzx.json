@@ -561,7 +561,13 @@
             "key": "荐片",
             "name": "🐭荐片P2P",
             "api": "csp_JianPian",
-            "type": 3
+            "type": 3,
+            "ext": {
+                "site": [
+                    "https://www.whhyn.com",
+                    "https://www.zxfmj.com"
+                ]
+            }
         },
         {
             "key": "荐片123",
