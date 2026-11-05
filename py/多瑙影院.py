@@ -456,16 +456,9 @@ class Spider(Spider):
             if m:
                 content = self._clean(m.group(1))
 
-        head = INTRO_PREFIX + "\n"
-        if year:
-            head += "年代: %s　" % year
-        if area:
-            head += "地区: %s　" % area
-        if vtype:
-            head += "类型: %s" % vtype
-        if year or area or vtype:
-            head += "\n"
-        content = head + (content or "暂无简介")
+        # 元信息(年代/地区/类型)走 vod_year/vod_area/vod_class 字段,
+        # 由 TVBox 详情页头部渲染; 简介只保留前缀 + 剧情正文
+        content = INTRO_PREFIX + "\n" + (content or "暂无简介")
 
         # ===== 剧集提取（按站点 tab 顺序）=====
         tabs = []
@@ -509,6 +502,7 @@ class Spider(Spider):
             "vod_score": score,
             "vod_year": year,
             "vod_area": area,
+            "vod_class": vtype,
             "vod_remarks": remarks or ("%d条线路" % len(play_from)),
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
