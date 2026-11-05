@@ -35878,6 +35878,12 @@
             "ext": "./js/Anime1.js"
         },
         {
+            "key": "稀饭",
+            "name": "🍚稀饭动漫",
+            "type": 3,
+            "api": "csp_AnimeXifan"
+        },
+        {
             "key": "巴士动漫",
             "name": "🚐巴士动漫",
             "type": 3,
