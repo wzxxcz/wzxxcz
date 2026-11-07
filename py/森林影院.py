@@ -6,7 +6,8 @@
   - 站点为苹果CMS(maccms) + hl048/stui 模板，与 ewave 主题的解析规则完全不同
   - 详情页 = /yingshi/z{id}.html，播放页 = /vodview/z{id}/{sid}/{nid}.html
   - 播放数据内联 var player_aaaa={...}，encrypt=0，url 即直链 m3u8，无需二次解析
-  - 线路按详情页面板原始顺序输出（本模板为 线路1/线路2/线路4/线路5/线路6，注意跳过线路3）
+  - 线路顺序【完全按详情页面板 DOM 顺序】输出，不做任何排序（与网站显示一致）；
+    注意面板文字「线路1/线路2/…」与链接里的 sid 并不对应，切勿按名字或 sid 排序
   - 剧集名需剔除 $ 和 #（TVBox 协议分隔符），否则播放列表会错位
   - 源站被 Cloudflare 前置，520 抖动极频繁，需带退避重试 + Session 保活
   - 兼容无副标题、无封面（/static/images/load.png 占位）、无演员的卡片
@@ -58,24 +59,16 @@ DETAIL_CACHE_TTL = 600    # 详情缓存 10 分钟
 MAX_RETRY = 3
 MAX_RETRY_HARD = 25       # 连续失败后的激进重试（仅播放页使用）
 
-# 线路播放顺序 —— 按 sid（URL 里的 /vodview/z{id}/{sid}/{nid}.html）升序排列
+# 线路播放顺序 —— 完全按详情页面板的 DOM 顺序输出，不做任何排序！
 #
-# 【重要】站点面板上写的是「线路1/线路2/线路4/线路5/线路6」，
-#         但这几个名字的顺序【不等于】实际播放顺序，千万不要按名字排序：
+# 【重要】面板文字「线路1/线路2/…」与链接里的 sid 并不对应（线路1 可能是 sid=6），
+#         且不同影片的面板排布也不一样，例如：
 #
-#           面板文字   sid   URL
-#           线路1       3    /vodview/z3754249/3/1.html   ← 名字最小，却排在最后
-#           线路2       1    /vodview/z3754249/1/1.html   ← 站点默认高亮这条
-#           线路4       2    /vodview/z3754249/2/1.html
-#           线路5       4    /vodview/z3754249/4/1.html
-#           线路6       5    /vodview/z3754249/5/1.html
+#           《伟大的长征》面板顺序: 线路1(6) 线路2(2) 线路3(3) 线路4(1) 线路6(4) 线路5(5)
+#           《哥斯拉-0.0》面板顺序:  线路1(3) 线路2(1) 线路4(2) 线路5(4) 线路6(5)
 #
-#         站点播放页只给「线路2」(sid=1) 加了 class="active"，也就是默认线路；
-#         详情页「立即播放」按钮同样指向 /1/1.html。故真实顺序 = sid 升序：
-#           sid 1 → sid 2 → sid 3 → sid 4 → sid 5
-#         即：线路2 → 线路4 → 线路1 → 线路5 → 线路6
-#
-# 若日后站点改动，此处无需维护，_parse_playlist 会直接从链接里读 sid 排序。
+#         站点网页怎么显示，我们就原样怎么输出 —— 不按名字排、不按 sid 排。
+#         （详情页「立即播放」指向 sid=1 只是站点默认播放链接，与显示顺序无关）
 
 # 双 UA：移动端 UA 命中率最高；iPad UA 在播放页被墙时作为备选
 MOBILE_UA = (
@@ -180,7 +173,9 @@ FILTER_DB = {
         "year": ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019",
                  "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010"],
     },
-    # 短剧：实测站点只有「按类型」一行，其余筛选面板为空，故留空不生成筛选
+    # 短剧：实测面板只有「按类型」一组（短剧大全/AI漫剧），
+    #       剧情/地区/年份三行在页面上是空壳（<a> 内无文字），故 cfg 留空，
+    #       但「类型」组由 _build_filter 依据 subs 照常生成
     "24": {},
 }
 
@@ -404,16 +399,27 @@ class Spider(Spider):
 
     def _build_filter(self, top_tid, subs=None):
         """
-        生成筛选组；短剧等无筛选的分类直接返回空列表。
+        生成筛选组。
         subs 为该分类的子分类列表 —— 作为「类型」组放在最前面，
         选中后 categoryContent 会通过 flt["sub"] 切换到对应子分类，
         与站点筛选面板的「按类型」行为完全一致。
+        短剧等无 剧情/地区/年份 的分类，「类型」组仍要生成（站点面板如此）。
         """
         cfg = FILTER_DB.get(top_tid, {})
-        if not cfg:
-            return []
-
         groups = []
+
+        # 「类型」组 = 子分类（动作片/喜剧片… 或 短剧大全/AI漫剧）
+        if subs:
+            groups.append({
+                "key": "sub",
+                "name": "类型",
+                "value": [{"n": "全部", "v": ""}] +
+                         [{"n": n, "v": "sub:%s" % sid} for n, sid in subs],
+            })
+
+        # 该分类没有 剧情/地区/年份 面板时（如短剧），到此为止
+        if not cfg:
+            return groups
 
         def _grp(key, label, values):
             return {
@@ -422,15 +428,6 @@ class Spider(Spider):
                 # 第一项固定「全部」，值传空串表示不筛选
                 "value": [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in values],
             }
-
-        # 「类型」组 = 子分类（动作片/喜剧片…），值用专门前缀区分子分类
-        if subs:
-            groups.append({
-                "key": "sub",
-                "name": "类型",
-                "value": [{"n": "全部", "v": ""}] +
-                         [{"n": n, "v": "sub:%s" % sid} for n, sid in subs],
-            })
 
         groups.append(_grp("class", "剧情", cfg.get("class", [])))
         groups.append(_grp("area", "地区", cfg.get("area", [])))
@@ -932,12 +929,13 @@ class Spider(Spider):
             </ul>
           </div>
 
-        注意：面板里 <h3> 的线路名与 URL 中的 sid 并不对应！
-              线路1 的剧集链接是 /3/1.html（sid=3），线路2 才是 /1/1.html。
-              站点播放页把 sid=1 那条标了 class="active"（= 默认线路），
-              详情页「立即播放」也指向 /1/1.html，
-              所以真实播放顺序 = sid 升序，而不是 <h3> 文字顺序。
-              这里从每个面板第一个剧集链接里读出 sid，按 sid 排序。
+        注意：线路顺序【完全按页面 DOM 顺序】输出，不做任何排序！
+              实测《伟大的长征》(z3133109) 详情页面板顺序为：
+                线路1(sid=6) → 线路2(sid=2) → 线路3(sid=3)
+                → 线路4(sid=1) → 线路6(sid=4) → 线路5(sid=5)
+              既不是按名字排，也不是按 sid 排 —— 站点网页显示什么顺序，
+              我们就原样输出什么顺序，这样 TVBox 里看到的线路列表才和网站一致。
+              （「立即播放」按钮指向 sid=1 只是站点的默认播放链接，与显示顺序无关）
         """
         groups = []
 
@@ -954,27 +952,20 @@ class Spider(Spider):
                 line_name = "线路%d" % (len(groups) + 1)
 
             eps = []
-            sid = 0
-            for a in re.finditer(r'<a href="(/vodview/z(\d+)/(\d+)/(\d+)\.html)">(.*?)</a>',
-                                 body, re.S):
+            for a in re.finditer(r'<a href="(/vodview/z\d+/\d+/\d+\.html)">(.*?)</a>', body, re.S):
                 href = a.group(1)
-                if not sid:
-                    # 取该面板首集的 sid 作为排序依据
-                    sid = int(a.group(3)) if a.group(3).isdigit() else 0
-                ep_name = _norm_ep_name(a.group(5))
+                ep_name = _norm_ep_name(a.group(2))
                 if not ep_name:
                     ep_name = "第%d集" % (len(eps) + 1)
                 eps.append("%s$%s" % (ep_name, _join_host(href)))
 
             if eps:
-                groups.append({"name": line_name, "sid": sid, "eps": eps, "idx": len(groups)})
+                groups.append({"name": line_name, "eps": eps})
 
         if not groups:
             return [], []
 
-        # 按 sid 升序 = 站点真实播放顺序（sid 相同时退回 DOM 顺序）
-        groups.sort(key=lambda x: (x["sid"] if x["sid"] else 99, x["idx"]))
-
+        # 不排序 —— 保持页面原始顺序
         lines = [g["name"] for g in groups]
         episodes = ["#".join(g["eps"]) for g in groups]
         return lines, episodes
