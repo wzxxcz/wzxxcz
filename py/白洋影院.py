@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-森林影院 m.zbtiehong.com | TVBox Python 爬虫 
+森林影院 m.zbtiehong.com | TVBox Python 爬虫 (V1.0)
 
 关键:
   - 站点为苹果CMS(maccms) + hl048/stui 模板，与 ewave 主题的解析规则完全不同
@@ -8,6 +8,7 @@
   - 播放数据内联 var player_aaaa={...}，encrypt=0，url 即直链 m3u8，无需二次解析
   - 线路按详情页面板原始顺序输出（本模板为 线路1/线路2/线路4/线路5/线路6，注意跳过线路3）
   - 剧集名需剔除 $ 和 #（TVBox 协议分隔符），否则播放列表会错位
+  - 简介统一添加 INTRO_PREFIX 前缀
   - 源站被 Cloudflare 前置，520 抖动极频繁，需带退避重试 + Session 保活
   - 兼容无副标题、无封面（/static/images/load.png 占位）、无演员的卡片
 """
@@ -370,18 +371,16 @@ class Spider(Spider):
     def homeContent(self, filter):
         result = {"class": [], "filters": {}}
 
-        # 分类：一级 + 二级全部平铺（TVBox 首页会渲染成一排按钮）
+        # 分类：只放 5 个一级分类，与站点顶部导航一致；
+        # 子分类（动作片/喜剧片…）通过筛选面板里的「类型」进入，不平铺
         for name, tid, subs in CATEGORY_TREE:
             result["class"].append({"type_id": tid, "type_name": name})
-            for sub_name, sub_id in subs:
-                result["class"].append({"type_id": sub_id, "type_name": sub_name})
 
-        # 筛选：二级分类沿用其父级的筛选面板（站点就是这么联动的）
+        # 筛选：一级分类挂自己的面板；面板第一组「剧情」里带上子分类，
+        # 选中即等价于切到该子分类（与站点筛选面板行为一致）
         if filter:
             for name, tid, subs in CATEGORY_TREE:
-                result["filters"][tid] = self._build_filter(tid)
-                for sub_name, sub_id in subs:
-                    result["filters"][sub_id] = self._build_filter(tid)
+                result["filters"][tid] = self._build_filter(tid, subs)
 
         videos = []
         try:
@@ -400,8 +399,13 @@ class Spider(Spider):
         result["list"] = videos
         return result
 
-    def _build_filter(self, top_tid):
-        """按父级 ID 生成筛选组；短剧等无筛选的分类直接返回空列表"""
+    def _build_filter(self, top_tid, subs=None):
+        """
+        生成筛选组；短剧等无筛选的分类直接返回空列表。
+        subs 为该分类的子分类列表 —— 作为「类型」组放在最前面，
+        选中后 categoryContent 会通过 flt["sub"] 切换到对应子分类，
+        与站点筛选面板的「按类型」行为完全一致。
+        """
         cfg = FILTER_DB.get(top_tid, {})
         if not cfg:
             return []
@@ -415,6 +419,15 @@ class Spider(Spider):
                 # 第一项固定「全部」，值传空串表示不筛选
                 "value": [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in values],
             }
+
+        # 「类型」组 = 子分类（动作片/喜剧片…），值用专门前缀区分子分类
+        if subs:
+            groups.append({
+                "key": "sub",
+                "name": "类型",
+                "value": [{"n": "全部", "v": ""}] +
+                         [{"n": n, "v": "sub:%s" % sid} for n, sid in subs],
+            })
 
         groups.append(_grp("class", "剧情", cfg.get("class", [])))
         groups.append(_grp("area", "地区", cfg.get("area", [])))
@@ -501,6 +514,13 @@ class Spider(Spider):
         tid = str(tid or "1")
         page = int(pg) if str(pg).isdigit() else 1
         extend = extend or {}
+
+        # 「类型」筛选值形如 "sub:13"，表示切到子分类；与其它筛选可叠加
+        sub = str(extend.get("sub", "") or "")
+        if sub.startswith("sub:"):
+            extend["sub"] = sub[4:]
+        elif "sub" in extend:
+            extend.pop("sub")
 
         url = self._build_category_url(tid, page, extend)
 
