@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-森林影院 m.zbtiehong.com | TVBox Python 爬虫 (V1.0)
+森林影院 m.zbtiehong.com | TVBox Python 爬虫 
 
 关键:
   - 站点为苹果CMS(maccms) + hl048/stui 模板，与 ewave 主题的解析规则完全不同
@@ -8,7 +8,6 @@
   - 播放数据内联 var player_aaaa={...}，encrypt=0，url 即直链 m3u8，无需二次解析
   - 线路按详情页面板原始顺序输出（本模板为 线路1/线路2/线路4/线路5/线路6，注意跳过线路3）
   - 剧集名需剔除 $ 和 #（TVBox 协议分隔符），否则播放列表会错位
-  - 简介统一添加 INTRO_PREFIX 前缀
   - 源站被 Cloudflare 前置，520 抖动极频繁，需带退避重试 + Session 保活
   - 兼容无副标题、无封面（/static/images/load.png 占位）、无演员的卡片
 """
@@ -59,20 +58,24 @@ DETAIL_CACHE_TTL = 600    # 详情缓存 10 分钟
 MAX_RETRY = 3
 MAX_RETRY_HARD = 25       # 连续失败后的激进重试（仅播放页使用）
 
-# 线路优先级：数字越小越靠前
-# 本模板线路名直接是「线路N」，按数字自然序即可；保留映射表便于日后改名
-LINE_PRIORITY = {
-    "线路1": 1,
-    "线路2": 2,
-    "线路3": 3,
-    "线路4": 4,
-    "线路5": 5,
-    "线路6": 6,
-    "线路7": 7,
-    "线路8": 8,
-    "线路9": 9,
-    "线路10": 10,
-}
+# 线路播放顺序 —— 按 sid（URL 里的 /vodview/z{id}/{sid}/{nid}.html）升序排列
+#
+# 【重要】站点面板上写的是「线路1/线路2/线路4/线路5/线路6」，
+#         但这几个名字的顺序【不等于】实际播放顺序，千万不要按名字排序：
+#
+#           面板文字   sid   URL
+#           线路1       3    /vodview/z3754249/3/1.html   ← 名字最小，却排在最后
+#           线路2       1    /vodview/z3754249/1/1.html   ← 站点默认高亮这条
+#           线路4       2    /vodview/z3754249/2/1.html
+#           线路5       4    /vodview/z3754249/4/1.html
+#           线路6       5    /vodview/z3754249/5/1.html
+#
+#         站点播放页只给「线路2」(sid=1) 加了 class="active"，也就是默认线路；
+#         详情页「立即播放」按钮同样指向 /1/1.html。故真实顺序 = sid 升序：
+#           sid 1 → sid 2 → sid 3 → sid 4 → sid 5
+#         即：线路2 → 线路4 → 线路1 → 线路5 → 线路6
+#
+# 若日后站点改动，此处无需维护，_parse_playlist 会直接从链接里读 sid 排序。
 
 # 双 UA：移动端 UA 命中率最高；iPad UA 在播放页被墙时作为备选
 MOBILE_UA = (
@@ -929,9 +932,12 @@ class Spider(Spider):
             </ul>
           </div>
 
-        注意：面板里 <h3> 的线路名和 URL 中的 sid 并不对应！
+        注意：面板里 <h3> 的线路名与 URL 中的 sid 并不对应！
               线路1 的剧集链接是 /3/1.html（sid=3），线路2 才是 /1/1.html。
-              所以必须以面板顺序 + 面板内 <h3> 为准，不能拿 sid 反推线路号。
+              站点播放页把 sid=1 那条标了 class="active"（= 默认线路），
+              详情页「立即播放」也指向 /1/1.html，
+              所以真实播放顺序 = sid 升序，而不是 <h3> 文字顺序。
+              这里从每个面板第一个剧集链接里读出 sid，按 sid 排序。
         """
         groups = []
 
@@ -948,21 +954,26 @@ class Spider(Spider):
                 line_name = "线路%d" % (len(groups) + 1)
 
             eps = []
-            for a in re.finditer(r'<a href="(/vodview/z\d+/\d+/\d+\.html)">(.*?)</a>', body, re.S):
+            sid = 0
+            for a in re.finditer(r'<a href="(/vodview/z(\d+)/(\d+)/(\d+)\.html)">(.*?)</a>',
+                                 body, re.S):
                 href = a.group(1)
-                ep_name = _norm_ep_name(a.group(2))
+                if not sid:
+                    # 取该面板首集的 sid 作为排序依据
+                    sid = int(a.group(3)) if a.group(3).isdigit() else 0
+                ep_name = _norm_ep_name(a.group(5))
                 if not ep_name:
                     ep_name = "第%d集" % (len(eps) + 1)
                 eps.append("%s$%s" % (ep_name, _join_host(href)))
 
             if eps:
-                groups.append({"name": line_name, "eps": eps})
+                groups.append({"name": line_name, "sid": sid, "eps": eps, "idx": len(groups)})
 
         if not groups:
             return [], []
 
-        # 按线路优先级排序，保证播放器默认落在「线路1」
-        groups.sort(key=lambda x: (LINE_PRIORITY.get(x["name"], 99), x["name"]))
+        # 按 sid 升序 = 站点真实播放顺序（sid 相同时退回 DOM 顺序）
+        groups.sort(key=lambda x: (x["sid"] if x["sid"] else 99, x["idx"]))
 
         lines = [g["name"] for g in groups]
         episodes = ["#".join(g["eps"]) for g in groups]
