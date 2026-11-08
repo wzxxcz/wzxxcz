@@ -70,12 +70,6 @@
             "url": "https://0701.tv1288.xyz/m3u"
         },
         {
-            "name": "山东电信",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://eastscreen.tv/iptvlist.php?token=LlNDBR0AAwweAwkOVFNLAwkGBgAI"
-        },
-        {
             "name": "Supprise0901",
             "type": 0,
             "ua": "okhttp/5.3.2",
