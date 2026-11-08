@@ -97,7 +97,7 @@
             "name": "卡卡西IPTV",
             "type": 0,
             "ua": "okhttp/5.3.2",
-            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/kakaxi-1/IPTV/refs/heads/main/ipv4.txt"
+            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/kakaxi-1/zubo/refs/heads/main/itvlist.txt"
         },
         {
             "name": "港澳台",
