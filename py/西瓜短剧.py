@@ -110,8 +110,8 @@ class Spider(_BaseSpider):
             if not self.cache_cats:
                 self.loadCategories()
             classes = [
-                {"type_id": self.TID_NEW, "type_name": "🔥 最新更新"},
-                {"type_id": self.TID_RANK_WEEK, "type_name": "📊 本周热播榜"},
+                {"type_id": self.TID_NEW, "type_name": "最新更新"},
+                {"type_id": self.TID_RANK_WEEK, "type_name": "本周热播榜"},
             ]
             classes.extend(self.cache_cats)
             result["class"] = classes
