@@ -1502,6 +1502,12 @@
             "filterable": 1
         },
         {
+            "key": "星辰影视1",
+            "name": "🌠星辰影视1",
+            "type": 3,
+            "api": "csp_XingChen"
+        },
+        {
             "key": "柠檬",
             "name": "🍋柠檬影院",
             "type": 3,
