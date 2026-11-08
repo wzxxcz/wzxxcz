@@ -28,6 +28,12 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/pyapk/1/refs/heads/main/zby"
         },
         {
+            "name": "裤佬IPTV直播1",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "https://iptv.445569.xyz/live.m3u"
+        },
+        {
             "name": "裤佬体育直播",
             "type": 0,
             "ua": "okhttp/5.3.2",
