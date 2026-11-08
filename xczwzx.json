@@ -11085,13 +11085,6 @@
             "ext": "http://99cms.jj99.icu:8199/api.php/app/"
         },
         {
-            "key": "面包影视",
-            "name": "🍞面包影视",
-            "type": 3,
-            "api": "csp_XBPQ",
-            "ext": "./XBPQ/面包影视.json"
-        },
-        {
             "key": "VIP",
             "name": "🧿VIP影视",
             "type": 3,
