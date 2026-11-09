@@ -118,6 +118,7 @@ _RE_CARD_MIN = re.compile(
 
 _RE_PAGE_TAIL = re.compile(r'尾页[^>]*href="[^"]*?page=(\d+)', re.I)
 _RE_PAGE_NUMS = re.compile(r'page=(\d+)', re.I)
+_RE_PAGE_HTML = re.compile(r'/all/\d+-(\d+)\.html', re.I)
 
 # 详情页 og 元信息
 _RE_OG = re.compile(
@@ -252,9 +253,16 @@ class Spider(Spider):
             })
         return videos
 
-    def _page_count(self, html):
+    def _page_count(self, html, is_static=False):
         if not html:
             return 1
+        
+        if is_static:
+            m = _RE_PAGE_HTML.findall(html)
+            if m:
+                return max(int(x) for x in m)
+            return 1
+
         m = _RE_PAGE_TAIL.search(html)
         if m:
             try:
@@ -282,29 +290,41 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        real_tid = extend.get("tid") or tid
-        params = {
-            "searchtype": "5",
-            "tid": real_tid,
-            "page": page,
-        }
-        if extend.get("area"):
-            params["area"] = extend["area"]
-        if extend.get("year"):
-            params["year"] = extend["year"]
-        if extend.get("order"):
-            params["order"] = extend["order"]
+        # 检查是否有筛选条件
+        has_filter = any(extend.get(k) for k in ("area", "year", "order", "tid"))
 
-        url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
-        self.log("category: %s" % url)
-        html = self._fetch(url)
-        if _RE_LIMIT.search(html):
-            self.log("  命中限流提示页")
-            return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
+        if has_filter:
+            # 走搜索筛选通道
+            real_tid = extend.get("tid") or tid
+            params = {
+                "searchtype": "5",
+                "tid": real_tid,
+                "page": page,
+            }
+            if extend.get("area"): params["area"] = extend["area"]
+            if extend.get("year"): params["year"] = extend["year"]
+            if extend.get("order"): params["order"] = extend["order"]
+            
+            url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
+            self.log("category (filter): %s" % url)
+            html = self._fetch(url)
+            if _RE_LIMIT.search(html):
+                self.log("  命中限流提示页")
+                return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
+            pagecount = self._page_count(html, is_static=False)
+        else:
+            # 走静态分类通道
+            if page <= 1:
+                url = "%s/all/%s.html" % (self.site_url, tid)
+            else:
+                url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
+            self.log("category (static): %s" % url)
+            html = self._fetch(url)
+            pagecount = self._page_count(html, is_static=True)
 
         videos = self._extract_videos(html)
-        pagecount = self._page_count(html)
         self.log("  videos=%d pagecount=%d" % (len(videos), pagecount))
+        
         return {
             "list": videos, "page": page, "pagecount": pagecount,
             "limit": 24, "total": pagecount * 24,
@@ -419,9 +439,7 @@ class Spider(Spider):
 
         # 线路名：mip-vd-tabs 里第一个 <ul> 的 <li>
         names = [self._clean(x) for x in _RE_TAB_NAME.findall(block)]
-        # 排除掉播放列表 ul 里的 li（那边没有纯 <li>文本</li> 结构，通常带 <a>）
         names = [n for n in names if n]
-        # 去重保序
         seen_n = set()
         names = [n for n in names if not (n in seen_n or seen_n.add(n))]
 
