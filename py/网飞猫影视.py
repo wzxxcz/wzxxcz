@@ -102,14 +102,15 @@ for c in CLASSES:
     ]
 
 # ===================== 正则 =====================
+# 🎯 核心修复：放宽贪婪匹配上限，兼容 text-right 标签
 _RE_CARD = re.compile(
     r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
-    r'[\s\S]{0,400}?<mip-img[^>]*?src="([^"]*)"'
-    r'[\s\S]{0,200}?<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>',
+    r'[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"'
+    r'[\s\S]{0,2000}?<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>',
     re.S | re.I)
 
 _RE_CARD_ULT = re.compile(
-    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,500}?<mip-img[^>]*?src="([^"]*)"',
+    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"',
     re.S | re.I)
 
 _RE_CARD_MIN = re.compile(
@@ -287,16 +288,10 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        static_url = "%s/all/%s.html" % (self.site_url, tid)
-        if page > 1:
-            static_url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
-            
-        self.log("category (static): %s" % static_url)
-        html = self._fetch(static_url)
-        videos = self._extract_videos(html)
+        # 🎯 策略调整：只要有参数或大类 ID，通通强推 search.php
+        has_filter = any(extend.get(k) for k in ("area", "year", "order", "tid"))
         
-        if not videos:
-            self.log("  static empty, trying search.php fallback...")
+        if has_filter or tid in ["1", "2", "3", "4"]:
             real_tid = extend.get("tid") or tid
             if real_tid == "2": real_tid = "13"
             elif real_tid == "1": real_tid = "5"
@@ -314,16 +309,25 @@ class Spider(Spider):
             
             search_url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
             self.log("category (search): %s" % search_url)
-            html2 = self._fetch(search_url)
+            html = self._fetch(search_url)
+        else:
+            # 纯子类且无筛选走静态
+            static_url = "%s/all/%s.html" % (self.site_url, tid)
+            if page > 1:
+                static_url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
+            self.log("category (static): %s" % static_url)
+            html = self._fetch(static_url)
             
-            if _RE_LIMIT.search(html2):
-                self.log("  命中限流提示页")
-                return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
-                
-            videos = self._extract_videos(html2)
-            if videos:
-                html = html2
+            # 兜底
+            if not self._extract_videos(html):
+                search_url = "%s/search.php?searchtype=5&tid=%s&page=%d" % (self.site_url, tid, page)
+                html = self._fetch(search_url)
 
+        if _RE_LIMIT.search(html):
+            self.log("  命中限流提示页")
+            return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
+
+        videos = self._extract_videos(html)
         pagecount = self._page_count(html)
         self.log("  videos=%d pagecount=%d" % (len(videos), pagecount))
 
