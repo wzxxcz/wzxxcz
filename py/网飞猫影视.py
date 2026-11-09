@@ -299,23 +299,13 @@ class Spider(Spider):
         elif req_tid == "3": req_tid = "30"
         elif req_tid == "4": req_tid = "34"
 
-        # 终极绝杀：完全模仿网页发出的完整 URL 格式
-        params = {
-            "page": page,
-            "searchtype": "5",
-            "order": extend.get("order") or "time",
-            "tid": req_tid,
-            "area": extend.get("area") or "",
-            "year": extend.get("year") or "2026",
-            "letter": "",
-            "yuyan": "",
-            "state": "",
-            "money": "",
-            "ver": "",
-            "jq": ""
-        }
-        
-        url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
+        # 终极绝杀：纯静态 URL 直连网页！
+        # 因为网页正常点“电视剧”就是跳转的 /all/2.html
+        # 网页点“国产剧”就是 /all/13.html
+        url = "%s/all/%s.html" % (self.site_url, req_tid)
+        if page > 1:
+            url = "%s/all/%s-%d.html" % (self.site_url, req_tid, page)
+            
         self.log("category: %s" % url)
         html = self._fetch(url)
 
