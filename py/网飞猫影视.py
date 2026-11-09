@@ -109,7 +109,7 @@ _RE_CARD = re.compile(
     re.S | re.I)
 
 _RE_CARD_ULT = re.compile(
-    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<(?:mip-)?img[^>]*?src="([^"]*)"',
+    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"',
     re.S | re.I)
 
 _RE_CARD_MIN = re.compile(
@@ -293,29 +293,12 @@ class Spider(Spider):
 
         req_tid = extend.get("tid") or tid
         
-        # 大类映射
-        if req_tid == "2": req_tid = "13"
-        elif req_tid == "1": req_tid = "5"
-        elif req_tid == "3": req_tid = "30"
-        elif req_tid == "4": req_tid = "34"
+        # 大类直接映射到原始大类，子类原样保留
+        # 网页的分类都是静态的 /all/xx.html
+        url = "%s/all/%s.html" % (self.site_url, req_tid)
+        if page > 1:
+            url = "%s/all/%s-%d.html" % (self.site_url, req_tid, page)
 
-        # 核心修复：使用规范的 urlencode，同时拼上网页里多如牛毛的隐藏空参数
-        params = {
-            "page": page,
-            "searchtype": "5",
-            "order": extend.get("order") or "time",
-            "tid": req_tid,
-            "area": extend.get("area") or "",
-            "year": extend.get("year") or "2026",
-            "letter": "",
-            "yuyan": "",
-            "state": "",
-            "money": "",
-            "ver": "",
-            "jq": ""
-        }
-        
-        url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
         self.log("category: %s" % url)
         html = self._fetch(url)
 
