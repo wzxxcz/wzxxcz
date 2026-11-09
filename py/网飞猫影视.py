@@ -293,14 +293,13 @@ class Spider(Spider):
 
         req_tid = extend.get("tid") or tid
         
-        # 强制大类映射
+        # 大类映射
         if req_tid == "2": req_tid = "13"
         elif req_tid == "1": req_tid = "5"
         elif req_tid == "3": req_tid = "30"
         elif req_tid == "4": req_tid = "34"
 
-        # 🎯 终极杀招：直接复刻网页的完整 URL 格式！
-        # 网页格式: search.php?page=1&searchtype=5&order=time&tid=13&area=&year=2026&letter=&yuyan=&state=&money=&ver=&jq=
+        # 核心修复：网页的 search.php 需要强制带上所有空参数才能出数据
         params = {
             "page": page,
             "searchtype": "5",
