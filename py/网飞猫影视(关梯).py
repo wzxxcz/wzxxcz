@@ -2,7 +2,7 @@
 """
 网飞猫影视 allurespabeauty.com | TVBox Python 爬虫
 基于实测 页面源码逆向：
-  - 分类/筛选：/search.php?searchtype=5&tid=...&page=N
+  - 分类/筛选：/all/{tid}.html 与 /search.php?searchtype=5&tid=...&page=N
   - 详情：/uty/{id}.html，剧集在两个 ul.stui-content__playlist，线路名在前置 <li>
   - 播放：/play/{id}-{line}-{ep}.html，m3u8 明文藏在 mip-iframe 的 url= 参数
   - 搜索限流 10 秒一次，命中提示页返回空列表
@@ -63,7 +63,6 @@ DEFAULT_PIC = HOST + "/pic/nopic.gif"
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
 # ===================== 分类 =====================
-# 只暴露 4 个顶层分类，子分类通过筛选的 class 参数进入
 CLASSES = [
     {"type_id": "2", "type_name": "电视剧"},
     {"type_id": "1", "type_name": "电影"},
@@ -71,7 +70,6 @@ CLASSES = [
     {"type_id": "4", "type_name": "动漫"},
 ]
 
-# 每个顶层分类下的子分类 tid -> 名称（来自首页"更多"里的小类链接）
 _SUB_CLASS = {
     "2": [("13", "国产剧"), ("14", "香港剧"), ("15", "台湾剧"), ("16", "欧美剧"),
           ("25", "韩国剧"), ("26", "日本剧"), ("27", "泰国剧"), ("28", "海外剧"),
@@ -104,19 +102,18 @@ for c in CLASSES:
     ]
 
 # ===================== 正则 =====================
-# 列表卡片：<a class="stui-vodlist__thumb" href="/uty/123.html" title="xxx"> ... <mip-img ... src="pic"> ... <span class="pic-text...">副标题</span>
+# 列表卡片：匹配更宽松，兼容所有 alt 和 text-right
 _RE_CARD = re.compile(
     r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
     r'[\s\S]{0,400}?<mip-img[^>]*?src="([^"]*)"'
     r'[\s\S]{0,200}?<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>',
     re.S | re.I)
 
-# 终极暴力兜底：无视任何结构，只要抓到 href 和图片就算赢
+# 终极兜底：只要带链接和图，无视标签
 _RE_CARD_ULT = re.compile(
     r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,500}?<mip-img[^>]*?src="([^"]*)"',
     re.S | re.I)
 
-# 兜底：只有 href + title，没有图/副标题
 _RE_CARD_MIN = re.compile(
     r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"',
     re.I)
@@ -132,7 +129,7 @@ _RE_DESC_DIV = re.compile(
     r'<div[^>]*class="stui-content__desc"[^>]*>([\s\S]*?)</div>', re.I)
 _RE_PIC = re.compile(r'<mip-img[^>]*?src="([^"]+)"', re.I)
 
-# 剧集列表：两个 <ul class="stui-content__playlist ...">，每项 <li ...><a title="第xx集" href="/play/...">..</a></li>
+# 剧集列表
 _RE_TABS_BLOCK = re.compile(
     r'<mip-vd-tabs[\s\S]*?</mip-vd-tabs>', re.I)
 _RE_TAB_NAME = re.compile(r'<li>([^<]+)</li>', re.I)
@@ -141,7 +138,7 @@ _RE_PLAYLIST_UL = re.compile(
 _RE_EP_A = re.compile(
     r'<a[^>]*title="([^"]*)"[^>]*href="(/play/[^"]+\.html)"', re.I)
 
-# 播放页：mip-iframe src="/js/player/...?url=<真实m3u8>"
+# 播放页
 _RE_IFRAME_URL = re.compile(
     r'<mip-iframe[^>]*?src="([^"]+)"', re.I)
 _RE_URL_PARAM = re.compile(r'[?&]url=([^&"\']+)', re.I)
@@ -213,9 +210,7 @@ class Spider(Spider):
         s = (s.replace("&nbsp;", " ").replace("\xa0", " ")
               .replace("&amp;", "&").replace("&quot;", '"')
               .replace("&#39;", "'").replace("&lt;", "<").replace("&gt;", ">"))
-        # 去掉零宽字符
         s = re.sub(r"[\u200b-\u200f\u2028-\u202f\ufeff]", "", s)
-        # 去掉简介里的 @xxx@ 广告词
         s = re.sub(r"@[^@\s]{0,30}@", "", s)
         s = re.sub(r"[ \t\r\f\v]+", " ", s)
         s = re.sub(r"\n{2,}", "\n", s)
@@ -230,8 +225,7 @@ class Spider(Spider):
 
         for m in _RE_CARD.finditer(html):
             href, title, pic, remark = m.group(1), m.group(2), m.group(3), m.group(4)
-            if href in seen:
-                continue
+            if href in seen: continue
             seen.add(href)
             videos.append({
                 "vod_id": href,
@@ -243,11 +237,9 @@ class Spider(Spider):
         if videos:
             return videos
 
-        # 第一重兜底：暴力匹配
         for m in _RE_CARD_ULT.finditer(html):
             href, title, pic = m.group(1), m.group(2), m.group(3)
-            if href in seen:
-                continue
+            if href in seen: continue
             seen.add(href)
             videos.append({
                 "vod_id": href,
@@ -255,15 +247,13 @@ class Spider(Spider):
                 "vod_pic": self._fix_url(pic) or self.default_pic,
                 "vod_remarks": "",
             })
-            
+
         if videos:
             return videos
 
-        # 第二重兜底：只要名字和链接
         for m in _RE_CARD_MIN.finditer(html):
             href, title = m.group(1), m.group(2)
-            if href in seen:
-                continue
+            if href in seen: continue
             seen.add(href)
             videos.append({
                 "vod_id": href,
@@ -303,35 +293,48 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        real_tid = extend.get("tid") or tid
-        
-        # 核心防拦截机制：大类映射 + 年份强塞
-        if real_tid == "2": real_tid = "13"
-        elif real_tid == "1": real_tid = "5"
-        elif real_tid == "3": real_tid = "30"
-        elif real_tid == "4": real_tid = "34"
-
-        params = {
-            "searchtype": "5",
-            "tid": real_tid,
-            "page": page,
-            "year": extend.get("year") or "2026"
-        }
-        if extend.get("area"): params["area"] = extend["area"]
-        if extend.get("order"): params["order"] = extend["order"]
-        
-        url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
-        self.log("category: %s" % url)
-        html = self._fetch(url)
-        
-        if _RE_LIMIT.search(html):
-            self.log("  命中限流提示页")
-            return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
-
+        # 1. 优先尝试静态页面（/all/2.html）
+        static_url = "%s/all/%s.html" % (self.site_url, tid)
+        if page > 1:
+            static_url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
+            
+        self.log("category (static): %s" % static_url)
+        html = self._fetch(static_url)
         videos = self._extract_videos(html)
+        
+        # 2. 如果静态页面没抓到数据，启用 search.php 接口兜底
+        if not videos:
+            self.log("  static empty, trying search.php fallback...")
+            real_tid = extend.get("tid") or tid
+            if real_tid == "2": real_tid = "13"
+            elif real_tid == "1": real_tid = "5"
+            elif real_tid == "3": real_tid = "30"
+            elif real_tid == "4": real_tid = "34"
+
+            params = {
+                "searchtype": "5",
+                "tid": real_tid,
+                "page": page,
+                "year": extend.get("year") or "2026"
+            }
+            if extend.get("area"): params["area"] = extend["area"]
+            if extend.get("order"): params["order"] = extend["order"]
+            
+            search_url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
+            self.log("category (search): %s" % search_url)
+            html2 = self._fetch(search_url)
+            
+            if _RE_LIMIT.search(html2):
+                self.log("  命中限流提示页")
+                return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
+                
+            videos = self._extract_videos(html2)
+            if videos:
+                html = html2  # 如果 search 成功，用 search 的 html 算页数
+
         pagecount = self._page_count(html)
         self.log("  videos=%d pagecount=%d" % (len(videos), pagecount))
-        
+
         return {
             "list": videos, "page": page, "pagecount": pagecount,
             "limit": 24, "total": pagecount * 24,
@@ -339,12 +342,9 @@ class Spider(Spider):
 
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
-
-        # 限流保护：同一进程内 10 秒只搜一次
         now = time.time()
         wait = 10 - (now - self._last_search)
-        if wait > 0:
-            time.sleep(wait)
+        if wait > 0: time.sleep(wait)
         self._last_search = time.time()
 
         keyword = urllib.parse.quote(key)
@@ -368,18 +368,14 @@ class Spider(Spider):
 
     # ---------- 详情 ----------
     def detailContent(self, ids):
-        if not ids:
-            return {"list": []}
+        if not ids: return {"list": []}
         vod_id = str(ids[0])
         url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
         self.log("detail: %s" % url)
 
         html = self._fetch(url)
-        self.log("  HTML len=%d" % len(html))
-        if not html:
-            return {"list": []}
+        if not html: return {"list": []}
 
-        # og 元信息
         og = {}
         for m in _RE_OG.finditer(html):
             og[m.group(1).lower()] = self._clean(m.group(2))
@@ -387,15 +383,13 @@ class Spider(Spider):
         name = og.get("title") or ""
         if not name:
             m = _RE_TITLE_H1.search(html)
-            if m:
-                name = self._clean(m.group(1))
+            if m: name = self._clean(m.group(1))
         name = re.sub(r"\s*\(\d{4}\)\s*$", "", name).strip() or vod_id
 
         pic = og.get("image") or ""
         if not pic:
             m = _RE_PIC.search(html)
-            if m:
-                pic = m.group(1)
+            if m: pic = m.group(1)
         pic = self._fix_url(pic) or self.default_pic
 
         director = og.get("video:director", "")
@@ -403,23 +397,16 @@ class Spider(Spider):
         vclass = og.get("video:class", "")
         varea = og.get("video:area", "")
 
-        # 简介：优先 stui-content__desc，再退 og:description / meta description
         content = ""
         m = _RE_DESC_DIV.search(html)
-        if m:
-            content = self._clean(m.group(1))
-        if not content:
-            content = og.get("description", "")
+        if m: content = self._clean(m.group(1))
+        if not content: content = og.get("description", "")
         if not content:
             m = re.search(r'<meta[^>]*name="description"[^>]*content="([^"]*)"', html, re.I)
-            if m:
-                content = self._clean(m.group(1))
+            if m: content = self._clean(m.group(1))
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
-        # 剧集：解析 mip-vd-tabs
         play_from, play_url = self._parse_playlists(html)
-        self.log("  lines=%s" % play_from)
-
         remarks = "%d条线路" % len(play_from) if play_from else ""
 
         return {"list": [{
@@ -438,13 +425,11 @@ class Spider(Spider):
 
     def _parse_playlists(self, html):
         play_from, play_url = [], []
-        if not html:
-            return play_from, play_url
+        if not html: return play_from, play_url
 
         block_m = _RE_TABS_BLOCK.search(html)
         block = block_m.group(0) if block_m else html
 
-        # 线路名：mip-vd-tabs 里第一个 <ul> 的 <li>
         names = [self._clean(x) for x in _RE_TAB_NAME.findall(block)]
         names = [n for n in names if n]
         seen_n = set()
@@ -456,13 +441,10 @@ class Spider(Spider):
             for m in _RE_EP_A.finditer(ul_html):
                 ep_name = self._clean(m.group(1))
                 href = m.group(2).replace("&amp;", "&")
-                if href.startswith("/"):
-                    href = self.site_url + href
-                if not ep_name:
-                    ep_name = "第%02d集" % (len(eps) + 1)
+                if href.startswith("/"): href = self.site_url + href
+                if not ep_name: ep_name = "第%02d集" % (len(eps) + 1)
                 eps.append((ep_name, href))
-            if not eps:
-                continue
+            if not eps: continue
             line_name = names[idx] if idx < len(names) else ("线路%d" % (idx + 1))
             play_from.append(line_name)
             play_url.append("#".join("%s$%s" % (n, h) for n, h in eps))
@@ -471,78 +453,48 @@ class Spider(Spider):
     # ---------- 播放 ----------
     def playerContent(self, flag, id, vipFlags):
         play_page = id if id.startswith("http") else self._fix_url(id)
-        self.log("player: %s" % play_page)
-
         now = int(time.time())
         if play_page in self._play_cache:
             ts, res = self._play_cache[play_page]
-            if now - ts < 600:
-                return res
+            if now - ts < 600: return res
 
         html = self._fetch(play_page, headers={"Referer": self.site_url + "/"})
         m3u8 = self._extract_m3u8(html)
-        self.log("  m3u8=%s" % (m3u8[:160] if m3u8 else "EMPTY"))
 
         if m3u8:
-            res = {
-                "parse": 0,
-                "playUrl": "",
-                "url": m3u8,
-                "header": {
-                    "User-Agent": UA,
-                    "Referer": self.site_url + "/",
-                },
-            }
+            res = {"parse": 0, "playUrl": "", "url": m3u8, "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
         else:
-            # 兜底：交给 TVBox 嗅探
-            res = {
-                "parse": 1,
-                "playUrl": "",
-                "url": play_page,
-                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
-            }
+            res = {"parse": 1, "playUrl": "", "url": play_page, "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
         self._play_cache[play_page] = (now, res)
         return res
 
     def _extract_m3u8(self, html):
-        if not html:
-            return ""
+        if not html: return ""
         m = _RE_IFRAME_URL.search(html)
-        if not m:
-            return ""
+        if not m: return ""
         iframe_src = m.group(1).replace("&amp;", "&")
         mu = _RE_URL_PARAM.search(iframe_src)
-        if not mu:
-            return ""
+        if not mu: return ""
         real = urllib.parse.unquote(mu.group(1))
-        if real.startswith("//"):
-            real = "https:" + real
+        if real.startswith("//"): real = "https:" + real
         return real if ".m3u8" in real.lower() or real.startswith("http") else ""
 
     # ---------- 杂项 ----------
     def localProxy(self, param):
         try:
             url = ""
-            if isinstance(param, dict):
-                url = param.get("url", "")
+            if isinstance(param, dict): url = param.get("url", "")
             else:
                 for pair in str(param).split("&"):
                     if "=" in pair:
                         k, v = pair.split("=", 1)
-                        if k == "url":
-                            url = v
-            if not url:
-                return [200, "image/jpeg", b"", ""]
+                        if k == "url": url = v
+            if not url: return [200, "image/jpeg", b"", ""]
             url = urllib.parse.unquote(url) if "%" in url else url
             url = self._fix_url(url)
-            rsp = self.fetch(url, headers={
-                "User-Agent": UA, "Referer": self.site_url + "/"}, timeout=15)
-            content = rsp.content
-            ctype = rsp.headers.get("Content-Type", "image/jpeg")
-            if not ctype.startswith("image/"):
-                ctype = "image/jpeg"
-            return [200, ctype, content, ""]
+            rsp = self.fetch(url, headers={"User-Agent": UA, "Referer": self.site_url + "/"}, timeout=15)
+            return [200, rsp.headers.get("Content-Type", "image/jpeg"), rsp.content, ""]
         except Exception:
             return [200, "image/jpeg", b"", ""]
 
