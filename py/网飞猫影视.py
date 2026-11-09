@@ -299,30 +299,24 @@ class Spider(Spider):
         elif req_tid == "3": req_tid = "30"
         elif req_tid == "4": req_tid = "34"
 
-        # 判定是否有真实筛选条件（年份/地区/排序）
-        has_filter = any(extend.get(k) for k in ("area", "year", "order"))
-
-        if has_filter:
-            # 关键修复：网页的 search.php 需要 tid, page, year，而且必须带一个空的 area（即使没选地区），否则必空
-            params = [
-                ("searchtype", "5"),
-                ("tid", req_tid),
-                ("page", str(page)),
-            ]
-            # 把 year 和 order 塞进去
-            params.append(("year", extend.get("year") or "2026"))
-            params.append(("order", extend.get("order") or "time"))
-            
-            # 如果选了地区，就传具体地区；没选就强行传空字符串，顺应网站的“潜规则”
-            params.append(("area", extend.get("area") or ""))
-            
-            url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
-        else:
-            # 没有任何筛选，走纯净的静态页
-            url = "%s/all/%s.html" % (self.site_url, req_tid)
-            if page > 1:
-                url = "%s/all/%s-%d.html" % (self.site_url, req_tid, page)
-
+        # 🎯 终极杀招：直接复刻网页的完整 URL 格式！
+        # 网页格式: search.php?page=1&searchtype=5&order=time&tid=13&area=&year=2026&letter=&yuyan=&state=&money=&ver=&jq=
+        params = {
+            "page": page,
+            "searchtype": "5",
+            "order": extend.get("order") or "time",
+            "tid": req_tid,
+            "area": extend.get("area") or "",
+            "year": extend.get("year") or "2026",
+            "letter": "",
+            "yuyan": "",
+            "state": "",
+            "money": "",
+            "ver": "",
+            "jq": ""
+        }
+        
+        url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
         self.log("category: %s" % url)
         html = self._fetch(url)
 
