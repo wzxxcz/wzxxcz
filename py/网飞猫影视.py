@@ -293,12 +293,29 @@ class Spider(Spider):
 
         req_tid = extend.get("tid") or tid
         
-        # 大类直接映射到原始大类，子类原样保留
-        # 网页的分类都是静态的 /all/xx.html
-        url = "%s/all/%s.html" % (self.site_url, req_tid)
-        if page > 1:
-            url = "%s/all/%s-%d.html" % (self.site_url, req_tid, page)
+        # 大类映射
+        if req_tid == "2": req_tid = "13"
+        elif req_tid == "1": req_tid = "5"
+        elif req_tid == "3": req_tid = "30"
+        elif req_tid == "4": req_tid = "34"
 
+        # 终极绝杀：完全模仿网页发出的完整 URL 格式
+        params = {
+            "page": page,
+            "searchtype": "5",
+            "order": extend.get("order") or "time",
+            "tid": req_tid,
+            "area": extend.get("area") or "",
+            "year": extend.get("year") or "2026",
+            "letter": "",
+            "yuyan": "",
+            "state": "",
+            "money": "",
+            "ver": "",
+            "jq": ""
+        }
+        
+        url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
         self.log("category: %s" % url)
         html = self._fetch(url)
 
