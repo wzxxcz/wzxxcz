@@ -286,40 +286,52 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        # 核心修改：大类直接映射，走 search 接口带 2026 兜底
-        has_filter = any(extend.get(k) for k in ("area", "year", "order", "tid"))
-        
-        if has_filter or tid in ["1", "2", "3", "4"]:
-            real_tid = extend.get("tid") or tid
-            if real_tid == "2": real_tid = "13"
-            elif real_tid == "1": real_tid = "5"
-            elif real_tid == "3": real_tid = "30"
-            elif real_tid == "4": real_tid = "34"
+        # 🎯 核心修复点：清理所有空参数，防止触发接口返回空
+        for k in list(extend.keys()):
+            if extend[k] in ("", None, "全部"):
+                del extend[k]
 
+        req_tid = extend.get("tid") or tid
+        # 大类映射
+        if req_tid == "2": req_tid = "13"
+        elif req_tid == "1": req_tid = "5"
+        elif req_tid == "3": req_tid = "30"
+        elif req_tid == "4": req_tid = "34"
+
+        # 方案 A：有筛选条件，走 search.php
+        has_filter = any(extend.get(k) for k in ("area", "year", "order"))
+        if has_filter:
             params = {
                 "searchtype": "5",
-                "tid": real_tid,
+                "tid": req_tid,
                 "page": page,
-                "year": extend.get("year") or "2026"
             }
+            if extend.get("year"): params["year"] = extend["year"]
             if extend.get("area"): params["area"] = extend["area"]
             if extend.get("order"): params["order"] = extend["order"]
             
-            search_url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
-            self.log("category (search): %s" % search_url)
-            html = self._fetch(search_url)
+            url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
+            self.log("category (search): %s" % url)
+            html = self._fetch(url)
         else:
-            # 纯子类走静态
-            static_url = "%s/all/%s.html" % (self.site_url, tid)
-            if page > 1:
-                static_url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
-            self.log("category (static): %s" % static_url)
-            html = self._fetch(static_url)
-            
-            # 静态兜底
-            if not self._extract_videos(html):
-                search_url = "%s/search.php?searchtype=5&tid=%s&page=%d&year=2026" % (self.site_url, tid, page)
-                html = self._fetch(search_url)
+            # 方案 B：无筛选，先试静态 /all/13.html
+            url = "%s/all/%s.html" % (self.site_url, req_tid)
+            self.log("category (static): %s" % url)
+            html = self._fetch(url)
+            videos = self._extract_videos(html)
+
+            # 如果静态页没数据，马上用 search.php 兜底
+            if not videos:
+                self.log("  static empty, fallback to search...")
+                params = {"searchtype": "5", "tid": req_tid, "page": page}
+                url2 = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
+                html2 = self._fetch(url2)
+                if _RE_LIMIT.search(html2):
+                    self.log("  命中限流提示页")
+                    return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
+                videos2 = self._extract_videos(html2)
+                if videos2:
+                    html = html2
 
         if _RE_LIMIT.search(html):
             self.log("  命中限流提示页")
