@@ -286,28 +286,26 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        # 清理空参数，防止反爬
+        # 清理空参数
         for k in list(extend.keys()):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
 
         req_tid = extend.get("tid") or tid
         
-        # 如果 TVBox 默认传了大类，强行换成子类
+        # 🎯 核心逻辑：如果不传子类，网站会拒答。这里强行映射大类。
         if req_tid == "2": req_tid = "13"
         elif req_tid == "1": req_tid = "5"
         elif req_tid == "3": req_tid = "30"
         elif req_tid == "4": req_tid = "34"
 
-        # 不管有没有筛选，强制走 search.php，并塞入必要的 year 兜底
+        # 强制走 search.php
         params = {
             "searchtype": "5",
             "tid": req_tid,
             "page": page,
+            "year": extend.get("year") or "2026"  # 强塞年份
         }
-        if extend.get("year"): params["year"] = extend["year"]
-        else: params["year"] = "2026"  # 保底年份
-        
         if extend.get("area"): params["area"] = extend["area"]
         if extend.get("order"): params["order"] = extend["order"]
         
