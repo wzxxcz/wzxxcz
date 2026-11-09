@@ -56,8 +56,9 @@ except ImportError:
 
 
 HOST = "https://www.allurespabeauty.com"
-UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+# 🎯 关键破防点：用 iPhone 的手机端 UA 伪装，绕过 PC 端爬虫拦截
+UA = ("Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 "
+      "(KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1")
 DEFAULT_PIC = HOST + "/pic/nopic.gif"
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
@@ -102,19 +103,16 @@ for c in CLASSES:
     ]
 
 # ===================== 正则 =====================
+# 修复：兼容 title 在 href 前后的双向匹配，无视花里胡哨的标签
 _RE_CARD = re.compile(
-    r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
-    r'[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"'
-    r'[\s\S]{0,2000}?<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>',
+    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<(?:mip-)?img[^>]*?src="([^"]*)"',
+    re.S | re.I)
+    
+_RE_CARD_REV = re.compile(
+    r'title="([^"]*)"[^>]*href="(/uty/\d+\.html)"[\s\S]{0,2000}?<(?:mip-)?img[^>]*?src="([^"]*)"',
     re.S | re.I)
 
-_RE_CARD_ULT = re.compile(
-    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"',
-    re.S | re.I)
-
-_RE_CARD_MIN = re.compile(
-    r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"',
-    re.I)
+_RE_REMARK = re.compile(r'<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>', re.I)
 
 _RE_PAGE_TAIL = re.compile(r'尾页[^>]*href="[^"]*?page=(\d+)', re.I)
 _RE_PAGE_NUMS = re.compile(r'page=(\d+)', re.I)
@@ -216,44 +214,40 @@ class Spider(Spider):
         if not html:
             return videos
 
+        # 正序抓
         for m in _RE_CARD.finditer(html):
-            href, title, pic, remark = m.group(1), m.group(2), m.group(3), m.group(4)
-            if href in seen: continue
-            seen.add(href)
-            videos.append({
-                "vod_id": href,
-                "vod_name": self._clean(title)[:100],
-                "vod_pic": self._fix_url(pic) or self.default_pic,
-                "vod_remarks": self._clean(remark),
-            })
-
-        if videos:
-            return videos
-
-        for m in _RE_CARD_ULT.finditer(html):
             href, title, pic = m.group(1), m.group(2), m.group(3)
             if href in seen: continue
             seen.add(href)
+            
+            remark = ""
+            r_m = _RE_REMARK.search(html[m.end():m.end()+2000])
+            if r_m: remark = self._clean(r_m.group(1))
+
             videos.append({
                 "vod_id": href,
                 "vod_name": self._clean(title)[:100],
                 "vod_pic": self._fix_url(pic) or self.default_pic,
-                "vod_remarks": "",
+                "vod_remarks": remark,
             })
 
-        if videos:
-            return videos
-
-        for m in _RE_CARD_MIN.finditer(html):
-            href, title = m.group(1), m.group(2)
+        # 逆序抓（防伪）
+        for m in _RE_CARD_REV.finditer(html):
+            title, href, pic = m.group(1), m.group(2), m.group(3)
             if href in seen: continue
             seen.add(href)
+            
+            remark = ""
+            r_m = _RE_REMARK.search(html[m.end():m.end()+2000])
+            if r_m: remark = self._clean(r_m.group(1))
+
             videos.append({
                 "vod_id": href,
                 "vod_name": self._clean(title)[:100],
-                "vod_pic": self.default_pic,
-                "vod_remarks": "",
+                "vod_pic": self._fix_url(pic) or self.default_pic,
+                "vod_remarks": remark,
             })
+
         return videos
 
     def _page_count(self, html):
@@ -299,13 +293,23 @@ class Spider(Spider):
         elif req_tid == "3": req_tid = "30"
         elif req_tid == "4": req_tid = "34"
 
-        # 终极绝杀：纯静态 URL 直连网页！
-        # 因为网页正常点“电视剧”就是跳转的 /all/2.html
-        # 网页点“国产剧”就是 /all/13.html
-        url = "%s/all/%s.html" % (self.site_url, req_tid)
-        if page > 1:
-            url = "%s/all/%s-%d.html" % (self.site_url, req_tid, page)
-            
+        # 终极绝杀：完全模仿网页发出的完整 URL 格式
+        params = {
+            "page": page,
+            "searchtype": "5",
+            "order": extend.get("order") or "time",
+            "tid": req_tid,
+            "area": extend.get("area") or "",
+            "year": extend.get("year") or "2026",
+            "letter": "",
+            "yuyan": "",
+            "state": "",
+            "money": "",
+            "ver": "",
+            "jq": ""
+        }
+        
+        url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
         self.log("category: %s" % url)
         html = self._fetch(url)
 
