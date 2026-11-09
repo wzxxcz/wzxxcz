@@ -286,21 +286,19 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        # 🎯 核心修复点：清理所有空参数，防止触发接口返回空
+        # 清理所有空参数，防止触发反爬或空数据
         for k in list(extend.keys()):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
 
         req_tid = extend.get("tid") or tid
-        # 大类映射
-        if req_tid == "2": req_tid = "13"
-        elif req_tid == "1": req_tid = "5"
-        elif req_tid == "3": req_tid = "30"
-        elif req_tid == "4": req_tid = "34"
-
-        # 方案 A：有筛选条件，走 search.php
+        
+        # 如果有筛选条件（选了年份、地区等），或者用户直接点了子分类（如13）
+        # 走 search.php
         has_filter = any(extend.get(k) for k in ("area", "year", "order"))
-        if has_filter:
+        is_sub_class = req_tid not in ["1", "2", "3", "4"]
+
+        if has_filter or is_sub_class:
             params = {
                 "searchtype": "5",
                 "tid": req_tid,
@@ -314,23 +312,19 @@ class Spider(Spider):
             self.log("category (search): %s" % url)
             html = self._fetch(url)
         else:
-            # 方案 B：无筛选，先试静态 /all/13.html
+            # 纯大类，且无筛选，走 /all/2.html
             url = "%s/all/%s.html" % (self.site_url, req_tid)
             self.log("category (static): %s" % url)
             html = self._fetch(url)
-            videos = self._extract_videos(html)
-
-            # 如果静态页没数据，马上用 search.php 兜底
-            if not videos:
+            
+            # 兜底：如果大类静态页死活出不来，说明隐藏了，改走 search.php 且强塞 year=2026
+            if not self._extract_videos(html):
                 self.log("  static empty, fallback to search...")
-                params = {"searchtype": "5", "tid": req_tid, "page": page}
-                url2 = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
+                # 网站大类对应的默认子类
+                fallback_tid = "13" if req_tid == "2" else ("5" if req_tid == "1" else ("30" if req_tid == "3" else "34"))
+                url2 = "%s/search.php?searchtype=5&tid=%s&page=%d&year=2026" % (self.site_url, fallback_tid, page)
                 html2 = self._fetch(url2)
-                if _RE_LIMIT.search(html2):
-                    self.log("  命中限流提示页")
-                    return {"list": [], "page": page, "pagecount": 1, "limit": 24, "total": 0}
-                videos2 = self._extract_videos(html2)
-                if videos2:
+                if not _RE_LIMIT.search(html2):
                     html = html2
 
         if _RE_LIMIT.search(html):
