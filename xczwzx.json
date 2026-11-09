@@ -35302,6 +35302,12 @@
             "ext": "./js/Anime1.js"
         },
         {
+            "key": "赏月",
+            "name": "🌙赏月动漫",
+            "type": 3,
+            "api": "csp_AnimeTsukimi"
+        },
+        {
             "key": "稀饭",
             "name": "🍚稀饭动漫",
             "type": 3,
