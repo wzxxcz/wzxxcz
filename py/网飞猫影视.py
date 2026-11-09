@@ -102,14 +102,19 @@ for c in CLASSES:
     ]
 
 # ===================== 正则 =====================
-# 放弃完美的结构，只要能匹配到 href 和 title 就行
 _RE_CARD = re.compile(
     r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
-    r'[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"',
+    r'[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"'
+    r'[\s\S]{0,2000}?<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>',
     re.S | re.I)
 
-# 副标题可能缺失，单独抓
-_RE_REMARK = re.compile(r'<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>', re.I)
+_RE_CARD_ULT = re.compile(
+    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"',
+    re.S | re.I)
+
+_RE_CARD_MIN = re.compile(
+    r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"',
+    re.I)
 
 _RE_PAGE_TAIL = re.compile(r'尾页[^>]*href="[^"]*?page=(\d+)', re.I)
 _RE_PAGE_NUMS = re.compile(r'page=(\d+)', re.I)
@@ -201,7 +206,7 @@ class Spider(Spider):
         s = re.sub(r"@[^@\s]{0,30}@", "", s)
         s = re.sub(r"[ \t\r\f\v]+", " ", s)
         s = re.sub(r"\n{2,}", "\n", s)
-        s = re.sub(r'\.\.$', '', s.strip())
+        s = re.sub(r'\.\.$', '', s.strip()) # 去掉结尾的多余小点
         return s.strip()
 
     # ---------- 列表解析 ----------
@@ -211,25 +216,44 @@ class Spider(Spider):
         if not html:
             return videos
 
-        # 抓取完整卡片（只抓 href, title, pic）
         for m in _RE_CARD.finditer(html):
-            href, title, pic = m.group(1), m.group(2), m.group(3)
+            href, title, pic, remark = m.group(1), m.group(2), m.group(3), m.group(4)
             if href in seen: continue
             seen.add(href)
-            
-            # 寻找紧跟其后的 span（因为有些卡片副标题在后面）
-            remark = ""
-            remark_m = _RE_REMARK.search(html[m.end():m.end()+1000])
-            if remark_m:
-                remark = self._clean(remark_m.group(1))
-
             videos.append({
                 "vod_id": href,
                 "vod_name": self._clean(title)[:100],
                 "vod_pic": self._fix_url(pic) or self.default_pic,
-                "vod_remarks": remark,
+                "vod_remarks": self._clean(remark),
             })
 
+        if videos:
+            return videos
+
+        for m in _RE_CARD_ULT.finditer(html):
+            href, title, pic = m.group(1), m.group(2), m.group(3)
+            if href in seen: continue
+            seen.add(href)
+            videos.append({
+                "vod_id": href,
+                "vod_name": self._clean(title)[:100],
+                "vod_pic": self._fix_url(pic) or self.default_pic,
+                "vod_remarks": "",
+            })
+
+        if videos:
+            return videos
+
+        for m in _RE_CARD_MIN.finditer(html):
+            href, title = m.group(1), m.group(2)
+            if href in seen: continue
+            seen.add(href)
+            videos.append({
+                "vod_id": href,
+                "vod_name": self._clean(title)[:100],
+                "vod_pic": self.default_pic,
+                "vod_remarks": "",
+            })
         return videos
 
     def _page_count(self, html):
@@ -262,10 +286,10 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        # 🎯 极简防守：有筛选条件走 search.php，纯大类走 /all/，且绝对不乱加参数
+        # 核心防拦截：只要是大类或者带筛选，统一走 search.php
         has_filter = any(extend.get(k) for k in ("area", "year", "order", "tid"))
         
-        if has_filter:
+        if has_filter or tid in ["1", "2", "3", "4"]:
             real_tid = extend.get("tid") or tid
             if real_tid == "2": real_tid = "13"
             elif real_tid == "1": real_tid = "5"
@@ -275,10 +299,9 @@ class Spider(Spider):
             params = {
                 "searchtype": "5",
                 "tid": real_tid,
-                "page": page
+                "page": page,
+                "year": extend.get("year") or "2026"  # 默认保底年份
             }
-            # 只有用户真的选了才传，绝不强塞！
-            if extend.get("year"): params["year"] = extend["year"]
             if extend.get("area"): params["area"] = extend["area"]
             if extend.get("order"): params["order"] = extend["order"]
             
@@ -286,12 +309,17 @@ class Spider(Spider):
             self.log("category (search): %s" % search_url)
             html = self._fetch(search_url)
         else:
-            # 无筛选走静态
+            # 纯子类且无筛选走静态
             static_url = "%s/all/%s.html" % (self.site_url, tid)
             if page > 1:
                 static_url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
             self.log("category (static): %s" % static_url)
             html = self._fetch(static_url)
+            
+            # 如果静态没数据，兜底搜索
+            if not self._extract_videos(html):
+                search_url = "%s/search.php?searchtype=5&tid=%s&page=%d&year=2026" % (self.site_url, tid, page)
+                html = self._fetch(search_url)
 
         if _RE_LIMIT.search(html):
             self.log("  命中限流提示页")
@@ -342,6 +370,7 @@ class Spider(Spider):
         html = self._fetch(url)
         if not html: return {"list": []}
 
+        # 1. 优先用 OG 标签
         og = {}
         for m in _RE_OG.finditer(html):
             og[m.group(1).lower()] = self._clean(m.group(2))
@@ -358,9 +387,11 @@ class Spider(Spider):
             if m: pic = m.group(1)
         pic = self._fix_url(pic) or self.default_pic
 
+        # 2. 导演/演员/分类/地区 直接从 og 拿
         director = og.get("video:director", "")
         actor = og.get("video:actor", "")
         
+        # 3. 年份、类型、地区：用正则强抓（优先正则，兜底 OG）
         vclass = ""
         m_type = _RE_TYPE.search(html)
         if m_type: vclass = m_type.group(1)
@@ -375,6 +406,7 @@ class Spider(Spider):
         m_year = _RE_YEAR.search(html)
         if m_year: vyear = m_year.group(1)
 
+        # 4. 简介
         content = ""
         m = _RE_DESC_DIV.search(html)
         if m: content = self._clean(m.group(1))
@@ -384,9 +416,11 @@ class Spider(Spider):
             if m: content = self._clean(m.group(1))
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
+        # 5. 剧集与线路
         play_from, play_url = self._parse_playlists(html)
         remarks = "%d条线路" % len(play_from) if play_from else ""
 
+        # 组装并塞入年份、地区、类型
         return {"list": [{
             "vod_id": vod_id,
             "vod_name": name,
@@ -396,7 +430,7 @@ class Spider(Spider):
             "vod_director": director,
             "vod_area": varea,
             "vod_year": vyear,
-            "vod_type": vclass,
+            "vod_type": vclass,  # <--- 类型完美补全
             "vod_remarks": remarks,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
