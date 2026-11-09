@@ -102,14 +102,12 @@ for c in CLASSES:
     ]
 
 # ===================== 正则 =====================
-# 列表卡片：匹配更宽松，兼容所有 alt 和 text-right
 _RE_CARD = re.compile(
     r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
     r'[\s\S]{0,400}?<mip-img[^>]*?src="([^"]*)"'
     r'[\s\S]{0,200}?<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>',
     re.S | re.I)
 
-# 终极兜底：只要带链接和图，无视标签
 _RE_CARD_ULT = re.compile(
     r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,500}?<mip-img[^>]*?src="([^"]*)"',
     re.S | re.I)
@@ -121,29 +119,24 @@ _RE_CARD_MIN = re.compile(
 _RE_PAGE_TAIL = re.compile(r'尾页[^>]*href="[^"]*?page=(\d+)', re.I)
 _RE_PAGE_NUMS = re.compile(r'page=(\d+)', re.I)
 
-# 详情页 og 元信息
-_RE_OG = re.compile(
-    r'<meta\s+property="og:([^"]+)"\s+content="([^"]*)"', re.I)
-_RE_TITLE_H1 = re.compile(r'<h1[^>]*class="title"[^>]*>([\s\S]*?)</h1>', re.I)
-_RE_DESC_DIV = re.compile(
-    r'<div[^>]*class="stui-content__desc"[^>]*>([\s\S]*?)</div>', re.I)
+_RE_OG = re.compile(r'<meta\s+property="og:([^"]+)"\s+content="([^"]*)"', re.I)
+_RE_TITLE_H1 = re.compile(r'<h3[^>]*class="title"[^>]*>([\s\S]*?)</h3>', re.I)
+_RE_DESC_DIV = re.compile(r'<div[^>]*class="stui-content__desc"[^>]*>([\s\S]*?)</div>', re.I)
 _RE_PIC = re.compile(r'<mip-img[^>]*?src="([^"]+)"', re.I)
 
-# 剧集列表
-_RE_TABS_BLOCK = re.compile(
-    r'<mip-vd-tabs[\s\S]*?</mip-vd-tabs>', re.I)
-_RE_TAB_NAME = re.compile(r'<li>([^<]+)</li>', re.I)
-_RE_PLAYLIST_UL = re.compile(
-    r'<ul[^>]*class="stui-content__playlist[^"]*"[^>]*>([\s\S]*?)</ul>', re.I)
-_RE_EP_A = re.compile(
-    r'<a[^>]*title="([^"]*)"[^>]*href="(/play/[^"]+\.html)"', re.I)
+# 提取年份、地区、类型信息
+_RE_YEAR = re.compile(r'年份：</span>\s*(\d+)', re.I)
+_RE_AREA = re.compile(r'地区：</span>([^<]+)', re.I)
+_RE_TYPE = re.compile(r'类型：</span>([^<]+)', re.I)
 
-# 播放页
-_RE_IFRAME_URL = re.compile(
-    r'<mip-iframe[^>]*?src="([^"]+)"', re.I)
+_RE_TABS_BLOCK = re.compile(r'<mip-vd-tabs[\s\S]*?</mip-vd-tabs>', re.I)
+_RE_TAB_NAME = re.compile(r'<li>([^<]+)</li>', re.I)
+_RE_PLAYLIST_UL = re.compile(r'<ul[^>]*class="stui-content__playlist[^"]*"[^>]*>([\s\S]*?)</ul>', re.I)
+_RE_EP_A = re.compile(r'<a[^>]*title="([^"]*)"[^>]*href="(/play/[^"]+\.html)"', re.I)
+
+_RE_IFRAME_URL = re.compile(r'<mip-iframe[^>]*?src="([^"]+)"', re.I)
 _RE_URL_PARAM = re.compile(r'[?&]url=([^&"\']+)', re.I)
 
-# 搜索限流提示页
 _RE_LIMIT = re.compile(r'搜索限制为\s*\d+\s*秒一次', re.I)
 
 
@@ -214,6 +207,8 @@ class Spider(Spider):
         s = re.sub(r"@[^@\s]{0,30}@", "", s)
         s = re.sub(r"[ \t\r\f\v]+", " ", s)
         s = re.sub(r"\n{2,}", "\n", s)
+        # 去掉结尾多余的标点
+        s = re.sub(r'\.\.$', '', s.strip())
         return s.strip()
 
     # ---------- 列表解析 ----------
@@ -293,7 +288,6 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        # 1. 优先尝试静态页面（/all/2.html）
         static_url = "%s/all/%s.html" % (self.site_url, tid)
         if page > 1:
             static_url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
@@ -302,7 +296,6 @@ class Spider(Spider):
         html = self._fetch(static_url)
         videos = self._extract_videos(html)
         
-        # 2. 如果静态页面没抓到数据，启用 search.php 接口兜底
         if not videos:
             self.log("  static empty, trying search.php fallback...")
             real_tid = extend.get("tid") or tid
@@ -330,7 +323,7 @@ class Spider(Spider):
                 
             videos = self._extract_videos(html2)
             if videos:
-                html = html2  # 如果 search 成功，用 search 的 html 算页数
+                html = html2
 
         pagecount = self._page_count(html)
         self.log("  videos=%d pagecount=%d" % (len(videos), pagecount))
@@ -376,6 +369,7 @@ class Spider(Spider):
         html = self._fetch(url)
         if not html: return {"list": []}
 
+        # 1. 优先用 OG 标签
         og = {}
         for m in _RE_OG.finditer(html):
             og[m.group(1).lower()] = self._clean(m.group(2))
@@ -392,11 +386,18 @@ class Spider(Spider):
             if m: pic = m.group(1)
         pic = self._fix_url(pic) or self.default_pic
 
+        # 2. 导演/演员/分类/地区 直接从 og 拿
         director = og.get("video:director", "")
         actor = og.get("video:actor", "")
         vclass = og.get("video:class", "")
         varea = og.get("video:area", "")
+        
+        # 3. 年份：OG 里没有，用正则强抓
+        vyear = ""
+        m_year = _RE_YEAR.search(html)
+        if m_year: vyear = m_year.group(1)
 
+        # 4. 简介
         content = ""
         m = _RE_DESC_DIV.search(html)
         if m: content = self._clean(m.group(1))
@@ -406,9 +407,11 @@ class Spider(Spider):
             if m: content = self._clean(m.group(1))
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
+        # 5. 剧集与线路
         play_from, play_url = self._parse_playlists(html)
         remarks = "%d条线路" % len(play_from) if play_from else ""
 
+        # 组装并塞入年份、地区、类型
         return {"list": [{
             "vod_id": vod_id,
             "vod_name": name,
@@ -417,6 +420,7 @@ class Spider(Spider):
             "vod_actor": actor,
             "vod_director": director,
             "vod_area": varea,
+            "vod_year": vyear,  # <--- 年份补全
             "vod_type": vclass,
             "vod_remarks": remarks,
             "vod_play_from": "$$$".join(play_from),
