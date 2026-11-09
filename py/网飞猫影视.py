@@ -109,7 +109,7 @@ _RE_CARD = re.compile(
     re.S | re.I)
 
 _RE_CARD_ULT = re.compile(
-    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"',
+    r'href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[\s\S]{0,2000}?<(?:mip-)?img[^>]*?src="([^"]*)"',
     re.S | re.I)
 
 _RE_CARD_MIN = re.compile(
