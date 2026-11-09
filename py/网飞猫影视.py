@@ -206,7 +206,7 @@ class Spider(Spider):
         s = re.sub(r"@[^@\s]{0,30}@", "", s)
         s = re.sub(r"[ \t\r\f\v]+", " ", s)
         s = re.sub(r"\n{2,}", "\n", s)
-        s = re.sub(r'\.\.$', '', s.strip()) # 去掉结尾的多余小点
+        s = re.sub(r'\.\.$', '', s.strip())
         return s.strip()
 
     # ---------- 列表解析 ----------
@@ -286,7 +286,7 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        # 核心防拦截：只要是大类或者带筛选，统一走 search.php
+        # 核心修改：大类直接映射，走 search 接口带 2026 兜底
         has_filter = any(extend.get(k) for k in ("area", "year", "order", "tid"))
         
         if has_filter or tid in ["1", "2", "3", "4"]:
@@ -300,7 +300,7 @@ class Spider(Spider):
                 "searchtype": "5",
                 "tid": real_tid,
                 "page": page,
-                "year": extend.get("year") or "2026"  # 默认保底年份
+                "year": extend.get("year") or "2026"
             }
             if extend.get("area"): params["area"] = extend["area"]
             if extend.get("order"): params["order"] = extend["order"]
@@ -309,14 +309,14 @@ class Spider(Spider):
             self.log("category (search): %s" % search_url)
             html = self._fetch(search_url)
         else:
-            # 纯子类且无筛选走静态
+            # 纯子类走静态
             static_url = "%s/all/%s.html" % (self.site_url, tid)
             if page > 1:
                 static_url = "%s/all/%s-%d.html" % (self.site_url, tid, page)
             self.log("category (static): %s" % static_url)
             html = self._fetch(static_url)
             
-            # 如果静态没数据，兜底搜索
+            # 静态兜底
             if not self._extract_videos(html):
                 search_url = "%s/search.php?searchtype=5&tid=%s&page=%d&year=2026" % (self.site_url, tid, page)
                 html = self._fetch(search_url)
@@ -370,7 +370,6 @@ class Spider(Spider):
         html = self._fetch(url)
         if not html: return {"list": []}
 
-        # 1. 优先用 OG 标签
         og = {}
         for m in _RE_OG.finditer(html):
             og[m.group(1).lower()] = self._clean(m.group(2))
@@ -387,11 +386,9 @@ class Spider(Spider):
             if m: pic = m.group(1)
         pic = self._fix_url(pic) or self.default_pic
 
-        # 2. 导演/演员/分类/地区 直接从 og 拿
         director = og.get("video:director", "")
         actor = og.get("video:actor", "")
         
-        # 3. 年份、类型、地区：用正则强抓（优先正则，兜底 OG）
         vclass = ""
         m_type = _RE_TYPE.search(html)
         if m_type: vclass = m_type.group(1)
@@ -406,7 +403,6 @@ class Spider(Spider):
         m_year = _RE_YEAR.search(html)
         if m_year: vyear = m_year.group(1)
 
-        # 4. 简介
         content = ""
         m = _RE_DESC_DIV.search(html)
         if m: content = self._clean(m.group(1))
@@ -416,11 +412,9 @@ class Spider(Spider):
             if m: content = self._clean(m.group(1))
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
-        # 5. 剧集与线路
         play_from, play_url = self._parse_playlists(html)
         remarks = "%d条线路" % len(play_from) if play_from else ""
 
-        # 组装并塞入年份、地区、类型
         return {"list": [{
             "vod_id": vod_id,
             "vod_name": name,
@@ -430,7 +424,7 @@ class Spider(Spider):
             "vod_director": director,
             "vod_area": varea,
             "vod_year": vyear,
-            "vod_type": vclass,  # <--- 类型完美补全
+            "vod_type": vclass,
             "vod_remarks": remarks,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
