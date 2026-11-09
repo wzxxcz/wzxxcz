@@ -299,7 +299,7 @@ class Spider(Spider):
         elif req_tid == "3": req_tid = "30"
         elif req_tid == "4": req_tid = "34"
 
-        # 核心修复：网页的 search.php 需要强制带上所有空参数才能出数据
+        # 核心修复：使用规范的 urlencode，同时拼上网页里多如牛毛的隐藏空参数
         params = {
             "page": page,
             "searchtype": "5",
