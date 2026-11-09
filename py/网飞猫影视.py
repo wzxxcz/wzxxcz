@@ -102,8 +102,9 @@ for c in CLASSES:
     ]
 
 # ===================== 正则 =====================
+# 修复：允许 href 和 title 前后顺序颠倒
 _RE_CARD = re.compile(
-    r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*href="(/uty/\d+\.html)"[^>]*title="([^"]*)"[^>]*>'
+    r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*?(?:href="(/uty/\d+\.html)"[^>]*?title="([^"]*)"|title="([^"]*)"[^>]*?href="(/uty/\d+\.html)")[^>]*>'
     r'[\s\S]{0,2000}?<mip-img[^>]*?src="([^"]*)"'
     r'[\s\S]{0,2000}?<span[^>]*class="pic-text[^"]*"[^>]*>([^<]*)</span>',
     re.S | re.I)
@@ -217,7 +218,14 @@ class Spider(Spider):
             return videos
 
         for m in _RE_CARD.finditer(html):
-            href, title, pic, remark = m.group(1), m.group(2), m.group(3), m.group(4)
+            # 因为正则做了双向兜底，所以需要判断取哪一组
+            if m.group(1):
+                href, title = m.group(1), m.group(2)
+                pic, remark = m.group(5), m.group(6)
+            else:
+                title, href = m.group(3), m.group(4)
+                pic, remark = m.group(5), m.group(6)
+                
             if href in seen: continue
             seen.add(href)
             videos.append({
@@ -286,43 +294,39 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
-        # 清理所有空参数，防止触发反爬或空数据
+        # 清理空参数
         for k in list(extend.keys()):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
 
         req_tid = extend.get("tid") or tid
         
-        # 如果有筛选条件（选了年份、地区等），或者用户直接点了子分类（如13）
-        # 走 search.php
-        has_filter = any(extend.get(k) for k in ("area", "year", "order"))
-        is_sub_class = req_tid not in ["1", "2", "3", "4"]
-
-        if has_filter or is_sub_class:
+        # 核心修复：由于网站对 search.php 的限制，必须给它塞满有效参数才不会空
+        if req_tid not in ["1", "2", "3", "4"]:
+            # 走子类或搜索
             params = {
                 "searchtype": "5",
                 "tid": req_tid,
                 "page": page,
+                "year": extend.get("year") or "2026",  # 强塞年份
+                "order": extend.get("order") or "time"  # 强塞排序
             }
-            if extend.get("year"): params["year"] = extend["year"]
             if extend.get("area"): params["area"] = extend["area"]
-            if extend.get("order"): params["order"] = extend["order"]
             
             url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
             self.log("category (search): %s" % url)
             html = self._fetch(url)
         else:
-            # 纯大类，且无筛选，走 /all/2.html
+            # 大类走静态
             url = "%s/all/%s.html" % (self.site_url, req_tid)
             self.log("category (static): %s" % url)
             html = self._fetch(url)
             
-            # 兜底：如果大类静态页死活出不来，说明隐藏了，改走 search.php 且强塞 year=2026
+            # 如果静态页还是没东西，强制走搜索并带上参数
             if not self._extract_videos(html):
                 self.log("  static empty, fallback to search...")
-                # 网站大类对应的默认子类
                 fallback_tid = "13" if req_tid == "2" else ("5" if req_tid == "1" else ("30" if req_tid == "3" else "34"))
-                url2 = "%s/search.php?searchtype=5&tid=%s&page=%d&year=2026" % (self.site_url, fallback_tid, page)
+                url2 = "%s/search.php?searchtype=5&tid=%s&page=%d&year=2026&order=time" % (self.site_url, fallback_tid, page)
                 html2 = self._fetch(url2)
                 if not _RE_LIMIT.search(html2):
                     html = html2
