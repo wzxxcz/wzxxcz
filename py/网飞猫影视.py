@@ -293,24 +293,35 @@ class Spider(Spider):
 
         req_tid = extend.get("tid") or tid
         
-        # 网站的筛选其实也是 GET 请求，参数和 search.php 一模一样
-        # 但为了防止它拦截，直接拼原汁原味的 HTML 静态地址
-        url = "%s/all/%s.html" % (self.site_url, req_tid)
-        if page > 1:
-            url = "%s/all/%s-%d.html" % (self.site_url, req_tid, page)
+        # 强制大类映射
+        if req_tid == "2": req_tid = "13"
+        elif req_tid == "1": req_tid = "5"
+        elif req_tid == "3": req_tid = "30"
+        elif req_tid == "4": req_tid = "34"
+
+        # 判定是否有真实筛选条件（年份/地区/排序）
+        has_filter = any(extend.get(k) for k in ("area", "year", "order"))
+
+        if has_filter:
+            # 关键修复：网页的 search.php 需要 tid, page, year，而且必须带一个空的 area（即使没选地区），否则必空
+            params = [
+                ("searchtype", "5"),
+                ("tid", req_tid),
+                ("page", str(page)),
+            ]
+            # 把 year 和 order 塞进去
+            params.append(("year", extend.get("year") or "2026"))
+            params.append(("order", extend.get("order") or "time"))
             
-        # 如果选择了额外的筛选条件，退回 search.php
-        if extend.get("area") or extend.get("year") or extend.get("order"):
-            params = {
-                "searchtype": "5",
-                "tid": req_tid,
-                "page": page,
-            }
-            if extend.get("year"): params["year"] = extend["year"]
-            if extend.get("area"): params["area"] = extend["area"]
-            if extend.get("order"): params["order"] = extend["order"]
+            # 如果选了地区，就传具体地区；没选就强行传空字符串，顺应网站的“潜规则”
+            params.append(("area", extend.get("area") or ""))
             
             url = "%s/search.php?%s" % (self.site_url, urllib.parse.urlencode(params))
+        else:
+            # 没有任何筛选，走纯净的静态页
+            url = "%s/all/%s.html" % (self.site_url, req_tid)
+            if page > 1:
+                url = "%s/all/%s-%d.html" % (self.site_url, req_tid, page)
 
         self.log("category: %s" % url)
         html = self._fetch(url)
