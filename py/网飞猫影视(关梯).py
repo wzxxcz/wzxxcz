@@ -207,8 +207,7 @@ class Spider(Spider):
         s = re.sub(r"@[^@\s]{0,30}@", "", s)
         s = re.sub(r"[ \t\r\f\v]+", " ", s)
         s = re.sub(r"\n{2,}", "\n", s)
-        # 去掉结尾多余的标点
-        s = re.sub(r'\.\.$', '', s.strip())
+        s = re.sub(r'\.\.$', '', s.strip()) # 去掉结尾的多余小点
         return s.strip()
 
     # ---------- 列表解析 ----------
@@ -389,10 +388,18 @@ class Spider(Spider):
         # 2. 导演/演员/分类/地区 直接从 og 拿
         director = og.get("video:director", "")
         actor = og.get("video:actor", "")
-        vclass = og.get("video:class", "")
-        varea = og.get("video:area", "")
         
-        # 3. 年份：OG 里没有，用正则强抓
+        # 3. 年份、类型、地区：用正则强抓（优先正则，兜底 OG）
+        vclass = ""
+        m_type = _RE_TYPE.search(html)
+        if m_type: vclass = m_type.group(1)
+        else: vclass = og.get("video:class", "")
+
+        varea = ""
+        m_area = _RE_AREA.search(html)
+        if m_area: varea = m_area.group(1)
+        else: varea = og.get("video:area", "")
+
         vyear = ""
         m_year = _RE_YEAR.search(html)
         if m_year: vyear = m_year.group(1)
@@ -420,8 +427,8 @@ class Spider(Spider):
             "vod_actor": actor,
             "vod_director": director,
             "vod_area": varea,
-            "vod_year": vyear,  # <--- 年份补全
-            "vod_type": vclass,
+            "vod_year": vyear,
+            "vod_type": vclass,  # <--- 类型完美补全
             "vod_remarks": remarks,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
