@@ -162,58 +162,10 @@
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/Supprise0901/TVBox_live/main/live.txt"
         },
         {
-            "name": "地方直播",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt"
-        },
-        {
-            "name": "地方直播1",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://gh-proxy.org/https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/ipv4/result.m3u"
-        },
-        {
-            "name": "天浪",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://210.245.166.84:1299/live/live1.txt"
-        },
-        {
-            "name": "云端",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "https://d.kstore.dev/download/11344/yunduan.txt"
-        },
-        {
             "name": "TNT",
             "type": 0,
             "ua": "okhttp/5.3.2",
             "url": "https://gh-proxy.org/https://raw.githubusercontent.com/TianmuTNT/iptv/main/iptv.txt"
-        },
-        {
-            "name": "王子",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://wangziduoqing.com/yuan/zb.txt"
-        },
-        {
-            "name": "光辉",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://ko.zoho.to/ii/32799.txt"
-        },
-        {
-            "name": "港台",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://ko.zoho.to/ii/09007.txt"
-        },
-        {
-            "name": "港奥台国际",
-            "type": 0,
-            "ua": "okhttp/5.3.2",
-            "url": "http://tv123.vvvv.ee/tv.m3u"
         },
         {
             "name": "迪基",
