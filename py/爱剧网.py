@@ -1,14 +1,15 @@
 # coding=utf-8
 """
 爱剧网 www.zachiska.com | TVBox Python 爬虫 
+关键:
   - 模板 ewave (/template/laoniu_jo3/)，后端 MacCMS
   - 分类只保留站方导航的 6 个顶级: 电视剧/电影/动漫/AI漫剧/短剧/综艺
-  - 筛选采用静态表（与站方各频道 channel-slide 逐项核对过），
-    不再请求 /vs/{tid}.html 抓筛选块，也省掉子分类继承逻辑
+  - 筛选五行与站方 /vs/{tid}.html 筛选面板完全一致:
+    按分类(子分类，选中后切换子 tid) / 按剧情 / 按地区 / 按年份 / 按排序
+    注: 站方「按排序」三个链接 href 相同（排序未接线），与站点行为保持一致
+  - homeVideoContent/homeContent 返回扁平 vod 列表（TVBox 标准格式，
+    分组 {name, videos} 格式会导致首页「更新推荐」海报不显示）
   - 结构: 首页分区 → /vs/{tid}/{class}/{area}/{lang}/{year}/{order}/{page}.html
-          详情 /info/{id}.html → 播放 /live/{id}-{sid}-{ep}.html（集序号从 1 开始）
-          搜索 /search.html?wd={kw}&page={page}
-  - 站方「按排序」三个链接 href 相同（排序未接线），故不提供排序筛选
 """
 import re
 import sys
@@ -80,6 +81,20 @@ CLASSES = [
     {"type_id": "37", "type_name": "综艺"},
 ]
 
+# 按分类（站方 channel-slide 子分类，选中后切换到子分类 tid）
+_CHANNEL_MAP = {
+    "2":  [("国产剧", "30"), ("韩剧", "15"), ("美剧", "14"), ("港剧", "13"),
+           ("日剧", "16"), ("台剧", "27"), ("泰剧", "28")],
+    "1":  [("动作片", "6"), ("爱情片", "7"), ("动画片", "58"), ("科幻片", "8"),
+           ("恐怖片", "9"), ("喜剧片", "11"), ("剧情片", "12"), ("纪实片", "24")],
+    "5":  [("国产动漫", "17"), ("日本动漫", "47"), ("欧美动漫", "49"),
+           ("香港动漫", "18"), ("韩国动漫", "48"), ("台湾动漫", "46")],
+    "29": [("都市短剧", "55")],
+    "37": [("大陆综艺", "38"), ("欧美综艺", "43"), ("香港综艺", "39"),
+           ("日本综艺", "41")],
+    # AI漫剧(59) 站方无子分类，不提供「按分类」行
+}
+
 # 筛选静态表：与站方 /vs/{tid}.html 各筛选块逐项一致（已去重）
 _FILTERS_MAP = {
     "2": {
@@ -141,6 +156,13 @@ _FILTER_NAMES = {"class": "剧情", "area": "地区", "year": "年份"}
 FILTERS = {}
 for _tid, _m in _FILTERS_MAP.items():
     _fs = []
+    if _tid in _CHANNEL_MAP:
+        _fs.append({
+            "key": "channel",
+            "name": "分类",
+            "value": [{"n": "全部", "v": ""}] +
+                     [{"n": n, "v": v} for n, v in _CHANNEL_MAP[_tid]],
+        })
     for _k in ("class", "area", "year"):
         _fs.append({
             "key": _k,
@@ -148,6 +170,14 @@ for _tid, _m in _FILTERS_MAP.items():
             "value": [{"n": "全部", "v": ""}] +
                      [{"n": x, "v": x} for x in _m[_k]],
         })
+    # 站方「按排序」最新/最热/评分 三个链接 href 相同（未接线），
+    # 这里与站点保持一致：可选中，但结果同「全部」
+    _fs.append({
+        "key": "order",
+        "name": "排序",
+        "value": [{"n": "最新", "v": ""}, {"n": "最热", "v": ""},
+                  {"n": "评分", "v": ""}],
+    })
     FILTERS[_tid] = _fs
 
 
@@ -433,23 +463,23 @@ class Spider(Spider):
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
+        """首页推荐：返回扁平 vod 列表（TVBox 标准格式，海报才能正常显示）"""
         html = self._fetch(HOST + "/")
         self.log("home HTML 长度: %d" % len(html))
         videos = []
+        seen = set()
         try:
             parts = html.split(
                 '<div class="ewave-pannel ewave-pannel-bg clearfix">')
             for p in parts[1:]:
-                m = re.search(r'<h3 class="title">([\s\S]*?)</h3>', p)
-                name = self._clean(m.group(1)) if m else ""
-                cards = self._extract_videos(p)[:12]
-                if cards:
-                    videos.append({
-                        "name": name or "推荐",
-                        "videos": cards,
-                    })
+                for card in self._extract_videos(p):
+                    if card["vod_id"] in seen:
+                        continue
+                    seen.add(card["vod_id"])
+                    videos.append(card)
         except Exception as e:
             self.log("home parse err: %s" % e)
+        self.log("  首页推荐共 %d 条" % len(videos))
         return {"list": videos}
 
     # -------- 分类 --------
@@ -466,6 +496,9 @@ class Spider(Spider):
         for k in list(extend.keys()):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
+
+        # 「按分类」选中子分类时切换到子 tid（如 国产剧 → /vs/30）
+        tid = str(extend.get("channel") or tid or "2")
 
         cls = self._q(extend.get("class") or "all")
         area = self._q(extend.get("area") or "all")
