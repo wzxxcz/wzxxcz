@@ -9,6 +9,8 @@
     注: 站方「按排序」三个链接 href 相同（排序未接线），与站点行为保持一致
   - homeVideoContent/homeContent 返回扁平 vod 列表（TVBox 标准格式，
     分组 {name, videos} 格式会导致首页「更新推荐」海报不显示）
+  - 详情简介取站方原文（顶部简介段落 → 底部剧情简介 → meta description 多层兜底），
+    类型/更新时间等字段全量保留
   - 结构: 首页分区 → /vs/{tid}/{class}/{area}/{lang}/{year}/{order}/{page}.html
 """
 import re
@@ -216,6 +218,13 @@ _RE_OG_IMAGE = re.compile(r'<meta property="og:image" content="([^"]+)"')
 _RE_TITLE_TAG = re.compile(r'<title>([^<]+)</title>')
 _RE_YEAR_FALLBACK = re.compile(
     r'<span class="text-muted">\s*年份：\s*</span>\s*(\d{4})')
+
+# 简介（多层兜底：顶部 desc 段落 → 底部剧情简介区块 → meta description）
+_RE_DESC = re.compile(r'<p class="desc[^"]*"[^>]*>([\s\S]*?)</p>', re.I)
+_RE_DESC_BLOCK = re.compile(
+    r'id="desc"[\s\S]*?<p class="col-pd">([\s\S]*?)</p>', re.I)
+_RE_META_DESC = re.compile(
+    r'<meta\s+name="description"\s+content="([^"]+)"', re.I)
 
 # 播放
 _RE_PLAYER = re.compile(r'var\s+player_aaaa\s*=\s*(\{[\s\S]*?\})\s*</script>')
@@ -666,6 +675,60 @@ class Spider(Spider):
         except Exception:
             pass
 
+        # ===== 简介：优先站方原文（顶部简介段落 → 底部剧情简介 → meta description） =====
+        content = ""
+        try:
+            m = _RE_DESC.search(html)
+            if m:
+                content = self._clean(m.group(1))
+        except Exception:
+            pass
+        if content:
+            content = re.sub(r'^(简介|剧情简介)[:：]\s*', '', content)
+        if not content:
+            try:
+                m = _RE_DESC_BLOCK.search(html)
+                if m:
+                    content = self._clean(m.group(1))
+            except Exception:
+                pass
+        if not content:
+            try:
+                m = _RE_META_DESC.search(html)
+                if m:
+                    content = self._clean(m.group(1))
+            except Exception:
+                pass
+        if not content:
+            # 兜底：站方无简介时按元信息拼接
+            content = self._build_intro(
+                name, year, area, type_, director, actor, remarks)
+        content = INTRO_PREFIX + "\n" + content
+
+        # 更新时间（站方展示字段，补充到简介末尾）
+        update_time = data.get("更新时间") or ""
+        if update_time:
+            content += "\n更新时间：" + update_time
+
+        # 类型：站方形如 "国产剧 重大革命历史剧,历史,战争,剧情,国产剧,..."，
+        # 全量保留并去重（vod_class 为逗号分隔标签，type_name 为原始串）
+        type_name = ""
+        vod_class = ""
+        try:
+            t = self._clean(type_)
+            if t:
+                type_name = t
+                segs = re.split(r'[\s,，、]+', t)
+                seen_t = set()
+                tags = []
+                for s in segs:
+                    if s and s not in seen_t:
+                        seen_t.add(s)
+                        tags.append(s)
+                vod_class = ",".join(tags)
+        except Exception:
+            pass
+
         # ===== 线路：playlist{N} 与 /live/{id}-{N}-{ep}.html 一一对应 =====
         groups = {}
         tab_names = {}
@@ -721,20 +784,19 @@ class Spider(Spider):
             "vod_name": name,
             "vod_pic": pic,
             "vod_remarks": remarks,
+            "type_name": type_name,
             "vod_year": year,
             "vod_area": area,
             "vod_actor": actor,
             "vod_director": director,
-            "vod_content": self._build_intro(
-                name, year, area, type_, director, actor, remarks),
+            "vod_content": content,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
         }
         if score:
             vod["vod_score"] = score
-        if type_:
-            parts = self._clean(type_).split()
-            vod["vod_class"] = parts[0] if parts else type_
+        if vod_class:
+            vod["vod_class"] = vod_class
         return {"list": [vod]}
 
     # -------- 播放 --------
