@@ -705,10 +705,11 @@ class Spider(Spider):
                 name, year, area, type_, director, actor, remarks)
         content = INTRO_PREFIX + "\n" + content
 
-        # 更新时间（站方展示字段，补充到简介末尾）
+        # 更新时间：放到详情页备注栏（标题下方），不混入简介
         update_time = data.get("更新时间") or ""
         if update_time:
-            content += "\n更新时间：" + update_time
+            remarks = ("%s（更新：%s）" % (remarks, update_time)) if remarks \
+                else ("更新：" + update_time)
 
         # 类型：站方形如 "国产剧 重大革命历史剧,历史,战争,剧情,国产剧,..."，
         # 全量保留并去重（vod_class 为逗号分隔标签，type_name 为原始串）
