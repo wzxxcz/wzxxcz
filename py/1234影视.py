@@ -8,6 +8,7 @@
   - 站点有 TLS 指纹检测(裸 requests/curl 会被挂起), 优先用 curl_cffi(chrome120 + HTTP/1.1) 伪装
   - 解析 player_aaaa JSON, 提取直链 m3u8 (encrypt=0 全部直链, parse=0 直接播)
   - 线路播放顺序与网站一致(路线二/路线三/播放四/路线一 按页面顺序)
+  - 简介添加指定前缀; 卡片/详情副标题(pic-text) 进 vod_remarks
 """
 import re
 import sys
@@ -129,10 +130,12 @@ _AREA_DM = ["国产", "日本", "欧美", "其他"]
 
 
 def _kv(name, values):
+    opts = [{"n": "全部", "v": ""}]
+    opts += [{"n": str(v), "v": str(v)} for v in values]
     return {"key": name, "name": {"class": "剧情", "area": "地区", "year": "年份",
                                   "lang": "语言", "letter": "字母",
                                   "sub": "分类"}[name],
-            "value": [{"n": v, "v": v} for v in [""] + values]}
+            "value": opts}
 
 
 FILTERS = {
@@ -155,7 +158,10 @@ FILTERS = {
         _kv("class", _CLASS_DM), _kv("area", _AREA_DM),
         _kv("year", [y for y in range(2021, 1999, -1)]),
     ],
-    "duanju": [],
+    "duanju": [
+        # 站点短剧页自身不渲染筛选栏, 但 URL 年份槽位可用, 补一个年份过滤
+        _kv("year", [y for y in range(2021, 1999, -1)]),
+    ],
 }
 
 
@@ -179,8 +185,6 @@ _RE_ACTOR = re.compile(
     r'<span class="text-muted">主演：</span>([\s\S]*?)</p>', re.I)
 _RE_DIRECTOR = re.compile(
     r'<span class="text-muted">导演：</span>([\s\S]*?)</p>', re.I)
-_RE_META_DATA = re.compile(
-    r'<span class="text-muted[^"]*">类型：</span>([\s\S]*?)</p>', re.I)
 _RE_SCORE = re.compile(r'class="branch">([\d.]+)<', re.I)
 _RE_INTRO_SKETCH = re.compile(
     r'<span class="detail-sketch">([\s\S]*?)</span>', re.I)
@@ -440,7 +444,7 @@ class Spider(Spider):
             url = ("%s/htmlsearch/-%s------------%d.html"
                    % (self.site_url, self._quote(key), page))
         self.log("search: %s" % url)
-        html = self._fetch(url)
+        html = self._fetch(url, retry=4)
         self.log("  HTML 长度: %d" % len(html))
         videos = self._extract_videos(html)
         return {
@@ -459,7 +463,7 @@ class Spider(Spider):
         url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
         self.log("detail: %s" % url)
 
-        html = self._fetch(url)
+        html = self._fetch(url, retry=4)
         self.log("  HTML 长度: %d" % len(html))
         if not html:
             return {"list": []}
@@ -485,15 +489,20 @@ class Spider(Spider):
         if m:
             remarks = self._clean(m.group(1))
 
-        # 主演 / 导演
+        # 主演 / 导演 (优先取演员链接, 用逗号分隔)
+        def _names(seg):
+            names = [self._clean(x) for x in re.findall(r'<a[^>]*>([^<]+)</a>', seg)]
+            names = [x for x in names if x]
+            return ",".join(names) if names else self._clean(seg)
+
         actor = ""
         m = _RE_ACTOR.search(html)
         if m:
-            actor = self._clean(m.group(1))
+            actor = _names(m.group(1))
         director = ""
         m = _RE_DIRECTOR.search(html)
         if m:
-            director = self._clean(m.group(1))
+            director = _names(m.group(1))
 
         # 评分
         score = ""
@@ -503,25 +512,54 @@ class Spider(Spider):
         if m:
             score = m.group(1)
 
-        # 类型/地区/年份 摘要
-        meta = ""
-        m = _RE_META_DATA.search(html)
-        if m:
-            meta = self._clean(m.group(1))
+        # 类型/地区/年份/语言/时间 (站点详情页逐项提取)
+        def _field(label):
+            mm = re.search(
+                r'<span class="text-muted[^"]*">%s：</span>\s*([^<]*)' % label, html)
+            return self._clean(mm.group(1)) if mm else ""
+
+        v_type = _field("类型")
+        v_area = _field("地区")
+        v_year = _field("年份")
+        v_lang = _field("语言")
+        v_time = _field("时间")
 
         # 简介 (该站模板简介常为空, 多层兜底)
-        content = ""
+        intro = ""
         m = _RE_INTRO_SKETCH.search(html)
         if m:
-            content = self._clean(m.group(1))
-        if not content:
+            intro = self._clean(m.group(1))
+        if not intro:
             m = _RE_META_DESC.search(html)
             if m:
-                content = self._clean(m.group(1))
-        if content:
-            content = INTRO_PREFIX + "\n" + content
-        else:
-            content = INTRO_PREFIX + "\n" + (meta or name)
+                intro = self._clean(m.group(1))
+        # 站点简介为空时 meta 里只剩 "片名:" 这种噪声, 丢弃
+        if intro and re.fullmatch(r".{0,40}[:：]", intro):
+            intro = ""
+
+        # 拼装完整信息(信息拿全)
+        info = []
+        line1 = []
+        if v_type:
+            line1.append("类型：%s" % v_type)
+        if v_area:
+            line1.append("地区：%s" % v_area)
+        if v_year:
+            line1.append("年份：%s" % v_year)
+        if v_lang:
+            line1.append("语言：%s" % v_lang)
+        if line1:
+            info.append("　".join(line1))
+        if remarks:
+            info.append("状态：%s" % remarks)
+        if v_time:
+            info.append("更新时间：%s" % v_time)
+
+        content = INTRO_PREFIX
+        if info:
+            content += "\n" + "\n".join(info)
+        if intro:
+            content += "\n\n" + intro
 
         # ===== 线路 + 剧集 (顺序与网站一致) =====
         play_from = []
