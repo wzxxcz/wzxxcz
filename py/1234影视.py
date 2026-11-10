@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-1234影视 m.aotanajeans.com | TVBox Python 爬虫 (V1.0)
+1234影视 m.aotanajeans.com | TVBox Python 爬虫 
 关键:
   - 苹果CMS(stui模板) 站点, 与网站完全一致:
     分类: /html/{tid}.html  ->  筛选列表: /htmlshow/{tid}-{area}-空-{class}-{lang}-{letter}-空-空-{page}-空-空-{year}.html
@@ -536,29 +536,10 @@ class Spider(Spider):
         if intro and re.fullmatch(r".{0,40}[:：]", intro):
             intro = ""
 
-        # 拼装完整信息(信息拿全)
-        info = []
-        line1 = []
-        if v_type:
-            line1.append("类型：%s" % v_type)
-        if v_area:
-            line1.append("地区：%s" % v_area)
-        if v_year:
-            line1.append("年份：%s" % v_year)
-        if v_lang:
-            line1.append("语言：%s" % v_lang)
-        if line1:
-            info.append("　".join(line1))
-        if remarks:
-            info.append("状态：%s" % remarks)
-        if v_time:
-            info.append("更新时间：%s" % v_time)
-
+        # 简介只放剧情简介本身(类型/地区/年份等走结构化字段, 由详情面板显示)
         content = INTRO_PREFIX
-        if info:
-            content += "\n" + "\n".join(info)
         if intro:
-            content += "\n\n" + intro
+            content += "\n" + intro
 
         # ===== 线路 + 剧集 (顺序与网站一致) =====
         play_from = []
@@ -594,7 +575,13 @@ class Spider(Spider):
             "vod_actor": actor,
             "vod_director": director,
             "vod_score": score,
-            "vod_remarks": remarks or ("%d条线路" % len(play_from)),
+            "vod_type": v_type,
+            "vod_class": v_type,
+            "type_name": v_type,
+            "vod_area": v_area,
+            "vod_year": v_year,
+            "vod_lang": v_lang,
+            "vod_remarks": remarks or v_time or ("%d条线路" % len(play_from)),
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url":  "$$$".join(play_url),
         }]}
