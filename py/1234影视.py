@@ -8,7 +8,6 @@
   - 站点有 TLS 指纹检测(裸 requests/curl 会被挂起), 优先用 curl_cffi(chrome120 + HTTP/1.1) 伪装
   - 解析 player_aaaa JSON, 提取直链 m3u8 (encrypt=0 全部直链, parse=0 直接播)
   - 线路播放顺序与网站一致(路线二/路线三/播放四/路线一 按页面顺序)
-  - 简介添加指定前缀; 卡片/详情副标题(pic-text) 进 vod_remarks
 """
 import re
 import sys
