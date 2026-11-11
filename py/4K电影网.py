@@ -2,15 +2,19 @@
 """
 4K电影网 zzhczj.com | TVBox Python 爬虫 
 关键:
-  - 全站伪静态路由:
+  - 全站伪静态路由（2026-11-11 从缓存页真实链接逐字实测）:
       频道      /unit/{type_id}.html         分页 /unit/{type_id}-{page}.html
-      筛选      /pack/[by/{排序}/][area/{地区}/][class/{类型}/]id/{频道或分类ID}\
-[/page/{页}][/year/{年}][/lang/{语言}][/letter/{字母}].html
+      筛选      /pack/[by/{排序}/][class/{类型}/][area/{地区}/area/{年份}/area/{语言}/]\
+id/{频道或分类ID}[/page/{页}][/letter/{字母}].html
+                ★ 该站模板把「年份」「语言」与「地区」共用 area 段:
+                  网页真实链接为 /pack/area/2018/id/13.html、/pack/area/国语/id/13.html
+                  （旧拼法 /pack/id/13/year/2018.html 会导致 CF 缓存永不命中）
                 （「按分类」是独立分类 id：国产剧=/pack/id/13.html 等）
       详情      /pagevid/{vod_id}.html
       播放      /slotplay/{vod_id}/{sid}/{nid}.html
   - 筛选 7 维与网页端 100% 同步: 分类(cat=站点真实分类id)/类型/地区/年份/语言/字母/排序，
-    启动时实时抓站点筛选区解析；筛选翻页优先走页面真实分页链接
+    启动时实时抓站点筛选区解析（行级判定年份/语言，与网页逐字一致）；
+    筛选翻页优先走页面真实分页链接
   - 线路顺序严格按详情页「切换来源」下拉的显示顺序（页面里线路名与 sid 并不对应）
   - 播放直链从 player_aaaa 提取；当前线路播放页拿不到（源站520）时自动接力其它线路同集，
     成功结果缓存 1 小时；所有 m3u8 已实测可直连（仅需 UA）
@@ -551,11 +555,18 @@ class Spider(Spider):
                 continue
 
             key = ""
-            for _name, href in items:
+            # 先用「非『全部』」链接形态判定维度（「全部」是 /pack/id/N.html，
+            # 会被误判成 cat）；area 段再做行级判定：该站模板把年份/语言
+            # 也生成为 /pack/area/{值}/（如 area/2018、area/国语）
+            for name, href in items:
+                if name == "全部":
+                    continue
                 k = self._key_from_href(href)
                 if k:
                     key = k
                     break
+            if key == "area":
+                key = self._row_area_key(items) or "area"
             if not key:
                 key = self._key_from_label(label)
             if not key or key in out:
@@ -724,10 +735,13 @@ class Spider(Spider):
         return out
 
     def _build_filter_url(self, tid, ext, page=1):
-        """按站点真实伪静态规则拼装（各单维链接均已实测验证）：
-        /pack/[by/{排序}/][area/{地区}/][class/{类型}/]id/{频道或分类ID}\
-        [/page/{页}][/year/{年}][/lang/{语言}][/letter/{字母}].html
-        id 前段: by / area / class；id 后段: page / year / lang / letter
+        """按站点真实伪静态规则拼装（全部从缓存页内真实链接逐字实测）：
+        /pack/[by/{排序}/][class/{类型}/][area/{地区}/area/{年份}/area/{语言}/]\
+id/{频道或分类ID}[/page/{页}][/letter/{字母}].html
+        注意：该站模板把「年份」「语言」与「地区」共用 area 段 ——
+        网页真实链接为 /pack/area/2018/id/13.html、/pack/area/国语/id/13.html
+        （2026-11-11 从 /pack/id/13.html 缓存页逐字提取，与旧拼法
+        /pack/id/13/year/2018.html 不一致，那会导致访客侧 CF 缓存永不命中）
         """
         def q(v):
             return urllib.parse.quote(str(v))
@@ -735,10 +749,12 @@ class Spider(Spider):
         parts = []
         if ext.get("sort"):
             parts.append("by/" + q(ext["sort"]))
-        if ext.get("area"):
-            parts.append("area/" + q(ext["area"]))
         if ext.get("class"):
             parts.append("class/" + q(ext["class"]))
+        # 地区/年份/语言共用 area 段，按 地区->年份->语言 依次输出（与网页一致）
+        for k in ("area", "year", "lang"):
+            if ext.get(k):
+                parts.append("area/" + q(ext[k]))
         # 「分类」选中时它是独立的分类 id（/pack/id/13.html），替代频道 id
         ident = str(ext.get("cat") or tid)
         parts.append("id/" + str(ident))
@@ -747,13 +763,32 @@ class Spider(Spider):
                 parts.append("page/%d" % int(page))
         except Exception:
             pass
-        if ext.get("year"):
-            parts.append("year/" + q(ext["year"]))
-        if ext.get("lang"):
-            parts.append("lang/" + q(ext["lang"]))
         if ext.get("letter"):
             parts.append("letter/" + q(ext["letter"]))
         return "%s/pack/%s.html" % (self.site_url, "/".join(parts))
+
+    _LANG_WORDS = {"国语", "英语", "粤语", "闽南语", "韩语", "日语",
+                   "法语", "德语", "其它", "其他"}
+
+    def _row_area_key(self, items):
+        """行级判定 area 段维度：该站模板把年份/语言也生成为 /pack/area/{值}/。
+        行内 area 值全为数字 -> 年份；多为语言词 -> 语言；否则 -> 地区
+        """
+        vals = []
+        for _n, h in items:
+            m = re.search(r"/pack/area/([^/]+)/", h)
+            if m:
+                vals.append(urllib.parse.unquote(m.group(1)))
+        vals = [v for v in vals if v]
+        if not vals:
+            return ""
+        if all(v.isdigit() for v in vals):
+            return "year"
+        hits = sum(1 for v in vals
+                   if v.endswith("语") or v in self._LANG_WORDS)
+        if hits and hits * 2 >= len(vals):
+            return "lang"
+        return "area"
 
     def _follow_filter(self, tid, ext, page=1):
         """兜底：像人一样逐个点筛选项，全程只使用页面里真实存在的链接"""
