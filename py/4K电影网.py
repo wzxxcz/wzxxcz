@@ -4,14 +4,19 @@
 关键:
   - 全站伪静态路由:
       频道      /unit/{type_id}.html         分页 /unit/{type_id}-{page}.html
-      筛选      /pack/[by/{排序}/][area/{地区}/][class/{类型}/]id/1[/page/{页}][/year/{年}][/lang/{语言}].html
+      筛选      /pack/[by/{排序}/][area/{地区}/][class/{类型}/]id/{频道或分类ID}\
+[/page/{页}][/year/{年}][/lang/{语言}][/letter/{字母}].html
+                （「按分类」是独立分类 id：国产剧=/pack/id/13.html 等）
       详情      /pagevid/{vod_id}.html
       播放      /slotplay/{vod_id}/{sid}/{nid}.html
-  - 筛选项（类型/地区/年份/语言/排序）启动时直接从站点筛选区实时抓取，与网页端 100% 同步；
-    筛选 URL 按站点真实规则拼接，拼接未命中会自动降级为「逐项跟随页面真实链接」
+  - 筛选 7 维与网页端 100% 同步: 分类(cat=站点真实分类id)/类型/地区/年份/语言/字母/排序，
+    启动时实时抓站点筛选区解析；筛选翻页优先走页面真实分页链接
   - 线路顺序严格按详情页「切换来源」下拉的显示顺序（页面里线路名与 sid 并不对应）
+  - 播放直链从 player_aaaa 提取；当前线路播放页拿不到（源站520）时自动接力其它线路同集，
+    成功结果缓存 1 小时；所有 m3u8 已实测可直连（仅需 UA）
   - 列表「副标题」取缩略图角标 pic-text（正片 / 已完结 / 更新至xxxx期）
-  - 源站偶发 Cloudflare 520，内置多次重试 + 分级降级
+  - 源站半残: Cloudflare 边缘有缓存的页面 200，回源全部 520 →
+    内置重试 + 页面结果缓存(5分钟)/负缓存(1分钟)，成功过一次的内容之后秒开
 """
 import re
 import sys
@@ -93,12 +98,16 @@ _YEARS = [{"n": "全部", "v": ""}] + \
 
 _AREAS = [{"n": "全部", "v": ""}] + \
          [{"n": x, "v": x} for x in
-          ("大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国",
-           "德国", "泰国", "印度", "意大利", "西班牙", "加拿大", "其他")]
+          ("内地", "大陆", "韩国", "香港", "台湾", "日本", "美国", "泰国",
+           "英国", "新加坡", "法国", "德国", "印度", "意大利", "西班牙", "其他")]
 
 _LANGS = [{"n": "全部", "v": ""}] + \
          [{"n": x, "v": x} for x in
           ("国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它")]
+
+_LETTERS = [{"n": "全部", "v": ""}] + \
+           [{"n": x, "v": x} for x in
+            list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") + ["0-9"]]
 
 _SORTS = [{"n": "按时间", "v": "time"},
           {"n": "按人气", "v": "hits"},
@@ -106,33 +115,42 @@ _SORTS = [{"n": "按时间", "v": "time"},
 
 # 静态兜底（homeContent 会优先从站点实时解析真实筛选项，解析失败才用这份）
 _CLASS_MAP = {
-    "1": ["动作", "喜剧", "爱情", "恐怖", "科幻", "剧情", "战争", "警匪",
-          "犯罪", "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚",
-          "经典", "青春", "文艺", "微电影", "古装", "历史", "运动", "农村",
-          "儿童", "网络电影"],
-    "2": ["国产剧", "港台剧", "日韩剧", "欧美剧", "海外剧", "动作", "喜剧",
-          "爱情", "悬疑", "古装", "都市", "家庭", "犯罪", "战争", "历史",
-          "青春", "科幻", "恐怖", "剧情", "武侠", "谍战", "年代", "农村", "儿童"],
-    "3": ["综艺", "真人秀", "脱口秀", "选秀", "访谈", "晚会", "搞笑", "情感",
-          "生活", "音乐", "游戏", "美食", "旅游", "亲子", "体育", "纪实"],
-    "4": ["国漫", "日漫", "欧美", "动画", "热血", "搞笑", "恋爱", "冒险",
-          "奇幻", "科幻", "治愈", "校园", "悬疑", "运动", "亲子"],
-    "24": ["短剧", "古装", "现代", "言情", "逆袭", "战神", "穿越", "重生",
-           "悬疑", "喜剧", "豪门", "都市", "甜宠", "虐恋"],
+    "1": ["喜剧", "爱情", "动作", "科幻", "剧情", "战争", "犯罪", "恐怖",
+          "悬疑", "惊悚", "奇幻", "武侠", "古装", "历史", "冒险", "动画",
+          "家庭", "传记", "经典", "青春", "文艺", "网络电影"],
+    "2": ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻",
+          "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"],
+    "3": ["真人秀", "脱口秀", "访谈", "晚会", "音乐", "游戏", "美食", "旅游",
+          "亲子", "体育", "纪实", "搞笑", "情感", "生活"],
+    "4": ["动画", "热血", "搞笑", "恋爱", "冒险", "奇幻", "科幻", "治愈",
+          "校园", "悬疑", "运动", "亲子", "国漫", "日漫", "欧美"],
+    "24": ["古装", "现代", "言情", "逆袭", "战神", "穿越", "重生", "悬疑",
+           "喜剧", "豪门", "都市", "甜宠", "虐恋", "短剧"],
+}
+
+# 「按分类」是独立分类 id（/pack/id/{N}.html），仅放已实测确认的电视剧频道
+_CAT_MAP = {
+    "2": [("国产剧", "13"), ("香港剧", "14"), ("韩国剧", "15"),
+          ("欧美剧", "16"), ("台湾剧", "22"), ("海外剧", "23")],
 }
 
 FILTERS = {}
 for _c in CLASSES:
     _tid = _c["type_id"]
-    FILTERS[_tid] = [
-        {"key": "class", "name": "类型",
-         "value": [{"n": "全部", "v": ""}] +
-                  [{"n": x, "v": x} for x in _CLASS_MAP.get(_tid, [])]},
-        {"key": "area", "name": "地区", "value": _AREAS},
-        {"key": "year", "name": "年份", "value": _YEARS},
-        {"key": "lang", "name": "语言", "value": _LANGS},
-        {"key": "sort", "name": "排序", "value": _SORTS},
-    ]
+    _data = []
+    if _CAT_MAP.get(_tid):
+        _data.append({"key": "cat", "name": "分类",
+                      "value": [{"n": "全部", "v": ""}] +
+                               [{"n": n, "v": v} for n, v in _CAT_MAP[_tid]]})
+    _data.append({"key": "class", "name": "类型",
+                  "value": [{"n": "全部", "v": ""}] +
+                           [{"n": x, "v": x} for x in _CLASS_MAP.get(_tid, [])]})
+    _data.append({"key": "area", "name": "地区", "value": _AREAS})
+    _data.append({"key": "year", "name": "年份", "value": _YEARS})
+    _data.append({"key": "lang", "name": "语言", "value": _LANGS})
+    _data.append({"key": "letter", "name": "字母", "value": _LETTERS})
+    _data.append({"key": "sort", "name": "排序", "value": _SORTS})
+    FILTERS[_tid] = _data
 
 
 # ===================== 正则 =====================
@@ -232,6 +250,7 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        self._page_cache = {}
         self._filters_cache = None
         self._warmed = False
         self.log("init: site=%s" % self.site_url)
@@ -456,13 +475,13 @@ class Spider(Spider):
         if "/class/" in h:
             return "class"
         if re.search(r'/pack/id/\d+\.html$', h):
-            return "cate"
+            return "cat"
         return ""
 
     def _key_from_label(self, label):
         label = label or ""
-        if "分类" in label:
-            return "cate"
+        if "分类" in label or "频道" in label:
+            return "cat"
         if "类型" in label:
             return "class"
         if "地区" in label:
@@ -505,6 +524,15 @@ class Spider(Spider):
                 key = self._key_from_label(label)
             if not key or key in out:
                 continue
+            if key == "cat":
+                # 「按频道」行（电影/电视剧/…）与「按分类」行同为 /pack/id/N.html，
+                # 区别在于频道行没有「全部」项 —— 没有 /pack.html 的视为频道行，跳过
+                if not any(h.rstrip("/").endswith("/pack.html") for _n, h in items):
+                    continue
+                # 频道 id 集合也是频道行特征（个别页面无 /pack.html 时兜底）
+                ids = re.findall(r"/pack/id/(\d+)\.html", " ".join(h for _n, h in items))
+                if ids and all(i in {c["type_id"] for c in CLASSES} for i in ids):
+                    continue
             out[key] = items
 
         # 排序 nav
@@ -534,7 +562,9 @@ class Spider(Spider):
 
     # ---------------------------------------------------------------- 首页
     def _build_filters_from_site(self):
-        """直接从站点筛选区抓真实选项，保证与网页一致；任何异常返回 None"""
+        """直接从站点筛选区抓真实选项，保证与网页一致；任何异常返回 None
+        网页顺序: 按分类(独立id) -> 按类型 -> 按地区 -> 按年份 -> 按语言 -> 按字母 -> 排序
+        """
         filters = {}
         for c in CLASSES:
             tid = c["type_id"]
@@ -542,6 +572,16 @@ class Spider(Spider):
                                timeout=8, retry=1)
             screen = self._parse_screen(html)
             data = []
+            if screen.get("cat"):
+                # 「按分类」是独立的分类 id（如 国产剧 -> /pack/id/13.html）
+                items = []
+                for n, href in screen["cat"]:
+                    mnum = re.search(r"/pack/id/(\d+)\.html", href)
+                    if mnum and n != "全部":
+                        items.append({"n": n, "v": mnum.group(1)})
+                if items:
+                    data.append({"key": "cat", "name": "分类",
+                                 "value": [{"n": "全部", "v": ""}] + items})
             if screen.get("class"):
                 data.append({"key": "class", "name": "类型",
                              "value": [{"n": "全部", "v": ""}] +
@@ -551,13 +591,23 @@ class Spider(Spider):
                              "value": [{"n": "全部", "v": ""}] +
                                       [{"n": n, "v": n} for n, _ in screen["area"]]})
             if screen.get("year"):
+                # 站点年份行本身有重复乱序项，去重保持原有顺序
+                yitems, yseen = [], set()
+                for n, _href in screen["year"]:
+                    if n not in yseen:
+                        yseen.add(n)
+                        yitems.append(n)
                 data.append({"key": "year", "name": "年份",
                              "value": [{"n": "全部", "v": ""}] +
-                                      [{"n": n, "v": n} for n, _ in screen["year"]]})
+                                      [{"n": n, "v": n} for n in yitems]})
             if screen.get("lang"):
                 data.append({"key": "lang", "name": "语言",
                              "value": [{"n": "全部", "v": ""}] +
                                       [{"n": n, "v": n} for n, _ in screen["lang"]]})
+            if screen.get("letter"):
+                data.append({"key": "letter", "name": "字母",
+                             "value": [{"n": "全部", "v": ""}] +
+                                      [{"n": n, "v": n} for n, _ in screen["letter"]]})
             if screen.get("sort"):
                 data.append({"key": "sort", "name": "排序",
                              "value": [{"n": n, "v": v} for n, v in screen["sort"]]})
@@ -597,6 +647,27 @@ class Spider(Spider):
         return {"list": videos[:60]}
 
     # ---------------------------------------------------------------- 分类
+    def _fetch_cached(self, url, timeout=15, retry=2, headers=None):
+        """分类/筛选页抓取：成功结果缓存 5 分钟，失败负缓存 1 分钟。
+        源站间歇 520，缓存能显著减少重复撞墙，并保证翻页/重进秒开。
+        """
+        now = time.time()
+        hit = self._page_cache.get(url)
+        if hit:
+            ts, text = hit
+            if text and now - ts < 300:
+                return text
+            if not text and now - ts < 60:
+                return ""
+        html = self._fetch(url, timeout=timeout, retry=retry, headers=headers)
+        ok = bool(html) and len(html) > 120
+        self._page_cache[url] = (now, html if ok else "")
+        # 缓存别无限膨胀
+        if len(self._page_cache) > 200:
+            for k in sorted(self._page_cache, key=lambda k: self._page_cache[k][0])[:100]:
+                del self._page_cache[k]
+        return html
+
     def _norm_extend(self, extend):
         if isinstance(extend, str):
             try:
@@ -613,8 +684,10 @@ class Spider(Spider):
         return out
 
     def _build_filter_url(self, tid, ext, page=1):
-        """按站点真实伪静态规则拼装（已实测）：
-        /pack/[by/{排序}/][area/{地区}/][class/{类型}/]id/{频道}[/page/{页}][/year/{年}][/lang/{语言}].html
+        """按站点真实伪静态规则拼装（各单维链接均已实测验证）：
+        /pack/[by/{排序}/][area/{地区}/][class/{类型}/]id/{频道或分类ID}\
+        [/page/{页}][/year/{年}][/lang/{语言}][/letter/{字母}].html
+        id 前段: by / area / class；id 后段: page / year / lang / letter
         """
         def q(v):
             return urllib.parse.quote(str(v))
@@ -626,7 +699,9 @@ class Spider(Spider):
             parts.append("area/" + q(ext["area"]))
         if ext.get("class"):
             parts.append("class/" + q(ext["class"]))
-        parts.append("id/" + str(tid))
+        # 「分类」选中时它是独立的分类 id（/pack/id/13.html），替代频道 id
+        ident = str(ext.get("cat") or tid)
+        parts.append("id/" + str(ident))
         try:
             if int(page) > 1:
                 parts.append("page/%d" % int(page))
@@ -636,24 +711,26 @@ class Spider(Spider):
             parts.append("year/" + q(ext["year"]))
         if ext.get("lang"):
             parts.append("lang/" + q(ext["lang"]))
+        if ext.get("letter"):
+            parts.append("letter/" + q(ext["letter"]))
         return "%s/pack/%s.html" % (self.site_url, "/".join(parts))
 
     def _follow_filter(self, tid, ext, page=1):
         """兜底：像人一样逐个点筛选项，全程只使用页面里真实存在的链接"""
         cur_url = "%s/unit/%s.html" % (self.site_url, tid)
-        html = self._fetch(cur_url, timeout=15, retry=2)
+        html = self._fetch_cached(cur_url, timeout=15, retry=2)
         if not html:
             cur_url = "%s/pack/id/%s.html" % (self.site_url, tid)
-            html = self._fetch(cur_url, timeout=15, retry=2)
+            html = self._fetch_cached(cur_url, timeout=15, retry=2)
 
-        for key in ("class", "area", "year", "lang"):
+        for key in ("cat", "class", "area", "year", "lang", "letter"):
             val = ext.get(key)
             if not val:
                 continue
             href = self._match_screen(html, key, val)
             if not href or href == cur_url:
                 continue
-            nxt = self._fetch(href, timeout=12, retry=3)
+            nxt = self._fetch_cached(href, timeout=12, retry=3)
             if not nxt or not self._extract_videos(nxt):
                 self.log("筛选项无结果: %s=%s" % (key, val))
                 continue
@@ -663,7 +740,7 @@ class Spider(Spider):
             for name, code in (self._parse_screen(html).get("sort") or []):
                 if code == ext["sort"] or str(ext["sort"]) in name:
                     href = "%s/pack/by/%s/id/%s.html" % (self.site_url, code, tid)
-                    nxt = self._fetch(href, timeout=12, retry=2)
+                    nxt = self._fetch_cached(href, timeout=12, retry=2)
                     if nxt and self._extract_videos(nxt):
                         cur_url, html = href, nxt
                     break
@@ -671,7 +748,7 @@ class Spider(Spider):
         if page > 1:
             purl = self._page_url(html, cur_url, page)
             if purl and purl != cur_url:
-                nxt = self._fetch(purl, timeout=15, retry=2)
+                nxt = self._fetch_cached(purl, timeout=15, retry=2)
                 if nxt:
                     cur_url, html = purl, nxt
         return html, cur_url
@@ -682,24 +759,32 @@ class Spider(Spider):
         ext = self._norm_extend(extend)
         tid = str(tid).strip()
 
-        has_filter = any(ext.get(k) for k in ("class", "area", "year", "lang", "sort"))
+        has_filter = any(ext.get(k)
+                         for k in ("cat", "class", "area", "year", "lang",
+                                   "letter", "sort"))
 
         html, cur_url = "", ""
         if has_filter:
-            cur_url = self._build_filter_url(tid, ext, page)
-            html = self._fetch(cur_url, timeout=15, retry=3)
-            if html:
-                if not self._extract_videos(html) and page > 1:
+            # 先拿「同条件第 1 页」，再优先使用页面里真实的翻页链接（与网页完全一致）
+            u1 = self._build_filter_url(tid, ext, 1)
+            h1 = self._fetch_cached(u1, timeout=15, retry=3)
+            if page > 1 and self._extract_videos(h1):
+                purl = self._page_url(h1, u1, page)
+                if purl and purl != u1:
+                    html = self._fetch_cached(purl, timeout=15, retry=3)
+                    if self._extract_videos(html):
+                        cur_url, u1 = purl, purl
+            if not self._extract_videos(html):
+                cur_url = self._build_filter_url(tid, ext, page)
+                html = h1 if (h1 and page == 1) else \
+                    self._fetch_cached(cur_url, timeout=15, retry=3)
+                if page > 1 and not self._extract_videos(html):
                     # 筛选页翻页失败时退回「同条件第 1 页」，别给未筛选的错误内容
-                    u1 = self._build_filter_url(tid, ext, 1)
-                    h1 = self._fetch(u1, timeout=15, retry=2)
                     if self._extract_videos(h1):
                         html, cur_url = h1, u1
-                if not self._extract_videos(html):
-                    self.log("模板筛选未命中，改走链接跟随: %s" % cur_url)
-                    html, cur_url = self._follow_filter(tid, ext, page)
-            else:
-                self.log("筛选页请求失败: %s" % cur_url)
+            if not self._extract_videos(html):
+                self.log("模板筛选未命中，改走链接跟随: %s" % cur_url)
+                html, cur_url = self._follow_filter(tid, ext, page)
 
         if not self._extract_videos(html):
             # 无筛选 / 兜底：直接走频道页（/unit/{tid}.html、/unit/{tid}-{page}.html）
@@ -707,15 +792,15 @@ class Spider(Spider):
                 cur_url = "%s/unit/%s-%d.html" % (self.site_url, tid, page)
             else:
                 cur_url = "%s/unit/%s.html" % (self.site_url, tid)
-            h2 = self._fetch(cur_url, timeout=15, retry=2)
+            h2 = self._fetch_cached(cur_url, timeout=15, retry=2)
             if not h2 and page == 1:
-                h2 = self._fetch("%s/unit/%s-1.html" % (self.site_url, tid),
+                h2 = self._fetch_cached("%s/unit/%s-1.html" % (self.site_url, tid),
                                  timeout=12, retry=2)
                 if h2:
                     cur_url = "%s/unit/%s-1.html" % (self.site_url, tid)
             if not h2:
                 cur_url = "%s/pack/id/%s.html" % (self.site_url, tid)
-                h2 = self._fetch(cur_url, timeout=15, retry=2)
+                h2 = self._fetch_cached(cur_url, timeout=15, retry=2)
             if h2:
                 html = h2
 
@@ -967,33 +1052,53 @@ class Spider(Spider):
         now = int(time.time())
         if play_page in self._play_cache:
             ts, res = self._play_cache[play_page]
-            if now - ts < 600:
+            if now - ts < 3600:
                 return res
 
-        html = self._fetch(play_page, headers={"Referer": self.site_url + "/"})
+        # 播放页 Referer 实测：各线路 CDN 对 Referer 不敏感，带站点首页即可
+        html = self._fetch(play_page, timeout=20, retry=2,
+                           headers={"Referer": self.site_url + "/"})
         direct = self._parse_play_html(html, play_page)
         self.log("  direct: %s" % (direct[:180] if direct else "EMPTY"))
 
         if direct:
-            low = direct.lower()
-            if ".m3u8" in low or ".mp4" in low:
-                res = {
-                    "parse": 0, "playUrl": "", "url": direct,
-                    "header": {"User-Agent": UA, "Referer": play_page},
-                }
-            else:
-                res = {
-                    "parse": 1, "playUrl": "", "url": play_page,
-                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
-                }
+            res = self._make_play_res(direct)
             self._play_cache[play_page] = (now, res)
             return res
 
-        # 兜底：交给 TVBox 嗅探
+        # ===== 关键兜底：源站间歇 520，当前线路拿不到时自动接力其它线路的同集 =====
+        # 播放页路由 /slotplay/{vid}/{sid}/{nid}.html，各线路同集数的 nid 一致
+        m = re.search(r"/slotplay/(\d+)/(\d+)/(\d+)\.html", play_page)
+        if m:
+            vid, cur_sid, nid = m.group(1), int(m.group(2)), m.group(3)
+            others = [s for s in range(1, 9) if s != cur_sid]
+            for sid2 in others:
+                alt = "%s/slotplay/%s/%d/%s.html" % (self.site_url, vid, sid2, nid)
+                h2 = self._fetch(alt, timeout=12, retry=1,
+                                 headers={"Referer": self.site_url + "/"})
+                d2 = self._parse_play_html(h2, alt)
+                if d2:
+                    self.log("  线路%s 失败, 接力线路%s: %s"
+                             % (cur_sid, sid2, d2[:120]))
+                    res = self._make_play_res(d2)
+                    self._play_cache[play_page] = (now, res)
+                    return res
+
+        # 最终兜底：交给 TVBox 嗅探
         res = {"parse": 1, "playUrl": "", "url": play_page,
                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
-        self._play_cache[play_page] = (now, res)
         return res
+
+    def _make_play_res(self, direct):
+        low = direct.lower()
+        if ".m3u8" in low or ".mp4" in low:
+            return {
+                "parse": 0, "playUrl": "", "url": direct,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+            }
+        # 直链但没有视频扩展名 → 仍交嗅探
+        return {"parse": 1, "playUrl": "", "url": direct,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
     def _parse_play_html(self, html, page_url=""):
         if not html:
