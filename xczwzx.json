@@ -1154,12 +1154,7 @@
             "key": "4K电影网",
             "name": "🍊4K电影网",
             "type": 3,
-            "api": "./py/4K电影网.py",
-            "searchable": 1,
-            "changeable": 1,
-            "quickSearch": 1,
-            "filterable": 1,
-            "playerType": 2
+            "api": "./py/4K电影网.py"
         },
         {
             "key": "追剧达人",
