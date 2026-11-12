@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ============ 未来影院 gygxpt.py  ============
 # v2.14 仅一处改动: detailContent 的 vod_content 统一拼上 INTRO_PREFIX 前缀;
-#       其余逻辑与 v2.13 完全一致(播放本地代理 + 同集自动换线 + 探测矩阵 + 空分类体检)
+#       其余逻辑与 v2.13 完全一致(播放本地代理 + 同集自动换线 + 探测矩阵 + 空分类体检), 播放链未动。
 # v2.13 ①**播放本地代理**(治"有的线路不能播"): 新增 _px_proxy() 内嵌 ThreadingHTTPServer(127.0.0.1:9978-9988),
 #         /p?url=&k= 路由: 抓流时带 UA+Referer(失败自动降为无 Referer/裸socket 兜底), m3u8 逐行重写为代理地址
 #         (含 #EXT-X-KEY URI / master 相对子列表 / 跨域分片), 分片原样透传并支持 Range(206+Content-Range);
@@ -24,6 +24,8 @@
 #   播放   /gygplayer/{vid}-{sid}-{nid}.html -> 页面内嵌 var now="...m3u8" 直链, 直接返回
 #   搜索   /search.php?searchword={kw}       -> .search-list .item 卡片
 # ★ 实测直链: cdn.yddsha2.com / v1.ppqrrs.com 等 m3u8 直链 HEAD 200 可用, 无防盗链
+# ★ 沙箱/数据中心 IP 会被 openresty WAF 拒连(非指纹问题), 家庭宽带等正常网络直连即可;
+#   已用浏览器通道抓取真实页面验证全部解析规则
 # ★ 版本兼容铁律: 全文件禁 3.9+ API (内置 Py<=3.8)
 # ★ 分隔符铁律: $=名称/地址 #=选集 $$$=线路; 线路名与地址$$$段数必须相等
 # ★ 合规: 站点为免费免登录站, 仅采集公开列表/详情/直链, 无 VIP 破解/验证码绕过/密钥逆向
@@ -53,23 +55,27 @@ except ImportError:
 HOST = 'https://www.gygxpt.com'
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
 MUA = 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36'
-PROBE = True
+PROBE = True           # 全通道失败时输出探测矩阵(每变体一张短卡片, 便于一键定位可用通道)
 PROBE_IP = '154.19.197.245'
-PR_BUDGET = 8
-PR_TO = 4
-FAST_TO = 7
-LIST_BUDGET = 10
-HIDE_EMPTY = True
-SWEEP_TTL = 21600
-NEED_PIC = True
-PX_MODE = 2
-PROXY_M3U8 = True
-FORCE_PX = False
-PX_PORTS = range(9978, 9989)
+PR_BUDGET = 8            # ★探测矩阵总预算(秒): 超预算即跳过剩余变体, 防止失败路径拖到 20s+
+PR_TO = 4                # ★探测单变体超时(秒)
+FAST_TO = 7              # ★搜索快通道总预算(秒)
+LIST_BUDGET = 10         # ★列表取回总预算(秒)
+HIDE_EMPTY = True      # ★ 后台体检: 逐个分类试抓, 页面里一个影片链接都没有的分类自动从导航隐藏(治"空白分类")
+SWEEP_TTL = 21600      # 体检间隔(秒), 进程内缓存, 默认 6 小时只跑一次
+NEED_PIC = True        # ★ 列表过滤: 站点"排行榜"区块(v-rank)是无封面纯文字榜, 混进列表会出现空白图 => 自动滤掉
+PX_MODE = 2            # ★ v2.13 播放模式: 0=直连输出 1=智能探测(裸播放器能用才直连) 2=HLS全走本地代理(默认,最稳)
+PROXY_M3U8 = True      # ★ 本地代理开关(127.0.0.1:9978-9988): m3u8+分片重写, 治防盗链/需特殊头/跨域分片黑屏
+FORCE_PX = False       # ★ 强制 mp4 也走代理(若真机仍有线路黑屏, 改 True)
+PX_PORTS = range(9978, 9989)  # 本地代理端口范围(与影视仓/zzoc 同段)
 
-# ★ 简介统一前缀(用户指定)
+# ★ v2.14 简介统一前缀(用户指定)
 INTRO_PREFIX = '🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！'
 
+# 完整 41 分类(浏览器实抓, 2026-09-22):
+#   电影子类 5-12/28/29 | 电视剧子类 13-16/32/33/34/42
+#   综艺子类 45-48 | 动分子类 49-54 | 短剧子类 61-67/69(缺 68)
+#   ★ 已剔除: 55 预告(用户指定) / 60 亚洲剧(站点空分类, 详见 DROP_TIDS)
 CATEGORIES = {
     '1': '电影', '2': '电视剧', '3': '综艺', '4': '动漫', '30': '短剧',
     '5': '动作片', '6': '爱情片', '7': '科幻片', '8': '恐怖片', '9': '战争片',
@@ -82,6 +88,8 @@ CATEGORIES = {
     '61': '有声动漫', '62': '女频恋爱', '63': '反转爽剧', '64': '脑洞悬疑',
     '65': '年代穿越', '66': '古装仙侠', '67': '现代都市', '69': '爽文短剧',
 }
+# 88模板规范: type_pid 为父分类ID, 一级分类 pid=0
+# ★ 已按用户要求剔除: 55 预告(用户指定去除) / 60 亚洲剧(站点实测空分类: /gyglist/60.html 返回 200 但 0 卡片、"第0页"、尾页指向自身)
 DROP_TIDS = ('55', '60')
 TYPE_PIDS = {
     '1': '0', '2': '0', '3': '0', '4': '0', '30': '0',
@@ -109,12 +117,12 @@ HDR_BASE = {
     'Upgrade-Insecure-Requests': '1',
     'Connection': 'keep-alive',
 }
-HOME_MAX = 36
-CAT_PAGE = 36
-PLAY_TTL = 900
-DETAIL_TTL = 900
-LINE_TTL = 900
-SEARCH_TTL = 300
+HOME_MAX = 36          # 首页最多取卡片数(去重后)
+CAT_PAGE = 36          # 分类每页实际条数(实测 36)
+PLAY_TTL = 900         # 播放直链缓存秒
+DETAIL_TTL = 900       # 详情缓存秒
+LINE_TTL = 900         # 线路缓存秒
+SEARCH_TTL = 300       # 搜索缓存秒
 _SEP_NAME_URL = '$'
 _SEP_EP = '#'
 _SEP_LINE = '$$$'
@@ -195,6 +203,7 @@ class Spider(Spider):
 
     # ========== 网络层 ==========
     def _ensure(self):
+        # 兜底自愈: 防止某些加载器未调用 init 就取数据 -> 整页空白
         if getattr(self, '_lk', None) is None:
             self._lk = threading.Lock()
             self._t0 = 0.0
@@ -229,6 +238,7 @@ class Spider(Spider):
             self.filters = {}
 
     def _sweep_async(self):
+        # 后台体检空分类(不阻塞首页); 结果存 self._empty, 由 homeContent 过滤
         if not HIDE_EMPTY:
             return
         try:
@@ -245,6 +255,8 @@ class Spider(Spider):
             pass
 
     def _sweep(self):
+        # 判空规则: 分类页取回成功 且 页面内一个 /gygvod/ 影片链接都没有 => 站点空分类, 隐藏之
+        # 取回失败(0字节)视为"不确定", 不动导航(防 WAF 限速时误删); 连续失败即中止(疑似被限速)
         bad = 0
         try:
             for tid in list(CATEGORIES.keys()):
@@ -273,6 +285,8 @@ class Spider(Spider):
                 pass
 
     def _mkpx(self, e):
+        # extend 逃生口: ①JSON {"host":"https://新域名","proxy":"socks5://ip:port"}
+        #   ②键值 host=https://... proxy=http://... ③裸代理 socks5://ip:port | http://ip:port
         e = (e or '').strip()
         if not e or len(e) > 500:
             return None
@@ -312,7 +326,7 @@ class Spider(Spider):
             s = requests.Session()
             s.headers.update({'User-Agent': self.ua})
             try:
-                s.trust_env = False
+                s.trust_env = False          # 忽略设备 HTTP_PROXY 等环境变量(常见 req=ConnectionError 元凶), 代理只走 extend 显式配置
             except Exception:
                 pass
             self._h1(s)
@@ -333,6 +347,8 @@ class Spider(Spider):
             return None
 
     def _h1(self, s):
+        # 实测: 该站拒 HTTP/2(Chromium 直接 net::ERR_HTTP2_PROTOCOL_ERROR, OkHttp/urllib3 默认 h2 => self.fetch 返回空 0 字节)
+        # 给 requests 挂 HTTP/1.1-only 适配器(自定 SSLContext + ALPN 只留 http/1.1), 让 req 通道也能通
         try:
             from requests.adapters import HTTPAdapter
 
@@ -366,6 +382,7 @@ class Spider(Spider):
             self._t0 = time.time()
 
     def _f(self, url, headers=None, tms=8000):
+        # fetch 兼容层: 部分 base.spider 实现的 fetch 不接受 timeout 关键字(否则 TypeError 被吞 -> 恒 404)
         try:
             return self.fetch(url, headers=headers, timeout=tms)
         except TypeError:
@@ -406,6 +423,8 @@ class Spider(Spider):
             return ''
 
     def _get(self, url, timeout=8):
+        # 取回顺序(实测): ① App 自带 HTTP 栈 self.fetch(设备侧可通) ② requests+浏览器头 ③ 裸 socket 兜底
+        # openresty WAF 对 Python 客户端特征会掐连接: 单次失败即吐空列表 -> 节流 + 退避 + 多通道重试
         hdrs = self._hdr(self.ref)
         g = []
         t0 = time.time()
@@ -460,6 +479,8 @@ class Spider(Spider):
             return type(ex).__name__
 
     def _probe(self):
+        # 全通道失败时输出探测矩阵: 每变体一张短卡片(名称=值, 同行相邻, 前端截断也不丢配对)
+        # ★ 自学习: 哪个变体通了就记 self._hit, 并自动切换 UA/协议/传输, 后续请求直接走它
         if not PROBE:
             return [self._dm()]
         if getattr(self, '_pbc', None):
@@ -526,6 +547,7 @@ class Spider(Spider):
         return out
 
     def _fast(self, url, t=FAST_TO):
+        # 搜索等前台操作用"快通道": 各通道只试一次, 不做重试/退避, 总耗时硬预算 7s(防 App 侧超时)
         t0 = time.time()
         ex = getattr(self, '_sk', False)
         pip = getattr(self, '_pip', None)
@@ -571,6 +593,7 @@ class Spider(Spider):
         return b''.join(out)
 
     def _rsock(self, url, timeout=15, ip=None):
+        # 末级兜底: 裸 socket HTTP/1.1(强制 ALPN http/1.1 + 浏览器头序), 绕过 requests/urllib3 被 WAF 掐连接的情况
         m = re.match(r'(https?)://([^/]+)(/.*)?$', url)
         if not m:
             return ''
@@ -666,6 +689,7 @@ class Spider(Spider):
         return u
 
     def _wp(self, its):
+        # 去掉无封面条目(排行榜纯文字区块), 避免前端出现空白图; 若全无封面则原样返回
         if not NEED_PIC:
             return its
         r = [i for i in its if i.get('vod_pic')]
@@ -678,7 +702,7 @@ class Spider(Spider):
         return None
 
     def _cset(self, cache, ck, v, ttl):
-        if len(cache) > 300:
+        if len(cache) > 300:            # 防长期运行内存膨胀: 超限先清过期项
             now = time.time()
             for k in [k for k, (_, t) in cache.items() if t <= now]:
                 cache.pop(k, None)
@@ -689,6 +713,7 @@ class Spider(Spider):
     _G_VOD = re.compile(r'<a\b[^>]*?href="(/gygvod/(\d+)\.html)"[^>]*>')
     _G_ATTR = re.compile(r'title="([^"]*)"')
     _G_ALT = re.compile(r'<img[^>]*alt="([^"]*)"', re.I)
+    # data-src/data-original/src 三路兜底; src 允许无扩展名 URL(站点大量封面无后缀)
     _G_IMG = re.compile(
         r'<img[^>]*data-src="([^"]+)"'
         r'|<img[^>]*data-original="([^"]+)"'
@@ -696,6 +721,7 @@ class Spider(Spider):
     _G_TIP = re.compile(r'class="[^"]*v-tips[^"]*"[^>]*>([^<]*)<')
 
     def _scan(self, h, limit=0):
+        # 卡片解析: href/title 属性顺序无关 + 名称三级兜底(title / img.alt / 锚文本)
         items, seen = [], set()
         for m in self._G_VOD.finditer(h):
             vid = m.group(2)
@@ -734,6 +760,7 @@ class Spider(Spider):
 
     # ========== 首页 ==========
     def homeContent(self, filter=False):
+        # 88模板首页: 返回分类导航 + 聚合推荐内容; 分类导航必须优先返回(永不空白)
         self._ensure()
         r = {'class': [{'type_id': k, 'type_name': v, 'type_pid': TYPE_PIDS.get(k, '0')} for k, v in self.types.items() if k not in DROP_TIDS and k not in self._empty]}
         self._sweep_async()
@@ -754,6 +781,7 @@ class Spider(Spider):
             return {'list': [self._dm()]}
 
     def _hv(self):
+        # 首页优先: 单请求抓首页解析推荐卡片; 取回失败即快返回(不再轮询多页, 避免 App 侧超时变空状态)
         t0 = time.time()
         items, seen = [], set()
         h = self._get(self.base + '/', 8)
@@ -782,6 +810,7 @@ class Spider(Spider):
         if not items:
             pv = self._probe()
             if getattr(self, '_hit', ''):
+                # 自学习刚认出可用通道 -> 立即用新通道重试一次(避免首次进入首页只看到诊断卡)
                 h2 = self._get(self.base + '/', 8)
                 items = self._wp(self._items(h2))[:HOME_MAX] if h2 else []
                 if not items:
@@ -792,6 +821,7 @@ class Spider(Spider):
         return {'list': items}
 
     def _dm(self):
+        # 取回全失败时的单条快照(短文本, 前端不会截断); 带封面便于必定渲染
         return {'vod_id': '0', 'vod_name': '【诊断】取回失败',
                 'vod_pic': self.base + '/templets/gygxpt/images/pic/1.png',
                 'vod_remarks': (self._dg or '解析0条')[:26], 'type_id': '0', 'type_name': '诊断'}
@@ -816,6 +846,7 @@ class Spider(Spider):
             items = self._probe()
         else:
             items = self._wp(items)
+        # TVBox 前端需要 type_id/type_name 做分类关联显示
         for it in items:
             it['type_id'] = t
             it['type_name'] = self.types.get(t, '')
@@ -824,6 +855,7 @@ class Spider(Spider):
                 'total': pcn * CAT_PAGE, 'list': items}
 
     def _pagecount(self, h, tid, cur=1):
+        # 大站(电影1853页/短剧3371页)每次翻页都全页扫描会很慢 => 按分类缓存 10 分钟
         ck = 'pc:' + str(tid)
         c = self._cget(self._pcnt, ck, 600)
         if c:
@@ -894,7 +926,7 @@ class Spider(Spider):
             intro = re.search(r'class="[^"]*infor_intro[^"]*"[^>]*>(.*?)</div>', h, re.S)
             if intro:
                 d['vod_content'] = re.sub(r'<[^>]+>', '', intro.group(1)).strip()[:800]
-        # ★ v2.14 简介统一前缀
+        # ★ v2.14 简介统一前缀(用户指定)
         if d['vod_content']:
             d['vod_content'] = INTRO_PREFIX + '\n' + d['vod_content']
         else:
@@ -921,6 +953,7 @@ class Spider(Spider):
     # ========== 线路/选集解析 ==========
     @staticmethod
     def _line_name(txt):
+        # 真实页面 tab 文本可能是 "无尽资源7集"(集数直接跟在名称后), 需清洗
         nm = re.sub(r'<sup.*?</sup>', '', txt, flags=re.S)
         nm = re.sub(r'<[^>]+>', '', nm)
         nm = re.sub(r'\s+', ' ', nm).strip()
@@ -934,6 +967,7 @@ class Spider(Spider):
         c = self._cget(self._lc, ck, LINE_TTL)
         if c:
             return c
+        # 线路名: #playNumTab 容器内 a 的文本(DOM序), 避免误抓页面上其它数字 id 链接
         tab_names = []
         mtab = re.search(r'id="playNumTab".*?</div>', h, re.S) or \
             re.search(r'id="playNumTab".*?</ul>', h, re.S)
@@ -944,6 +978,7 @@ class Spider(Spider):
                 tab_names.append((m.group(1), nm))
         if not tab_names:
             tab_names = [('1', '默认')]
+        # 选集: 所有 ul.play_num_list, DOM 顺序与 tab 顺序一致(实测 sid=tab id-1)
         uls = re.findall(r'<ul class="[^"]*play_num_list[^"]*"(.*?)</ul>', h, re.S)
         froms, urls = [], []
         for i, ul in enumerate(uls):
@@ -961,6 +996,7 @@ class Spider(Spider):
             fname = tab_names[i][1] if i < len(tab_names) else ('线路%d' % (i + 1))
             froms.append(fname)
             urls.append(_SEP_EP.join('%s%s%s' % (n, _SEP_NAME_URL, u) for _, n, u in eps))
+        # 兜底: 线路tab缺失时按 sid 直接拼
         if not froms and re.search(r'/gygplayer/%s-\d+-\d+\.html' % re.escape(vid), h):
             for i in range(8):
                 seg = re.findall(r'<a[^>]*title="([^"]*)"[^>]*href="(/gygplayer/%s-%d-\d+\.html)"[^>]*>' % (re.escape(vid), i), h, re.S)
@@ -1003,6 +1039,7 @@ class Spider(Spider):
         return r
 
     def _spc(self, h, pn=1):
+        # 搜索页尾"共296部 2/60" -> (总页数, 总条数)
         if not h:
             return 1, 0
         t = re.sub(r'&nbsp;', ' ', re.sub(r'<[^>]+>', ' ', h))
@@ -1134,7 +1171,9 @@ class Spider(Spider):
         except Exception:
             pass
 
-    # ========== 本地代理 ==========
+    # ========== 本地代理(兜底): m3u8 KEY/分片重写 + 图片转码 ==========
+    # ========== v2.13 播放本地代理(m3u8+分片重写, 治防盗链/需特殊头) ==========
+
     _SPK = {}
 
     def _srvup(self):
@@ -1239,6 +1278,8 @@ class Spider(Spider):
         return b, ct, extra
 
     def _need_px(self, u):
+        # 裸播放器模拟: 不带 Referer 拉 m3u8/子列表/首分片; 必失败 = 防盗链 => 必须走代理
+        # 主机级缓存: 同一 CDN 只探一次(_nh), 避免每个影片都重复探
         hm = re.match(r'https?://([^/]+)', u or '')
         host = hm.group(1) if hm else ''
         nh = getattr(self, '_nh', None) or {}
@@ -1281,6 +1322,7 @@ class Spider(Spider):
         return c
 
     def _alt_play(self, url):
+        # 同集自动换线: 当前线路取不出 m3u8 时, 依次试其它 sid 的同集(最多 8 条线路)
         m = re.search(r'/gygplayer/(\d+)-(\d+)-(\d+)\.html', url or '')
         if not m:
             return ''
@@ -1300,6 +1342,8 @@ class Spider(Spider):
         return ''
 
     def _mkplay(self, u):
+        # PX_MODE 2/HLS: 播放链(m3u8)默认走本地代理重写(零探测, 播放器不用带妖头, 也不受跨域分片影响);
+        # PX_MODE 1: 智能探测(裸播放器能拉通就直连, 省代理开销, 但多 2-3 次探测请求)
         if not u:
             return {'parse': 0, 'url': ''}
         is_hls = 'm3u8' in u.lower()
@@ -1358,6 +1402,7 @@ class Spider(Spider):
             elif ln.startswith('/') and not ln.startswith('//'):
                 ln = 'proxy?url=' + quote(origin + ln, safe='')
             elif ln and not ln.startswith('#') and not ln.startswith('//') and not ln.startswith('proxy'):
+                # 相对路径行(如 master 内 "1000k_720/hls/index.m3u8")补全为代理绝对地址
                 ln = 'proxy?url=' + quote(base + ln, safe='')
             out.append(ln)
         return [200, 'application/vnd.apple.mpegurl', '\n'.join(out)]
