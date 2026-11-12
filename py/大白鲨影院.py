@@ -4,7 +4,7 @@
 站点: stui 模板 + MacCMS + Cloudflare
 关键:
   - 分类 16 个（拼音 slug），筛选走 12 段 /vodshow/ URL（类型-地区-空-剧情-语言-字母-空-空-页码-空-空-年份）
-  - 分页走路径式第 9 段（与站点原生完全一致），列表 36 条/页
+  - 分页必须用 ?page=N（路径式页码会被 Cloudflare 拦），列表 36 条/页
   - 详情 /tr-{slug}.html，播放 /trplay-{slug}-{sid}-{ep}.html
   - 线路顺序按页面 stui-pannel-box b playlist 块顺序（与 sid 大小无关）
   - Cloudflare 挑战页用附加随机 query 绕过
@@ -152,6 +152,7 @@ _RE_SLUG = re.compile(r'/tr-([A-Za-z0-9_\-]+)\.html', re.I)
 _RE_NUM = re.compile(r'<span class="num">\s*(\d+)\s*/\s*(\d+)\s*</span>')
 _RE_PLAYER = re.compile(r'var\s+player_aaaa\s*=\s*(\{[\s\S]*?\})\s*</script>', re.I)
 _RE_SCREEN = re.compile(r'<ul class="stui-screen__list[^"]*"[^>]*>([\s\S]*?)</ul>', re.I)
+_RE_HEAD = re.compile(r'<div class="stui-pannel__head[^"]*"[^>]*>', re.I)
 _RE_RANK_LI = re.compile(r'<li class="bottom-line-dot">([\s\S]*?)</li>', re.I)
 _RE_EXT = re.compile(r'\.(m3u8|mp4|flv|mkv|ts|avi|mov|rmvb|webm)(\?|#|$)', re.I)
 
@@ -381,10 +382,8 @@ class Spider(Spider):
     # ------------------------------------------------------------ 首页
     def homeContent(self, filter):
         result = {}
-        # 优先动态抓首页顶部导航（只取 5 个真实分类，保证干净）
         classes = self._nav_classes()
         if not classes:
-            # 抓不到则回退到你原来的 16 个
             classes = [{"type_id": c["type_id"], "type_name": c["type_name"]} for c in CLASSES]
         result["class"] = classes
 
@@ -394,7 +393,6 @@ class Spider(Spider):
                 tid = c["type_id"]
                 meta = self._fmeta.get(tid)
                 if meta is None:
-                    # 动态抓 /vodtype/ 页面解析筛选
                     h = self._fetch(HOST + "/vodtype/%s.html" % tid)
                     meta, order = self._parse_filters(h, tid)
                     self._fmeta[tid] = meta
@@ -402,7 +400,6 @@ class Spider(Spider):
                 
                 fl = []
                 if meta:
-                    # 解析成功，使用网站实时筛选
                     for dim in ("剧情", "地区", "年份", "语言", "字母"):
                         vals_map = meta.get(dim) or {}
                         if not vals_map:
@@ -414,7 +411,6 @@ class Spider(Spider):
                                 vals.append({"n": label, "v": label})
                         fl.append({"key": dim, "name": dim, "value": vals})
                 else:
-                    # 解析失败，回退到你最开始的硬编码筛选
                     tpl = _TPL.get(next((c2["tpl"] for c2 in CLASSES if c2["type_id"] == tid), "MOVIE"), _F_MOVIE)
                     for dim in ("剧情", "地区", "年份", "语言", "字母"):
                         words = (tpl.get(dim) or "").split()
@@ -429,7 +425,6 @@ class Spider(Spider):
         return result
 
     def _nav_classes(self):
-        """从首页 .stui-header__menu 抓一级分类（/vodtype/xxx.html）"""
         h = self._home_html or self._fetch(HOST + "/")
         if not h:
             return []
@@ -509,14 +504,12 @@ class Spider(Spider):
                 seg = _seg_body(href)
                 if len(seg) < 12:
                     continue
-                # 1. 优先按 SEG_IDX 的段位来取（这样短剧带大陆默认值也能取对）
                 idx = SEG_IDX.get(dim)
                 if idx is not None and idx < len(seg) and seg[idx]:
                     vals[label] = (idx, seg[idx])
                     if label not in seq:
                         seq.append(label)
                     continue
-                # 2. 兜底逻辑：最后一个非空段
                 filled = [i for i in range(1, min(len(seg), 12)) if seg[i]]
                 if not filled:
                     continue
@@ -534,8 +527,11 @@ class Spider(Spider):
         s[0] = tid
         for i in range(1, 12):
             s[i] = segs[i] if i < len(segs) else ""
-        s[8] = str(int(pg)) if pg and int(pg) > 1 else ""   # 路径式页码
-        return HOST + "/vodshow/%s.html" % "-".join(s)
+        s[8] = ""       # 页码一律走 ?page=N，路径式会被 Cloudflare 拦
+        url = HOST + "/vodshow/%s.html" % "-".join(s)
+        if pg and int(pg) > 1:
+            url += "?page=%d" % int(pg)
+        return url
 
     def categoryContent(self, tid, pg, filter, extend):
         pg = int(pg or 1)
@@ -564,7 +560,6 @@ class Spider(Spider):
                 hit = meta[k][v]
                 segs[hit[0]] = hit[1]
             else:
-                # 兜底硬编码字典
                 if k in SEG_IDX:
                     segs[SEG_IDX[k]] = v
 
@@ -581,9 +576,11 @@ class Spider(Spider):
 
     # ------------------------------------------------------------ 详情
     def _field(self, h, label):
+        # 形式一：<span class="text-muted">总点击量：306</span>
         m = re.search(r'<span class="text-muted[^"]*">\s*' + label + r'\s*[:：]\s*([^<]*)</span>', h)
         if m and m.group(1).strip():
             return _html(m.group(1))
+        # 形式二：<span class="text-muted">类型：</span><a>国产</a>
         m = re.search(r'<span class="text-muted[^"]*">\s*' + label + r'\s*[:：]\s*</span>([\s\S]*?)(?=</p>|<span class="text-muted)', h)
         if not m:
             return ""
