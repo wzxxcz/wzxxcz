@@ -3,11 +3,13 @@
 大白鲨影院 shipin.trjsgc.com | TVBox Python 爬虫
 站点: stui 模板 + MacCMS + Cloudflare
 关键:
-  - 分类 16 个（拼音 slug），筛选走 12 段 /vodshow/ URL（类型-地区-空-剧情-语言-字母-空-空-页码-空-空-年份）
-  - 电影 / 连续剧 页带“按类型”导航（=切 type_id），与站点筛选面板一致
+  - 分类 5 个（与站点导航一致）：电影 / 连续剧 / 综艺 / 动漫 / 热播短剧
+  - 电影、连续剧页的“按类型”导航做成筛选第一栏（动作片…、国产剧…），与站点筛选面板一致
+  - 筛选走 12 段 /vodshow/ URL（类型-地区-空-剧情-语言-字母-空-空-页码-空-空-年份）
   - 分页必须用 ?page=N（路径式页码会被 Cloudflare 拦），列表 36 条/页
   - 详情 /tr-{slug}.html，播放 /trplay-{slug}-{sid}-{ep}.html
   - 线路顺序按页面 stui-pannel-box b playlist 块顺序（与 sid 大小无关）
+  - 首页只保留站点“最新XX”5 个有海报的分块（周榜单/总榜单无封面，不返回）
   - Cloudflare 挑战页用附加随机 query 绕过
 """
 import re
@@ -71,28 +73,17 @@ PAGE_SIZE = 36
 SEARCH_SIZE = 10
 
 # ------------------------------------------------------------------ 分类
-# 站点导航 16 个分类（全部为拼音 slug，详情页即 /tr-{slug}.html）
+# 站点导航 5 个分类（拼音 slug，详情页即 /tr-{slug}.html）
 CLASSES = [
-    {"type_id": "dianying",      "type_name": "电影",   "tpl": "MOVIE"},
-    {"type_id": "dongzuopian",   "type_name": "动作片", "tpl": "MOVIE"},
-    {"type_id": "xijupian",      "type_name": "喜剧片", "tpl": "MOVIE"},
-    {"type_id": "aiqingpian",    "type_name": "爱情片", "tpl": "MOVIE"},
-    {"type_id": "kehuanpian",    "type_name": "科幻片", "tpl": "MOVIE"},
-    {"type_id": "kongbupian",    "type_name": "恐怖片", "tpl": "MOVIE"},
-    {"type_id": "juqingpian",    "type_name": "剧情片", "tpl": "MOVIE"},
-    {"type_id": "zhanzhengpian", "type_name": "战争片", "tpl": "MOVIE"},
-    {"type_id": "lianxuju",      "type_name": "连续剧", "tpl": "TV"},
-    {"type_id": "guochanju",     "type_name": "国产剧", "tpl": "TV"},
-    {"type_id": "gangtaiju",     "type_name": "港台剧", "tpl": "TV"},
-    {"type_id": "rihanju",       "type_name": "日韩剧", "tpl": "TV"},
-    {"type_id": "oumeiju",       "type_name": "欧美剧", "tpl": "TV"},
-    {"type_id": "zongyi",        "type_name": "综艺",   "tpl": "VARIETY"},
-    {"type_id": "dongman",       "type_name": "动漫",   "tpl": "ANIME"},
-    {"type_id": "duanju",        "type_name": "热播短剧", "tpl": "SHORT"},
+    {"type_id": "dianying", "type_name": "电影",     "tpl": "MOVIE"},
+    {"type_id": "lianxuju", "type_name": "连续剧",   "tpl": "TV"},
+    {"type_id": "zongyi",   "type_name": "综艺",     "tpl": "VARIETY"},
+    {"type_id": "dongman",  "type_name": "动漫",     "tpl": "ANIME"},
+    {"type_id": "duanju",   "type_name": "热播短剧", "tpl": "SHORT"},
 ]
 
 # 站点“按类型”导航（筛选面板第一栏），值即目标分类 type_id
-# 仅 电影 / 连续剧 两个栏目页有，子分类页没有
+# 仅 电影 / 连续剧 两个栏目页有，其余栏目和子分类页没有
 _SUB_TYPE = {
     "dianying": [
         ("动作片", "dongzuopian"), ("喜剧片", "xijupian"), ("爱情片", "aiqingpian"),
@@ -444,6 +435,10 @@ class Spider(Spider):
         groups = []
         used = set()
         for i, (start, name) in enumerate(heads):
+            # 只取“最新电影/最新连续剧/最新综艺/最新动漫/最新热播短剧”这 5 块
+            # （周榜单、总榜单是纯文字榜，站点不给封面，App 里只能显示成色块）
+            if not name.startswith("最新"):
+                continue
             end = heads[i + 1][0] if i + 1 < len(heads) else len(h)
             block = h[start:end]
             if "stui-vodlist__thumb" in block:
