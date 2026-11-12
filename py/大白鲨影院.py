@@ -141,7 +141,7 @@ _TPL = {
 
 # 12 段 URL 中各筛选维度所在的位置
 # /vodshow/{type}-{area}-{}-{class}-{lang}-{letter}-{}-{}-{page}-{}-{}-{year}.html
-SEG_IDX = {"剧情": 3, "地区": 1, "年份": 11, "语言": 4, "字母": 5}
+SEG_IDX = {"剧情": 3, "地区": 1, "年份": 11, "语言": 4, "字母": 5, "排序": 2}
 
 # ------------------------------------------------------------------ 正则
 _RE_THUMB_A = re.compile(r'<a\b[^>]*class="[^"]*stui-vodlist__thumb[^"]*"[^>]*>', re.I)
@@ -325,7 +325,14 @@ class Spider(Spider):
             if not name:
                 continue
             seen.add(slug)
+            
+            # 提取封面（智能识别懒加载属性）
             pic = _attr(tag, "data-original") or _attr(tag, "data-src") or _attr(tag, "src")
+            if not pic:
+                img = re.search(r'<img\b[^>]*>', seg, re.I)
+                if img:
+                    pic = _attr(img.group(0), "data-original") or _attr(img.group(0), "data-src") or _attr(img.group(0), "src")
+
             rm = _RE_PIC_TEXT.search(seg)
             remark = _html(rm.group(1)) if rm else ""
             am = _RE_ACTORS_P.search(seg)
@@ -400,7 +407,8 @@ class Spider(Spider):
                 
                 fl = []
                 if meta:
-                    for dim in ("剧情", "地区", "年份", "语言", "字母"):
+                    # 动态解析出的真实筛选（已包含排序）
+                    for dim in ("排序", "剧情", "地区", "年份", "语言", "字母"):
                         vals_map = meta.get(dim) or {}
                         if not vals_map:
                             continue
@@ -411,7 +419,10 @@ class Spider(Spider):
                                 vals.append({"n": label, "v": label})
                         fl.append({"key": dim, "name": dim, "value": vals})
                 else:
+                    # 抓不到时的硬编码兜底（加入排序）
                     tpl = _TPL.get(next((c2["tpl"] for c2 in CLASSES if c2["type_id"] == tid), "MOVIE"), _F_MOVIE)
+                    # 排序兜底
+                    fl.append({"key": "排序", "name": "排序", "value": [{"n": "全部", "v": ""}, {"n": "按时间", "v": "time"}, {"n": "按人气", "v": "hits"}, {"n": "按评分", "v": "score"}]})
                     for dim in ("剧情", "地区", "年份", "语言", "字母"):
                         words = (tpl.get(dim) or "").split()
                         if not words:
@@ -520,6 +531,13 @@ class Spider(Spider):
             if vals:
                 meta[dim] = vals
                 order[dim] = seq
+                
+        # 特殊追加：把网页顶部的「排序」栏加进筛选里
+        if 'nav nav-head' in (h or ''):
+            sort_vals = {"按时间": (2, "time"), "按人气": (2, "hits"), "按评分": (2, "score")}
+            meta["排序"] = sort_vals
+            order["排序"] = list(sort_vals.keys())
+            
         return meta, order
 
     def _cat_url(self, tid, segs, pg):
