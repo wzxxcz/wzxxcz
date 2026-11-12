@@ -4,7 +4,7 @@
 站点: stui 模板 + MacCMS + Cloudflare
 关键:
   - 分类 16 个（拼音 slug），筛选走 12 段 /vodshow/ URL（类型-地区-空-剧情-语言-字母-空-空-页码-空-空-年份）
-  - 分页必须用 ?page=N（路径式页码会被 Cloudflare 拦），列表 36 条/页
+  - 分页走 ?page=N（路径式页码会被拦），列表 36 条/页
   - 详情 /tr-{slug}.html，播放 /trplay-{slug}-{sid}-{ep}.html
   - 线路顺序按页面 stui-pannel-box b playlist 块顺序（与 sid 大小无关）
   - Cloudflare 挑战页用附加随机 query 绕过
@@ -58,12 +58,10 @@ except ImportError:
 
 
 HOST = "https://shipin.trjsgc.com"
-
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
-
 DEFAULT_PIC = HOST + "/statics/img/load.gif"
 
 PAGE_SIZE = 36
@@ -137,7 +135,7 @@ _TPL = {
     "SHORT": _F_SHORT,
 }
 
-# 12 段 URL 中各筛选维度所在的位置
+# 排序强行放在 index 2，符合 MacCMS 的规范
 SEG_IDX = {"剧情": 3, "地区": 1, "年份": 11, "语言": 4, "字母": 5, "排序": 2}
 
 # ------------------------------------------------------------------ 正则
@@ -149,7 +147,6 @@ _RE_SLUG = re.compile(r'/tr-([A-Za-z0-9_\-]+)\.html', re.I)
 _RE_NUM = re.compile(r'<span class="num">\s*(\d+)\s*/\s*(\d+)\s*</span>')
 _RE_PLAYER = re.compile(r'var\s+player_aaaa\s*=\s*(\{[\s\S]*?\})\s*</script>', re.I)
 _RE_SCREEN = re.compile(r'<ul class="stui-screen__list[^"]*"[^>]*>([\s\S]*?)</ul>', re.I)
-_RE_HEAD = re.compile(r'<div class="stui-pannel__head[^"]*"[^>]*>', re.I)
 _RE_RANK_LI = re.compile(r'<li class="bottom-line-dot">([\s\S]*?)</li>', re.I)
 _RE_EXT = re.compile(r'\.(m3u8|mp4|flv|mkv|ts|avi|mov|rmvb|webm)(\?|#|$)', re.I)
 
@@ -197,7 +194,6 @@ def _pic(u):
 
 
 def _seg_body(href):
-    """把 /vodshow/xxx.html 拆成 12 段"""
     body = href.split("?")[0].split("#")[0]
     body = body.replace("/vodshow/", "").replace(".html", "")
     return urllib.parse.unquote(body).split("-")
@@ -205,7 +201,6 @@ def _seg_body(href):
 
 class Spider(Spider):
 
-    # ------------------------------------------------------------ 基础
     def __init__(self):
         try:
             super(Spider, self).__init__()
@@ -219,8 +214,8 @@ class Spider(Spider):
             "Referer": HOST + "/",
         }
         self._last_req = 0.0
-        self._fmeta = {}      # tid -> {维度: {值: (段位, 值)}}
-        self._fmeta_raw = {}  # tid -> {维度: [值...]} 顺序保留
+        self._fmeta = {}
+        self._fmeta_raw = {}
         self._home_html = ""
 
     def getName(self):
@@ -249,7 +244,6 @@ class Spider(Spider):
             pass
         self._session = None
 
-    # ------------------------------------------------------------ 网络
     def _is_cf(self, h):
         if not h:
             return True
@@ -283,7 +277,6 @@ class Spider(Spider):
         return ""
 
     def _fetch(self, url):
-        """取页面；遇到 Cloudflare 挑战页就附加随机 query 重取（站点对无参路径有缓存拦截）"""
         h = self._raw(url)
         if not self._is_cf(h):
             return h
@@ -296,11 +289,9 @@ class Spider(Spider):
             time.sleep(0.5 + i * 0.4)
         return h or ""
 
-    # ------------------------------------------------------------ 卡片解析
     def _cards(self, h):
         if not h:
             return []
-        # 详情页的大图块会被误判为列表卡片，先剔除
         h = re.sub(r'<div class="stui-content__thumb">[\s\S]*?</div>', '', h, count=1)
         out = []
         seen = set()
@@ -322,7 +313,7 @@ class Spider(Spider):
                 continue
             seen.add(slug)
             
-            # 强行获取真实封面（优先拿 data-original，过滤默认 loading 图）
+            # 精准取图，如果图为空才取备用，绝不把 load.gif 吐出去
             pic = _attr(tag, "data-original") or _attr(tag, "data-src") or _attr(tag, "src")
             if not pic or "load.gif" in pic:
                 img = re.search(r'<img\b[^>]*>', seg, re.I)
@@ -343,7 +334,6 @@ class Spider(Spider):
         return out
 
     def _rank_items(self, seg):
-        """首页榜单（stui-vodlist__text 文字列表）"""
         out = []
         seen = set()
         for m in _RE_RANK_LI.finditer(seg):
@@ -392,6 +382,9 @@ class Spider(Spider):
 
         if filter:
             filters = {}
+            # 无论是哪个分类，都强行给它注入“排序”按钮
+            sort_vals = [{"n": "全部", "v": ""}, {"n": "按时间", "v": "time"}, {"n": "按人气", "v": "hits"}, {"n": "按评分", "v": "score"}]
+            
             for c in classes:
                 tid = c["type_id"]
                 meta = self._fmeta.get(tid)
@@ -403,7 +396,6 @@ class Spider(Spider):
                 
                 fl = []
                 if meta:
-                    # 动态解析出的真实筛选
                     for dim in ("剧情", "地区", "年份", "语言", "字母"):
                         vals_map = meta.get(dim) or {}
                         if not vals_map:
@@ -415,15 +407,9 @@ class Spider(Spider):
                                 vals.append({"n": label, "v": label})
                         fl.append({"key": dim, "name": dim, "value": vals})
                     
-                    # 追加排序放到最后面
-                    if "排序" in meta:
-                        vals = [{"n": "全部", "v": ""}]
-                        for label in meta["排序"].keys():
-                            vals.append({"n": label, "v": label})
-                        fl.append({"key": "排序", "name": "排序", "value": vals})
-
+                    # 强制在末尾加入排序按钮
+                    fl.append({"key": "排序", "name": "排序", "value": sort_vals})
                 else:
-                    # 抓不到时的硬编码兜底
                     tpl = _TPL.get(next((c2["tpl"] for c2 in CLASSES if c2["type_id"] == tid), "MOVIE"), _F_MOVIE)
                     for dim in ("剧情", "地区", "年份", "语言", "字母"):
                         words = (tpl.get(dim) or "").split()
@@ -433,8 +419,7 @@ class Spider(Spider):
                         for w in words:
                             vals.append({"n": w, "v": w})
                         fl.append({"key": dim, "name": dim, "value": vals})
-                    # 排序兜底放在最后
-                    fl.append({"key": "排序", "name": "排序", "value": [{"n": "全部", "v": ""}, {"n": "按时间", "v": "time"}, {"n": "按人气", "v": "hits"}, {"n": "按评分", "v": "score"}]})
+                    fl.append({"key": "排序", "name": "排序", "value": sort_vals})
 
                 filters[tid] = fl
             result["filters"] = filters
@@ -471,19 +456,18 @@ class Spider(Spider):
             return {"list": []}
 
         groups = []
-        # 按顶层 stui-pannel 块切分
+        # 精准切块：只找有大图列表的模块，彻底抛弃底部的文字排行榜
         blocks = re.split(r'<div class="stui-pannel stui-pannel-bg', h)
         for blk in blocks[1:]:
-            # 排除底部纯榜单块（没左栏的）
             if 'col-lg-wide-75' not in blk:
                 continue
 
-            # 提取当前块的标题（如“最新电影”）
-            m = re.search(r'<div class="col-lg-wide-75[^"]*">[\s\S]*?<h3 class="title">[\s\S]*?<a[^>]*>([\s\S]*?)</a>', blk)
+            # 从 h3 提取标题
+            m = re.search(r'<h3 class="title">[\s\S]*?<a[^>]*>([\s\S]*?)</a>', blk)
             gname = _html(m.group(1)) if m else "最新推荐"
 
-            # 精确提取左侧卡片列表，防止沾染右侧榜单
-            lm = re.search(r'<div class="col-lg-wide-75[^"]*">[\s\S]*?<ul class="stui-vodlist clearfix">([\s\S]*?)</ul>', blk)
+            # 精准定位左栏大图列表，绝不混入右栏
+            lm = re.search(r'<ul class="stui-vodlist clearfix">([\s\S]*?)</ul>', blk)
             if not lm:
                 continue
                 
@@ -495,7 +479,6 @@ class Spider(Spider):
 
     # ------------------------------------------------------------ 筛选
     def _parse_filters(self, h, tid):
-        """动态解析分类页筛选块，返回 {维度: {显示名: (段位, 值)}}"""
         meta = {}
         order = {}
         for m in _RE_SCREEN.finditer(h or ""):
@@ -504,7 +487,7 @@ class Spider(Spider):
             if not nm:
                 continue
             raw = nm.group(1).strip()
-            if raw == "按类型":      # 这是分类导航（换 seg[0]），不是筛选
+            if raw == "按类型": 
                 continue
             dim = raw.replace("按", "").strip()
             if dim not in SEG_IDX:
@@ -536,13 +519,6 @@ class Spider(Spider):
             if vals:
                 meta[dim] = vals
                 order[dim] = seq
-                
-        # 特殊追加：把网页顶部的「排序」栏加进筛选里，绑定到第 3 段（索引 2）
-        if 'nav nav-head' in (h or ''):
-            sort_vals = {"按时间": (2, "time"), "按人气": (2, "hits"), "按评分": (2, "score")}
-            meta["排序"] = sort_vals
-            order["排序"] = list(sort_vals.keys())
-            
         return meta, order
 
     def _cat_url(self, tid, segs, pg):
@@ -550,7 +526,7 @@ class Spider(Spider):
         s[0] = tid
         for i in range(1, 12):
             s[i] = segs[i] if i < len(segs) else ""
-        s[8] = ""       # 页码一律走 ?page=N，路径式会被 Cloudflare 拦
+        s[8] = ""
         url = HOST + "/vodshow/%s.html" % "-".join(s)
         if pg and int(pg) > 1:
             url += "?page=%d" % int(pg)
@@ -579,7 +555,10 @@ class Spider(Spider):
         for k, v in ext.items():
             if not v:
                 continue
-            if meta and k in meta and v in meta[k]:
+            # 强行把排序塞入第 3 段 (索引 2)
+            if k == "排序":
+                segs[2] = v
+            elif meta and k in meta and v in meta[k]:
                 hit = meta[k][v]
                 segs[hit[0]] = hit[1]
             else:
@@ -599,11 +578,9 @@ class Spider(Spider):
 
     # ------------------------------------------------------------ 详情
     def _field(self, h, label):
-        # 形式一：<span class="text-muted">总点击量：306</span>
         m = re.search(r'<span class="text-muted[^"]*">\s*' + label + r'\s*[:：]\s*([^<]*)</span>', h)
         if m and m.group(1).strip():
             return _html(m.group(1))
-        # 形式二：<span class="text-muted">类型：</span><a>国产</a>
         m = re.search(r'<span class="text-muted[^"]*">\s*' + label + r'\s*[:：]\s*</span>([\s\S]*?)(?=</p>|<span class="text-muted)', h)
         if not m:
             return ""
@@ -642,7 +619,6 @@ class Spider(Spider):
         if not h:
             return {"list": []}
 
-        # 标题 / 评分
         t = re.search(r'<h1 class="title">([\s\S]*?)</h1>', h, re.I)
         title_raw = t.group(1) if t else ""
         score = ""
@@ -654,7 +630,6 @@ class Spider(Spider):
         if not name:
             return {"list": []}
 
-        # 竖图 / 副标题
         pic = ""
         remark = ""
         tm = re.search(r'<div class="stui-content__thumb">([\s\S]*?)</div>', h, re.I)
@@ -683,13 +658,11 @@ class Spider(Spider):
         director = self._field(h, "导演")
         score_cnt = self._field(h, "网友对评分")
 
-        # 面包屑分类
         cat = ""
         cm = re.search(r'<a href="/vodshow/[^"]*"[^>]*>([^<]{1,12})</a>\s*<i class="icon iconfont icon-more">', h)
         if cm:
             cat = _html(cm.group(1))
 
-        # 短简介
         desc = ""
         dm = re.search(r'<p class="desc[^"]*">([\s\S]*?)</p>', h, re.I)
         if dm:
@@ -701,7 +674,6 @@ class Spider(Spider):
 
         long_desc = self._long_desc(h)
 
-        # 简介拼装：短简介优先，缺失则用长简介里的剧情简述
         if desc:
             content = INTRO_PREFIX + "\n" + desc
             if long_desc and desc[:30] not in long_desc:
@@ -723,7 +695,6 @@ class Spider(Spider):
                 body = "，".join(bits) if bits else "暂无简介"
             content = INTRO_PREFIX + "\n" + body
 
-        # 线路：按 stui-pannel-box b playlist 块顺序取，块顺序与 sid 无关
         play_from = []
         play_url = []
         pos = [m.start() for m in re.finditer(r'<div class="stui-pannel-box b playlist', h, re.I)]
@@ -791,7 +762,6 @@ class Spider(Spider):
         if not u:
             return {"parse": 1, "playUrl": "", "url": url,
                     "header": json.dumps({"User-Agent": UA, "Referer": HOST + "/"})}
-        # hnyun 等源给的是 /play/xxx 无后缀，需补 index.m3u8
         if not _RE_EXT.search(u):
             u = u.rstrip("/") + "/index.m3u8"
         header = {
