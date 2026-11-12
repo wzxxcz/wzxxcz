@@ -70,7 +70,6 @@ PAGE_SIZE = 36
 SEARCH_SIZE = 10
 
 # ------------------------------------------------------------------ 分类
-# 站点导航 16 个分类（全部为拼音 slug，详情页即 /tr-{slug}.html）
 CLASSES = [
     {"type_id": "dianying",      "type_name": "电影",   "tpl": "MOVIE"},
     {"type_id": "dongzuopian",   "type_name": "动作片", "tpl": "MOVIE"},
@@ -90,7 +89,6 @@ CLASSES = [
     {"type_id": "duanju",        "type_name": "短剧",   "tpl": "SHORT"},
 ]
 
-# 各分类页真实筛选维度（抓自站点 stui-screen__list，按字母顺序去重）
 _F_MOVIE = {
     "剧情": "喜剧 爱情 恐怖 动作 科幻 剧情 战争 警匪 犯罪 动画 奇幻 武侠 冒险 枪战 悬疑 惊悚 经典 青春 文艺 微电影 古装 历史 运动 农村 儿童 网络电影",
     "地区": "大陆 香港 台湾 美国 法国 英国 日本 韩国 德国 泰国 印度 意大利 西班牙 加拿大 其他",
@@ -140,8 +138,7 @@ _TPL = {
 }
 
 # 12 段 URL 中各筛选维度所在的位置
-# 巧妙地把「排序」塞进第 6 段（原本字母的位置），实现下拉菜单
-SEG_IDX = {"剧情": 3, "地区": 1, "年份": 11, "语言": 4, "字母": 5, "排序": 5}
+SEG_IDX = {"剧情": 3, "地区": 1, "年份": 11, "语言": 4, "字母": 5, "排序": 2}
 
 # ------------------------------------------------------------------ 正则
 _RE_THUMB_A = re.compile(r'<a\b[^>]*class="[^"]*stui-vodlist__thumb[^"]*"[^>]*>', re.I)
@@ -156,7 +153,6 @@ _RE_HEAD = re.compile(r'<div class="stui-pannel__head[^"]*"[^>]*>', re.I)
 _RE_RANK_LI = re.compile(r'<li class="bottom-line-dot">([\s\S]*?)</li>', re.I)
 _RE_EXT = re.compile(r'\.(m3u8|mp4|flv|mkv|ts|avi|mov|rmvb|webm)(\?|#|$)', re.I)
 
-# Cloudflare 挑战页特征
 _CF_MARKS = (
     "One moment, please",
     "Just a moment",
@@ -407,8 +403,8 @@ class Spider(Spider):
                 
                 fl = []
                 if meta:
-                    # 动态解析出的真实筛选（已包含排序）
-                    for dim in ("排序", "剧情", "地区", "年份", "语言", "字母"):
+                    # 动态解析出的真实筛选
+                    for dim in ("剧情", "地区", "年份", "语言", "字母"):
                         vals_map = meta.get(dim) or {}
                         if not vals_map:
                             continue
@@ -418,11 +414,17 @@ class Spider(Spider):
                             if label and label != "全部":
                                 vals.append({"n": label, "v": label})
                         fl.append({"key": dim, "name": dim, "value": vals})
+                    
+                    # 追加排序放到最后面
+                    if "排序" in meta:
+                        vals = [{"n": "全部", "v": ""}]
+                        for label in meta["排序"].keys():
+                            vals.append({"n": label, "v": label})
+                        fl.append({"key": "排序", "name": "排序", "value": vals})
+
                 else:
-                    # 抓不到时的硬编码兜底（加入排序）
+                    # 抓不到时的硬编码兜底
                     tpl = _TPL.get(next((c2["tpl"] for c2 in CLASSES if c2["type_id"] == tid), "MOVIE"), _F_MOVIE)
-                    # 排序兜底
-                    fl.append({"key": "排序", "name": "排序", "value": [{"n": "全部", "v": ""}, {"n": "按时间", "v": "time"}, {"n": "按人气", "v": "hits"}, {"n": "按评分", "v": "score"}]})
                     for dim in ("剧情", "地区", "年份", "语言", "字母"):
                         words = (tpl.get(dim) or "").split()
                         if not words:
@@ -431,6 +433,9 @@ class Spider(Spider):
                         for w in words:
                             vals.append({"n": w, "v": w})
                         fl.append({"key": dim, "name": dim, "value": vals})
+                    # 排序兜底放在最后
+                    fl.append({"key": "排序", "name": "排序", "value": [{"n": "全部", "v": ""}, {"n": "按时间", "v": "time"}, {"n": "按人气", "v": "hits"}, {"n": "按评分", "v": "score"}]})
+
                 filters[tid] = fl
             result["filters"] = filters
         return result
@@ -532,9 +537,9 @@ class Spider(Spider):
                 meta[dim] = vals
                 order[dim] = seq
                 
-        # 特殊追加：把网页顶部的「排序」栏加进筛选里，强行绑定到第 6 段（索引 5）
+        # 特殊追加：把网页顶部的「排序」栏加进筛选里，绑定到第 3 段（索引 2）
         if 'nav nav-head' in (h or ''):
-            sort_vals = {"按时间": (5, "time"), "按人气": (5, "hits"), "按评分": (5, "score")}
+            sort_vals = {"按时间": (2, "time"), "按人气": (2, "hits"), "按评分": (2, "score")}
             meta["排序"] = sort_vals
             order["排序"] = list(sort_vals.keys())
             
