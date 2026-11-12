@@ -11,6 +11,8 @@
   - 详情 /tr-{slug}.html，播放 /trplay-{slug}-{sid}-{ep}.html
   - 线路顺序按页面 stui-pannel-box b playlist 块顺序（与 sid 大小无关）
   - 简介取详情页下方“剧情简介”整段（短“简介”常只有一句，会截断）
+  - 主演/导演：详情页数据行被站点模板截断（示例只到“王”），改用“剧情简介”宣传句
+    “本部作品是由导演X，主演A,B,C…等一起努力共同拍摄完成的”取全量名单
   - 首页只保留站点“最新XX”5 个分块，分组带首集封面
   - Cloudflare 挑战页用附加随机 query 绕过
 """
@@ -187,7 +189,7 @@ def _attr(tag, name):
     m = re.search(r'\b' + name + r'\s*=\s*"([^"]*)"', tag, re.I)
     if m:
         return m.group(1).strip()
-    m = re.search(r"\b" + name + r'\s*=\s*' + "'([^']*)'", tag, re.I)
+    m = re.search(r"\b" + name + r"\s*=\s*'([^']*)'", tag, re.I)
     return m.group(1).strip() if m else ""
 
 
@@ -221,6 +223,17 @@ def _seg_body(href):
     body = href.split("?")[0].split("#")[0]
     body = body.replace("/vodshow/", "").replace(".html", "")
     return urllib.parse.unquote(body).split("-")
+
+
+def _names(s):
+    """把宣传句里的名单切成条目（兼容 , ， 、 / 空格）"""
+    parts = re.split(r'[,，、/\s]+', s or "")
+    out = []
+    for x in parts:
+        x = x.strip(" ，,、/。")
+        if x and x not in out:
+            out.append(x)
+    return out
 
 
 class Spider(Spider):
@@ -594,20 +607,51 @@ class Spider(Spider):
                 return ",".join(vals)
         return _html(seg)
 
-    def _long_desc(self, h):
-        """详情页下方“剧情简介”整段，取其中的剧情简述（去掉站点宣传语）"""
+    def _promo(self, h):
+        """详情页下方“剧情简介”整段原文（站点宣传句 + 剧情正文）"""
         i = h.find('id="desc"')
         if i < 0:
             return ""
         blk = h[i: i + 6000]
         p = re.search(r'<p class="col-pd">([\s\S]*?)</p>', blk, re.I)
-        if not p:
-            return ""
-        txt = _html(p.group(1))
-        m = re.search(r'剧情简述\s*[:：]?\s*(.+)$', txt)
+        return _html(p.group(1)) if p else ""
+
+    def _plot(self, promo):
+        """从宣传句里剥出“剧情简述”后的正文（去掉站点套话）"""
+        m = re.search(r'剧情简述\s*[:：]?\s*(.+)$', promo or "")
         if m and len(m.group(1).strip()) > 8:
             return m.group(1).strip()
-        return txt
+        return promo or ""
+
+    def _long_desc(self, h):
+        return self._plot(self._promo(h))
+
+    def _promo_meta(self, promo):
+        """从宣传句取全量名单：
+        本部作品是由导演柏杉，主演A,B,C…等一起努力共同拍摄完成的
+        该作品在2026年上映于 中国大陆 / 新加坡 / 马来西亚地区
+        站点数据行会把主演截断（只留 5 个、末尾还被砍半），这里才是全的
+        """
+        out = {}
+        m = re.search(r'导演\s*([^，。,]{1,80}?)\s*[，,]\s*主演', promo or "")
+        if not m:
+            m = re.search(r'导演\s*([^，。,]{1,60}?)\s*[，。]', promo or "")
+        if m and m.group(1).strip():
+            ds = _names(m.group(1))
+            if ds:
+                out["director"] = ",".join(ds)
+        m = re.search(r'主演\s*([^。]{2,600}?)\s*等', promo or "")
+        if m:
+            names = _names(m.group(1))
+            if len(names) >= 2:
+                out["actor"] = ",".join(names)
+        m = re.search(r'(\d{4})\s*年上映于\s*([^。]{1,200}?)地区', promo or "")
+        if m:
+            out["year"] = m.group(1)
+            areas = _names(m.group(2))
+            if areas:
+                out["area"] = ",".join(areas)
+        return out
 
     def detailContent(self, ids):
         vid = ids[0] if isinstance(ids, (list, tuple)) else ids
@@ -678,7 +722,19 @@ class Spider(Spider):
         if len(desc) < 12:
             desc = ""
 
-        long_desc = self._long_desc(h)
+        promo = self._promo(h)
+        long_desc = self._plot(promo)
+
+        # 数据行被站点模板截断的字段，用宣传句里的全量名单补齐（只在更全时覆盖）
+        pm = self._promo_meta(promo)
+        if pm.get("actor") and len(pm["actor"]) > len(actor):
+            actor = pm["actor"]
+        if pm.get("director") and len(pm["director"]) > len(director):
+            director = pm["director"]
+        if pm.get("area") and len(_names(pm["area"])) > len(_names(area)):
+            area = pm["area"]
+        if pm.get("year") and not year:
+            year = pm["year"]
 
         # 简介：优先下方“剧情简介”整段，短简介常常只是首句（会截断剧情）
         brief = ""
