@@ -3,8 +3,8 @@
 大白鲨影院 shipin.trjsgc.com | TVBox Python 爬虫
 站点: stui 模板 + MacCMS + Cloudflare
 关键:
-  - 分类 16 个（拼音 slug），筛选走 12 段 /vodshow/ URL（类型-地区-空-剧情-语言-字母-空-空-页码-空-空-年份）
-  - 分页必须用 ?page=N（路径式页码会被 Cloudflare 拦），列表 36 条/页
+  - 一级分类 5 个（/vodtype/ 导航），动态抓取；筛选走 12 段 /vodshow/ URL
+  - 分页走路径式第 9 段（站点原生），列表 36 条/页
   - 详情 /tr-{slug}.html，播放 /trplay-{slug}-{sid}-{ep}.html
   - 线路顺序按页面 stui-pannel-box b playlist 块顺序（与 sid 大小无关）
   - Cloudflare 挑战页用附加随机 query 绕过
@@ -70,74 +70,14 @@ PAGE_SIZE = 36
 SEARCH_SIZE = 10
 
 # ------------------------------------------------------------------ 分类
-# 站点导航 16 个分类（全部为拼音 slug，详情页即 /tr-{slug}.html）
+# 兜底分类（站点导航实际只有 5 个一级，运行时会动态抓取覆盖）
 CLASSES = [
-    {"type_id": "dianying",      "type_name": "电影",   "tpl": "MOVIE"},
-    {"type_id": "dongzuopian",   "type_name": "动作片", "tpl": "MOVIE"},
-    {"type_id": "xijupian",      "type_name": "喜剧片", "tpl": "MOVIE"},
-    {"type_id": "aiqingpian",    "type_name": "爱情片", "tpl": "MOVIE"},
-    {"type_id": "kehuanpian",    "type_name": "科幻片", "tpl": "MOVIE"},
-    {"type_id": "kongbupian",    "type_name": "恐怖片", "tpl": "MOVIE"},
-    {"type_id": "juqingpian",    "type_name": "剧情片", "tpl": "MOVIE"},
-    {"type_id": "zhanzhengpian", "type_name": "战争片", "tpl": "MOVIE"},
-    {"type_id": "lianxuju",      "type_name": "连续剧", "tpl": "TV"},
-    {"type_id": "guochanju",     "type_name": "国产剧", "tpl": "TV"},
-    {"type_id": "gangtaiju",     "type_name": "港台剧", "tpl": "TV"},
-    {"type_id": "rihanju",       "type_name": "日韩剧", "tpl": "TV"},
-    {"type_id": "oumeiju",       "type_name": "欧美剧", "tpl": "TV"},
-    {"type_id": "zongyi",        "type_name": "综艺",   "tpl": "VARIETY"},
-    {"type_id": "dongman",       "type_name": "动漫",   "tpl": "ANIME"},
-    {"type_id": "duanju",        "type_name": "短剧",   "tpl": "SHORT"},
+    {"type_id": "dianying",  "type_name": "电影"},
+    {"type_id": "lianxuju",  "type_name": "连续剧"},
+    {"type_id": "zongyi",    "type_name": "综艺"},
+    {"type_id": "dongman",   "type_name": "动漫"},
+    {"type_id": "duanju",    "type_name": "热播短剧"},
 ]
-
-# 各分类页真实筛选维度（抓自站点 stui-screen__list，按字母顺序去重）
-_F_MOVIE = {
-    "剧情": "喜剧 爱情 恐怖 动作 科幻 剧情 战争 警匪 犯罪 动画 奇幻 武侠 冒险 枪战 悬疑 惊悚 经典 青春 文艺 微电影 古装 历史 运动 农村 儿童 网络电影",
-    "地区": "大陆 香港 台湾 美国 法国 英国 日本 韩国 德国 泰国 印度 意大利 西班牙 加拿大 其他",
-    "年份": "2018 2017 2016 2015 2014 2013 2012 2011 2010",
-    "语言": "国语 英语 粤语 闽南语 韩语 日语 法语 德语 其它",
-    "字母": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
-}
-
-_F_TV = {
-    "剧情": "古装 战争 青春偶像 喜剧 家庭 犯罪 动作 奇幻 剧情 历史 经典 乡村 情景 商战 网剧 其他",
-    "地区": "内地 韩国 香港 台湾 日本 美国 泰国 英国 新加坡 其他",
-    "年份": "2018 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2006 2005 2004",
-    "语言": "国语 英语 粤语 闽南语 韩语 日语 其它",
-    "字母": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
-}
-
-_F_VARIETY = {
-    "剧情": "选秀 情感 访谈 播报 旅游 音乐 美食 纪实 曲艺 生活 游戏互动 财经 求职",
-    "地区": "内地 港台 日韩 欧美",
-    "年份": "2018 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004",
-    "语言": "国语 英语 粤语 闽南语 韩语 日语 其它",
-    "字母": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
-}
-
-_F_ANIME = {
-    "剧情": "情感 科幻 热血 推理 搞笑 冒险 萝莉 校园 动作 机战 运动 战争 少年 少女 社会 原创 亲子 益智 励志 其他",
-    "地区": "国产 日本 欧美 其他",
-    "年份": "2018 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004",
-    "语言": "国语 英语 粤语 闽南语 韩语 日语 其它",
-    "字母": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
-}
-
-_F_SHORT = {
-    "剧情": "喜剧 爱情 恐怖 动作 科幻 剧情 战争 警匪 犯罪",
-    "地区": "大陆 香港 台湾 美国 法国 英国 日本 韩国 其他",
-    "年份": "2024 2023 2022 2021",
-    "语言": "国语 英语 粤语 闽南语 韩语 日语 其它",
-    "字母": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
-}
-
-_TPL = {
-    "MOVIE": _F_MOVIE,
-    "TV": _F_TV,
-    "VARIETY": _F_VARIETY,
-    "ANIME": _F_ANIME,
-    "SHORT": _F_SHORT,
-}
 
 # 12 段 URL 中各筛选维度所在的位置
 # /vodshow/{type}-{area}-{}-{class}-{lang}-{letter}-{}-{}-{page}-{}-{}-{year}.html
@@ -152,7 +92,6 @@ _RE_SLUG = re.compile(r'/tr-([A-Za-z0-9_\-]+)\.html', re.I)
 _RE_NUM = re.compile(r'<span class="num">\s*(\d+)\s*/\s*(\d+)\s*</span>')
 _RE_PLAYER = re.compile(r'var\s+player_aaaa\s*=\s*(\{[\s\S]*?\})\s*</script>', re.I)
 _RE_SCREEN = re.compile(r'<ul class="stui-screen__list[^"]*"[^>]*>([\s\S]*?)</ul>', re.I)
-_RE_HEAD = re.compile(r'<div class="stui-pannel__head[^"]*"[^>]*>', re.I)
 _RE_RANK_LI = re.compile(r'<li class="bottom-line-dot">([\s\S]*?)</li>', re.I)
 _RE_EXT = re.compile(r'\.(m3u8|mp4|flv|mkv|ts|avi|mov|rmvb|webm)(\?|#|$)', re.I)
 
@@ -382,24 +321,64 @@ class Spider(Spider):
     # ------------------------------------------------------------ 首页
     def homeContent(self, filter):
         result = {}
-        result["class"] = [{"type_id": c["type_id"], "type_name": c["type_name"]}
-                           for c in CLASSES]
+
+        # 1) 分类：从首页导航动态抓 /vodtype/xxx.html
+        classes = self._nav_classes()
+        if not classes:
+            classes = [{"type_id": c["type_id"], "type_name": c["type_name"]}
+                       for c in CLASSES]
+        result["class"] = classes
+
+        # 2) 筛选：对每个分类实时抓 /vodtype/xxx.html，解析 stui-screen__list
         if filter:
             filters = {}
-            for c in CLASSES:
-                tpl = _TPL.get(c["tpl"], _F_MOVIE)
+            for c in classes:
+                tid = c["type_id"]
+                meta = self._fmeta.get(tid)
+                if meta is None:
+                    h = self._fetch(HOST + "/vodtype/%s.html" % tid)
+                    meta, order = self._parse_filters(h, tid)
+                    self._fmeta[tid] = meta
+                    self._fmeta_raw[tid] = order
                 fl = []
                 for dim in ("剧情", "地区", "年份", "语言", "字母"):
-                    words = (tpl.get(dim) or "").split()
-                    if not words:
+                    vals_map = meta.get(dim) or {}
+                    if not vals_map:
                         continue
+                    seq = self._fmeta_raw.get(tid, {}).get(dim) or list(vals_map.keys())
                     vals = [{"n": "全部", "v": ""}]
-                    for w in words:
-                        vals.append({"n": w, "v": w})
+                    for label in seq:
+                        if label and label != "全部":
+                            vals.append({"n": label, "v": label})
                     fl.append({"key": dim, "name": dim, "value": vals})
-                filters[c["type_id"]] = fl
+                filters[tid] = fl
             result["filters"] = filters
+
         return result
+
+    def _nav_classes(self):
+        """从首页 .stui-header__menu 抓一级分类（/vodtype/xxx.html）"""
+        h = self._home_html or self._fetch(HOST + "/")
+        if not h:
+            return []
+        self._home_html = h
+        out = []
+        seen = set()
+        m = re.search(r'<ul class="stui-header__menu[^"]*">([\s\S]*?)</ul>', h, re.I)
+        if not m:
+            return []
+        for href, tx in re.findall(r'<a\s+href="([^"]+)"[^>]*>([\s\S]*?)</a>', m.group(1), re.I):
+            hm = re.search(r'/vodtype/([A-Za-z0-9_]+)\.html', href, re.I)
+            if not hm:
+                continue
+            tid = hm.group(1)
+            if tid in seen:
+                continue
+            seen.add(tid)
+            nm = _html(tx)
+            if nm and nm != "首页":
+                out.append({"type_id": tid, "type_name": nm})
+        return out
 
     def homeVideoContent(self):
         h = self._home_html or self._fetch(HOST + "/")
@@ -408,41 +387,47 @@ class Spider(Spider):
         if not h:
             return {"list": []}
 
-        heads = []
-        for m in _RE_HEAD.finditer(h):
-            seg = h[m.end(): m.end() + 1000]
-            t = re.search(r'<h3 class="title">([\s\S]*?)</h3>', seg)
-            if not t:
-                continue
-            name = _html(t.group(1))
-            if not name:
-                continue
-            heads.append((m.end() + t.end(), name))
-
         groups = []
         used = set()
-        for i, (start, name) in enumerate(heads):
-            end = heads[i + 1][0] if i + 1 < len(heads) else len(h)
-            block = h[start:end]
-            if "stui-vodlist__thumb" in block:
-                items = self._cards(block)
-            elif "stui-vodlist__text" in block:
-                items = self._rank_items(block)
-            else:
+
+        # 按顶层 stui-pannel 块切
+        blocks = re.split(r'<div class="stui-pannel stui-pannel-bg', h)
+        for bi, blk in enumerate(blocks[1:], 1):
+            # 跳过「分类总榜单」这类纯榜单块（没有左栏 75% 容器）
+            if 'col-lg-wide-75' not in blk:
                 continue
-            if not items:
-                continue
-            gname = name
-            if gname in used:
-                gname = "%s %d" % (name, i + 1)
-            used.add(gname)
-            groups.append({"vod_name": gname, "vod_id": "", "vod_list": items})
+
+            # 左栏：第一个 <ul class="stui-vodlist clearfix">（不是 __text）
+            lm = re.search(r'<ul class="stui-vodlist clearfix">([\s\S]*?)</ul>', blk)
+            if lm:
+                cards = self._cards(lm.group(1))
+                if cards:
+                    tm = re.search(r'<h3 class="title">\s*<a[^>]*>([\s\S]*?)</a>', blk)
+                    gname = _html(tm.group(1)) if tm else ("板块%d" % bi)
+                    if gname in used:
+                        gname = "%s %d" % (gname, bi)
+                    used.add(gname)
+                    groups.append({"vod_name": gname, "vod_id": "", "vod_list": cards})
+
+            # 右栏：周榜单（stui-vodlist__text active）
+            rm = re.search(r'<ul class="stui-vodlist__text active[^"]*">([\s\S]*?)</ul>', blk)
+            if rm:
+                items = self._rank_items(rm.group(1))
+                if items:
+                    rm2 = re.search(r'<h3 class="title">[\s\S]*?<a[^>]*>([\s\S]*?)</a>', blk)
+                    gname = _html(rm2.group(1)) if rm2 else ("榜单%d" % bi)
+                    if gname in used:
+                        gname = "%s %d" % (gname, bi)
+                    used.add(gname)
+                    groups.append({"vod_name": gname, "vod_id": "", "vod_list": items})
 
         return {"list": groups}
 
     # ------------------------------------------------------------ 筛选
     def _parse_filters(self, h, tid):
-        """动态解析分类页筛选块，返回 {维度: {显示名: (段位, 值)}}"""
+        """动态解析分类页筛选块，返回 {维度: {显示名: (段位, 值)}}
+        优先用 SEG_IDX 取对应段位，兼容短剧页默认带 seg[1]=大陆 的情况。
+        """
         meta = {}
         order = {}
         for m in _RE_SCREEN.finditer(h or ""):
@@ -465,12 +450,20 @@ class Spider(Spider):
                 if label == "全部":
                     continue
                 seg = _seg_body(href)
-                if len(seg) != 12:          # 0-9 这类跨段值直接跳过
+                if len(seg) < 12:
                     continue
-                filled = [i for i in range(1, 12) if seg[i]]
-                if len(filled) != 1:
+                idx = SEG_IDX.get(dim)
+                if idx is not None and idx < len(seg) and seg[idx]:
+                    vals[label] = (idx, seg[idx])
+                    if label not in seq:
+                        seq.append(label)
                     continue
-                vals[label] = (filled[0], seg[filled[0]])
+                # 兜底：最后一个非空段（排除 seg[0]）
+                filled = [i for i in range(1, min(len(seg), 12)) if seg[i]]
+                if not filled:
+                    continue
+                last = filled[-1]
+                vals[label] = (last, seg[last])
                 if label not in seq:
                     seq.append(label)
             if vals:
@@ -483,18 +476,15 @@ class Spider(Spider):
         s[0] = tid
         for i in range(1, 12):
             s[i] = segs[i] if i < len(segs) else ""
-        s[8] = ""       # 页码一律走 ?page=N，路径式会被 Cloudflare 拦
-        url = HOST + "/vodshow/%s.html" % "-".join(s)
-        if pg and int(pg) > 1:
-            url += "?page=%d" % int(pg)
-        return url
+        s[8] = str(int(pg)) if pg and int(pg) > 1 else ""   # 路径式页码
+        return HOST + "/vodshow/%s.html" % "-".join(s)
 
     def categoryContent(self, tid, pg, filter, extend):
         pg = int(pg or 1)
         ext = dict(extend or {})
         meta = self._fmeta.get(tid)
         if meta is None:
-            base = self._fetch(self._cat_url(tid, [""] * 12, 1))
+            base = self._fetch(HOST + "/vodtype/%s.html" % tid)
             meta, order = self._parse_filters(base, tid)
             self._fmeta[tid] = meta
             self._fmeta_raw[tid] = order
