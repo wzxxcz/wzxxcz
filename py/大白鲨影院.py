@@ -140,8 +140,8 @@ _TPL = {
 }
 
 # 12 段 URL 中各筛选维度所在的位置
-# /vodshow/{type}-{area}-{}-{class}-{lang}-{letter}-{}-{}-{page}-{}-{}-{year}.html
-SEG_IDX = {"剧情": 3, "地区": 1, "年份": 11, "语言": 4, "字母": 5, "排序": 2}
+# 巧妙地把「排序」塞进第 6 段（原本字母的位置），实现下拉菜单
+SEG_IDX = {"剧情": 3, "地区": 1, "年份": 11, "语言": 4, "字母": 5, "排序": 5}
 
 # ------------------------------------------------------------------ 正则
 _RE_THUMB_A = re.compile(r'<a\b[^>]*class="[^"]*stui-vodlist__thumb[^"]*"[^>]*>', re.I)
@@ -326,9 +326,9 @@ class Spider(Spider):
                 continue
             seen.add(slug)
             
-            # 提取封面（智能识别懒加载属性）
+            # 强行获取真实封面（优先拿 data-original，过滤默认 loading 图）
             pic = _attr(tag, "data-original") or _attr(tag, "data-src") or _attr(tag, "src")
-            if not pic:
+            if not pic or "load.gif" in pic:
                 img = re.search(r'<img\b[^>]*>', seg, re.I)
                 if img:
                     pic = _attr(img.group(0), "data-original") or _attr(img.group(0), "data-src") or _attr(img.group(0), "src")
@@ -477,7 +477,7 @@ class Spider(Spider):
             m = re.search(r'<div class="col-lg-wide-75[^"]*">[\s\S]*?<h3 class="title">[\s\S]*?<a[^>]*>([\s\S]*?)</a>', blk)
             gname = _html(m.group(1)) if m else "最新推荐"
 
-            # 提取左侧卡片列表
+            # 精确提取左侧卡片列表，防止沾染右侧榜单
             lm = re.search(r'<div class="col-lg-wide-75[^"]*">[\s\S]*?<ul class="stui-vodlist clearfix">([\s\S]*?)</ul>', blk)
             if not lm:
                 continue
@@ -532,9 +532,9 @@ class Spider(Spider):
                 meta[dim] = vals
                 order[dim] = seq
                 
-        # 特殊追加：把网页顶部的「排序」栏加进筛选里
+        # 特殊追加：把网页顶部的「排序」栏加进筛选里，强行绑定到第 6 段（索引 5）
         if 'nav nav-head' in (h or ''):
-            sort_vals = {"按时间": (2, "time"), "按人气": (2, "hits"), "按评分": (2, "score")}
+            sort_vals = {"按时间": (5, "time"), "按人气": (5, "hits"), "按评分": (5, "score")}
             meta["排序"] = sort_vals
             order["排序"] = list(sort_vals.keys())
             
