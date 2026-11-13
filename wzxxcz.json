@@ -10,6 +10,12 @@
             "url": "https://ds65.tv1288.xyz"
         },
         {
+            "name": "央卫港台1",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://tv.305362.xyz/tg/live/27f2.txt"
+        },
+        {
             "name": "酒店",
             "type": 0,
             "ua": "okhttp/5.3.2",
