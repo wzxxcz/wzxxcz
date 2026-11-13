@@ -1,4 +1,3 @@
-```python
 # coding=utf-8
 """
 LIBVIO libvio.cam | TVBox Python 爬虫
@@ -9,8 +8,7 @@ LIBVIO libvio.cam | TVBox Python 爬虫
   - 分类沿用站点 5 大类，站内“分类”子类(动作/喜剧... = /show/6..)走筛选首行
   - 详情页按 h3 线路标题 + 其下选集 ul 的顺序输出线路与剧集
   - 副标题取卡片 .pic-text text-right
-  - 播放: 播放页 player_aaaa 的 encrypt=1/2 可直接解；
-    encrypt=3 走站点 artplayer 的 smartplay 换源，响应 AES-CBC 本地解密
+  - 播放: encrypt=1/2 直接解；encrypt=3 走 artplayer 的 smartplay 换源 + AES-CBC 本地解密
 """
 import re
 import sys
@@ -614,10 +612,17 @@ class Spider(Spider):
             self.log("  => smartplay 直链: %s" % direct[:160])
             return res
 
-        # 兜底：交回 App 按站点页面原样解析
-        res = {"parse": 1, "playUrl": "", "url": play_page,
-               "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
+        # 兜底：把站点自己的播放器页交给 App 嗅探（WebView 解析可自行取链）
+        fb = play_page
+        if str((data or {}).get("encrypt") or "") == "3" and (data or {}).get("url"):
+            nxt = (data or {}).get("link_next") or ""
+            fb = "%s/static/player/artplayer/?url=%s%s" % (
+                self.site_url, data["url"],
+                ("&next=" + (self.site_url + nxt) if nxt else ""))
+        res = {"parse": 1, "playUrl": "", "url": fb,
+               "header": {"User-Agent": UA, "Referer": play_page}}
         self._play_cache[play_page] = (now, res)
+        self.log("  => 兜底嗅探: %s" % fb[:120])
         return res
 
     def _player_data(self, html):
@@ -670,20 +675,35 @@ class Spider(Spider):
         return kind
 
     def _post_json(self, url, payload, headers):
-        """POST JSON：优先复用宿主 fetch，环境不支持 method/data 时用 requests"""
+        """POST JSON：宿主 fetch → requests → 标准库 urllib，三路兜底"""
         body = json.dumps(payload)
+        # 1) 宿主 fetch（部分宿主不支持 method/data）
         try:
             rsp = self.fetch(url, headers=headers, timeout=20,
                              method="POST", data=body)
             return rsp.text if hasattr(rsp, "text") else str(rsp)
         except Exception as e:
             self.log("  post#fetch 失败: %s" % e)
+        # 2) requests
         try:
             import requests
             r = requests.post(url, headers=headers, data=body, timeout=20)
             return r.text or ""
         except Exception as e:
             self.log("  post#requests 失败: %s" % e)
+        # 3) 标准库 urllib（Chaquopy 一定有）
+        try:
+            import ssl
+            import urllib.request
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            req = urllib.request.Request(
+                url, data=body.encode("utf-8"), headers=headers, method="POST")
+            rsp = urllib.request.urlopen(req, timeout=20, context=ctx)
+            return rsp.read().decode("utf-8", "ignore")
+        except Exception as e:
+            self.log("  post#urllib 失败: %s" % e)
         return ""
 
     def _smartplay(self, play_page, data):
@@ -692,59 +712,65 @@ class Spider(Spider):
         if not blob:
             return ""
         nxt = (data or {}).get("link_next") or ""
-        page_url = "%s/static/player/artplayer/?url=%s%s" % (
-            self.site_url, blob,
-            ("&next=" + (self.site_url + nxt) if nxt else ""))
-        page = self._fetch(page_url, timeout=25, headers={"Referer": play_page})
 
-        mv = _RE_PAGE_VKEY.search(page or "")
-        mc = _RE_PAGE_CODE.search(page or "")
-        mt = _RE_PAGE_TS.search(page or "")
-        if not (mv and mc and mt):
-            self.log("  smartplay: 播放器页参数缺失")
-            return ""
+        for attempt in (1, 2):
+            page_url = "%s/static/player/artplayer/?url=%s%s" % (
+                self.site_url, blob,
+                ("&next=" + (self.site_url + nxt) if nxt else ""))
+            page = self._fetch(page_url, timeout=25, headers={"Referer": play_page})
 
-        now = int(time.time())
-        body = self._post_json(SMART_API, {
-            "vkey": mv.group(1),
-            "code": mc.group(1),
-            "t": now,
-            "signature": hashlib.md5(str(now).encode()).hexdigest(),
-        }, {
-            "User-Agent": UA,
-            "Content-Type": "application/json",
-            "Origin": self.site_url,
-            "Referer": page_url,
-        })
-        if not body:
-            return ""
+            mv = _RE_PAGE_VKEY.search(page or "")
+            mc = _RE_PAGE_CODE.search(page or "")
+            mt = _RE_PAGE_TS.search(page or "")
+            if not (mv and mc and mt):
+                self.log("  smartplay#%d: 播放器页参数缺失(页长%d)" % (attempt, len(page or "")))
+                continue
 
-        try:
-            ret = json.loads(body)
-        except Exception:
-            self.log("  smartplay: 响应非 JSON %s" % (body or "")[:120])
-            return ""
+            now = int(time.time())
+            body = self._post_json(SMART_API, {
+                "vkey": mv.group(1),
+                "code": mc.group(1),
+                "t": now,
+                "signature": hashlib.md5(str(now).encode()).hexdigest(),
+            }, {
+                "User-Agent": UA,
+                "Content-Type": "application/json",
+                "Origin": self.site_url,
+                "Referer": page_url,
+            })
+            if not body:
+                self.log("  smartplay#%d: 接口无响应" % attempt)
+                continue
 
-        if not ret or (ret.get("code") and ret.get("code") != 200):
-            self.log("  smartplay: 返回错误 %s" % (ret.get("msg") if ret else "空"))
-            return ""
+            try:
+                ret = json.loads(body)
+            except Exception:
+                self.log("  smartplay#%d: 响应非 JSON %s" % (attempt, (body or "")[:120]))
+                continue
 
-        url = ret.get("url") or ""
-        if not url:
-            self.log("  smartplay: 无 url")
-            return ""
+            if not ret or (ret.get("code") and ret.get("code") != 200):
+                self.log("  smartplay#%d: 返回错误 %s" % (
+                    attempt, ret.get("msg") if ret else "空"))
+                continue
 
-        if not url.startswith("http"):
-            url = self._smart_decrypt(url, mt.group(1))
+            url = ret.get("url") or ""
+            if not url:
+                self.log("  smartplay#%d: 无 url" % attempt)
+                continue
 
-        if "/T/" in url:
-            url = url.split("/T/", 1)[0]
-        if "/fallbackurl/" in url:
-            url = url.split("/fallbackurl/", 1)[0].strip()
+            if not url.startswith("http"):
+                url = self._smart_decrypt(url, mt.group(1))
 
-        if url.startswith("http") and ("119.91.61.181" not in url):
-            return url
-        self.log("  smartplay: 地址不可直用 %s" % url[:120])
+            if "/T/" in url:
+                url = url.split("/T/", 1)[0]
+            if "/fallbackurl/" in url:
+                url = url.split("/fallbackurl/", 1)[0].strip()
+
+            if url.startswith("http") and ("119.91.61.181" not in url):
+                self.log("  smartplay#%d: 拿到地址 %s" % (attempt, url[:120]))
+                return url
+            self.log("  smartplay#%d: 地址不可直用 %s" % (attempt, url[:100]))
+
         return ""
 
     def _smart_decrypt(self, cipher, timestamp):
