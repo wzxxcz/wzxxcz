@@ -1,3 +1,4 @@
+```python
 # coding=utf-8
 """
 LIBVIO libvio.cam | TVBox Python 爬虫
@@ -8,13 +9,15 @@ LIBVIO libvio.cam | TVBox Python 爬虫
   - 分类沿用站点 5 大类，站内“分类”子类(动作/喜剧... = /show/6..)走筛选首行
   - 详情页按 h3 线路标题 + 其下选集 ul 的顺序输出线路与剧集
   - 副标题取卡片 .pic-text text-right
-  - 播放页 player_aaaa 的 encrypt=3 是站点第三方 smartplay 加密 token，
-    走 parse=1 交回 App 用站点播放器原样解析
+  - 播放: 播放页 player_aaaa 的 encrypt=1/2 可直接解；
+    encrypt=3 走站点 artplayer 的 smartplay 换源，响应 AES-CBC 本地解密
 """
 import re
 import sys
 import json
 import time
+import base64
+import hashlib
 import urllib.parse
 
 sys.path.append('..')
@@ -45,8 +48,13 @@ except ImportError:
             return self._session
 
         def fetch(self, url, headers=None, **kw):
+            method = (kw.pop('method', 'GET') or 'GET').upper()
             timeout = kw.pop('timeout', 15)
-            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
+            data = kw.pop('data', None)
+            if method == 'POST':
+                r = self._sess.post(url, headers=headers, data=data, timeout=timeout, **kw)
+            else:
+                r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
             r.encoding = 'utf-8'
             return r
 
@@ -66,6 +74,10 @@ DEFAULT_PIC = HOST + "/template/libvio/statics/img/load.png"
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
+# smartplay 换源接口与解密用料（取自站点 artplayer 页明文）
+SMART_API = "https://hd.ticktockwow.com/smartplay-cache/api/webvideo_ty.php"
+SMART_SALT = "RY7e48naFXPsLJC"
+
 CLASSES = [
     {"type_id": "1", "type_name": "电影"},
     {"type_id": "2", "type_name": "电视剧"},
@@ -80,7 +92,6 @@ _SORTS = [
     {"n": "评分", "v": "score"},
 ]
 
-# 站点筛选面板原始数据（名称与顺序与站点一致）
 _F_T1 = {
     "class": [("动作", "6"), ("喜剧", "7"), ("爱情", "8"), ("科幻", "9"),
               ("恐怖", "10"), ("剧情", "11"), ("战争", "12")],
@@ -198,7 +209,95 @@ _RE_LINE = re.compile(
     r'<h3[^>]*>([\s\S]*?)</h3>[\s\S]{0,300}?'
     r'<ul class="stui-content__playlist[\s\S]*?</ul>', re.S)
 _RE_LINE_A = re.compile(r'<a href="([^"]+)"[^>]*>([\s\S]*?)</a>', re.S)
-_RE_PLAYER_AA = re.compile(r"var player_aaaa=(\{[\s\S]*?\});\s*</script>")
+_RE_PLAYER_AA = re.compile(
+    r"var player_aaaa=(\{[\s\S]*?\})\s*(?:;)?\s*</script>")
+_RE_PAGE_VKEY = re.compile(r'const playPageUrl\s*=\s*"([^"]*)"')
+_RE_PAGE_CODE = re.compile(r'const secretKeySeed\s*=\s*"([^"]*)"')
+_RE_PAGE_TS = re.compile(r'const timestamp\s*=\s*"([^"]*)"')
+
+
+# ===================== AES-128-CBC 解密（纯 Python，供 smartplay 响应使用）=====
+_SB = [
+0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76,
+0xca,0x82,0xc9,0x7d,0xfa,0x59,0x47,0xf0,0xad,0xd4,0xa2,0xaf,0x9c,0xa4,0x72,0xc0,
+0xb7,0xfd,0x93,0x26,0x36,0x3f,0xf7,0xcc,0x34,0xa5,0xe5,0xf1,0x71,0xd8,0x31,0x15,
+0x04,0xc7,0x23,0xc3,0x18,0x96,0x05,0x9a,0x07,0x12,0x80,0xe2,0xeb,0x27,0xb2,0x75,
+0x09,0x83,0x2c,0x1a,0x1b,0x6e,0x5a,0xa0,0x52,0x3b,0xd6,0xb3,0x29,0xe3,0x2f,0x84,
+0x53,0xd1,0x00,0xed,0x20,0xfc,0xb1,0x5b,0x6a,0xcb,0xbe,0x39,0x4a,0x4c,0x58,0xcf,
+0xd0,0xef,0xaa,0xfb,0x43,0x4d,0x33,0x85,0x45,0xf9,0x02,0x7f,0x50,0x3c,0x9f,0xa8,
+0x51,0xa3,0x40,0x8f,0x92,0x9d,0x38,0xf5,0xbc,0xb6,0xda,0x21,0x10,0xff,0xf3,0xd2,
+0xcd,0x0c,0x13,0xec,0x5f,0x97,0x44,0x17,0xc4,0xa7,0x7e,0x3d,0x64,0x5d,0x19,0x73,
+0x60,0x81,0x4f,0xdc,0x22,0x2a,0x90,0x88,0x46,0xee,0xb8,0x14,0xde,0x5e,0x0b,0xdb,
+0xe0,0x32,0x3a,0x0a,0x49,0x06,0x24,0x5c,0xc2,0xd3,0xac,0x62,0x91,0x95,0xe4,0x79,
+0xe7,0xc8,0x37,0x6d,0x8d,0xd5,0x4e,0xa9,0x6c,0x56,0xf4,0xea,0x65,0x7a,0xae,0x08,
+0xba,0x78,0x25,0x2e,0x1c,0xa6,0xb4,0xc6,0xe8,0xdd,0x74,0x1f,0x4b,0xbd,0x8b,0x8a,
+0x70,0x3e,0xb5,0x66,0x48,0x03,0xf6,0x0e,0x61,0x35,0x57,0xb9,0x86,0xc1,0x1d,0x9e,
+0xe1,0xf8,0x98,0x11,0x69,0xd9,0x8e,0x94,0x9b,0x1e,0x87,0xe9,0xce,0x55,0x28,0xdf,
+0x8c,0xa1,0x89,0x0d,0xbf,0xe6,0x42,0x68,0x41,0x99,0x2d,0x0f,0xb0,0x54,0xbb,0x16]
+_INV = [0] * 256
+for _i, _v in enumerate(_SB):
+    _INV[_v] = _i
+_RCON = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36]
+
+
+def _xt(a):
+    return ((a << 1) ^ 0x1b) & 0xff if a & 0x80 else ((a << 1) & 0xff)
+
+
+def _gmul(a, b):
+    r = 0
+    while b:
+        if b & 1:
+            r ^= a
+        a = _xt(a)
+        b >>= 1
+    return r & 0xff
+
+
+def _aes_expand(key):
+    nk = len(key) // 4
+    nr = nk + 6
+    w = [list(key[i * 4:i * 4 + 4]) for i in range(nk)]
+    for i in range(nk, (nr + 1) * 4):
+        t = list(w[i - 1])
+        if i % nk == 0:
+            t = t[1:] + t[:1]
+            t = [_SB[b] for b in t]
+            t[0] ^= _RCON[i // nk - 1]
+        elif nk > 6 and i % nk == 4:
+            t = [_SB[b] for b in t]
+        w.append([w[i - nk][j] ^ t[j] for j in range(4)])
+    return w, nr
+
+
+def _aes_dec_block(w, nr, blk):
+    s = [[blk[4 * c + r] ^ w[nr * 4 + c][r] for c in range(4)] for r in range(4)]
+    for rnd in range(nr - 1, -1, -1):
+        s = [[s[r][(c - r) % 4] for c in range(4)] for r in range(4)]
+        s = [[_INV[b] for b in row] for row in s]
+        s = [[s[r][c] ^ w[rnd * 4 + c][r] for c in range(4)] for r in range(4)]
+        if rnd:
+            out = [[0] * 4 for _ in range(4)]
+            for c in range(4):
+                a0, a1, a2, a3 = s[0][c], s[1][c], s[2][c], s[3][c]
+                out[0][c] = _gmul(a0, 14) ^ _gmul(a1, 11) ^ _gmul(a2, 13) ^ _gmul(a3, 9)
+                out[1][c] = _gmul(a0, 9) ^ _gmul(a1, 14) ^ _gmul(a2, 11) ^ _gmul(a3, 13)
+                out[2][c] = _gmul(a0, 13) ^ _gmul(a1, 9) ^ _gmul(a2, 14) ^ _gmul(a3, 11)
+                out[3][c] = _gmul(a0, 11) ^ _gmul(a1, 13) ^ _gmul(a2, 9) ^ _gmul(a3, 14)
+            s = out
+    return bytes(s[r][c] for c in range(4) for r in range(4))
+
+
+def _aes_cbc_decrypt(key, iv, data):
+    w, nr = _aes_expand(key)
+    prev = iv
+    out = b""
+    for i in range(0, len(data) - len(data) % 16, 16):
+        blk = data[i:i + 16]
+        dec = _aes_dec_block(w, nr, blk)
+        out += bytes(a ^ b for a, b in zip(dec, prev))
+        prev = blk
+    return out
 
 
 class Spider(Spider):
@@ -224,12 +323,16 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        self._kind_cache = {}
         self.log("init: site=%s" % self.site_url)
 
     # ---------- 基础 ----------
-    def _fetch(self, url, timeout=20):
+    def _fetch(self, url, timeout=20, headers=None):
         try:
-            rsp = self.fetch(url, headers=self.headers, timeout=timeout)
+            h = dict(self.headers)
+            if headers:
+                h.update(headers)
+            rsp = self.fetch(url, headers=h, timeout=timeout)
             if hasattr(rsp, "text"):
                 return rsp.text or ""
             if hasattr(rsp, "content"):
@@ -483,8 +586,11 @@ class Spider(Spider):
             if now - ts < 600:
                 return res
 
-        # 少数线路若是 encrypt=1/2 的明文直链，能解就直接直链
-        direct = self._direct_url(self._fetch(play_page))
+        html = self._fetch(play_page)
+        data = self._player_data(html)
+
+        # 明文直链线路（encrypt=0/1/2）
+        direct = self._direct_url(data)
         if direct:
             res = {
                 "parse": 0, "playUrl": "", "url": direct,
@@ -494,22 +600,39 @@ class Spider(Spider):
             self.log("  => 直链: %s" % direct[:160])
             return res
 
-        # 站点 encrypt=3：加密 token 由站点播放器向 smartplay 接口换取，
-        # 交回 App 按站点原样解析
+        # encrypt=3：走站点 artplayer 的 smartplay 换源（网盘线路除外）
+        if self._player_kind((data or {}).get("from")) == "artplayer":
+            direct = self._smartplay(play_page, data)
+        else:
+            direct = ""
+        if direct:
+            res = {
+                "parse": 0, "playUrl": "", "url": direct,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"},
+            }
+            self._play_cache[play_page] = (now, res)
+            self.log("  => smartplay 直链: %s" % direct[:160])
+            return res
+
+        # 兜底：交回 App 按站点页面原样解析
         res = {"parse": 1, "playUrl": "", "url": play_page,
                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
         self._play_cache[play_page] = (now, res)
         return res
 
-    def _direct_url(self, html):
+    def _player_data(self, html):
         if not html:
-            return ""
+            return {}
         m = _RE_PLAYER_AA.search(html)
         if not m:
-            return ""
+            return {}
         try:
-            data = json.loads(m.group(1).replace("\\/", "/"))
+            return json.loads(m.group(1).replace("\\/", "/"))
         except Exception:
+            return {}
+
+    def _direct_url(self, data):
+        if not data:
             return ""
         raw = data.get("url") or ""
         enc = str(data.get("encrypt") or "0")
@@ -519,7 +642,6 @@ class Spider(Spider):
             if enc == "1":
                 raw = urllib.parse.unquote(raw)
             elif enc == "2":
-                import base64
                 raw = urllib.parse.unquote(base64.b64decode(
                     raw + "=" * ((4 - len(raw) % 4) % 4)).decode("utf-8", "ignore"))
             elif enc != "0":
@@ -529,6 +651,118 @@ class Spider(Spider):
         if raw.startswith("http") and (".m3u8" in raw or ".mp4" in raw):
             return raw
         return ""
+
+    def _player_kind(self, frm):
+        """读 /static/player/{from}.js 判断播放器类型：artplayer / pan / 空"""
+        frm = (frm or "").strip()
+        if not frm:
+            return ""
+        if frm in self._kind_cache:
+            return self._kind_cache[frm]
+        kind = ""
+        js = self._fetch("%s/static/player/%s.js" % (self.site_url, frm), timeout=15)
+        if js:
+            if "artplayer" in js:
+                kind = "artplayer"
+            elif "pan.html" in js:
+                kind = "pan"
+        self._kind_cache[frm] = kind
+        return kind
+
+    def _post_json(self, url, payload, headers):
+        """POST JSON：优先复用宿主 fetch，环境不支持 method/data 时用 requests"""
+        body = json.dumps(payload)
+        try:
+            rsp = self.fetch(url, headers=headers, timeout=20,
+                             method="POST", data=body)
+            return rsp.text if hasattr(rsp, "text") else str(rsp)
+        except Exception as e:
+            self.log("  post#fetch 失败: %s" % e)
+        try:
+            import requests
+            r = requests.post(url, headers=headers, data=body, timeout=20)
+            return r.text or ""
+        except Exception as e:
+            self.log("  post#requests 失败: %s" % e)
+        return ""
+
+    def _smartplay(self, play_page, data):
+        """encrypt=3：页面给 vkey/code/timestamp，接口换真实地址，AES-CBC 本地解密"""
+        blob = (data or {}).get("url") or ""
+        if not blob:
+            return ""
+        nxt = (data or {}).get("link_next") or ""
+        page_url = "%s/static/player/artplayer/?url=%s%s" % (
+            self.site_url, blob,
+            ("&next=" + (self.site_url + nxt) if nxt else ""))
+        page = self._fetch(page_url, timeout=25, headers={"Referer": play_page})
+
+        mv = _RE_PAGE_VKEY.search(page or "")
+        mc = _RE_PAGE_CODE.search(page or "")
+        mt = _RE_PAGE_TS.search(page or "")
+        if not (mv and mc and mt):
+            self.log("  smartplay: 播放器页参数缺失")
+            return ""
+
+        now = int(time.time())
+        body = self._post_json(SMART_API, {
+            "vkey": mv.group(1),
+            "code": mc.group(1),
+            "t": now,
+            "signature": hashlib.md5(str(now).encode()).hexdigest(),
+        }, {
+            "User-Agent": UA,
+            "Content-Type": "application/json",
+            "Origin": self.site_url,
+            "Referer": page_url,
+        })
+        if not body:
+            return ""
+
+        try:
+            ret = json.loads(body)
+        except Exception:
+            self.log("  smartplay: 响应非 JSON %s" % (body or "")[:120])
+            return ""
+
+        if not ret or (ret.get("code") and ret.get("code") != 200):
+            self.log("  smartplay: 返回错误 %s" % (ret.get("msg") if ret else "空"))
+            return ""
+
+        url = ret.get("url") or ""
+        if not url:
+            self.log("  smartplay: 无 url")
+            return ""
+
+        if not url.startswith("http"):
+            url = self._smart_decrypt(url, mt.group(1))
+
+        if "/T/" in url:
+            url = url.split("/T/", 1)[0]
+        if "/fallbackurl/" in url:
+            url = url.split("/fallbackurl/", 1)[0].strip()
+
+        if url.startswith("http") and ("119.91.61.181" not in url):
+            return url
+        self.log("  smartplay: 地址不可直用 %s" % url[:120])
+        return ""
+
+    def _smart_decrypt(self, cipher, timestamp):
+        """key=md5(timestamp+salt)[16:], iv=md5(timestamp+salt)[:16], AES-CBC/Pkcs7"""
+        try:
+            mat = hashlib.md5((str(timestamp) + SMART_SALT).encode("utf-8")).hexdigest()
+            key = mat[16:].encode("utf-8")
+            iv = mat[:16].encode("utf-8")
+            raw = base64.b64decode(cipher + "=" * ((4 - len(cipher) % 4) % 4))
+            pt = _aes_cbc_decrypt(key, iv, raw)
+            if pt:
+                pad = pt[-1]
+                if 0 < pad < 17 and pt[-pad:] == bytes([pad]) * pad:
+                    pt = pt[:-pad]
+            return pt.decode("utf-8", "ignore").strip()
+        except Exception as e:
+            self.log("  smartplay: 解密失败 %s" % e)
+            return ""
 
     def isVideoFormat(self, url):
         return ".m3u8" in url or ".mp4" in url
