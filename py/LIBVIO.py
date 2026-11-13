@@ -8,7 +8,9 @@ LIBVIO libvio.cam | TVBox Python 爬虫
   - 分类沿用站点 5 大类，站内“分类”子类(动作/喜剧... = /show/6..)走筛选首行
   - 详情页按 h3 线路标题 + 其下选集 ul 的顺序输出线路与剧集
   - 副标题取卡片 .pic-text text-right
-  - 播放: encrypt=1/2 直接解；encrypt=3 走 artplayer 的 smartplay 换源 + AES-CBC 本地解密
+  - 简介添加指定前缀
+  - 播放: 播放页 player_aaaa 的 encrypt=1/2 可直接解；
+    encrypt=3 走站点 artplayer 的 smartplay 换源，响应 AES-CBC 本地解密
 """
 import re
 import sys
@@ -679,7 +681,7 @@ class Spider(Spider):
         body = json.dumps(payload)
         # 1) 宿主 fetch（部分宿主不支持 method/data）
         try:
-            rsp = self.fetch(url, headers=headers, timeout=20,
+            rsp = self.fetch(url, headers=headers, timeout=8,
                              method="POST", data=body)
             return rsp.text if hasattr(rsp, "text") else str(rsp)
         except Exception as e:
@@ -687,7 +689,7 @@ class Spider(Spider):
         # 2) requests
         try:
             import requests
-            r = requests.post(url, headers=headers, data=body, timeout=20)
+            r = requests.post(url, headers=headers, data=body, timeout=8)
             return r.text or ""
         except Exception as e:
             self.log("  post#requests 失败: %s" % e)
@@ -700,11 +702,55 @@ class Spider(Spider):
             ctx.verify_mode = ssl.CERT_NONE
             req = urllib.request.Request(
                 url, data=body.encode("utf-8"), headers=headers, method="POST")
-            rsp = urllib.request.urlopen(req, timeout=20, context=ctx)
+            rsp = urllib.request.urlopen(req, timeout=8, context=ctx)
             return rsp.read().decode("utf-8", "ignore")
         except Exception as e:
             self.log("  post#urllib 失败: %s" % e)
         return ""
+
+    def _api_call(self, params, headers):
+        """先 POST JSON；不是 JSON（网关报错页）就再用 GET 查询串试一次"""
+        body = self._post_json(SMART_API, params, headers)
+        if body and body.strip()[:1] in ("{", "["):
+            return body
+        try:
+            h = dict(headers)
+            h.pop("Content-Type", None)
+            rsp = self.fetch("%s?%s" % (SMART_API, urllib.parse.urlencode(params)),
+                             headers=h, timeout=8)
+            g = rsp.text if hasattr(rsp, "text") else str(rsp)
+            if g and g.strip()[:1] in ("{", "["):
+                self.log("  api#get 命中")
+                return g
+            return g or body
+        except Exception as e:
+            self.log("  api#get 失败: %s" % e)
+        return body
+
+    def _api_pick(self, ret):
+        """宽松取地址：code 允许 0/200/缺省，地址允许在 url/data/playurl"""
+        if isinstance(ret, list) and ret:
+            ret = ret[0]
+        if not isinstance(ret, dict):
+            return "", "响应不是对象"
+        code = ret.get("code")
+        if code is None:
+            code = 0
+        if str(code) not in ("0", "200"):
+            msg = ret.get("msg") or ret.get("message") or ""
+            return "", "code=%s %s" % (code, msg)
+        url = ret.get("url") or ""
+        if not url:
+            d = ret.get("data")
+            if isinstance(d, dict):
+                url = d.get("url") or d.get("playurl") or d.get("playUrl") or ""
+            elif isinstance(d, str):
+                url = d
+        if not url:
+            url = ret.get("playurl") or ret.get("playUrl") or ""
+        if not url:
+            return "", "无 url 字段(%s)" % ",".join(list(ret.keys())[:6])
+        return url, "ok"
 
     def _smartplay(self, play_page, data):
         """encrypt=3：页面给 vkey/code/timestamp，接口换真实地址，AES-CBC 本地解密"""
@@ -727,7 +773,8 @@ class Spider(Spider):
                 continue
 
             now = int(time.time())
-            body = self._post_json(SMART_API, {
+            t0 = time.time()
+            body = self._api_call({
                 "vkey": mv.group(1),
                 "code": mc.group(1),
                 "t": now,
@@ -740,6 +787,9 @@ class Spider(Spider):
             })
             if not body:
                 self.log("  smartplay#%d: 接口无响应" % attempt)
+                if time.time() - t0 > 12:
+                    self.log("  接口不通(%.1fs)，不再重试" % (time.time() - t0))
+                    break
                 continue
 
             try:
@@ -748,14 +798,9 @@ class Spider(Spider):
                 self.log("  smartplay#%d: 响应非 JSON %s" % (attempt, (body or "")[:120]))
                 continue
 
-            if not ret or (ret.get("code") and ret.get("code") != 200):
-                self.log("  smartplay#%d: 返回错误 %s" % (
-                    attempt, ret.get("msg") if ret else "空"))
-                continue
-
-            url = ret.get("url") or ""
+            url, why = self._api_pick(ret)
             if not url:
-                self.log("  smartplay#%d: 无 url" % attempt)
+                self.log("  smartplay#%d: 取链失败 %s" % (attempt, why))
                 continue
 
             if not url.startswith("http"):
@@ -766,7 +811,7 @@ class Spider(Spider):
             if "/fallbackurl/" in url:
                 url = url.split("/fallbackurl/", 1)[0].strip()
 
-            if url.startswith("http") and ("119.91.61.181" not in url):
+            if url.startswith("http"):
                 self.log("  smartplay#%d: 拿到地址 %s" % (attempt, url[:120]))
                 return url
             self.log("  smartplay#%d: 地址不可直用 %s" % (attempt, url[:100]))
