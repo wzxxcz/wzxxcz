@@ -86,6 +86,17 @@ _FALLBACK_CLASSES = [
     {"type_id": "4", "type_name": "动漫"},
 ]
 
+# 兜底线路别名（以站点 config.player.play 实时返回为准）
+_LINE_FALLBACK = {
+    "dyttm3u8": "天堂线路",
+    "1080zyk": "幼稚线路",
+    "bfzym3u8": "暴风线路",
+    "ffm3u8": "非凡线路",
+    "modum3u8": "魔都线路",
+    "tym3u8": "天涯线路",
+    "wwm3u8": "望望线路",
+}
+
 _ROW_LABELS = {"class": "类型", "area": "地区", "year": "年份", "lang": "语言"}
 
 
@@ -111,6 +122,7 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._cfg = None
+        self._line_names = dict(_LINE_FALLBACK)
         self._play_cache = {}
         self._load_config()
 
@@ -156,6 +168,10 @@ class Spider(Spider):
             d = self._request("GET", "api/config", {"token": ""})
             if d.get("code") == 0 and isinstance(d.get("data"), dict):
                 self._cfg = d["data"]
+                play = (self._cfg.get("player") or {}).get("play") or {}
+                for flag, conf in play.items():
+                    if isinstance(conf, dict) and conf.get("name"):
+                        self._line_names[str(flag)] = conf["name"]
         except Exception as e:
             self.log("  配置加载失败: %s" % e)
         if not self._cfg:
@@ -201,6 +217,10 @@ class Spider(Spider):
                 continue
             keep.append(t)
         return "\n".join(keep).strip()
+
+    def _line_name(self, flag):
+        flag = (flag or "").strip()
+        return self._line_names.get(flag) or self._clean(flag)
 
     def _card(self, c):
         if not isinstance(c, dict) or not c.get("vod_id"):
@@ -384,13 +404,14 @@ class Spider(Spider):
         # 标准 MacCMS legacy 字段
         from_lines = str(info.get("vod_play_from") or "").split("$$$")
         url_lines = str(info.get("vod_play_url") or "").split("$$$")
-        for i, line_name in enumerate(from_lines):
+        for i, line_flag in enumerate(from_lines):
             if i >= len(url_lines):
                 break
             eps = [e for e in str(url_lines[i]).split("#") if e]
             if not eps:
                 continue
-            play_from.append(self._clean(line_name) or "线路%d" % (len(play_from) + 1))
+            alias = self._line_name(line_flag) or "线路%d" % (len(play_from) + 1)
+            play_from.append(alias)
             play_url.append("#".join(eps))
 
         # 兜底: vod_play_list 结构
@@ -421,7 +442,8 @@ class Spider(Spider):
                         ep = "第%d集" % (len(eps) + 1)
                     eps.append("%s$%s" % (ep, self._fix_url(url)))
                 if eps:
-                    play_from.append(self._clean(ln.get("sid")) or "线路%d" % (len(play_from) + 1))
+                    alias = self._line_name(ln.get("sid")) or "线路%d" % (len(play_from) + 1)
+                    play_from.append(alias)
                     play_url.append("#".join(eps))
 
         return play_from, play_url
