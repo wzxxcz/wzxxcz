@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-剧下饭 manian.juxiafan.com | TVBox Python 爬虫 
+剧下饭 manian.juxiafan.com | TVBox Python 爬虫 (豆花类式规范)
 站点: http://manian.juxiafan.com/  (内置 8 个备用域名自动轮换)
 接口: JSON API, AES-256-ECB(PKCS7/base64) 签名
 包含: 分类、筛选(类型/地区/年份)、多线路播放顺序及解析、详情页、副标题、搜索、直播兜底
