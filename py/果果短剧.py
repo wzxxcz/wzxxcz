@@ -78,12 +78,14 @@ DEFAULT_PIC = HOST + "/img/logo1.png"
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
-# 兜底分类（以站点 api/config 实时返回为准）
+# 兜底分类（以站点 config.head_nav / type 实时返回为准）
 _FALLBACK_CLASSES = [
+    {"type_id": "netflix", "type_name": "Netflix"},
     {"type_id": "1", "type_name": "短剧"},
     {"type_id": "2", "type_name": "电影"},
     {"type_id": "3", "type_name": "电视剧"},
     {"type_id": "4", "type_name": "动漫"},
+    {"type_id": "han", "type_name": "韩剧"},
 ]
 
 # 兜底线路别名（以站点 config.player.play 实时返回为准）
@@ -222,6 +224,15 @@ class Spider(Spider):
         flag = (flag or "").strip()
         return self._line_names.get(flag) or self._clean(flag)
 
+    def _nav_id(self, url, key):
+        if url and "?" in url:
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+            if q.get("id"):
+                return q["id"][0]
+        if key and "|" in key:
+            return key.split("|", 1)[1]
+        return ""
+
     def _card(self, c):
         if not isinstance(c, dict) or not c.get("vod_id"):
             return None
@@ -243,13 +254,33 @@ class Spider(Spider):
             out.append(card)
         return out
 
+    def _custom_cards(self, cid):
+        d = self._request("POST", "custom", {"id": cid, "token": ""})
+        widgets = d.get("data") if isinstance(d.get("data"), list) else []
+        cards = []
+        for w in widgets or []:
+            if isinstance(w, dict):
+                cards.extend(w.get("list", []) or [])
+        return self._cards(cards)
+
     # ---------- 分类 / 筛选 ----------
     def _classes(self):
-        types = [t for t in (self._cfg.get("type") or [])
-                 if t.get("type_mid") == 1]
-        if types:
-            return [{"type_id": str(t["type_id"]), "type_name": t["type_name"]}
-                    for t in types]
+        nav = (self._cfg.get("config") or {}).get("head_nav") or []
+        out = []
+        for n in nav:
+            name = self._clean(n.get("name"))
+            cid = self._nav_id(n.get("url") or "", n.get("key") or "")
+            if not cid or cid == "tuijian" or not name:
+                continue
+            out.append({"type_id": cid, "type_name": name})
+        if out:
+            try:
+                nav_map = {self._nav_id(x.get("url") or "", x.get("key") or ""):
+                           int(x.get("weight") or 0) for x in nav}
+                out.sort(key=lambda x: nav_map.get(x["type_id"], 0), reverse=True)
+            except Exception:
+                pass
+            return out
         return _FALLBACK_CLASSES
 
     def _filters(self):
@@ -287,13 +318,7 @@ class Spider(Spider):
         return {"class": self._classes(), "filters": self._filters()}
 
     def homeVideoContent(self):
-        d = self._request("POST", "custom", {"id": "tuijian", "token": ""})
-        widgets = d.get("data") if isinstance(d.get("data"), list) else []
-        cards = []
-        for w in widgets or []:
-            if isinstance(w, dict):
-                cards.extend(w.get("list", []) or [])
-        cards = self._cards(cards)
+        cards = self._custom_cards("tuijian")
         self.log("home 卡片: %d 条" % len(cards))
         if not cards:
             d = self._request("POST", "vod/show", {"page": 0, "token": ""})
@@ -312,6 +337,13 @@ class Spider(Spider):
         for k in list(extend.keys()):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
+
+        # 专题频道（Netflix / 韩剧 等）走 custom 小部件
+        if not str(tid).isdigit():
+            cards = self._custom_cards(str(tid))
+            self.log("  频道 %s: %d 条" % (tid, len(cards)))
+            return {"list": cards, "page": page, "pagecount": 1,
+                    "limit": len(cards) or 40, "total": len(cards)}
 
         body = {"id": str(tid), "page": page - 1, "token": ""}
         for k in ("class", "area", "year", "lang", "by"):
