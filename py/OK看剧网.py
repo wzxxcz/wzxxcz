@@ -101,7 +101,7 @@ _RE_PIC = re.compile(r'data-lazy-src="([^"]+)"', re.I)
 _RE_PIC_FALLBACK = re.compile(r'<noscript><img[^>]*src="([^"]+)"', re.I)
 _RE_STATUS = re.compile(r'<span class="(?:home-card-)?status">([^<]*)</span>', re.I)
 _RE_SCORE = re.compile(r'<span class="(?:home-card-)?score">([^<]*)</span>', re.I)
-_RE_PAGE = re.compile(r'/channel/[a-z-]+\?page=(\d+)')
+_RE_PAGE = re.compile(r'/channel/[a-z-]+\?[^"\']*?page=(\d+)')
 _RE_PAGE_SEARCH = re.compile(r'/search\?[^"\']*page=(\d+)')
 
 _RE_H1 = re.compile(r'<h1[^>]*>([\s\S]*?)</h1>', re.I)
@@ -116,6 +116,9 @@ _RE_SOURCE_BTN = re.compile(
 _RE_SRC_NAME = re.compile(r'data-source-name="([^"]*)"', re.I)
 _RE_SRC_EPS = re.compile(r'data-source-episodes="([^"]*)"', re.I)
 _RE_PLAYER_URL = re.compile(r'data-player-url="([^"]*)"', re.I)
+_RE_PLAYER_DATA = re.compile(r'id="player-data"[^>]*>([\s\S]*?)</script>', re.I)
+_RE_DIRECT_MEDIA = re.compile(
+    r'https?://[^"\'\s\\]+\.(?:m3u8|mp4|flv)[^"\'\s\\]*', re.I)
 
 
 class Spider(Spider):
@@ -144,10 +147,13 @@ class Spider(Spider):
 
     # ---------- 工具 ----------
 
-    def _fetch(self, url, timeout=15):
+    def _fetch(self, url, timeout=15, referer=None):
         try:
             import urllib.request as _u
-            req = _u.Request(url, headers=self.headers)
+            headers = dict(self.headers)
+            if referer:
+                headers["Referer"] = referer
+            req = _u.Request(url, headers=headers)
             with _u.urlopen(req, timeout=timeout) as rsp:
                 return rsp.read().decode("utf-8", "ignore")
         except Exception as e:
@@ -411,6 +417,27 @@ class Spider(Spider):
 
     # ---------- 播放 ----------
 
+    def _resolve_parser(self, parser_url):
+        """解析第三方解析器页面, 提取内嵌直链 (m3u8/mp4/flv); 取不到返回空串。"""
+        if not parser_url or not parser_url.startswith("http"):
+            return ""
+        page = self._fetch(parser_url, referer=self.site_url + "/")
+        if not page:
+            return ""
+        md = _RE_PLAYER_DATA.search(page)
+        if md:
+            try:
+                import html as _html
+                data = json.loads(_html.unescape(md.group(1)))
+                if isinstance(data, dict) and data.get("url"):
+                    return data["url"].strip()
+            except Exception:
+                pass
+        mm = _RE_DIRECT_MEDIA.search(page)
+        if mm:
+            return mm.group(0).replace("&amp;", "&")
+        return ""
+
     def playerContent(self, flag, id, vipFlags=""):
         # id 形态: "{sourceIndex}:{watchPath}"
         source_idx, watch_path = "1", ""
@@ -428,10 +455,18 @@ class Spider(Spider):
 
         html = self._fetch(watch_url)
         mu = _RE_PLAYER_URL.search(html)
+        parser_url = ""
         if mu:
             import html as _html
-            player_url = urllib.parse.unquote(_html.unescape(mu.group(1)))
-            return {"parse": 1, "playUrl": "", "url": player_url,
+            parser_url = urllib.parse.unquote(_html.unescape(mu.group(1)))
+
+        if parser_url:
+            direct = self._resolve_parser(parser_url)
+            if direct:
+                return {"parse": 0, "playUrl": "", "url": direct,
+                        "header": {"User-Agent": UA, "Referer": parser_url}}
+            # 解析器页面无内嵌直链 (需浏览器环境), 交播放器打开 iframe 嗅探
+            return {"parse": 1, "playUrl": "", "url": parser_url,
                     "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
         # 兜底: 交播放器打开播放页自行嗅探
