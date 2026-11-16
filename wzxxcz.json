@@ -1692,10 +1692,10 @@
             "api": "./py/追剧猫.py"
         },
         {
-            "key": "剧OK",
-            "name": "🍊剧OK",
+            "key": "OK看剧网",
+            "name": "🍊OK看剧网",
             "type": 3,
-            "api": "./py/剧OK.py"
+            "api": "./py/OK看剧网.py"
         },
         {
             "key": "蝴蝶影院",
