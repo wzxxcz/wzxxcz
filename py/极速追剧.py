@@ -117,17 +117,18 @@ for c in CLASSES:
 
 
 # ===================== 正则 =====================
-# 列表 / 首页卡片：<a href="/detail/123.html" ...> ... <img ...> ... 标题 ... 副标题
-_RE_CARD = re.compile(
-    r'<a\s+href="(/detail/\d+\.html)"[^>]*>([\s\S]*?)</a>', re.I)
+# 通用锚点（兼容相对路径 / 绝对地址 / 首尾空格）
+_RE_ANCHOR = re.compile(
+    r'<a\s+href="([^"]*)"[^>]*>([\s\S]*?)</a>', re.I)
 _RE_TITLE = re.compile(r'class="vod-title[^>]*>([\s\S]*?)</p>', re.I)
 _RE_SUB = re.compile(r'class="vod-subtitle[^>]*>([\s\S]*?)</p>', re.I)
-_RE_HREF = re.compile(r'href="(/detail/\d+\.html)"', re.I)
+_RE_BADGE = re.compile(
+    r'class="vod-badge vod-badge-episodes"[^>]*>([\s\S]*?)</span>', re.I)
 
 # 搜索卡片
 _RE_SEARCH_SPLIT = re.compile(r'<div class="search-item">', re.I)
 _RE_SEARCH_POSTER = re.compile(
-    r'<a\s+href="(/detail/\d+\.html)"[^>]*>\s*<img[^>]*?(?:data-src|src)="([^"]*)"[^>]*?(?:alt="([^"]*)")?',
+    r'<a\s+href="([^"]*)"[^>]*>\s*<img[^>]*?(?:data-src|src)="([^"]*)"[^>]*?(?:alt="([^"]*)")?',
     re.S | re.I)
 _RE_SEARCH_TITLE = re.compile(
     r'class="search-item-title[^>]*>([\s\S]*?)</a>', re.I)
@@ -142,7 +143,7 @@ _RE_TAB = re.compile(
 _RE_PANEL = re.compile(
     r'<div[^>]*source-panel[^>]*id="([^"]+)"[^>]*>([\s\S]*?)(?=<div[^>]*source-panel|$)', re.I)
 _RE_EP_A = re.compile(
-    r'<a\s+href="(/vodplay/[^"]+)"[^>]*>([\s\S]*?)</a>', re.I)
+    r'<a\s+href="([^"]*)"[^>]*>([\s\S]*?)</a>', re.I)
 _RE_PLAY_HREF = re.compile(
     r'^/vodplay/(\d+)-(.+)-(\d+)\.html$', re.I)
 
@@ -154,6 +155,8 @@ _RE_META_ROW = re.compile(
     r'class="meta-label"[^>]*>([\s\S]*?)</span>\s*<[^>]*class="meta-value"[^>]*>([\s\S]*?)</span>', re.I)
 _RE_POSTER_IMG = re.compile(
     r'<div class="detail-poster-wrapper">\s*<img[^>]*?(?:data-src|src)="([^"]*)"', re.S | re.I)
+_RE_SYNOPSIS = re.compile(
+    r'<div[^>]*class="synopsis-content"[^>]*>([\s\S]*?)</div>', re.I)
 
 
 class Spider(Spider):
@@ -209,6 +212,20 @@ class Spider(Spider):
             return self.site_url + url
         return urllib.parse.urljoin(self.site_url + "/", url)
 
+    def _norm_detail(self, raw):
+        if not raw:
+            return ""
+        u = raw.strip().replace("&amp;", "&")
+        m = re.search(r'/detail/(\d+)\.html', u)
+        return "/detail/%s.html" % m.group(1) if m else ""
+
+    def _norm_play(self, raw):
+        if not raw:
+            return ""
+        u = raw.strip().replace("&amp;", "&")
+        m = re.search(r'/vodplay/(\d+)-(.+)-(\d+)\.html', u)
+        return "/vodplay/%s-%s-%s.html" % m.groups() if m else ""
+
     def _clean(self, s):
         if not s:
             return ""
@@ -228,9 +245,10 @@ class Spider(Spider):
         if not html:
             return videos
 
-        for m in _RE_CARD.finditer(html):
-            href, inner = m.group(1), m.group(2)
-            if href in seen:
+        for m in _RE_ANCHOR.finditer(html):
+            href = self._norm_detail(m.group(1))
+            inner = m.group(2)
+            if not href or href in seen:
                 continue
             img = ""
             alt = ""
@@ -244,21 +262,25 @@ class Spider(Spider):
             title = self._clean(mt.group(1)) if mt else ""
             ms = _RE_SUB.search(inner)
             sub = self._clean(ms.group(1)) if ms else ""
+            mb = _RE_BADGE.search(inner)
+            badge = self._clean(mb.group(1)) if mb else ""
             if not title:
                 title = alt.replace("封面图片", "").strip()
             if not title:
                 continue
             seen.add(href)
+            remarks = " ｜ ".join([x for x in (badge, sub) if x])
             videos.append({
                 "vod_id": href,
                 "vod_name": title[:100],
                 "vod_pic": self._fix_url(img) or self.default_pic,
-                "vod_remarks": sub,
+                "vod_remarks": remarks,
             })
 
         # 兜底：锚点与图片分开配对
         if not videos:
-            hrefs = _RE_HREF.findall(html)
+            hrefs = [self._norm_detail(h) for h in re.findall(r'href="([^"]*)"', html)]
+            hrefs = [h for h in hrefs if h]
             imgs = re.findall(r'<img[^>]*?(?:data-src|src)="([^"]*)"', html)
             alts = re.findall(r'<img[^>]*?alt="([^"]*)"', html)
             for i, href in enumerate(hrefs):
@@ -285,8 +307,8 @@ class Spider(Spider):
             mp = _RE_SEARCH_POSTER.search(block)
             if not mp:
                 continue
-            href = mp.group(1)
-            if href in seen:
+            href = self._norm_detail(mp.group(1))
+            if not href or href in seen:
                 continue
             img = mp.group(2)
             alt = mp.group(3) or ""
@@ -440,8 +462,13 @@ class Spider(Spider):
                 pic = mp.group(1)
         pic = self._fix_url(pic) or self.default_pic
 
-        # 简介（多级兜底）
-        content = self._clean(ld.get("description", ""))
+        # 简介（优先页面完整简介容器，再 JSON-LD / meta description 兜底）
+        content = ""
+        ms = _RE_SYNOPSIS.search(html)
+        if ms:
+            content = self._clean(ms.group(1))
+        if not content:
+            content = self._clean(ld.get("description", ""))
         if not content:
             m = _RE_META_DESC.search(html)
             if m:
@@ -478,7 +505,9 @@ class Spider(Spider):
             label = self._clean(tab_labels.get(pid, "")) or pid
             eps = []
             for em in _RE_EP_A.finditer(block):
-                href = em.group(1).replace("&amp;", "&")
+                href = self._norm_play(em.group(1))
+                if not href:
+                    continue
                 ep_name = self._clean(em.group(2))
                 if not ep_name:
                     ep_name = "第%d集" % (len(eps) + 1)
@@ -525,8 +554,8 @@ class Spider(Spider):
         res = {"parse": 1, "playUrl": "", "url": play_page,
                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
-        # 解析 /vodplay/{vodId}-{playFrom}-{index}.html
-        rel = id if id.startswith("/") else urllib.parse.urlparse(play_page).path
+        # 解析 /vodplay/{vodId}-{playFrom}-{index}.html（兼容绝对地址 / 首尾空格）
+        rel = self._norm_play(id) or urllib.parse.urlparse(play_page).path
         m = _RE_PLAY_HREF.match(rel)
         if m:
             vod_id, play_from, index = m.group(1), m.group(2), m.group(3)
