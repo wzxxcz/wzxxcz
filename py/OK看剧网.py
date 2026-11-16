@@ -53,9 +53,6 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
-# 露骨/伦理类标题过滤 (与站点“伦理片”频道不上榜保持一致)
-_ADULT_RE = re.compile(r"操逼|性爱|色情|淫荡|H\s*版|癖好|AV片|成人影片|Cosplay|cosplay")
-
 # 频道: slug -> 名称 (伦理片频道按要求不上榜)
 CHANNELS = [
     {"type_id": "movie",        "type_name": "电影"},
@@ -201,8 +198,6 @@ class Spider(Spider):
                     name = ma.group(1)
             if not name:
                 continue
-            if _ADULT_RE.search(name):
-                continue
             mp = _RE_PIC.search(block)
             if not mp:
                 mp = _RE_PIC_FALLBACK.search(block)
@@ -312,8 +307,6 @@ class Spider(Spider):
             name = self._clean(mh.group(1))
         if not name:
             name = vid
-        if _ADULT_RE.search(name):
-            return {"list": []}
 
         eyebrow = ""
         me = _RE_EYEBROW.search(html)
