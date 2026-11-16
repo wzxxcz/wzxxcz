@@ -140,6 +140,12 @@ def _pic(u):
     u = (u or "").strip()
     if not u:
         return DEFAULT_PIC
+    # 解包站点图片代理 /img.php?url=<直链>（代理会间歇 503，直链 CDN 更稳）
+    if "/img.php?" in u:
+        q = urllib.parse.urlparse(u)
+        target = urllib.parse.parse_qs(q.query).get("url", [None])[0]
+        if target:
+            u = target
     if u.startswith("//"):
         return "https:" + u
     if u.startswith("http"):
@@ -374,28 +380,19 @@ class Spider(Spider):
                 continue
             heads.append((m.end() + t.end(), name))
 
-        groups = []
-        used = set()
+        videos = []
+        seen = set()
         for i, (start, name) in enumerate(heads):
             end = heads[i + 1][0] if i + 1 < len(heads) else len(h)
             block = h[start:end]
             items = self._cards(block)
-            extra = self._rank(block)
-            if extra:
-                have = set(x["vod_id"] for x in items)
-                for x in extra:
-                    if x["vod_id"] not in have:
-                        items.append(x)
-                        have.add(x["vod_id"])
-            if not items:
-                continue
-            gname = name
-            if gname in used:
-                gname = "%s %d" % (name, i + 1)
-            used.add(gname)
-            groups.append({"vod_name": gname, "vod_id": "", "vod_list": items})
+            for x in items:
+                if x["vod_id"] in seen:
+                    continue
+                seen.add(x["vod_id"])
+                videos.append(x)
 
-        return {"list": groups}
+        return {"list": videos}
 
     # ------------------------------------------------------------ 分类
     def _cat_url(self, tid, pg):
