@@ -417,26 +417,37 @@ class Spider(Spider):
 
     # ---------- 播放 ----------
 
+    @staticmethod
+    def _mime_for(vtype, url):
+        vtype = (vtype or "").lower()
+        url = (url or "").lower()
+        if vtype == "mp4" or ".mp4" in url:
+            return "video/mp4"
+        if vtype == "flv" or ".flv" in url:
+            return "video/x-flv"
+        # 默认按 HLS 处理 (m3u8 / 无后缀的 m3u8 直链)
+        return "application/vnd.apple.mpegurl"
+
     def _resolve_parser(self, parser_url):
-        """解析第三方解析器页面, 提取内嵌直链 (m3u8/mp4/flv); 取不到返回空串。"""
+        """解析第三方解析器页面, 提取内嵌直链; 返回 (直链, 类型), 取不到 ("", "")。"""
         if not parser_url or not parser_url.startswith("http"):
-            return ""
+            return "", ""
         page = self._fetch(parser_url, referer=self.site_url + "/")
         if not page:
-            return ""
+            return "", ""
         md = _RE_PLAYER_DATA.search(page)
         if md:
             try:
                 import html as _html
                 data = json.loads(_html.unescape(md.group(1)))
                 if isinstance(data, dict) and data.get("url"):
-                    return data["url"].strip()
+                    return data["url"].strip(), (data.get("type") or "")
             except Exception:
                 pass
         mm = _RE_DIRECT_MEDIA.search(page)
         if mm:
-            return mm.group(0).replace("&amp;", "&")
-        return ""
+            return mm.group(0).replace("&amp;", "&"), ""
+        return "", ""
 
     def playerContent(self, flag, id, vipFlags=""):
         # id 形态: "{sourceIndex}:{watchPath}"
@@ -461,11 +472,12 @@ class Spider(Spider):
             parser_url = urllib.parse.unquote(_html.unescape(mu.group(1)))
 
         if parser_url:
-            direct = self._resolve_parser(parser_url)
+            direct, vtype = self._resolve_parser(parser_url)
             if direct:
                 return {"parse": 0, "playUrl": "", "url": direct,
+                        "format": self._mime_for(vtype, direct),
                         "header": {"User-Agent": UA, "Referer": parser_url}}
-            # 解析器页面无内嵌直链 (需浏览器环境), 交播放器打开 iframe 嗅探
+            # 解析器页面无内嵌直链 (如 m3u8 类解析器需浏览器环境), 交播放器打开 iframe 嗅探
             return {"parse": 1, "playUrl": "", "url": parser_url,
                     "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
