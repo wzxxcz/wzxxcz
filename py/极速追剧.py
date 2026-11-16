@@ -157,6 +157,7 @@ _RE_POSTER_IMG = re.compile(
     r'<div class="detail-poster-wrapper">\s*<img[^>]*?(?:data-src|src)="([^"]*)"', re.S | re.I)
 _RE_SYNOPSIS = re.compile(
     r'<div[^>]*class="synopsis-content"[^>]*>([\s\S]*?)</div>', re.I)
+_RE_TAG_PILL = re.compile(r'<span class="tag-pill"[^>]*>([\s\S]*?)</span>', re.I)
 
 
 class Spider(Spider):
@@ -495,7 +496,18 @@ class Spider(Spider):
         if isinstance(rating, dict) and rating.get("ratingValue"):
             score = str(rating["ratingValue"])
 
-        remarks = meta.get("备注", "") or meta.get("更新", "")
+        # 地区 / 年份 / 语言 / 别名 / 更新 / 类型标签（与站点详情元信息一致）
+        area = meta.get("地区", "")
+        year = meta.get("年份", "")
+        lang = meta.get("语言", "")
+        alias = meta.get("别名", "")
+        update_time = meta.get("更新", "")
+        genre = self._clean(str(ld.get("genre", "") or ""))
+        if not genre:
+            pills = [self._clean(p) for p in _RE_TAG_PILL.findall(html)]
+            genre = ",".join([p for p in pills if p])
+
+        remarks = meta.get("备注", "") or update_time
 
         # ===== 线路 / 选集 =====
         tab_labels = dict(_RE_TAB.findall(html))
@@ -536,6 +548,13 @@ class Spider(Spider):
             "vod_director": director,
             "vod_score": score,
             "vod_remarks": remarks or ("%d条线路" % len(groups)),
+            "vod_area": area,
+            "vod_year": year,
+            "vod_lang": lang,
+            "vod_classify": genre,
+            "type_name": genre,
+            "vod_alias": alias,
+            "vod_update": update_time,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
         }]}
