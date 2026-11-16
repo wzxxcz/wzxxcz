@@ -10,7 +10,6 @@
   - 筛选支持：类型 / 地区 / 年份 / 语言 / 排序
   - 播放缓存 600s + 失败 parse:1 兜底嗅探
   - 模块级单例双入口（drpy site / 旧内核）
-  - 简介前缀 INTRO_PREFIX + 弹幕地址
 """
 import base64
 import hashlib
