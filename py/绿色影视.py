@@ -6,7 +6,7 @@
   - 分类严格按站点主导航 5 个: 电影1 / 电视剧2 / 综艺3 / 动漫4 / 短剧26
   - 子分类（动作片5… / 大陆剧13…）作为「类型」筛选维度，不单独占分类
   - 分类列表 /frim/{tid}-{page}.html（48 条/页，page=1 省略）
-  - 筛选 /search.php?searchtype=5&tid=&area=&year=&yuyan=&order=&page=N
+  - 筛选 /search.php?searchtype=5&tid=&area=&year=&yuyan=&state=&order=&page=N
   - 详情 /movie/{id}.html，播放 /play/{id}-{sid}-{nid}.html
   - 播放地址藏在 base64decode("...") 里，需解码
   - 线路按 nav-tabs 出现顺序与 playlist 编号配对（编号顺序 ≠ 显示顺序）
@@ -98,6 +98,8 @@ FILTER_YEAR = [str(y) for y in range(2026, 1949, -1)]
 FILTER_LANG = ["国语", "粤语", "英语", "日语", "韩语", "泰语", "法语"]
 
 FILTER_ORDER = [("时间", "time"), ("人气", "hit"), ("评分", "commend")]
+
+FILTER_STATE = [("完结", "w"), ("连载中", "l")]
 
 # ------------------------------------------------------------------ 正则
 _RE_THUMB_A = re.compile(r'<a\b[^>]*class="[^"]*myui-vodlist__thumb[^"]*"[^>]*>', re.I)
@@ -254,7 +256,12 @@ class Spider(Spider):
             if not name:
                 continue
             seen.add(vid)
-            pic = _attr(tag, "data-original") or _attr(tag, "data-src") or _attr(tag, "src")
+            pic = (_attr(tag, "data-original") or _attr(tag, "data-src")
+                   or _attr(tag, "src"))
+            if not pic:
+                sm = re.search(r'style="background:\s*url\(([^)]+)\)', tag, re.I)
+                if sm:
+                    pic = sm.group(1)
             rm = _RE_PIC_TEXT.search(seg)
             remark = _html(rm.group(1)) if rm else ""
             tg = _RE_PIC_TAG.search(seg)
@@ -324,6 +331,11 @@ class Spider(Spider):
                 for a in FILTER_AREA:
                     vals.append({"n": a, "v": a})
                 fl.append({"key": "地区", "name": "地区", "value": vals})
+
+                vals = [{"n": "全部", "v": ""}]
+                for nm, ov in FILTER_STATE:
+                    vals.append({"n": nm, "v": ov})
+                fl.append({"key": "状态", "name": "状态", "value": vals})
 
                 vals = [{"n": "全部", "v": ""}]
                 for y in FILTER_YEAR:
@@ -401,6 +413,8 @@ class Spider(Spider):
             params.append(("yuyan", ext["语言"]))
         if ext.get("排序"):
             params.append(("order", ext["排序"]))
+        if ext.get("状态"):
+            params.append(("state", ext["状态"]))
         if pg > 1:
             params.append(("page", str(pg)))
         qs = "&".join("%s=%s" % (k, urllib.parse.quote(str(v))) for k, v in params)
@@ -415,7 +429,7 @@ class Spider(Spider):
             tid = str(ext["类型"])
         ext.pop("类型", None)
 
-        use_search = bool(ext.get("地区") or ext.get("年份") or ext.get("语言") or ext.get("排序"))
+        use_search = bool(ext.get("地区") or ext.get("年份") or ext.get("语言") or ext.get("排序") or ext.get("状态"))
         if use_search:
             url = self._search_url(tid, ext, pg)
         else:
@@ -544,20 +558,13 @@ class Spider(Spider):
             if not um:
                 continue
             eps = []
-            for href, tx in re.findall(r'<a\b[^>]*href="([^"]*)"[^>]*title="([^"]*)"', um.group(1), re.I):
+            for a in re.finditer(r'<a\b[^>]*>([\s\S]*?)</a>', um.group(1), re.I):
+                tag = a.group(0)
+                href = _attr(tag, "href")
                 if "/play/" not in href:
                     continue
-                nm = _html(tx) or "播放"
+                nm = _html(_attr(tag, "title")) or _html(a.group(1)) or "播放"
                 eps.append("%s$%s" % (nm, href))
-            if not eps:
-                # 属性顺序不定的兜底
-                for a in re.finditer(r'<a\b[^>]*>([\s\S]*?)</a>', um.group(1), re.I):
-                    tag = a.group(0)
-                    href = _attr(tag, "href")
-                    if "/play/" not in href:
-                        continue
-                    nm = _html(_attr(tag, "title")) or _html(a.group(1)) or "播放"
-                    eps.append("%s$%s" % (nm, href))
             if not eps:
                 continue
             if label in play_from:
@@ -571,6 +578,7 @@ class Spider(Spider):
             "vod_pic": _pic(pic),
             "vod_remarks": remark,
             "type_name": cat,
+            "vod_classify": cat,
             "vod_year": year,
             "vod_area": area,
             "vod_lang": lang,
@@ -634,7 +642,10 @@ class Spider(Spider):
         if pg > 1:
             url += "&page=%d" % pg
         h = self._fetch(url)
-        cards = self._cards(self._scope(h, r'<ul class="myui-vodlist clearfix"[^>]*>'))
+        scoped = self._scope(h, r'<ul class="myui-vodlist__media[^"]*"[^>]*>')
+        if scoped == h:
+            scoped = self._scope(h, r'<ul class="myui-vodlist clearfix"[^>]*>')
+        cards = self._cards(scoped)
         pc = self._pagecount(h, pg)
         if pg > pc:
             cards = []
