@@ -8,8 +8,8 @@
   - 分类列表 /frim/{tid}-{page}.html（48 条/页，page=1 省略）
   - 筛选 /search.php?searchtype=5&tid=&area=&year=&yuyan=&state=&order=&page=N
   - 详情 /movie/{id}.html，播放 /play/{id}-{sid}-{nid}.html
-  - 播放地址藏在 base64decode("...") 里，需解码
-  - 线路按 nav-tabs 出现顺序与 playlist 编号配对（编号顺序 ≠ 显示顺序）
+  - 播放地址藏在 base64decode("...") 里，需解码；分享页再抓 var main 拼回域名
+  - 线路按标签出现顺序与对应编号块配对（playlist{N} / player{N} 两套命名兼容）
 """
 import re
 import sys
@@ -110,9 +110,12 @@ _RE_ACTOR_P = re.compile(r'<p class="text[^"]*"[^>]*>([\s\S]*?)</p>', re.I)
 _RE_MID = re.compile(r'/movie/(\d+)\.html', re.I)
 _RE_RANK_LI = re.compile(r'<a class="top-line-dot[^"]*"\s+href="([^"]+)"[^>]*title="([^"]*)"', re.I)
 _RE_NUM = re.compile(r'<a class="btn btn-warm">\s*(\d+)\s*/\s*(\d+)\s*</a>')
-_RE_TAB = re.compile(r'<li><a href="#playlist(\d+)"[^>]*>([^<]*)</a></li>', re.I)
+# 站点两套线路命名并存：旧片 #playlist{N} / id="playlist{N}"，新片 #player{N} / id="player{N}"
+_RE_TAB = re.compile(
+    r'<li[^>]*>\s*<a\b[^>]*href="[^"]*#(playlist|player)(\d+)\s*"[^>]*>([\s\S]*?)</a></li>', re.I)
 _RE_HEAD = re.compile(r'<div class="myui-panel__head[^"]*"[^>]*>', re.I)
 _RE_NOW = re.compile(r'var\s+now\s*=\s*base64decode\("([^"]*)"\)', re.I)
+_RE_SHARE_MAIN = re.compile(r'var\s+main\s*=\s*"([^"]*)"', re.I)
 _RE_EXT = re.compile(r'\.(m3u8|mp4|flv|mkv|ts|avi|mov|rmvb|webm)(\?|#|$)', re.I)
 
 
@@ -541,13 +544,13 @@ class Spider(Spider):
             content_body = "，".join(bits) if bits else "暂无简介"
         content = INTRO_PREFIX + "\n" + content_body
 
-        # 线路：nav-tabs 显示顺序 → 对应 playlist 编号块
+        # 线路：标签显示顺序 → 对应编号块（playlist{N} / player{N}）
         play_from = []
         play_url = []
         tabs = _RE_TAB.findall(h)
-        for num, label in tabs:
+        for prefix, num, label in tabs:
             label = _html(label) or ("线路%s" % num)
-            blk_m = re.search(r'<div id="playlist%s"[\s\S]*?</div>' % re.escape(num), h, re.I)
+            blk_m = re.search(r'<div id="%s%s"[\s\S]*?</div>' % (re.escape(prefix), re.escape(num)), h, re.I)
             if not blk_m:
                 continue
             blk = blk_m.group(0)
@@ -622,6 +625,15 @@ class Spider(Spider):
 
         if u.startswith("//"):
             u = "https:" + u
+        # now 可能是 /share/<hash> 分享页：抓页面取 var main，拼回分享域名得到真实流地址
+        if u.startswith("http") and not _RE_EXT.search(u):
+            sh = self._fetch(u)
+            mm = _RE_SHARE_MAIN.search(sh or "")
+            if mm:
+                main = mm.group(1).replace("\\/", "/")
+                pu = urllib.parse.urlparse(u)
+                host = pu.scheme + "://" + pu.netloc
+                u = host + main
         if not _RE_EXT.search(u):
             u = u.rstrip("/") + "/index.m3u8"
         return {"parse": 0, "playUrl": "", "url": u, "header": header}
