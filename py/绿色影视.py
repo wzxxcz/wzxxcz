@@ -603,7 +603,6 @@ class Spider(Spider):
         else:
             url = HOST + "/play/%s.html" % s
         h = self._fetch(url)
-        header = json.dumps({"User-Agent": UA, "Referer": HOST + "/"})
 
         u = ""
         m = _RE_NOW.search(h or "")
@@ -621,21 +620,36 @@ class Spider(Spider):
                 except Exception:
                     u = ""
         if not u:
+            header = json.dumps({"User-Agent": UA, "Referer": HOST + "/"})
             return {"parse": 1, "playUrl": "", "url": url, "header": header}
 
         if u.startswith("//"):
             u = "https:" + u
         # now 可能是 /share/<hash> 分享页：抓页面取 var main，拼回分享域名得到真实流地址
+        share_url = ""
         if u.startswith("http") and not _RE_EXT.search(u):
             sh = self._fetch(u)
             mm = _RE_SHARE_MAIN.search(sh or "")
             if mm:
+                share_url = u
                 main = mm.group(1).replace("\\/", "/")
                 pu = urllib.parse.urlparse(u)
                 host = pu.scheme + "://" + pu.netloc
                 u = host + main
         if not _RE_EXT.search(u):
             u = u.rstrip("/") + "/index.m3u8"
+
+        # 防盗链：分享线路沿用原始分享页地址作 Referer（贴近浏览器真实来源）；
+        # 直链线路跟随流地址自身域名；兜底站点域名
+        referer = share_url or HOST + "/"
+        if not share_url:
+            try:
+                pu = urllib.parse.urlparse(u)
+                if pu.scheme and pu.netloc:
+                    referer = pu.scheme + "://" + pu.netloc + "/"
+            except Exception:
+                pass
+        header = json.dumps({"User-Agent": UA, "Referer": referer})
         return {"parse": 0, "playUrl": "", "url": u, "header": header}
 
     # ------------------------------------------------------------ 搜索
