@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 达达兔影院 kshaodj.com | TVBox Python 爬虫
-覆盖：首页、分类、筛选（类型/地区/年份/排序）、详情、多线路多选集、
+覆盖：首页、分类、筛选（分类片种/类型/地区/年份/排序）、详情、多线路多选集、
       播放解析、搜索、副标题/备注/地区/年份/别名等详情字段。
 播放：优先将 player_data.url 混淆串还原为 m3u8/mp4 直链（parse:0）；
       还原失败时回退站点原生 CDN 解码页 p/d.html?p=<from>&u=<url> 内嵌播放（parse:1）。
@@ -72,36 +72,83 @@ CLASSES = [
     {"type_id": "duanju",    "type_name": "短剧"},
 ]
 
-_GENRES = ["剧情", "喜剧", "动作", "爱情", "惊悚", "悬疑", "犯罪", "科幻",
-           "冒险", "奇幻", "纪录", "动画", "动漫", "古装", "家庭", "战争",
-           "历史", "武侠", "传记", "运动", "音乐", "歌舞"]
+# 「分类」片种/剧种：值为短链 slug，占短链第 0 槽；空 = 频道本身
+_FENLEI = {
+    "dianying": [("动作片", "dongzuopian"), ("喜剧片", "xijupian"),
+                 ("爱情片", "aiqingpian"), ("科幻片", "kehuanpian"),
+                 ("恐怖片", "kongbupian"), ("剧情片", "juqingpian"),
+                 ("战争片", "zhanzhengpian"), ("动漫片", "dongmanpian"),
+                 ("纪录片", "jilupian")],
+    "lianxuju": [("国产剧", "guochanju"), ("欧美剧", "oumeiju"),
+                 ("日韩剧", "rihanju"), ("港台剧", "gangtaiju"),
+                 ("海外剧", "haiwaiju")],
+    "dongman": [("国产动漫", "guochandongman"), ("日韩动漫", "rihandongman"),
+                ("欧美动漫", "oumeidongman"), ("港台动漫", "gangtaidongman"),
+                ("海外动漫", "haiwaidongman")],
+    "zongyi": [("内地综艺", "neidizongyi"), ("港台综艺", "gangtaizongyi"),
+               ("日韩综艺", "rihanzongyi"), ("欧美综艺", "oumeizongyi")],
+    "duanju": [],
+}
 
-_AREAS = ["大陆", "香港", "台湾", "泰国", "日本", "印度", "美国", "英国",
-          "法国", "韩国", "德国", "加拿大", "西班牙", "意大利", "澳大利亚",
-          "俄罗斯", "其他"]
+# 「类型」：值为中文，占短链第 3 槽
+_GENRES = {
+    "dianying": ["剧情", "喜剧", "动作", "爱情", "恐怖", "惊悚", "犯罪", "科幻",
+                 "悬疑", "冒险", "奇幻", "纪录", "动画", "动漫", "古装", "家庭",
+                 "战争", "历史", "武侠", "传记", "运动", "音乐", "歌舞"],
+    "lianxuju": ["剧情", "爱情", "喜剧", "犯罪", "悬疑", "恐怖", "科幻", "惊悚",
+                 "古装", "动作", "家庭", "奇幻", "历史", "战争", "冒险", "武侠",
+                 "传记", "同性", "纪录", "动画"],
+    "dongman": ["动画", "剧情", "喜剧", "动作", "奇幻", "冒险", "科幻", "爱情",
+                "悬疑", "儿童", "短片", "运动", "惊悚", "武侠", "战争", "家庭",
+                "古装", "犯罪", "恐怖", "历史", "音乐"],
+    "zongyi": ["真人秀", "脱口秀", "音乐", "盛会", "访谈", "选秀", "美食", "曲艺",
+               "搞笑", "生活", "游戏", "歌舞", "情感", "文化", "旅游", "纪实",
+               "竞技", "益智", "晚会", "少儿", "其它"],
+    "duanju": [],
+}
 
-_YEARS = [str(y) for y in range(2026, 1999, -1)]
+# 「地区」：占短链第 1 槽
+_AREAS = {
+    "dianying": ["大陆", "香港", "台湾", "泰国", "日本", "印度", "美国", "英国",
+                 "法国", "韩国", "德国", "加拿大", "西班牙", "意大利", "澳大利亚",
+                 "俄罗斯", "其它"],
+    "lianxuju": ["大陆", "香港", "台湾", "日本", "泰国", "韩国", "美国", "英国",
+                 "法国", "加拿大", "西班牙", "新加坡", "澳大利亚", "其它"],
+    "dongman": ["大陆", "台湾", "日本", "美国", "韩国", "法国", "英国", "加拿大",
+                "澳大利亚", "其它"],
+    "zongyi": ["大陆", "台湾", "香港", "日本", "韩国", "美国", "英国"],
+    "duanju": [],
+}
 
-_SORTS = [{"n": "热度最高", "v": "hits"},
-          {"n": "时间最新", "v": "time"},
-          {"n": "评分最高", "v": "score"}]
+_YEARS_FULL = [str(y) for y in range(2025, 1999, -1)]
+_YEARS_DJ = [str(y) for y in range(2025, 2019, -1)]
+_YEARS = {"duanju": _YEARS_DJ}
+
+_SORTS = [("按最新", "time"), ("按最热", "hits"), ("按评分", "score")]
 
 FILTERS = {}
 for c in CLASSES:
     tid = c["type_id"]
-    FILTERS[tid] = [
-        {"key": "class", "name": "分类",
-         "value": [{"n": "全部", "v": ""}] +
-                  [{"n": x, "v": x} for x in _GENRES]},
-        {"key": "area", "name": "地区",
-         "value": [{"n": "全部", "v": ""}] +
-                  [{"n": x, "v": x} for x in _AREAS]},
-        {"key": "year", "name": "年份",
-         "value": [{"n": "全部", "v": ""}] +
-                  [{"n": x, "v": x} for x in _YEARS]},
-        {"key": "sort", "name": "排序",
-         "value": [{"n": "默认", "v": ""}] + _SORTS},
-    ]
+    fl = []
+    if _FENLEI[tid]:
+        fl.append({"key": "fenlei", "name": "分类",
+                   "value": [{"n": "全部", "v": ""}] +
+                            [{"n": n, "v": v} for n, v in _FENLEI[tid]]})
+    if _GENRES[tid]:
+        fl.append({"key": "class", "name": "类型",
+                   "value": [{"n": "全部", "v": ""}] +
+                            [{"n": x, "v": x} for x in _GENRES[tid]]})
+    if _AREAS[tid]:
+        fl.append({"key": "area", "name": "地区",
+                   "value": [{"n": "全部", "v": ""}] +
+                            [{"n": x, "v": x} for x in _AREAS[tid]]})
+    fl.append({"key": "year", "name": "年份",
+               "value": [{"n": "全部", "v": ""}] +
+                        [{"n": x, "v": x} for x in _YEARS.get(tid, _YEARS_FULL)]})
+    fl.append({"key": "sort", "name": "排序",
+               "value": [{"n": "默认", "v": ""}] +
+                        [{"n": n, "v": v} for n, v in _SORTS]})
+    FILTERS[tid] = fl
 
 
 # ===================== 正则 =====================
@@ -312,10 +359,10 @@ class Spider(Spider):
         self.log("home HTML 长度: %d" % len(html))
         return {"list": self._cards(html)}
 
-    def _show_slug(self, channel, area, sort, cls, page, year):
-        # 12 字段定宽短链：频道-地区-排序-类型-(空)-分页-(空)-年份
+    def _show_slug(self, channel, fenlei, area, sort, cls, page, year):
+        # 12 字段定宽短链：分类/频道-地区-排序-类型-(空)-分页-(空)-年份
         seg = [""] * 12
-        seg[0] = channel
+        seg[0] = fenlei or channel
         seg[1] = area or ""
         seg[2] = sort or ""
         seg[3] = cls or ""
@@ -334,12 +381,13 @@ class Spider(Spider):
             extend = {}
         ext = {k: v for k, v in extend.items() if v not in ("", None, "全部")}
 
+        fenlei = ext.get("fenlei", "")
         area = ext.get("area", "")
         cls = ext.get("class", "")
         year = ext.get("year", "")
         sort = ext.get("sort", "")
 
-        url = self.site_url + self._show_slug(tid, area, sort, cls, page, year)
+        url = self.site_url + self._show_slug(tid, fenlei, area, sort, cls, page, year)
         self.log("category: %s" % url)
         html = self._fetch(url)
         self.log("  HTML 长度: %d" % len(html))
