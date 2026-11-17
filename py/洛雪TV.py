@@ -153,6 +153,14 @@ for c in CLASSES:
 QUARK_CHANNEL = {"variety": "综艺", "short": "短剧"}
 
 _RE_DIRECT = re.compile(r"\.(?:m3u8|mp4)(?:[?#]|$)", re.I)
+# 组名（平台/线路代号）友好别名，对齐站点 lineLabel 映射
+GROUP_ALIAS = {
+    "mjzy": "lx", "jlplayer": "lx", "bilibili": "B站", "b站": "B站",
+    "qq": "腾讯视频", "腾讯": "腾讯视频", "qiyi": "爱奇艺", "爱奇艺": "爱奇艺",
+    "youku": "优酷", "优酷": "优酷", "mgtv": "芒果", "芒果": "芒果",
+}
+# 纯编码后缀类组名（m3u8/hls/mp4）站点不显示代号，归入默认线路
+_RE_CODEC_GROUP = re.compile(r"^[a-z0-9_.-]*(?:m3u8|hls|mp4)[a-z0-9_.-]*$", re.I)
 
 # TMDB 地区代码 -> 中文
 AREA_CN = {
@@ -261,6 +269,35 @@ class Spider(Spider):
                 return True
         return False
 
+    # ---------------- 片名匹配（对齐站点 titleScore / normalizeTitle）----------------
+    def _normalize_title(self, v):
+        s = re.sub(r"[\s\u3000]+", "", str(v or "").lower())
+        s = re.sub(r"[·•・:：,，.。!！?？'‘’\"“”()（）\[\]【】{}<>《》\-_/\\]", "", s)
+        s = re.sub(r"(?:第?[一二三四五六七八九十百0-9]+季|season[0-9]+)", "", s, flags=re.I)
+        s = re.sub(r"(?:20\d{2}|19\d{2})$", "", s)
+        return s
+
+    def _title_score(self, name, wanted):
+        a, b = self._normalize_title(name), self._normalize_title(wanted)
+        if not a or not b:
+            return 99
+        if a == b:
+            return 0
+        if a.startswith(b) or b.startswith(a):
+            return 1
+        if (b in a or a in b) and min(len(a), len(b)) >= 3:
+            return 2
+        return 99
+
+    def _group_label(self, raw):
+        raw = self._clean(raw)
+        if not raw:
+            return ""
+        if _RE_CODEC_GROUP.match(raw):
+            return ""
+        key = re.sub(r"[\s_-]+", "", raw.lower())
+        return GROUP_ALIAS.get(key, raw)
+
     # ---------------- 数据源请求 ----------------
     def _tmdb_get(self, endpoint, params=None, page=1):
         q = {"api_key": "", "language": "zh-CN", "page": page}
@@ -270,8 +307,8 @@ class Spider(Spider):
                urllib.parse.quote(endpoint, safe="") + "&" + urllib.parse.urlencode(q))
         self.log("tmdb: %s" % url[:160])
         data = self._get_json(url, timeout=20)
-        # 上游偶发超时/空响应，重试一次
-        if not isinstance(data, dict) or not data.get("results"):
+        # 上游偶发超时/空响应，重试一次（列表端点看 results，详情端点看整体非空）
+        if not isinstance(data, dict) or not data or not data.get("results"):
             data = self._get_json(url, timeout=20)
         return data if isinstance(data, dict) else {}
 
@@ -292,7 +329,7 @@ class Spider(Spider):
         q = {"action": "detail", "source": str(source), "id": str(sid)}
         url = self.site_url + "/api/proxy.php?" + urllib.parse.urlencode(q)
         self.log("proxy detail: %s" % url[:160])
-        data = self._get_json(url)
+        data = self._get_json(url, timeout=20)
         if not isinstance(data, dict) or not data.get("success"):
             return {}
         details = data.get("details") or []
@@ -517,19 +554,25 @@ class Spider(Spider):
             "content": self._clean(detail.get("overview") or ""),
         }
 
-    def _ordered_rows(self, rows):
-        seen = set()
-        ordered = []
-        for row in rows or []:
+    def _ordered_rows(self, rows, wanted="", year=""):
+        # 与站点 buildCandidates 一致：同一源只保留片名最匹配的一条，
+        # 按源顺序 -> 片名相似度 -> 原始下标排序；不匹配（score=99）的剔除。
+        best = {}
+        for idx, row in enumerate(rows or []):
             if not row or not row.get("source"):
                 continue
-            key = str(row["source"]) + ":" + str(row.get("id"))
-            if key in seen:
-                continue
-            seen.add(key)
-            ordered.append(row)
-        ordered.sort(key=lambda r: SOURCE_ORDER.index(r["source"])
-                     if r["source"] in SOURCE_ORDER else 99)
+            src = str(row["source"])
+            score = self._title_score(row.get("name") or "", wanted)
+            if year and str(row.get("year") or "") == str(year):
+                score -= 0.2
+            cand = {"row": row, "score": score, "index": idx}
+            old = best.get(src)
+            if old is None or cand["score"] < old["score"]:
+                best[src] = cand
+        ordered = [c["row"] for c in best.values() if c["score"] < 99]
+        ordered.sort(key=lambda r: (
+            SOURCE_ORDER.index(r["source"]) if r["source"] in SOURCE_ORDER else 99,
+            best[r["source"]]["score"], best[r["source"]]["index"]))
         return ordered
 
     def detailContent(self, ids):
@@ -545,27 +588,30 @@ class Spider(Spider):
         if vod_id.startswith("source:"):
             parts = vod_id.split(":", 2)
             source, sid = parts[1], parts[2]
-            rows = [{"source": source, "id": sid}]
+            # 搜索结果卡片直连：该源该行即用户所选，不再做片名相似度筛选
+            ordered = [{"source": source, "id": sid}]
         elif vod_id.startswith("tmdb:"):
             parts = vod_id.split(":", 2)
             media, tid = parts[1], parts[2]
             tmdb_detail = self._tmdb_detail(media, tid)
             meta = self._meta_from_tmdb(tmdb_detail)
             rows = self._proxy_search(meta.get("name") or "").get("results") or []
+            ordered = self._ordered_rows(rows, meta.get("name") or "", meta.get("year") or "")
         elif vod_id.startswith("quark:"):
             parts = vod_id.split(":", 3)
             title = parts[3] if len(parts) > 3 else ""
             meta = {"name": title}
             rows = self._proxy_search(title).get("results") or []
+            ordered = self._ordered_rows(rows, title, "")
         else:
             rows = self._proxy_search(vod_id).get("results") or []
+            ordered = self._ordered_rows(rows, vod_id, "")
 
-        ordered = self._ordered_rows(rows)
         self.log("  候选源: %d 个" % len(ordered))
 
-        # 最多采集前 3 个源，避免详情请求过多
+        # 站点候选上限 12；详情按需拉取，这里取前 8 个源兼顾加载速度
         chosen = []
-        for row in ordered[:3]:
+        for row in ordered[:8]:
             det = self._proxy_detail(row["source"], row["id"])
             if det:
                 chosen.append((row, det))
@@ -600,9 +646,9 @@ class Spider(Spider):
                 if not eps:
                     continue
                 label = source_name
-                gname = self._clean(g.get("group") or "")
-                if gname and gname != source:
-                    label = "%s·%s" % (source_name, gname)
+                glabel = self._group_label(g.get("group") or "")
+                if glabel and glabel.lower() != source.lower():
+                    label = "%s·%s" % (source_name, glabel)
                 # 线路名去重
                 base_label, idx = label, 2
                 while label in play_from:
@@ -670,6 +716,10 @@ class Spider(Spider):
     def playerContent(self, flag, id, vipFlags):
         play_url = id if str(id).startswith("http") else self._fix_url(id)
         self.log("player: %s" % play_url)
+
+        if not play_url:
+            return {"parse": 0, "playUrl": "", "url": "",
+                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
         now = int(time.time())
         if play_url in self._play_cache:
