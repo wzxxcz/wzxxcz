@@ -17,6 +17,7 @@
   - 播放链路:
       · 集地址本身是 .m3u8/.mp4 直链 -> parse:0 直放
       · 集地址是第三方平台页面   -> 用该源 player_api 拼接成解析页 -> parse:1 iframe
+简介统一加锁定前缀（逐字不可改）。
 """
 import re
 import sys
@@ -102,6 +103,17 @@ SOURCE_PARSER = {
 }
 DEFAULT_PARSER = "https://svip.qlplayer.cyou/?url="
 
+# 站点公开 iframe 备用解析（对齐 official_routes 中 type=iframe、official_only=false 的线路，
+# 顺序与网页"解析线路"区一致）；type=json 的鉴权路由无会话 403，不在此列。
+PUBLIC_IFRAME_PARSERS = [
+    {"name": "默认解析", "api": "https://svip.qlplayer.cyou/?url="},
+    {"name": "无名",     "api": "https://jx.wmxz.online/?url="},
+    {"name": "闪电",     "api": "https://bfq.txnp.cn/excessive?url="},
+    # m1907 站点配置 hide_mobile=true（手机端隐藏），TVBox 爬虫不分端，予以保留
+    {"name": "m1907",   "api": "https://im1907.top/?jx="},
+    {"name": "洛雪聚合", "api": "https://jx.lxyy.club/index.php?url="},
+]
+
 # 筛选：排序
 SORTS = [
     {"n": "热度最高", "v": "popularity.desc"},
@@ -151,6 +163,11 @@ for c in CLASSES:
 
 # 夸克榜单频道映射（综艺/短剧走夸克榜单）
 QUARK_CHANNEL = {"variety": "综艺", "short": "短剧"}
+
+# 官方采集源与官方平台线路展示顺序（对齐 config.official_source / official_platform_order，
+# playback-defaults.js lineOrder：仅官方源按此顺序重排平台组，其余源保持接口原序）
+OFFICIAL_SOURCE = "qilin"
+OFFICIAL_PLATFORM_ORDER = ["qq", "bilibili", "mgtv", "qiyi", "youku"]
 
 _RE_DIRECT = re.compile(r"\.(?:m3u8|mp4)(?:[?#]|$)", re.I)
 # 组名（平台/线路代号）友好别名，对齐站点 lineLabel 映射
@@ -641,6 +658,13 @@ class Spider(Spider):
                 # 兜底：详情已预拼好 名称$链接#...
                 groups = [{"group": "", "episodes": self._parse_play_url(det["play_url"])}]
 
+            # 官方源平台组按站点 official_platform_order 重排（稳定排序，未列平台保持原序）
+            if source == OFFICIAL_SOURCE and len(groups) > 1:
+                def _plat_rank(g):
+                    k = re.sub(r"[\s_-]+", "", str(g.get("group") or "").lower())
+                    return OFFICIAL_PLATFORM_ORDER.index(k) if k in OFFICIAL_PLATFORM_ORDER else len(OFFICIAL_PLATFORM_ORDER)
+                groups = sorted(groups, key=_plat_rank)
+
             for g in groups:
                 eps = g.get("episodes") or []
                 if not eps:
@@ -660,10 +684,32 @@ class Spider(Spider):
                     ep_url = ep.get("url") or ""
                     if ep_url:
                         ep_lines.append("%s$%s" % (ep_name, ep_url))
-                if ep_lines:
-                    play_from.append(label)
-                    play_url.append("#".join(ep_lines))
-                    self._parser_map[label] = player_api
+                if not ep_lines:
+                    continue
+
+                # 直链组（.m3u8/.mp4）：parse:0 直放，不挂解析备用
+                first_url = (eps[0].get("url") or "") if eps else ""
+                is_direct = bool(_RE_DIRECT.search(first_url or ""))
+
+                # 主线路（源自带 player_api / 默认解析）
+                play_from.append(label)
+                play_url.append("#".join(ep_lines))
+                self._parser_map[label] = player_api
+
+                # 解析页组：并列网站公开 iframe 备用解析（对齐网页"解析线路"区），
+                # 与主解析相同的那条跳过；json 鉴权路由不在此列。
+                if not is_direct:
+                    for p in PUBLIC_IFRAME_PARSERS:
+                        if p["api"] == player_api:
+                            continue
+                        alt_label = "%s〔%s〕" % (label, p["name"])
+                        alt_base, alt_idx = alt_label, 2
+                        while alt_label in play_from:
+                            alt_label = "%s(%d)" % (alt_base, alt_idx)
+                            alt_idx += 1
+                        play_from.append(alt_label)
+                        play_url.append("#".join(ep_lines))
+                        self._parser_map[alt_label] = p["api"]
 
         name = meta.get("name") or vod_id
         content = meta.get("content") or ""
