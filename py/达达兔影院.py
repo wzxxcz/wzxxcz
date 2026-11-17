@@ -283,6 +283,15 @@ class Spider(Spider):
             m = _RE_SUBJECT.search(block)
             if not m:
                 continue
+            # 剔除频道导航(smlist_box/hidden_xs)、纯文字周榜(part_eone)等非海报卡片
+            li_cls = re.search(r'<li\s+class="([^"]*)"', block)
+            cls_txt = li_cls.group(1) if li_cls else ""
+            if ("part_eone" in cls_txt or "smlist_box" in cls_txt
+                    or cls_txt.strip() == "hidden_xs"):
+                continue
+            # 仅保留带封面的海报卡片；剔除标题栏分栏链接等无封面块
+            if not (_RE_BG.search(block) or _RE_IMG.search(block)):
+                continue
             sid = m.group(1)
             href = "/subject/%s.html" % sid
 
@@ -316,6 +325,9 @@ class Spider(Spider):
                 if mi:
                     pic = mi.group(1)
             pic = self._fix_url(pic) or self.default_pic
+            # loading 占位图 / 站点资源图不算真实封面，置空以便后续真实封面覆盖
+            if "/asset/img/" in pic or "loading1.gif" in pic:
+                pic = self.default_pic
 
             # 备注/角标：pic_text > voddate > vodlist_sub
             remarks = ""
