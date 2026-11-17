@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 洛雪TV · 影视推荐  tv.lxyy.club | TVBox Python 爬虫
-站点结构:
+站点结构（线上实证 2026-11-17）:
   - 首页/目录: TMDB 代理 /api/tmdb.php?path=<endpoint>&api_key=&language=zh-CN&page=<n>
       · 推荐  trending/all/day
       · 电影  discover/movie
@@ -17,7 +17,6 @@
   - 播放链路:
       · 集地址本身是 .m3u8/.mp4 直链 -> parse:0 直放
       · 集地址是第三方平台页面   -> 用该源 player_api 拼接成解析页 -> parse:1 iframe
-简介统一加锁定前缀（逐字不可改）。
 """
 import re
 import sys
@@ -179,6 +178,10 @@ GROUP_ALIAS = {
 # 纯编码后缀类组名（m3u8/hls/mp4）站点不显示代号，归入默认线路
 _RE_CODEC_GROUP = re.compile(r"^[a-z0-9_.-]*(?:m3u8|hls|mp4)[a-z0-9_.-]*$", re.I)
 
+# 自营(jl)分享页 / 智能线路防盗链直链：smart.m3u8 被 403，需转分享页取内嵌可用线路
+_RE_JL_SHARE = re.compile(r"jimaoys\d+\.com/s/([a-z0-9]+)", re.I)
+_RE_JL_SMART = re.compile(r"/public/playback/([a-z0-9]+)/smart\.m3u8", re.I)
+
 # TMDB 地区代码 -> 中文
 AREA_CN = {
     "CN": "中国大陆", "US": "美国", "JP": "日本", "KR": "韩国", "HK": "中国香港",
@@ -221,7 +224,28 @@ class Spider(Spider):
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
         self._parser_map = {}
+        self._ensure_session()
         self.log("init: site=%s" % self.site_url)
+
+    def _ensure_session(self):
+        """先访问首页预热，再 POST playback-session 建立播放会话，拿到
+        sg_playback_access Cookie 并写入请求头。冷数据的搜索/详情在无会话时
+        可能被上游拒绝或超时；会话建立失败则静默回退裸请求，不影响现有流程。"""
+        try:
+            sess = getattr(self, "_sess", None) or getattr(self, "_session", None)
+            if sess is None:
+                return
+            h = dict(self.headers)
+            sess.get(self.site_url + "/", headers=h, timeout=12)
+            rsp = sess.post(self.site_url + "/api/playback-session.php",
+                            headers=h, timeout=12)
+            ck = ""
+            if hasattr(rsp, "cookies"):
+                ck = rsp.cookies.get("sg_playback_access") or ""
+            if ck:
+                self.headers["Cookie"] = "sg_playback_access=" + ck
+        except Exception as e:
+            self.log("session skip: %s" % e)
 
     # ---------------- 基础工具 ----------------
     def _fetch(self, url, timeout=15, headers=None):
@@ -336,6 +360,10 @@ class Spider(Spider):
         url = self.site_url + "/api/proxy.php?" + urllib.parse.urlencode(q)
         self.log("proxy search: %s" % url[:160])
         data = self._get_json(url)
+        # 上游间歇超时/拒绝，空结果时短暂等待重试一次
+        if not (isinstance(data, dict) and data.get("success") and data.get("results")):
+            time.sleep(0.8)
+            data = self._get_json(url)
         if not isinstance(data, dict) or not data.get("success"):
             return {"results": [], "sources": {}}
         return data
@@ -347,6 +375,9 @@ class Spider(Spider):
         url = self.site_url + "/api/proxy.php?" + urllib.parse.urlencode(q)
         self.log("proxy detail: %s" % url[:160])
         data = self._get_json(url, timeout=20)
+        if not (isinstance(data, dict) and data.get("success") and data.get("details")):
+            time.sleep(0.8)
+            data = self._get_json(url, timeout=20)
         if not isinstance(data, dict) or not data.get("success"):
             return {}
         details = data.get("details") or []
@@ -758,6 +789,58 @@ class Spider(Spider):
                 eps.append({"name": self._clean(n), "url": u})
         return eps
 
+    # ---------------- 自营(jl)防盗链解析 ----------------
+    def _probe_m3u8(self, url):
+        """探测 m3u8 直链是否可达：200 且正文为 #EXTM3U，排除 403/404 的 JSON 拦截页。"""
+        try:
+            rsp = self.fetch(url, headers={
+                "User-Agent": UA, "Referer": "https://jimaoys95.com/"}, timeout=10)
+            status = getattr(rsp, "status_code", 0)
+            body = ""
+            if hasattr(rsp, "text"):
+                body = rsp.text or ""
+            elif hasattr(rsp, "content"):
+                body = rsp.content.decode("utf-8", "ignore")
+            return status == 200 and "#EXTM3U" in body[:512]
+        except Exception:
+            return False
+
+    def _resolve_jl_stream(self, url):
+        """自营(jl)智能线路 smart.m3u8 被防盗链 403；改抓对应分享页内嵌 sources，
+        按顺序取首条可达的 line1~7 直链。解析失败返回 ""，交回 iframe 兜底。"""
+        if not url:
+            return ""
+        m = _RE_JL_SHARE.search(url) or _RE_JL_SMART.search(url)
+        if not m:
+            return ""
+        key = m.group(1)
+        if not hasattr(self, "_jl_cache"):
+            self._jl_cache = {}
+        if key in self._jl_cache:
+            return self._jl_cache[key]
+
+        result = ""
+        share_url = "https://jimaoys95.com/s/%s" % key
+        html = self._fetch(share_url, timeout=15, headers={"Referer": share_url})
+        if html:
+            mt = re.search(r'<script id="share-boot" type="application/json">(.*?)</script>',
+                           html, re.S)
+            if mt:
+                try:
+                    boot = json.loads(mt.group(1))
+                    for s in (boot.get("sources") or []):
+                        su = (s.get("url") or "").strip()
+                        if not su or not _RE_DIRECT.search(su):
+                            continue
+                        if self._probe_m3u8(su):
+                            result = su
+                            break
+                except Exception as e:
+                    self.log("jl share parse FAIL %s -> %s" % (key, e))
+                    result = ""
+        self._jl_cache[key] = result
+        return result
+
     # ---------------- 播放 ----------------
     def playerContent(self, flag, id, vipFlags):
         play_url = id if str(id).startswith("http") else self._fix_url(id)
@@ -775,11 +858,26 @@ class Spider(Spider):
 
         header = {"User-Agent": UA, "Referer": self.site_url + "/"}
 
+        # 自营(jl)防盗链：先转分享页取可达直链；解析失败再走原直链/iframe 兜底
+        jl_url = self._resolve_jl_stream(play_url)
+        if jl_url:
+            res = {"parse": 0, "playUrl": "", "url": jl_url, "header": header}
+            self._play_cache[play_url] = (now, res)
+            self.log("  => jl resolved parse=0 %s" % jl_url[:120])
+            return res
+
         if _RE_DIRECT.search(play_url or ""):
             # 直链 m3u8 / mp4
             res = {"parse": 0, "playUrl": "", "url": play_url, "header": header}
         else:
-            parser = self._parser_map.get(flag) or SOURCE_PARSER.get(flag) or DEFAULT_PARSER
+            parser = self._parser_map.get(flag) or SOURCE_PARSER.get(flag)
+            if not parser:
+                # 实例映射未复用时，按线路名反查源 id 取对应解析器
+                for sid, sname in SOURCE_NAMES.items():
+                    if flag and sname and (sname in flag or flag.startswith(sname)):
+                        parser = SOURCE_PARSER.get(sid)
+                        break
+            parser = parser or DEFAULT_PARSER
             target = play_url
             if parser:
                 target = parser + urllib.parse.quote(play_url or "", safe="")
