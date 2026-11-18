@@ -24,7 +24,7 @@
   search.php（分类分页/筛选/搜索）首次访问返回轻量 JS 校验页（733 字节「请稍候」），
   页面脚本下发 cookie idc_search_browser=<hex>，种入 cookie 后 URL 追加 _idc_pass=<hex>
   重放即放行；放行标记随 cookie 保留（Max-Age=1800），同会话后续请求直接 200。
-  校验 hash 与会话 cookie 均通过显式 Cookie 请求头携带，不依赖框架会话 cookie jar。
+  爬虫内置「取校验页 → 提取 hash 种 cookie → 加重放参数重放」闭环，不依赖浏览器 JS。
 """
 import re
 import sys
@@ -100,14 +100,28 @@ CLASSES = [
     {"type_id": "29", "type_name": "短剧"},
 ]
 
-# ===== 站点真实筛选选项（取自放行分类页快照，值与站点原值逐字一致）=====
-_JQ = ["乡村", "偶像", "剧情", "励志", "古装", "同人", "宫廷", "家庭", "对话", "少儿",
-       "年代", "恐怖", "悬疑", "搞笑", "时装", "热血", "耽美", "解密", "言情", "都市"]
+# ===== 站点真实筛选选项（取自放行分类页快照，值与站点原值逐字、顺序一致）=====
+_JQ = ["解密", "乡村", "都市", "少儿", "对话", "搞笑", "恐怖", "宫廷", "剧情", "言情",
+       "家庭", "励志", "偶像", "时装", "年代", "悬疑", "古装", "热血", "同人", "耽美"]
 _AREA = ["大陆", "香港", "台湾", "日本", "韩国", "欧美", "泰国", "其他"]
-_YEAR = [str(y) for y in range(2026, 2009, -1)]
+# 站点年份序列（站点本身缺 2011；more 为展开按钮，无实际取值，不纳入）
+_YEAR = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018",
+         "2017", "2016", "2015", "2014", "2013", "2012", "2010"]
 _YUYAN = ["国语", "粤语", "英语", "日语", "韩语", "泰语", "法语"]
 _LETTER = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") + ["0-9"]
 _ORDER = [{"n": "最新", "v": "time"}, {"n": "最热", "v": "hit"}, {"n": "评分", "v": "score"}]
+
+# 各大类下的二级分类（站点 hl01 行，子 tid）；仅作为筛选维度，不进一级分类墙
+_SUB = {
+    "1":  [("动作片", "5"), ("喜剧片", "6"), ("爱情片", "7"), ("科幻片", "8"),
+           ("恐怖片", "9"), ("剧情片", "10"), ("战争片", "11"), ("纪录片", "12")],
+    "2":  [("国产剧", "13"), ("香港剧", "14"), ("台湾剧", "15"), ("欧美剧", "16"),
+           ("韩国剧", "25"), ("日本剧", "26"), ("泰国剧", "27"), ("海外剧", "28"), ("短剧", "29")],
+    "3":  [("大陆综艺", "30"), ("港台综艺", "31"), ("日韩综艺", "32"), ("欧美综艺", "33")],
+    "4":  [("大陆动漫", "34"), ("日本动漫", "35"), ("欧美动漫", "36"), ("海外动漫", "37"), ("动画片", "38")],
+    "29": [("国产剧", "13"), ("香港剧", "14"), ("台湾剧", "15"), ("欧美剧", "16"),
+           ("韩国剧", "25"), ("日本剧", "26"), ("泰国剧", "27"), ("海外剧", "28"), ("短剧", "29")],
+}
 
 
 def _opts(values):
@@ -117,7 +131,13 @@ def _opts(values):
 FILTERS = {}
 for c in CLASSES:
     tid = c["type_id"]
-    FILTERS[tid] = [
+    rows = []
+    if _SUB.get(tid):
+        rows.append({
+            "key": "tid", "name": "分类",
+            "value": [{"n": "全部", "v": ""}] + [{"n": n, "v": t} for n, t in _SUB[tid]],
+        })
+    rows += [
         {"key": "jq",     "name": "类型", "value": _opts(_JQ)},
         {"key": "area",   "name": "地区", "value": _opts(_AREA)},
         {"key": "year",   "name": "年份", "value": _opts(_YEAR)},
@@ -125,6 +145,7 @@ for c in CLASSES:
         {"key": "letter", "name": "字母", "value": _opts(_LETTER)},
         {"key": "order",  "name": "排序", "value": _ORDER},
     ]
+    FILTERS[tid] = rows
 
 # ===================== 正则 =====================
 _RE_CARD = re.compile(
@@ -480,10 +501,11 @@ class Spider(Spider):
         return {"list": videos}
 
     def _category_url(self, tid, page, extend):
-        # 无筛选第 1 页直连 /zjm/<tid>.html；其余走 search.php
+        # 子分类（hl01）筛选优先于大类 tid；无筛选第 1 页直连 /zjm/<tid>.html
+        sub_tid = extend.get("tid") if isinstance(extend, dict) else None
         if not extend and page == 1:
             return "%s/zjm/%s.html" % (self.site_url, str(tid))
-        params = {"searchtype": "5", "tid": str(tid), "page": str(page)}
+        params = {"searchtype": "5", "tid": str(sub_tid or tid), "page": str(page)}
         for k in ("jq", "area", "year", "yuyan", "letter", "order"):
             if extend.get(k):
                 params[k] = str(extend[k])
@@ -719,6 +741,33 @@ class Spider(Spider):
                 return url
         return ""
 
+    def _resolve_sub_stream(self, url, header):
+        """若为多码率 master 列表，解析第一条子 m3u8 补全返回；
+        已是媒体播放列表或 mp4 则原样；子流不可达时回退 master，不误伤。"""
+        if not url or ".mp4" in url.lower():
+            return url
+        try:
+            rsp = self.fetch(url, headers=header, timeout=10)
+            text = rsp.text if hasattr(rsp, "text") else (
+                rsp.content.decode("utf-8", "ignore") if hasattr(rsp, "content") else "")
+            if "#EXT-X-STREAM-INF" not in text:
+                return url  # 已是媒体播放列表，直接含分片
+            for line in text.splitlines():
+                line = line.strip().replace("\\/", "/")
+                if line and not line.startswith("#"):
+                    sub = urllib.parse.urljoin(url, line)
+                    try:
+                        rs = self.fetch(sub, headers=header, timeout=10)
+                        if getattr(rs, "status_code", 200) == 200:
+                            self.log("  master 解析子流 %s" % sub[:120])
+                            return sub
+                    except Exception:
+                        pass
+                    break
+        except Exception as e:
+            self.log("  子流解析回退: %s" % e)
+        return url
+
     def playerContent(self, flag, id, vipFlags):
         play_page = id if str(id).startswith("http") else self._fix_url(id)
         self.log("player: %s" % play_page)
@@ -731,9 +780,10 @@ class Spider(Spider):
 
         header = {"User-Agent": UA, "Referer": self.site_url + "/"}
 
-        # 传入本身已是裸直链，直接放行
+        # 传入本身已是裸直链，直接放行（master 则解析到子流）
         if _RE_STREAM.search(play_page):
-            res = {"parse": 0, "playUrl": "", "url": play_page, "header": header}
+            final = self._resolve_sub_stream(play_page, header)
+            res = {"parse": 0, "playUrl": "", "url": final, "header": header}
             self._play_cache[play_page] = (now, res)
             return res
 
@@ -743,6 +793,7 @@ class Spider(Spider):
             stream = self._extract_stream(html)
 
         if stream:
+            stream = self._resolve_sub_stream(stream, header)
             res = {"parse": 0, "playUrl": "", "url": stream, "header": header}
             self._play_cache[play_page] = (now, res)
             self.log("  => 直链 parse=0 %s" % stream[:140])
