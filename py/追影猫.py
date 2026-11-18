@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 追影猫（追剧猫） www.movienuke.com | TVBox Python 爬虫
-站点结构（线上实证 2026-11-18，服务端渲染 HTML，模板 conch，苹果 CMS 风格）:
+站点结构（服务端渲染 HTML，模板 conch，苹果 CMS 风格）:
   - 首页:   /
   - 分类:   /zjm/<tid>.html                        （第 1 页、无筛选直连，不触发校验）
             /search.php?searchtype=5&tid=<tid>&page=<p>&jq=&area=&year=&yuyan=&letter=&order=
@@ -24,7 +24,7 @@
   search.php（分类分页/筛选/搜索）首次访问返回轻量 JS 校验页（733 字节「请稍候」），
   页面脚本下发 cookie idc_search_browser=<hex>，种入 cookie 后 URL 追加 _idc_pass=<hex>
   重放即放行；放行标记随 cookie 保留（Max-Age=1800），同会话后续请求直接 200。
-  爬虫内置「取校验页 → 提取 hash 种 cookie → 加重放参数重放」闭环，不依赖浏览器 JS。
+  校验 hash 与会话 cookie 均通过显式 Cookie 请求头携带，不依赖框架会话 cookie jar。
 """
 import re
 import sys
@@ -185,6 +185,10 @@ class Spider(Spider):
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
         self._idc_ok = False
+        # IDC 浏览器校验放行标记：hash 与额外会话 cookie 均显式带到请求头，
+        # 不依赖底层会话 cookie jar 是否暴露给爬虫（兼容框架基类 fetch）。
+        self._idc_browser = ""
+        self._idc_cookies = {}
         self.log("init: site=%s" % self.site_url)
 
     # ---------------- 基础工具 ----------------
@@ -214,6 +218,8 @@ class Spider(Spider):
 
     def _reset_session(self):
         self._idc_ok = False
+        self._idc_browser = ""
+        self._idc_cookies = {}
         try:
             if hasattr(self, "reset_session"):
                 self.reset_session()
@@ -229,29 +235,77 @@ class Spider(Spider):
             pass
 
     @staticmethod
-    def _idc_pass():
-        return format(int(time.time()), 'x') + ''.join(
-            random.choice('abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(6))
+    def _b36(n):
+        digits = '0123456789abcdefghijklmnopqrstuvwxyz'
+        if n == 0:
+            return '0'
+        s = ''
+        while n:
+            n, r = divmod(n, 36)
+            s = digits[r] + s
+        return s
+
+    def _idc_pass(self):
+        # 对齐浏览器：Date.now().toString(36) + Math.random().toString(36).slice(2,8)
+        return self._b36(int(time.time() * 1000)) + ''.join(
+            random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for _ in range(6))
+
+    def _cookie_header(self):
+        """把放行 hash 与服务端会话 cookie 合并成 Cookie 请求头（显式携带，不依赖 jar）。"""
+        pairs = []
+        if self._idc_browser:
+            pairs.append("idc_search_browser=" + self._idc_browser)
+        for k, v in self._idc_cookies.items():
+            pairs.append("%s=%s" % (k, v))
+        return "; ".join(pairs)
+
+    def _store_set_cookie(self, rsp):
+        """best-effort 记录响应 Set-Cookie 中的会话键值，供后续请求显式带回。"""
+        try:
+            sc = rsp.headers.get("Set-Cookie") or rsp.headers.get("set-cookie")
+            if not sc:
+                return
+            for part in sc.split(","):
+                kv = part.split(";")[0].strip()
+                if "=" in kv:
+                    k, v = kv.split("=", 1)
+                    k = k.strip()
+                    if k and k.lower() not in ("idc_search_browser",):
+                        self._idc_cookies[k] = v.strip()
+        except Exception:
+            pass
 
     def _solve_idc(self, url, text):
-        """从校验页提取 hash 种入 cookie，追加 _idc_pass 重放放行。
-        返回 (是否成功, 重放响应正文)；成功时正文即放行后的目标页。"""
-        sess = self._low_session()
-        if sess is None:
-            return False, ""
+        """从校验页提取 hash，显式 Cookie 头 + _idc_pass 重放放行。
+        返回 (是否成功, 重放响应正文)；成功时正文即放行后的目标页。
+        hash 同时写入底层会话 jar 作双保险；放行后的会话 cookie 一并记录，
+        后续请求通过显式 Cookie 头带回，不依赖框架会话是否对外暴露 cookie jar。"""
         m = re.search(r'idc_search_browser=([a-f0-9]+)', text or "")
         if not m:
             return False, ""
-        try:
-            sess.cookies.set("idc_search_browser", m.group(1),
-                             domain="www.movienuke.com")
-        except Exception:
-            pass
+        self._idc_browser = m.group(1)
+
+        # 双保险：底层会话若可写则种入
+        sess = self._low_session()
+        if sess is not None:
+            try:
+                sess.cookies.set("idc_search_browser", self._idc_browser,
+                                 domain="www.movienuke.com", path="/")
+            except Exception:
+                pass
+
         sep = '&' if '?' in url else '?'
         replay = url + sep + "_idc_pass=" + self._idc_pass()
+        h = dict(self.headers)
+        ck = self._cookie_header()
+        if ck:
+            h["Cookie"] = ck
         try:
-            rsp = sess.get(replay, headers=self.headers, timeout=12, verify=False)
-            body = rsp.text or ""
+            rsp = self.fetch(replay, headers=h, timeout=12)
+            body = rsp.text if hasattr(rsp, "text") else (
+                rsp.content.decode("utf-8", "ignore") if hasattr(rsp, "content") else str(rsp))
+            body = body or ""
+            self._store_set_cookie(rsp)
             if not self._is_idc_page(body):
                 self._idc_ok = True
                 self.log("浏览器校验通过")
@@ -265,6 +319,11 @@ class Spider(Spider):
             h = dict(self.headers)
             if headers:
                 h.update(headers)
+            # 显式带回 IDC 放行 hash 与会话 cookie（不依赖框架会话 jar）
+            ck = self._cookie_header()
+            if ck:
+                old = h.get("Cookie") or h.get("cookie")
+                h["Cookie"] = (old + "; " + ck) if old else ck
             rsp = self.fetch(url, headers=h, timeout=timeout)
             if hasattr(rsp, "text"):
                 return rsp.text or ""
