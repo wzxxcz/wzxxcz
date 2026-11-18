@@ -21,11 +21,15 @@
         站点自身再包一层 /jx/index.html?url=<encodeURIComponent(直链)>，
         爬虫直接取解码后的裸 m3u8 直链 parse=0 播放，失败再交客户端嗅探兜底。
 
-说明（站点服务端防护，非代码阉割）:
-  分类墙 /marathon/ 与搜索 /search/ 在站点侧由图片验证码 + WAF 拦截，
-  纯 Python（客户端无浏览器、无 OCR 引擎）无法自动通过；爬虫仍按站点真实路由
-  实现 categoryContent / searchContent 与同一套卡片解析，一旦运行环境会话
-  已通过站点验证（或站点放开校验）即可正常出列表。首页 / 详情 / 播放实测可达。
+站点防护与通过机制（线上实证 2026-11-18）:
+  分类墙 /marathon/ 与搜索 /search/ 首次访问会 302 到应用层图片验证码
+  /verify_captcha.jsp，答对一次后放行标记只存在服务端 PHPSESSID 会话内，
+  同会话后续分类 / 搜索即 200；服务端校验大小写不敏感。
+  爬虫内置“取图 → 识别 → 提交 → 复用会话”闭环：
+    · 识别器可插拔，优先 ddddocr（运行环境已安装时直接生效，实测 5/5 放行）；
+    · 环境无 OCR 引擎时不崩溃，分类 / 搜索返回空，首页 / 详情 / 播放不受影响。
+  另有 5001 字节“安全校验”硬拦页（Action Drop Connection，无挑战 cookie），
+  属站点风控，爬虫侧不做绕过。
 """
 import re
 import sys
@@ -93,39 +97,90 @@ DEFAULT_PIC = ""
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
 # ===================== 分类（对齐站点导航 /marathon/<tid>_1.html）=====================
+# 一级大类 + 电视剧站点二级子分类（tid 均为站点真实路由）
 CLASSES = [
     {"type_id": "1",  "type_name": "电影"},
     {"type_id": "2",  "type_name": "电视剧"},
     {"type_id": "3",  "type_name": "综艺"},
     {"type_id": "4",  "type_name": "动漫"},
     {"type_id": "34", "type_name": "短剧"},
+    {"type_id": "13", "type_name": "国产剧"},
+    {"type_id": "14", "type_name": "港剧"},
+    {"type_id": "15", "type_name": "欧美剧"},
+    {"type_id": "16", "type_name": "日剧"},
+    {"type_id": "20", "type_name": "台剧"},
+    {"type_id": "21", "type_name": "泰剧"},
+    {"type_id": "25", "type_name": "韩剧"},
+    {"type_id": "46", "type_name": "海外剧"},
 ]
 
-# 题材（站点分类页被验证码防护，选项据详情类型字段与站点可见分区归纳，界面展示用）
-_GENRE = ["剧情", "喜剧", "动作", "爱情", "恐怖", "科幻", "悬疑", "惊悚", "冒险",
-          "奇幻", "犯罪", "战争", "警匪", "动画", "古装", "历史", "武侠", "青春",
-          "文艺", "都市", "男频", "女频", "重生", "甜虐爱情", "国产", "短剧"]
-_AREA = ["大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国", "德国",
-         "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"]
-_YEAR = [str(y) for y in range(2026, 2009, -1)]
+# ===== 各分类站点真实筛选选项（取自放行分类页快照，值必须与站点原值逐字一致）=====
+_GENRE = {
+    "1": ["喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪", "犯罪",
+          "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚", "经典", "青春",
+          "文艺", "微电影", "古装", "历史", "运动", "农村", "儿童", "网络电影"],
+    "2": ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻", "剧情",
+          "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"],
+    "3": ["选秀", "情感", "访谈", "播报", "旅游", "音乐", "美食", "纪实", "曲艺",
+          "生活", "游戏互动", "财经", "求职"],
+    "4": ["情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园", "动作",
+          "机战", "运动", "战争", "少年", "少女", "社会", "原创", "亲子", "益智",
+          "励志", "其他"],
+    "34": ["都市", "赘婿", "战神", "古代言情", "现代言情", "历史", "脑洞", "玄幻",
+           "电视节目", "搞笑", "网剧", "喜剧", "萌宝", "神豪", "致富", "奇幻脑洞",
+           "超能", "强者回归", "甜宠", "励志", "豪门恩怨", "复仇", "长生", "神医",
+           "马甲", "亲情", "小人物", "奇幻", "无敌", "现实", "重生", "闪婚", "职场商战",
+           "穿越", "年代", "权谋", "高手下山", "悬疑", "家国情仇", "虐恋", "古装",
+           "时空之旅", "玄幻仙侠", "欢喜冤家", "传承觉醒", "情感", "逆袭", "家庭"],
+}
+_AREA = {
+    "1": ["大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国", "德国",
+          "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"],
+    "2": ["内地", "韩国", "香港", "台湾", "日本", "美国", "泰国", "英国", "新加坡", "其他"],
+    "3": ["内地", "港台", "日韩", "欧美"],
+    "4": ["国产", "日本", "欧美", "其他"],
+    "34": ["大陆", "香港", "台湾", "美国", "韩国", "日本", "泰国", "新加坡", "马来西亚",
+           "印度", "英国", "法国", "加拿大", "西班牙", "俄罗斯", "其它"],
+}
+_LANG = {
+    "1": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它"],
+    "2": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"],
+    "3": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"],
+    "4": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"],
+    "34": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它"],
+}
+_YEAR = [str(y) for y in range(2026, 1999, -1)]
+_RES = ["正片", "预告片", "花絮"]
+
+# 电视剧二级子分类复用电视剧筛选
+_ALIAS_FILTER_TID = {"13": "2", "14": "2", "15": "2", "16": "2",
+                     "20": "2", "21": "2", "25": "2", "46": "2"}
+
+
+def _opts(values):
+    return [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in values]
+
 
 FILTERS = {}
 for c in CLASSES:
     tid = c["type_id"]
+    base = _ALIAS_FILTER_TID.get(tid, tid)
     FILTERS[tid] = [
-        {"key": "genre", "name": "类型",
-         "value": [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in _GENRE]},
-        {"key": "area", "name": "地区",
-         "value": [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in _AREA]},
-        {"key": "year", "name": "年份",
-         "value": [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in _YEAR]},
+        {"key": "genre", "name": "类型", "value": _opts(_GENRE.get(base, []))},
+        {"key": "area",  "name": "地区", "value": _opts(_AREA.get(base, []))},
+        {"key": "lang",  "name": "语言", "value": _opts(_LANG.get(base, []))},
+        {"key": "year",  "name": "年份", "value": _opts(_YEAR)},
+        {"key": "res",   "name": "资源", "value": _opts(_RES)},
     ]
 
 # ===================== 正则 =====================
 _RE_HREF = re.compile(r'href="(/have/(\d+)\.html)"', re.I)
 _RE_IMG = re.compile(r'data-original="([^"]*)"', re.I)
 _RE_H4 = re.compile(r'<h4[^>]*>([\s\S]*?)</h4>', re.I)
-_RE_REMARK = re.compile(r'rounded font-medium">([^<]*)</div>', re.I)
+# 卡片左上黑底状态标签（第12集已完结 / 正片 / 更新至HD）
+_RE_STATUS_CARD = re.compile(r'bg-black/70[\s\S]*?>([\s\S]*?)</div>', re.I)
+# 详情海报左上状态标签（第24集已完结 / 已完结 / 全28集）
+_RE_REMARK = re.compile(r'bg-primary text-white[\s\S]*?>([\s\S]*?)</div>', re.I)
 _RE_H1 = re.compile(r'<h1[^>]*>([\s\S]*?)</h1>', re.I)
 _RE_SUBTITLE = re.compile(r'<p[^>]*text-muted-foreground[^>]*>([^<]*)</p>', re.I)
 _RE_SCORE = re.compile(r'bg-green-500[^>]*>([\s\S]*?)</span>', re.I)
@@ -171,9 +226,29 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        # 验证码会话状态：答对一次后同 PHPSESSID 会话内复用
+        self._captcha_ok = False
+        self._ocr = None
+        self._ocr_tried = False
         self.log("init: site=%s" % self.site_url)
 
     # ---------------- 基础工具 ----------------
+    def _low_session(self):
+        """取底层 requests 会话（兼容基类 _session / _sess 两种暴露方式）。"""
+        s = getattr(self, "_session", None)
+        if s is None and hasattr(self, "_sess"):
+            try:
+                s = self._sess
+            except Exception:
+                s = None
+        return s
+
+    def _is_captcha_page(self, text):
+        if not text:
+            return False
+        return ("verify_captcha" in text or "请输入验证码" in text
+                or ('captcha.jsp' in text and 'name="captcha"' in text))
+
     def _is_upstream_error(self, text):
         if not text:
             return True
@@ -185,6 +260,8 @@ class Spider(Spider):
 
     def _reset_session(self):
         """best-effort 关闭复用坏连接的会话，下次请求重建新连接。"""
+        # 会话 cookie 一并丢弃，验证码放行标记随之失效，需重新过验
+        self._captcha_ok = False
         try:
             if hasattr(self, "reset_session"):
                 self.reset_session()
@@ -198,6 +275,74 @@ class Spider(Spider):
             self._session = None
         except Exception:
             pass
+
+    def _load_ocr(self):
+        """懒加载 OCR 引擎；环境未安装 ddddocr 时返回 None（不报错崩溃）。"""
+        if self._ocr_tried:
+            return self._ocr
+        self._ocr_tried = True
+        try:
+            import ddddocr
+            self._ocr = ddddocr.DdddOcr(show_ad=False)
+            self.log("OCR 引擎 ddddocr 已加载")
+        except Exception as e:
+            self._ocr = None
+            self.log("OCR 引擎不可用: %s" % e)
+        return self._ocr
+
+    def _ocr_captcha(self, img_bytes):
+        ocr = self._load_ocr()
+        if ocr is None or not img_bytes:
+            return ""
+        try:
+            code = ocr.classification(img_bytes) or ""
+            # 仅保留字母数字，取前 4 位；服务端校验大小写不敏感
+            return re.sub(r"[^A-Za-z0-9]", "", code)[:4]
+        except Exception as e:
+            self.log("OCR 识别失败: %s" % e)
+            return ""
+
+    def _target_path(self, url):
+        u = url.replace(self.site_url, "", 1)
+        if not u.startswith("/"):
+            u = "/" + u
+        return u
+
+    def _solve_captcha(self, target_url):
+        """同会话：取验证码图 → 识别 → 提交 → 302 放行。成功后会话内复用。"""
+        if self._captcha_ok:
+            return True
+        sess = self._low_session()
+        if sess is None:
+            self.log("无底层会话，无法过验")
+            return False
+        target_path = self._target_path(target_url)
+
+        for attempt in range(2):
+            try:
+                # 先访问目标种入 PHPSESSID（被 302 到验证码页，cookie 已写入会话）
+                sess.get(target_url, headers=self.headers, timeout=12, verify=False)
+                img = sess.get(self.site_url + "/captcha.jsp",
+                               headers=self.headers, timeout=12, verify=False).content
+                code = self._ocr_captcha(img)
+                if not code:
+                    self.log("验证码识别为空，无法自动通过")
+                    return False
+
+                post_url = (self.site_url + "/verify_captcha.jsp?redirect="
+                            + urllib.parse.quote(target_path, safe=""))
+                rsp = sess.post(post_url, data={"captcha": code},
+                                headers=self.headers, allow_redirects=False,
+                                timeout=12, verify=False)
+                if rsp.status_code == 302:
+                    self._captcha_ok = True
+                    self.log("验证码通过: %s" % code)
+                    return True
+                self.log("验证码被拒: %s (HTTP %s)" % (code, rsp.status_code))
+            except Exception as e:
+                self.log("验证码流程异常: %s" % e)
+            time.sleep(0.6 * (attempt + 1))
+        return False
 
     def _fetch(self, url, timeout=15, headers=None):
         def _once():
@@ -218,6 +363,19 @@ class Spider(Spider):
             except Exception as e:
                 self.log("fetch FAIL %s -> %s" % (url, e))
                 text = ""
+
+            # 命中验证码页：同会话自动过验，成功后重新取一次
+            if text and self._is_captcha_page(text):
+                if self._solve_captcha(url):
+                    try:
+                        text = _once()
+                    except Exception as e:
+                        self.log("过验后重试 FAIL %s -> %s" % (url, e))
+                        text = ""
+                else:
+                    self.log("验证码未能自动通过，本列表返回空")
+                    return ""
+
             if text and not self._is_upstream_error(text):
                 return text
             self._reset_session()
@@ -274,7 +432,7 @@ class Spider(Spider):
             hits.append((m.start(), href, vid))
 
         for pos, href, vid in hits:
-            block = html[max(0, pos - 200):pos + 1200]
+            block = html[max(0, pos - 200):pos + 1700]
 
             # 海报：块内首个 data-original；片名：h4 优先，img alt 兜底（不强求二者顺序）
             pic = ""
@@ -283,9 +441,14 @@ class Spider(Spider):
                 pic = mp.group(1)
 
             title = ""
-            mh = _RE_H4.search(block)
-            if mh:
-                title = self._clean(mh.group(1))
+            # 片名：底部 hover 层 p 优先，h4 次之，img alt 兜底
+            mt = re.search(r'<p[^>]*font-medium[^>]*>([\s\S]*?)</p>', block, re.I)
+            if mt:
+                title = self._clean(mt.group(1))
+            if not title:
+                mh = _RE_H4.search(block)
+                if mh:
+                    title = self._clean(mh.group(1))
             if not title:
                 ma = re.search(r'<img[^>]*?alt="([^"]*)"', block, re.I)
                 if ma:
@@ -296,9 +459,14 @@ class Spider(Spider):
             if self._is_placeholder_pic(pic):
                 pic = self.default_pic
 
-            # 备注：右下角年份 / 状态标签
-            mrem = _RE_REMARK.search(block)
+            # 备注：优先左上黑底状态标签（第12集已完结 / 正片 / 更新至HD）；
+            # 缺失时兜底右上角标（首页年份 / 分类评分）
+            mrem = _RE_STATUS_CARD.search(block)
             remarks = self._clean(mrem.group(1)) if mrem else ""
+            if not remarks:
+                mr2 = re.search(r'bg-primary/90[\s\S]*?>([\s\S]*?)</div>', block)
+                if mr2:
+                    remarks = self._clean(mr2.group(1))
 
             if not title:
                 continue
@@ -314,7 +482,8 @@ class Spider(Spider):
     def _page_count(self, html):
         if not html:
             return 1
-        pages = [int(x) for x in re.findall(r'/marathon/\d+_(\d+)\.html', html)]
+        pages = [int(x) for x in re.findall(r'/marathon/\d+_(\d+)(?:/|\.html)', html)]
+        pages += [int(x) for x in re.findall(r'/search/[^/"]+/(\d+)\.html', html)]
         if pages:
             return max(1, max(pages))
         return 1
@@ -329,6 +498,12 @@ class Spider(Spider):
         self.log("home: %d 条" % len(videos))
         return {"list": videos}
 
+    def _filter_slug(self, extend):
+        # 站点筛选槽位：题材-地区-语言-年份-资源 + 尾部 3 个空占位，空槽留空
+        slots = [extend.get("genre", ""), extend.get("area", ""), extend.get("lang", ""),
+                 extend.get("year", ""), extend.get("res", ""), "", "", ""]
+        return "-".join(slots)
+
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
         if isinstance(extend, str):
@@ -342,8 +517,14 @@ class Spider(Spider):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
 
-        # 站点分类路由：/marathon/<tid>_<page>.html
-        url = "%s/marathon/%s_%d.html" % (self.site_url, str(tid), page)
+        # 站点分类路由：
+        #   无筛选第 1 页  /marathon/<tid>_1.html
+        #   筛选 / 分页     /marathon/<tid>_<page>/<题材>-<地区>-<语言>-<年份>-<资源>---.html
+        base = "%s/marathon/%s_%d" % (self.site_url, str(tid), page)
+        if extend or page > 1:
+            url = "%s/%s.html" % (base, self._filter_slug(extend))
+        else:
+            url = base + ".html"
         self.log("category: %s" % url)
 
         html = self._fetch(url)
@@ -358,7 +539,11 @@ class Spider(Spider):
     def searchContent(self, key, quick, pg="1"):
         page = int(pg) if pg else 1
         keyword = urllib.parse.quote(str(key or "").strip())
-        url = "%s/search/%s.html" % (self.site_url, keyword)
+        # 站点搜索分页：第 1 页 /search/<kw>.html，其后 /search/<kw>/<page>.html
+        if page <= 1:
+            url = "%s/search/%s.html" % (self.site_url, keyword)
+        else:
+            url = "%s/search/%s/%d.html" % (self.site_url, keyword, page)
         self.log("search: %s" % url)
         html = self._fetch(url)
         videos = self._parse_cards(html)
