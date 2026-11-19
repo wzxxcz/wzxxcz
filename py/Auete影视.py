@@ -94,7 +94,8 @@ _SUBTYPE = {
     "Zy": [("guozong", "国综"), ("hanzong", "韩综"), ("meizong", "美综")],
     "Dm": [("donghua", "动画"), ("riman", "日漫"), ("guoman", "国漫"),
            ("meiman", "美漫")],
-    "qita": [("wlp", "网大电影"), ("laodianying", "国产老电影")],
+    "qita": [("Jlp", "记录片"), ("Jdp", "经典片"), ("Jdj", "经典剧"),
+             ("wlp", "网大电影"), ("laodianying", "国产老电影")],
 }
 
 FILTERS = {}
