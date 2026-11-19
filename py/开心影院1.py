@@ -5,8 +5,8 @@
   - 首页:   /
   - 分类:   /assydls/<tid>.html
             /assydls/<tid>-<page>.html          （分页）
-  - 筛选:   /assydso/<tid>-<地区>-<类型>-<语言>-<字母>-<排序>-<年份>.html
-            （12 段空槽；段0=tid，段3=类型，段11=年份）
+  - 筛选:   /assydso/<12段空槽>.html
+            （段0=子类型 tid，段1=地区，段3=剧情，段8=页码，段11=年份）
   - 详情:   /assydxq/<id>.html
   - 搜索:   /assydsc/-------------.html?wd=<关键词>
   - 播放:   /assydbf/<vid>-<line>-<ep>.html
@@ -159,9 +159,9 @@ for c in CLASSES:
     FILTERS[tid] = dims
 
 # ===================== 正则 =====================
-_RE_THUMB = re.compile(
-    r'<a[^>]*class="[^"]*stui-vodlist__thumb[^"]*"[^>]*href="(/assydxq/\d+\.html)"[^>]*title="([^"]*)"',
-    re.I)
+_RE_ANCHOR = re.compile(r'<a\b[^>]*stui-vodlist__thumb[^>]*>', re.I)
+_RE_HREF = re.compile(r'href="(/assydxq/\d+\.html)"', re.I)
+_RE_TITLE = re.compile(r'title="([^"]*)"', re.I)
 _RE_BG = re.compile(r'(?:background-image|background)\s*:\s*url\(([^)]+)\)', re.I)
 _RE_ORIG = re.compile(r'data-original="([^"]*)"', re.I)
 _RE_PICTEXT = re.compile(r'<span class="pic-text[^"]*"[^>]*>([\s\S]*?)</span>', re.I)
@@ -276,9 +276,14 @@ class Spider(Spider):
         if not html:
             return videos
 
-        thumbs = list(_RE_THUMB.finditer(html))
-        for i, mt in enumerate(thumbs):
-            href, title = mt.group(1), self._clean(mt.group(2))
+        anchors = list(_RE_ANCHOR.finditer(html))
+        for i, mt in enumerate(anchors):
+            tag = mt.group(0)
+            mh = _RE_HREF.search(tag)
+            mt2 = _RE_TITLE.search(tag)
+            if not mh or not mt2:
+                continue
+            href, title = mh.group(1), self._clean(mt2.group(1))
             if href in seen:
                 continue
             seen.add(href)
@@ -295,7 +300,7 @@ class Spider(Spider):
                 pic = self.default_pic
             mr = _RE_PICTEXT.search(seg)
             remarks = self._clean(mr.group(1)) if mr else ""
-            end = thumbs[i + 1].start() if i + 1 < len(thumbs) else len(html)
+            end = anchors[i + 1].start() if i + 1 < len(anchors) else len(html)
             ms = _RE_SUB.search(html[mt.start():end])
             subtitle = self._clean(ms.group(1)) if ms else ""
             if not subtitle:
@@ -319,15 +324,30 @@ class Spider(Spider):
         self.log("home HTML 长度: %d" % len(html))
         return {"list": self._parse_cards(html)}
 
-    def _filter_url(self, tid, extend):
+    def _page_count(self, html):
+        """从分页块 num(x/y) 解析总页数；兜底尾页链接最大页码；无分页块返回 1。"""
+        if not html:
+            return 1
+        block = re.search(r'<ul class="stui-page[\s\S]*?</ul>', html)
+        if not block:
+            return 1
+        scope = block.group(0)
+        m = re.search(r'(\d+)\s*/\s*(\d+)', scope)
+        if m:
+            return max(1, int(m.group(2)))
+        pages = [int(x) for x in re.findall(r'-(\d+)\.html', scope)]
+        return max(1, max(pages)) if pages else 1
+
+    def _filter_url(self, tid, extend, page=1):
         """构造筛选 URL：12 段空槽。
-        段0=子类型 tid（未选则原 tid），段1=地区，段3=剧情，段11=年份。"""
+        段0=子类型 tid（未选则原 tid），段1=地区，段3=剧情，段8=页码，段11=年份。"""
         parts = [""] * 12
         parts[0] = str(extend.get("subtype") or tid)
         if extend.get("area"):
             parts[1] = extend["area"]
         if extend.get("class"):
             parts[3] = extend["class"]
+        parts[8] = str(page)
         if extend.get("year"):
             parts[11] = str(extend["year"])
         return self.site_url + "/assydso/" + "-".join(parts) + ".html"
@@ -346,15 +366,16 @@ class Spider(Spider):
                 del extend[k]
 
         if extend:
-            url = self._filter_url(tid, extend)
+            url = self._filter_url(tid, extend, page)
         else:
             url = self.site_url + "/assydls/%s-%d.html" % (tid, page)
         self.log("category: %s" % url)
         html = self._fetch(url)
         videos = self._parse_cards(html)
+        pagecount = self._page_count(html)
         return {
-            "list": videos, "page": page, "pagecount": 9999,
-            "limit": 36, "total": 9999,
+            "list": videos, "page": page, "pagecount": pagecount,
+            "limit": 36, "total": pagecount * 36,
         }
 
     def searchContent(self, key, quick, pg="1"):
@@ -365,9 +386,10 @@ class Spider(Spider):
         self.log("search: %s" % url)
         html = self._fetch(url)
         videos = self._parse_cards(html)
+        pagecount = self._page_count(html)
         return {
-            "list": videos, "page": page, "pagecount": 9999,
-            "limit": 36, "total": 999,
+            "list": videos, "page": page, "pagecount": pagecount,
+            "limit": 36, "total": pagecount * 36,
         }
 
     def searchContentPage(self, key, quick, pg="1"):
