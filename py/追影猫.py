@@ -743,26 +743,41 @@ class Spider(Spider):
 
     def _resolve_sub_stream(self, url, header):
         """若为多码率 master 列表，解析第一条子 m3u8 补全返回；
-        已是媒体播放列表或 mp4 则原样；子流不可达时回退 master，不误伤。"""
+        已是媒体播放列表或 mp4 则原样；子流不可达时回退 master，不误伤。
+        网络异常/非 200 时重试一次，再失败才回退。"""
         if not url or ".mp4" in url.lower():
             return url
+
+        def _get(target):
+            last = None
+            for _ in range(2):
+                try:
+                    rs = self.fetch(target, headers=header, timeout=10)
+                    if getattr(rs, "status_code", 200) == 200:
+                        return rs, None
+                    last = Exception("http_%s" % getattr(rs, "status_code", "?"))
+                except Exception as e:
+                    last = e
+            return None, last
+
         try:
-            rsp = self.fetch(url, headers=header, timeout=10)
-            text = rsp.text if hasattr(rsp, "text") else (
-                rsp.content.decode("utf-8", "ignore") if hasattr(rsp, "content") else "")
+            rm, err = _get(url)
+            if err is not None:
+                self.log("  master 拉取重试后失败: %s" % err)
+                return url
+            text = rm.text if hasattr(rm, "text") else (
+                rm.content.decode("utf-8", "ignore") if hasattr(rm, "content") else "")
             if "#EXT-X-STREAM-INF" not in text:
                 return url  # 已是媒体播放列表，直接含分片
             for line in text.splitlines():
                 line = line.strip().replace("\\/", "/")
                 if line and not line.startswith("#"):
                     sub = urllib.parse.urljoin(url, line)
-                    try:
-                        rs = self.fetch(sub, headers=header, timeout=10)
-                        if getattr(rs, "status_code", 200) == 200:
-                            self.log("  master 解析子流 %s" % sub[:120])
-                            return sub
-                    except Exception:
-                        pass
+                    rs, sub_err = _get(sub)
+                    if rs is not None:
+                        self.log("  master 解析子流 %s" % sub[:120])
+                        return sub
+                    self.log("  子流重试后失败: %s" % sub_err)
                     break
         except Exception as e:
             self.log("  子流解析回退: %s" % e)
