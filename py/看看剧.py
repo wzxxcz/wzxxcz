@@ -526,6 +526,22 @@ class Spider(Spider):
         self._classes = classes
         return classes
 
+    def _live_group_filter(self):
+        """直播分组筛选：对齐站点 /live 固定的 全部/足球/篮球；电视订阅组追加在后。"""
+        priority = ["足球", "篮球", "赛事直播"]
+        groups, seen = [], set()
+        for g in priority:  # 赛事固定分组先列，即使当前暂无对应赛事
+            groups.append(g)
+            seen.add(g)
+        for c in self._fetch_live_channels():
+            g = c.get("group") or "直播"
+            if g not in seen:
+                seen.add(g)
+                groups.append(g)
+        value = [{"n": "全部", "v": ""}]
+        value += [{"n": g, "v": g} for g in groups]
+        return [{"key": "group", "name": "分组", "value": value}]
+
     def _load_filters(self):
         if self._filters is not None:
             return self._filters
@@ -533,6 +549,7 @@ class Spider(Spider):
         for c in self._load_classes():
             cid = c["type_id"]
             if cid == "live":
+                filters[cid] = self._live_group_filter()
                 continue
             detail = self._api("GET", "/categories/" + cid)
             f = {}
@@ -559,23 +576,29 @@ class Spider(Spider):
 
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
-        if str(tid) == "live":
-            chans = self._fetch_live_channels()
-            videos = [{
-                "vod_id": "live@%d" % i,
-                "vod_name": c["name"],
-                "vod_pic": c.get("logo") or "",
-                "vod_remarks": c.get("remarks") or c.get("group") or "",
-                "vod_subtitle": "",
-            } for i, c in enumerate(chans)]
-            return {"list": videos, "page": 1, "pagecount": 1,
-                    "limit": len(videos), "total": len(videos)}
         if isinstance(extend, str):
             try:
                 extend = json.loads(extend)
             except Exception:
                 extend = {}
         extend = extend or {}
+        if str(tid) == "live":
+            grp = extend.get("group")
+            all_chans = self._fetch_live_channels()
+            view = all_chans
+            if grp and grp != "全部":
+                view = [c for c in all_chans
+                        if (c.get("group") or "直播") == grp]
+            view_ids = {id(c) for c in view}
+            videos = [{
+                "vod_id": "live@%d" % i,
+                "vod_name": c["name"],
+                "vod_pic": c.get("logo") or "",
+                "vod_remarks": c.get("remarks") or c.get("group") or "",
+                "vod_subtitle": "",
+            } for i, c in enumerate(all_chans) if id(c) in view_ids]
+            return {"list": videos, "page": 1, "pagecount": 1,
+                    "limit": len(videos), "total": len(videos)}
         params = {"page": page, "page_size": PAGE_SIZE}
         for key, _label in _FILTER_DEFS:
             val = extend.get(key)
@@ -630,6 +653,10 @@ class Spider(Spider):
         sub_title = self._clean(data.get("subTitle") or "")
         actor = self._clean(data.get("actor") or "")
         director = self._clean(data.get("director") or "")
+        cls = self._clean(data.get("classExtend") or data.get("categoryName") or "")
+        year = self._clean(str(data.get("year") or ""))
+        area = self._clean(data.get("area") or "")
+        lang = self._clean(data.get("lang") or "")
         score = self._clean(str(data.get("doubanScore") or ""))
         remarks = self._remarks(data)
 
@@ -666,6 +693,10 @@ class Spider(Spider):
             "vod_content": content,
             "vod_actor": actor,
             "vod_director": director,
+            "vod_class": cls,
+            "vod_year": year,
+            "vod_area": area,
+            "vod_lang": lang,
             "vod_score": score,
             "vod_remarks": remarks or ("%d条线路" % len(play_from)),
             "vod_play_from": "$$$".join(play_from),
