@@ -35788,6 +35788,12 @@
             "api": "csp_AnimeHuazi"
         },
         {
+            "key": "漫国动漫",
+            "name": "🤣漫国动漫",
+            "type": 3,
+            "api": "csp_AnimeGHG"
+        },
+        {
             "key": "红果短剧",
             "name": "🍎红果短剧",
             "type": 3,
