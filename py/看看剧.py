@@ -112,6 +112,19 @@ _FILTER_DEFS = [
 class Spider(Spider):
 
     # ---------- 基础 ----------
+    # 兼容壳子基类 log 单参签名：多参拼接为一行，避免 TypeError 把成功结果兜底成首页
+    def log(self, *a, **kw):
+        try:
+            parts = []
+            for x in a:
+                if isinstance(x, (dict, list)):
+                    parts.append(json.dumps(x, ensure_ascii=False))
+                else:
+                    parts.append(str(x))
+            print("[kkju]", " ".join(parts))
+        except Exception:
+            pass
+
     def getName(self):
         return "看看剧"
 
