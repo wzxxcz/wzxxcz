@@ -50,9 +50,21 @@ except ImportError:
                 self._session.mount('http://', adapter)
             return self._session
 
-        def fetch(self, url, headers=None, **kw):
-            timeout = kw.pop('timeout', 15)
-            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
+        def fetch(self, url, params=None, cookies=None, headers=None,
+                  timeout=5, verify=True, stream=False, allow_redirects=True):
+            r = self._sess.get(url, params=params, cookies=cookies,
+                               headers=headers, timeout=timeout, verify=verify,
+                               stream=stream, allow_redirects=allow_redirects)
+            r.encoding = 'utf-8'
+            return r
+
+        def post(self, url, params=None, data=None, json=None, cookies=None,
+                 headers=None, timeout=5, verify=True, stream=False,
+                 allow_redirects=True):
+            r = self._sess.post(url, params=params, data=data, json=json,
+                                cookies=cookies, headers=headers, timeout=timeout,
+                                verify=verify, stream=stream,
+                                allow_redirects=allow_redirects)
             r.encoding = 'utf-8'
             return r
 
@@ -112,6 +124,8 @@ class Spider(Spider):
         self._play_cache = {}
         self._classes = None
         self._filters = None
+        self._settings = None
+        self._live_channels = None
 
     # ---------- 签名与请求 ----------
     def _sorted_query(self, params):
@@ -156,6 +170,8 @@ class Spider(Spider):
         sign = self._sign_headers(method, path, raw_query, body_text)
         headers = dict(self.headers)
         headers.update(sign)
+        if method == "POST":
+            headers["Content-Type"] = "application/json"
 
         url = self.site_url + API_PREFIX + path
         if params:
@@ -163,11 +179,12 @@ class Spider(Spider):
 
         try:
             if method == "POST":
-                rsp = self.fetch(url, headers=headers, method="POST",
-                                 data=body_text.encode("utf-8"), timeout=20) \
-                    if self._supports_method() else self._post(url, headers, body_text)
+                rsp = self.post(url, headers=headers,
+                                data=body_text.encode("utf-8"),
+                                timeout=20, verify=False)
             else:
-                rsp = self.fetch(url, headers=headers, timeout=20)
+                rsp = self.fetch(url, headers=headers, timeout=20,
+                                  verify=False)
         except Exception as e:
             self.log("api FAIL", method, path, e)
             return None
@@ -188,19 +205,6 @@ class Spider(Spider):
             self.log("api code", data.get("code"), data.get("message"), path)
             return None
         return data.get("data") if isinstance(data, dict) else data
-
-    def _supports_method(self):
-        return False
-
-    def _post(self, url, headers, body_text):
-        # 兜底：基类 fetch 仅 GET 时，用 session 直接 POST
-        sess = getattr(self, "_sess", None)
-        if sess is None:
-            return None
-        h = dict(headers)
-        h["Content-Type"] = "application/json"
-        return sess.post(url, headers=h, data=body_text.encode("utf-8"),
-                         timeout=20, verify=False)
 
     # ---------- 工具 ----------
     def _clean(self, s):
@@ -240,6 +244,51 @@ class Spider(Spider):
             "vod_subtitle": self._clean(item.get("subTitle") or ""),
         }
 
+    def _resolve_sub_stream(self, url, header):
+        """master 多码率 → 第一条子 m3u8；已是播放列表/mp4 原样；失败回退 master。"""
+        if not url or ".mp4" in url.lower():
+            return url
+
+        def _head(target):
+            last = None
+            for _ in range(2):
+                try:
+                    rs = self.fetch(target, headers=header, timeout=10,
+                                    verify=False, stream=True)
+                    if getattr(rs, "status_code", 200) == 200:
+                        return rs, None
+                    last = Exception("http_%s" % getattr(rs, "status_code", "?"))
+                except Exception as e:
+                    last = e
+            return None, last
+
+        try:
+            rm, err = _head(url)
+            if err is not None:
+                return url
+            ctype = rm.headers.get("Content-Type", "") or ""
+            chunk = next(rm.iter_content(2048), b"")
+            rm.close()
+            # 非 HLS/DASH（mp4/flv/图片等）原样返回
+            if "mpegurl" not in ctype and "dash+xml" not in ctype \
+                    and not chunk.lstrip().startswith(b"#EXTM3U"):
+                return url
+            text = chunk.decode("utf-8", "ignore")
+            if "#EXT-X-STREAM-INF" not in text:
+                return url
+            for line in text.splitlines():
+                line = line.strip().replace("\\/", "/")
+                if line and not line.startswith("#"):
+                    sub = urllib.parse.urljoin(url, line)
+                    rs, sub_err = _head(sub)
+                    if rs is not None:
+                        rs.close()
+                        return sub
+                    break
+        except Exception as e:
+            self.log("子流解析回退:", e)
+        return url
+
     @staticmethod
     def _as_list(data):
         if data is None:
@@ -249,6 +298,154 @@ class Spider(Spider):
         if isinstance(data, dict):
             return data.get("list") or data.get("records") or []
         return []
+
+    # ---------- 直播 ----------
+    def _load_settings(self):
+        if self._settings is not None:
+            return self._settings
+        data = self._api("GET", "/settings")
+        self._settings = data if isinstance(data, dict) else {}
+        return self._settings
+
+    def _parse_playlist_text(self, text):
+        out, group, logo, pending = [], "", "", None
+        for raw in (text or "").replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+            line = raw.strip()
+            if not line:
+                continue
+            if line.startswith("#EXTM3U") or line.startswith("#EXT-X"):
+                continue
+            if "#genre#" in line:
+                group = line.split(",")[0].strip()
+                continue
+            if line.startswith("#EXTINF"):
+                m = re.search(r'group-title="([^"]*)"', line)
+                if m:
+                    group = m.group(1).strip()
+                ml = re.search(r'tvg-logo="([^"]*)"', line)
+                logo = ml.group(1).strip() if ml else ""
+                if "," in line:
+                    pending = line.split(",", 1)[1].strip()
+                continue
+            if line.startswith("#"):
+                continue
+            if "://" not in line:
+                continue
+            if "," in line:
+                name, url = line.split(",", 1)
+                name, url = name.strip(), url.strip()
+            else:
+                url, name = line, (pending or line)
+            if url:
+                out.append({"name": self._clean(name) or url, "url": url,
+                            "group": group, "logo": logo, "remarks": ""})
+            pending, logo = None, ""
+        return out
+
+    def _tv_channels(self, settings):
+        raw = (settings.get("live_m3u_urls") or settings.get("live_m3u_url") or "").strip()
+        urls = []
+        try:
+            arr = json.loads(raw) if raw.startswith("[") else [raw]
+            if isinstance(arr, list):
+                urls = [x.strip() for x in arr if isinstance(x, str) and x.strip()]
+        except Exception:
+            if raw:
+                urls = [raw]
+        out = []
+        for u in urls:
+            try:
+                rsp = self.fetch(u, headers={"User-Agent": UA}, timeout=12,
+                                 verify=False)
+                text = rsp.content.decode("utf-8", "ignore")
+                if "EXTM3U" not in text and "genre#" not in text:
+                    text = rsp.content.decode("gb18030", "ignore")
+                out.extend(self._parse_playlist_text(text))
+            except Exception as e:
+                self.log("订阅拉取失败:", u, e)
+        return out
+
+    def _match_channels(self, settings):
+        enabled = str(settings.get("live_match_enabled_web")
+                      or settings.get("live_match_enabled_app") or "1")
+        if enabled not in ("1", "true", "True"):
+            return []
+        base = (settings.get("live_match_api_base")
+                or "https://api.okzhibo.live/live/api/live/").strip().rstrip("/") + "/"
+        out = []
+        try:
+            rsp = self.fetch(base + "all",
+                             headers={"User-Agent": UA,
+                                      "Referer": self.site_url + "/"},
+                             timeout=12, verify=False)
+            lst = (rsp.json().get("data") or {}).get("list") or []
+            for m in lst:
+                url = m.get("live_m3u8_url") or m.get("live_flv_url") or ""
+                if not url or "://" not in url:
+                    continue
+                home = (m.get("home") or {}).get("name") or ""
+                away = (m.get("away") or {}).get("name") or ""
+                name = ("%s vs %s" % (home, away)) if (home or away) else str(m.get("matchId"))
+                league = m.get("leagueName") or ""
+                mt = m.get("matchTimeText") or ""
+                remarks = " ".join(x for x in (league, mt) if x)
+                out.append({"name": self._clean(name), "url": url,
+                            "group": "体育赛事", "logo": m.get("leagueLogo") or "",
+                            "remarks": remarks})
+        except Exception as e:
+            self.log("赛事拉取失败:", e)
+        return out
+
+    def _fetch_live_channels(self):
+        if self._live_channels is not None:
+            return self._live_channels
+        settings = self._load_settings() or {}
+        chans = self._tv_channels(settings) + self._match_channels(settings)
+        seen, ded = set(), []
+        for c in chans:
+            if c["url"] in seen:
+                continue
+            seen.add(c["url"])
+            ded.append(c)
+        self._live_channels = ded
+        return ded
+
+    def liveContent(self, url):
+        if url and "://" in url:
+            try:
+                rsp = self.fetch(url, headers={"User-Agent": UA}, timeout=12,
+                                 verify=False)
+                return rsp.content.decode("utf-8", "ignore")
+            except Exception:
+                pass
+        lines, cur_group = [], None
+        for c in self._fetch_live_channels():
+            g = c.get("group") or "直播"
+            if g != cur_group:
+                lines.append("%s,#genre#" % g)
+                cur_group = g
+            lines.append("%s,%s" % (c["name"], c["url"]))
+        return "\n".join(lines)
+
+    def _live_detail(self, vid):
+        chans = self._fetch_live_channels()
+        try:
+            idx = int(vid.split("@", 1)[1])
+        except Exception:
+            return {"list": []}
+        if idx < 0 or idx >= len(chans):
+            return {"list": []}
+        c = chans[idx]
+        return {"list": [{
+            "vod_id": vid,
+            "vod_name": c["name"],
+            "vod_pic": c.get("logo") or "",
+            "vod_subtitle": "",
+            "vod_content": "",
+            "vod_remarks": c.get("remarks") or c.get("group") or "直播",
+            "vod_play_from": "直播",
+            "vod_play_url": "%s$%s" % (c["name"], vid),
+        }]}
 
     # ---------- 分类 / 筛选 ----------
     def _load_classes(self):
@@ -264,6 +461,8 @@ class Spider(Spider):
                     "type_id": str(c.get("id")),
                     "type_name": self._clean(c.get("name") or ""),
                 })
+        # 站点导航独立「直播」页（电视订阅 + 赛事），不在 /categories 内
+        classes.append({"type_id": "live", "type_name": "直播"})
         self._classes = classes
         return classes
 
@@ -273,6 +472,8 @@ class Spider(Spider):
         filters = {}
         for c in self._load_classes():
             cid = c["type_id"]
+            if cid == "live":
+                continue
             detail = self._api("GET", "/categories/" + cid)
             f = {}
             if isinstance(detail, dict):
@@ -298,6 +499,17 @@ class Spider(Spider):
 
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
+        if str(tid) == "live":
+            chans = self._fetch_live_channels()
+            videos = [{
+                "vod_id": "live@%d" % i,
+                "vod_name": c["name"],
+                "vod_pic": c.get("logo") or "",
+                "vod_remarks": c.get("remarks") or c.get("group") or "",
+                "vod_subtitle": "",
+            } for i, c in enumerate(chans)]
+            return {"list": videos, "page": 1, "pagecount": 1,
+                    "limit": len(videos), "total": len(videos)}
         if isinstance(extend, str):
             try:
                 extend = json.loads(extend)
@@ -347,6 +559,8 @@ class Spider(Spider):
         if not ids:
             return {"list": []}
         vod_id = str(ids[0])
+        if vod_id.startswith("live@"):
+            return self._live_detail(vod_id)
         data = self._api("GET", "/videos/" + vod_id)
         if not data:
             return {"list": []}
@@ -402,6 +616,22 @@ class Spider(Spider):
     def playerContent(self, flag, id, vipFlags):
         token_id = str(id or "")
         now = int(time.time())
+
+        # 直播频道直链
+        if token_id.startswith("live@"):
+            chans = self._fetch_live_channels()
+            try:
+                idx = int(token_id.split("@", 1)[1])
+                channel = chans[idx]
+            except Exception:
+                channel = None
+            if channel:
+                header = {"User-Agent": UA, "Referer": self.site_url + "/"}
+                return {"parse": 0, "playUrl": "", "url": channel["url"],
+                        "header": header}
+            return {"parse": 1, "playUrl": "", "url": self.site_url + "/",
+                    "header": {"User-Agent": UA,
+                               "Referer": self.site_url + "/"}}
         if token_id in self._play_cache:
             ts, res = self._play_cache[token_id]
             if now - ts < 600:
@@ -453,7 +683,15 @@ class Spider(Spider):
             self._play_cache[token_id] = (now, res)
             return res
 
+        # master 多码率 → 首条子流；mp4 原样
+        raw_fmt = (data.get("format") or "").strip()
+        fmt = raw_fmt.lower()
+        if fmt != "mp4":
+            play_url = self._resolve_sub_stream(play_url, header)
+
         res = {"parse": 0, "playUrl": "", "url": play_url, "header": header}
+        if raw_fmt:
+            res["format"] = raw_fmt
         self._play_cache[token_id] = (now, res)
         self.log("直链:", play_url[:120])
         return res
