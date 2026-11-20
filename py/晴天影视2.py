@@ -161,12 +161,12 @@ for c in CLASSES:
         {"key": "lang", "name": "语言",
          "value": [{"n": "全部", "v": ""}] +
                   [{"n": x, "v": x} for x in langs]},
-        {"key": "letter", "name": "字母",
-         "value": [{"n": "全部", "v": ""}] +
-                  [{"n": x, "v": x} for x in _LETTERS]},
         {"key": "year", "name": "年份",
          "value": [{"n": "全部", "v": ""}] +
                   [{"n": x, "v": x} for x in years]},
+        {"key": "letter", "name": "字母",
+         "value": [{"n": "全部", "v": ""}] +
+                  [{"n": x, "v": x} for x in _LETTERS]},
         {"key": "sort", "name": "排序",
          "value": [{"n": n, "v": v} for n, v in _SORTS]},
     ]
