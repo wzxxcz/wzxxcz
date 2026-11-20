@@ -178,6 +178,7 @@ _RE_LI = re.compile(r'<li[^>]*class="[^"]*col-xs-4[\s\S]*?</li>', re.I)
 _RE_CARD_HREF = re.compile(r'href="(/FLxxbdA/\d+\.html)"', re.I)
 _RE_CARD_TITLE = re.compile(r'title="([^"]*)"', re.I)
 _RE_CARD_PIC = re.compile(r'data-original="([^"]+)"', re.I)
+_RE_CARD_BG = re.compile(r'data-background="([^"]+)"', re.I)
 _RE_STATUS = re.compile(r'<p class="item-status[^"]*"[^>]*>([\s\S]*?)</p>', re.I)
 _RE_BLURB = re.compile(r'<p class="item-blurb[^"]*"[^>]*>([\s\S]*?)</p>', re.I)
 
@@ -295,6 +296,8 @@ class Spider(Spider):
             mt = _RE_CARD_TITLE.search(block)
             name = self._clean(mt.group(1)) if mt else ""
             mp = _RE_CARD_PIC.search(block)
+            if not mp:
+                mp = _RE_CARD_BG.search(block)
             pic = self._fix_url(mp.group(1)) if mp else self.default_pic
 
             mr = _RE_STATUS.search(block)
@@ -316,12 +319,23 @@ class Spider(Spider):
     def _page_count(self, html):
         if not html:
             return 1
-        pages = re.findall(r'/-(\d+)\.html', html)
-        if pages:
+        m = re.search(r'<ul[^>]*class="[^"]*ewave-page[^"]*"[\s\S]*?</ul>', html)
+        block = m.group(0) if m else html
+        # 优先取 “当前页/总页” 文本，如 <span class="num">1/2303</span>
+        total = re.search(r'(\d+)\s*/\s*(\d+)', block)
+        if total:
             try:
-                return max(int(p) for p in pages)
+                return int(total.group(2))
             except Exception:
                 pass
+        # 兜底：分页 slug 段 8 为页码（段 0 是 tid，不能取）
+        pages = []
+        for lk in re.findall(r'/qSoQnXw/([^"\s]+)\.html', block):
+            seg = lk.split("-")
+            if len(seg) > 8 and seg[8].isdigit():
+                pages.append(int(seg[8]))
+        if pages:
+            return max(pages)
         return 9999
 
     # ---------------- 筛选 URL ----------------
@@ -368,10 +382,10 @@ class Spider(Spider):
 
         has_filter = any([subtype, type_, lang, letter, year, sort])
         if not has_filter:
-            # 主类导航路由
+            # 主类导航路由；翻页对齐站点分页按钮，走 slug 段 8 页码
             url = self.site_url + ("/xphjTV7/%s.html" % tid)
             if page > 1:
-                url = self.site_url + ("/xphjTV7/%s-%d.html" % (tid, page))
+                url = self.site_url + self._filter_slug(tid, page=page)
         else:
             url = self.site_url + self._filter_slug(
                 tid, subtype=subtype, type_=type_, lang=lang, letter=letter,
