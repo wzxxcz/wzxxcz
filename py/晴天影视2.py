@@ -89,36 +89,54 @@ _SUBTYPE = {
           ("9", "战争片"), ("10", "喜剧片"), ("11", "纪录片"), ("12", "剧情片"),
           ("38", "悬疑片"), ("39", "犯罪片"), ("40", "奇幻片"), ("41", "动画片"),
           ("42", "原创电影")],
-    "2": [("13", "大陆剧"), ("14", "港台剧"), ("15", "欧美剧"), ("16", "韩国剧"),
-          ("28", "泰国剧"), ("45", "日本剧"), ("43", "海外剧")],
+    "2": [("28", "泰国剧"), ("45", "日本剧"), ("13", "大陆剧"), ("14", "港台剧"),
+          ("15", "欧美剧"), ("16", "韩国剧"), ("43", "海外剧")],
     "3": [("34", "内地综艺"), ("35", "港台综艺"), ("36", "日韩综艺"), ("37", "欧美综艺")],
     "4": [("29", "国产动漫"), ("30", "日韩动漫"), ("31", "欧美动漫")],
     "44": [("58", "脑洞短剧"), ("46", "爱情短剧"), ("47", "逆袭短剧"),
            ("51", "都市短剧"), ("59", "穿越短剧"), ("60", "古装短剧")],
 }
 
-_AREAS = ["内地", "香港", "台湾", "美国", "韩国", "日本", "俄罗斯", "泰国",
-          "新加坡", "马来西亚", "印度", "英国"]
+# 题材（剧情，slug 段3；电影频道快照实证 + 网剧）
+_TYPES = ["剧情", "喜剧", "爱情", "动作", "惊悚", "犯罪", "恐怖", "悬疑", "奇幻",
+          "冒险", "科幻", "战争", "家庭", "历史", "古装", "传记", "音乐", "武侠",
+          "运动", "短片", "歌舞", "儿童", "动画", "西部", "灾难", "青春", "戏曲",
+          "文艺", "网剧"]
 _LANGS = ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它"]
-_YEARS = [str(y) for y in range(2026, 1999, -1)]
-_SORTS = [{"n": "全部", "v": ""}, {"n": "最多播放", "v": "hits"},
-          {"n": "最好评", "v": "score"}]
+_LETTERS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+_YEARS = [str(y) for y in range(2026, 2008, -1)]  # 2026 .. 2009
+_SORTS = [("最近更新", "time"), ("最多播放", "hits"), ("最好评", "score")]
 
+# slug 12 段：段0=tid/子类型tid 段2=排序 段3=题材 段4=语言 段5=字母 段8=页码 段11=年份
+# 段1=地区（站点源码注释隐藏，不下发该维度）
 FILTERS = {}
 for c in CLASSES:
     tid = c["type_id"]
-    FILTERS[tid] = [
-        {"key": "area", "name": "地区",
+    dims = []
+    subs = _SUBTYPE.get(tid, [])
+    if subs:
+        dims.append({
+            "key": "subtype", "name": "分类",
+            "value": [{"n": "全部", "v": ""}] +
+                     [{"n": n, "v": v} for v, n in subs],
+        })
+    dims += [
+        {"key": "type", "name": "剧情",
          "value": [{"n": "全部", "v": ""}] +
-                  [{"n": x, "v": x} for x in _AREAS]},
+                  [{"n": x, "v": x} for x in _TYPES]},
         {"key": "lang", "name": "语言",
          "value": [{"n": "全部", "v": ""}] +
                   [{"n": x, "v": x} for x in _LANGS]},
+        {"key": "letter", "name": "字母",
+         "value": [{"n": "全部", "v": ""}] +
+                  [{"n": x, "v": x} for x in _LETTERS]},
         {"key": "year", "name": "年份",
          "value": [{"n": "全部", "v": ""}] +
                   [{"n": x, "v": x} for x in _YEARS]},
-        {"key": "sort", "name": "排序", "value": _SORTS},
+        {"key": "sort", "name": "排序",
+         "value": [{"n": n, "v": v} for n, v in _SORTS]},
     ]
+    FILTERS[tid] = dims
 
 # ===================== 正则 =====================
 # 卡片 li 块
@@ -273,12 +291,15 @@ class Spider(Spider):
         return 9999
 
     # ---------------- 筛选 URL ----------------
-    def _filter_slug(self, tid, area="", lang="", year="", sort="", page=1):
+    # slug 12 段：0=tid/子类型 2=排序 3=题材 4=语言 5=字母 8=页码 11=年份
+    def _filter_slug(self, tid, subtype="", type_="", lang="", letter="",
+                     year="", sort="", page=1):
         seg = [""] * 12
-        seg[0] = str(tid)
-        seg[1] = area
+        seg[0] = str(subtype or tid)
         seg[2] = sort
+        seg[3] = type_
         seg[4] = lang
+        seg[5] = letter
         seg[8] = str(page) if page and page > 1 else ""
         seg[11] = year
         return "/qSoQnXw/" + "-".join(seg) + ".html"
@@ -304,20 +325,23 @@ class Spider(Spider):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
 
-        area = extend.get("area", "")
+        subtype = extend.get("subtype", "")
+        type_ = extend.get("type", "")
         lang = extend.get("lang", "")
+        letter = extend.get("letter", "")
         year = extend.get("year", "")
         sort = extend.get("sort", "")
 
-        # 子类型 tid 直接走分类路由；主类 + 组合筛选走 slug 路由
-        is_sub = any(tid == t for subs in _SUBTYPE.values() for t, _ in subs)
-        if is_sub and not (area or lang or year or sort):
+        has_filter = any([subtype, type_, lang, letter, year, sort])
+        if not has_filter:
+            # 主类导航路由
             url = self.site_url + ("/xphjTV7/%s.html" % tid)
             if page > 1:
                 url = self.site_url + ("/xphjTV7/%s-%d.html" % (tid, page))
         else:
             url = self.site_url + self._filter_slug(
-                tid, area=area, lang=lang, year=year, sort=sort, page=page)
+                tid, subtype=subtype, type_=type_, lang=lang, letter=letter,
+                year=year, sort=sort, page=page)
 
         self.log("category: %s" % url)
         html = self._fetch(url)
