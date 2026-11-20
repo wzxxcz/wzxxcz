@@ -124,6 +124,7 @@ _RE_OG = re.compile(r'<meta\s+property="og:([^"]+)"\s+content="([^"]*)"', re.I)
 _RE_TITLE_H1 = re.compile(r'<h1[^>]*>([\s\S]*?)</h1>', re.I)
 _RE_POSTER = re.compile(
     r'<img[^>]*class="[^"]*img-fluid[^"]*lazy[^"]*"[^>]*src="([^"]*)"', re.I)
+_RE_DES = re.compile(r'<p class="detail-des">([\s\S]*?)</p>', re.I)
 
 _RE_LABEL = re.compile(
     r'◎[^：:]*?(导演|主演|分类|地区|上映年份|语言)[：:]</span>\s*<b>([\s\S]*?)</b>', re.I)
@@ -195,7 +196,11 @@ class Spider(Spider):
             return ""
         s = re.sub(r"<br\s*/?>", "\n", s, flags=re.I)
         s = re.sub(r"<[^>]+>", "", s)
+        # 模板占位残留，如 {self:share}
+        s = re.sub(r"\{self:[^}]*\}", "", s)
         s = (s.replace("&nbsp;", " ").replace("\xa0", " ")
+              .replace("&emsp;", " ").replace("&ensp;", " ")
+              .replace("&emsp14;", " ").replace("&#12288;", " ")
               .replace("&amp;", "&").replace("&quot;", '"')
               .replace("&#39;", "'").replace("&lt;", "<").replace("&gt;", ">"))
         s = re.sub(r"[ \t\r\f\v]+", " ", s)
@@ -365,14 +370,21 @@ class Spider(Spider):
             pic = mp.group(1)
         pic = self._fix_url(pic) or self._fix_url(og.get("image", "")) or self.default_pic
 
-        # 简介：og:description 优先，name=description 兜底
-        content = og.get("description", "")
+        # 简介：详情正文 p.detail-des 完整版优先，og:description /
+        # name=description（被站点截断）兜底
+        content = ""
+        md = _RE_DES.search(html)
+        if md:
+            content = self._clean(md.group(1))
+        if not content:
+            content = og.get("description", "")
         if not content:
             md = re.search(
                 r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']',
                 html, re.I)
             if md:
                 content = self._clean(md.group(1))
+        content = re.sub(r'\{self:[^}]*\}', "", content)
         content = re.sub(r'^(剧情简介|简介)[：:]\s*', "", content)
         content = re.sub(r'。?高清全集免费在线观看.*$', "", content)
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
@@ -454,6 +466,7 @@ class Spider(Spider):
         stream = self._extract_stream(html)
 
         if stream:
+            stream = self._resolve_sub_stream(stream, header)
             res = {"parse": 0, "playUrl": "", "url": stream, "header": header}
             self._play_cache[play_page] = (now, res)
             return res
@@ -477,6 +490,47 @@ class Spider(Spider):
             return m.group(1).replace("\\/", "/")
         m = _RE_STREAM.search(html)
         return m.group(0) if m else ""
+
+    def _resolve_sub_stream(self, url, header):
+        """多码率 master 列表：解析首条子 m3u8 并 urljoin 成绝对地址；
+        已是媒体播放列表/mp4 原样返回；子流不可达回退 master，不误伤。"""
+        if not url or ".mp4" in url.lower():
+            return url
+
+        def _get(target):
+            last = None
+            for _ in range(2):
+                try:
+                    rs = self.fetch(target, headers=header, timeout=10)
+                    if getattr(rs, "status_code", 200) == 200:
+                        return rs, None
+                    last = Exception("http_%s" % getattr(rs, "status_code", "?"))
+                except Exception as e:
+                    last = e
+            return None, last
+
+        try:
+            rm, err = _get(url)
+            if err is not None:
+                self.log("  master 拉取重试后失败: %s" % err)
+                return url
+            text = rm.text if hasattr(rm, "text") else (
+                rm.content.decode("utf-8", "ignore") if hasattr(rm, "content") else "")
+            if "#EXT-X-STREAM-INF" not in text:
+                return url  # 已是含分片的媒体播放列表
+            for line in text.splitlines():
+                line = line.strip().replace("\\/", "/")
+                if line and not line.startswith("#"):
+                    sub = urllib.parse.urljoin(url, line)
+                    rs, sub_err = _get(sub)
+                    if rs is not None:
+                        self.log("  master 解析子流 %s" % sub[:120])
+                        return sub
+                    self.log("  子流重试后失败: %s" % sub_err)
+                    break
+        except Exception as e:
+            self.log("  子流解析回退: %s" % e)
+        return url
 
     # ---------------- 其余契约 ----------------
     def localProxy(self, param):
