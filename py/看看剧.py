@@ -26,6 +26,16 @@ import urllib.parse
 sys.path.append('..')
 
 try:
+    import requests as _requests
+    try:
+        import urllib3
+        urllib3.disable_warnings()
+    except Exception:
+        pass
+except ImportError:
+    _requests = None
+
+try:
     from base.spider import Spider
 except ImportError:
     import requests as _rq
@@ -126,6 +136,42 @@ class Spider(Spider):
         self._filters = None
         self._settings = None
         self._live_channels = None
+        # 自建 Session，不依赖壳子基类是否提供 fetch/post/session
+        self._http = self._build_http()
+
+    def _build_http(self):
+        if _requests is None:
+            return None
+        try:
+            sess = _requests.Session()
+            sess.verify = False
+            adapter = _requests.adapters.HTTPAdapter(
+                pool_connections=10, pool_maxsize=10, max_retries=0)
+            sess.mount("https://", adapter)
+            sess.mount("http://", adapter)
+            return sess
+        except Exception as e:
+            self.log("自建 Session 不可用,回退基类:", e)
+            return None
+
+    def _request(self, method, url, headers, body=None, timeout=20, stream=False):
+        method = method.upper()
+        # 优先自建 Session；任一环节异常再回退壳子基类方法（版本/兼容双保险）
+        if self._http is not None:
+            try:
+                if method == "POST":
+                    return self._http.post(url, headers=headers, data=body,
+                                           timeout=timeout, verify=False, stream=stream)
+                return self._http.get(url, headers=headers, timeout=timeout,
+                                      verify=False, stream=stream)
+            except Exception as e:
+                self.log("自建请求失败,回退基类:", method, url[:60], e)
+        # 回退壳子基类方法（版本差异兜底）
+        if method == "POST":
+            return self.post(url, headers=headers, data=body, timeout=timeout,
+                             verify=False)
+        return self.fetch(url, headers=headers, timeout=timeout, verify=False,
+                          stream=stream)
 
     # ---------- 签名与请求 ----------
     def _sorted_query(self, params):
@@ -178,13 +224,8 @@ class Spider(Spider):
             url += "?" + urllib.parse.urlencode(params)
 
         try:
-            if method == "POST":
-                rsp = self.post(url, headers=headers,
-                                data=body_text.encode("utf-8"),
-                                timeout=20, verify=False)
-            else:
-                rsp = self.fetch(url, headers=headers, timeout=20,
-                                  verify=False)
+            body_bytes = body_text.encode("utf-8") if body_text is not None else None
+            rsp = self._request(method, url, headers, body=body_bytes, timeout=20)
         except Exception as e:
             self.log("api FAIL", method, path, e)
             return None
@@ -253,8 +294,8 @@ class Spider(Spider):
             last = None
             for _ in range(2):
                 try:
-                    rs = self.fetch(target, headers=header, timeout=10,
-                                    verify=False, stream=True)
+                    rs = self._request("GET", target, header, timeout=10,
+                                       stream=True)
                     if getattr(rs, "status_code", 200) == 200:
                         return rs, None
                     last = Exception("http_%s" % getattr(rs, "status_code", "?"))
@@ -355,8 +396,7 @@ class Spider(Spider):
         out = []
         for u in urls:
             try:
-                rsp = self.fetch(u, headers={"User-Agent": UA}, timeout=12,
-                                 verify=False)
+                rsp = self._request("GET", u, {"User-Agent": UA}, timeout=12)
                 text = rsp.content.decode("utf-8", "ignore")
                 if "EXTM3U" not in text and "genre#" not in text:
                     text = rsp.content.decode("gb18030", "ignore")
@@ -373,24 +413,31 @@ class Spider(Spider):
         base = (settings.get("live_match_api_base")
                 or "https://api.okzhibo.live/live/api/live/").strip().rstrip("/") + "/"
         out = []
+        gt_group = {"1": "足球", "18": "篮球"}
         try:
-            rsp = self.fetch(base + "all",
-                             headers={"User-Agent": UA,
-                                      "Referer": self.site_url + "/"},
-                             timeout=12, verify=False)
+            rsp = self._request("GET", base + "all",
+                                {"User-Agent": UA,
+                                 "Referer": self.site_url + "/"}, timeout=12)
             lst = (rsp.json().get("data") or {}).get("list") or []
             for m in lst:
                 url = m.get("live_m3u8_url") or m.get("live_flv_url") or ""
                 if not url or "://" not in url:
                     continue
-                home = (m.get("home") or {}).get("name") or ""
-                away = (m.get("away") or {}).get("name") or ""
-                name = ("%s vs %s" % (home, away)) if (home or away) else str(m.get("matchId"))
+                home = m.get("home") or {}
+                away = m.get("away") or {}
+                hn, an = home.get("name") or "", away.get("name") or ""
+                hs, as_ = home.get("score"), away.get("score")
+                name = ("%s vs %s" % (hn, an)) if (hn or an) else str(m.get("matchId"))
                 league = m.get("leagueName") or ""
                 mt = m.get("matchTimeText") or ""
-                remarks = " ".join(x for x in (league, mt) if x)
+                score = ""
+                if hs is not None and as_ is not None:
+                    score = "%s-%s" % (hs, as_)
+                remarks = " ".join(x for x in (league, score, mt) if x)
+                gt = str(m.get("gameType") or "")
+                grp = gt_group.get(gt, "赛事直播")
                 out.append({"name": self._clean(name), "url": url,
-                            "group": "体育赛事", "logo": m.get("leagueLogo") or "",
+                            "group": grp, "logo": m.get("leagueLogo") or "",
                             "remarks": remarks})
         except Exception as e:
             self.log("赛事拉取失败:", e)
@@ -400,7 +447,8 @@ class Spider(Spider):
         if self._live_channels is not None:
             return self._live_channels
         settings = self._load_settings() or {}
-        chans = self._tv_channels(settings) + self._match_channels(settings)
+        # 站点 /live 默认展示「赛事直播」，赛事排前；电视频道排后
+        chans = self._match_channels(settings) + self._tv_channels(settings)
         seen, ded = set(), []
         for c in chans:
             if c["url"] in seen:
@@ -413,8 +461,7 @@ class Spider(Spider):
     def liveContent(self, url):
         if url and "://" in url:
             try:
-                rsp = self.fetch(url, headers={"User-Agent": UA}, timeout=12,
-                                 verify=False)
+                rsp = self._request("GET", url, {"User-Agent": UA}, timeout=12)
                 return rsp.content.decode("utf-8", "ignore")
             except Exception:
                 pass
@@ -614,6 +661,16 @@ class Spider(Spider):
 
     # ---------- 播放 ----------
     def playerContent(self, flag, id, vipFlags):
+        # 整体兜底：任何未捕获异常都返回合法结构，避免冒泡到壳子 Java 侧变成空 Result
+        try:
+            return self._player_main(flag, id, vipFlags)
+        except Exception as e:
+            self.log("playerContent 异常兜底:", e)
+            return {"parse": 1, "playUrl": "", "url": self.site_url + "/",
+                    "header": {"User-Agent": UA,
+                               "Referer": self.site_url + "/"}}
+
+    def _player_main(self, flag, id, vipFlags):
         token_id = str(id or "")
         now = int(time.time())
 
@@ -713,8 +770,8 @@ class Spider(Spider):
             url = urllib.parse.unquote(url) if "%" in url else url
             if url.startswith("/"):
                 url = self.site_url + url
-            rsp = self.fetch(url, headers={"User-Agent": UA,
-                                           "Referer": self.site_url + "/"})
+            rsp = self._request("GET", url, {"User-Agent": UA,
+                                              "Referer": self.site_url + "/"})
             content = rsp.content
             ctype = rsp.headers.get("Content-Type", "image/jpeg")
             if not ctype.startswith("image/"):
