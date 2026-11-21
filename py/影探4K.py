@@ -104,12 +104,12 @@ HOME_CACHE_TTL = 6 * 3600
 
 INTRO_PREFIX = '🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！'
 
-# 与真实网站顶部导航栏完全一致的主分类（其余 ①②③ 为站内下拉子页，不在 TVBox 展示）
-SITE_TABS = ['1', '21', '3', '25', '56', '22', '23', '24', '29']
+# 导航以后端 nav 接口为准：动态读取，剔除无名项与 ①②③④⑤ 圈码分组子页
 
 _BASE64_RE = re.compile(r'(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?')
 _LDMAX_RE = re.compile(r'^https?://ldmax\.cooom/', re.I)
 _MEDIA_RE = re.compile(r'\.(?:mp4|m3u8?|flv|avi|mkv|ts|mov|wmv|webm|m4v|mpd)$', re.I)
+_CIRCLED_RE = re.compile(r'[①②③④⑤⑥⑦⑧⑨⑩]')
 
 # ===================== 模块级缓存 =====================
 _home_cache = {}
@@ -352,11 +352,10 @@ def home(extend=''):
     for item in list_of(data.get('list')):
         if not isinstance(item, dict):
             continue
-        if item.get('type_id') is None or not text(item.get('type_name')):
+        name = text(item.get('type_name'))
+        if item.get('type_id') is None or not name or _CIRCLED_RE.search(name):
             continue
         tid = text(item['type_id'])
-        if tid not in SITE_TABS:
-            continue
         classes.append({'type_id': tid, 'type_name': text(item['type_name'])})
         ext = object_of(item.get('type_extend'))
         groups = []
