@@ -619,10 +619,9 @@
             "quickSearch": 0,
             "ext": {
                 "site": [
-                    "https://sidhub.cc",
+                    "https://seedog.cc",
                     "https://seeduck.cc",
-                    "https://hubdog.cc",
-                    "http://104.243.25.80"
+                    "https://hubdog.cc"
                 ]
             },
             "timeout": 60
