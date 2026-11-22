@@ -1685,15 +1685,6 @@
             "filterable": 0
         },
         {
-            "key": "下饭",
-            "name": "🍗下饭影视",
-            "type": 3,
-            "api": "csp_JuXiaFan",
-            "searchable": 1,
-            "quickSearch": 1,
-            "filterable": 1
-        },
-        {
             "key": "快映fox",
             "name": "快映影视",
             "type": 3,
