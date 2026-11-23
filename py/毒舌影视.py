@@ -258,9 +258,6 @@ _RE_LINE_NAME = re.compile(r'<h3[^>]*class="title"[^>]*>([\s\S]*?)</h3>', re.I)
 _RE_EP = re.compile(
     r'<li[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)</a>', re.I)
 
-# 播放页 player_aaaa
-_RE_PLAYER_AA = re.compile(r'player_aaaa\s*=\s*(\{[\s\S]*?\})\s*(?:</script>|;)', re.I)
-
 # 分页总页：<span class="num">当前/总页</span>
 _RE_PAGE_NUM = re.compile(r'<span[^>]*class="num"[^>]*>\s*(\d+)\s*/\s*(\d+)', re.I)
 
@@ -287,31 +284,46 @@ class Spider(Spider):
         self._play_cache = {}
 
     # ---------------- 基础工具 ----------------
-    def _fetch(self, url, timeout=(10, 60), headers=None):
-        last = None
-        for attempt in range(10):
+    @staticmethod
+    def _is_upstream_error(text, status=200):
+        """识别上游/网关错误空壳、Cloudflare 错误页与非 200 响应；正常业务页一律放行。"""
+        if not text or len(text) < 200:
+            return True
+        try:
+            if status and int(status) != 200:
+                return True
+        except Exception:
+            pass
+        low = text.lower()
+        return any(k in low for k in (
+            "upstream connect error", "connection timeout", "connection reset",
+            "bad gateway", "service unavailable", "reset reason",
+            "error code", "ray id", "web server is down",
+            "sorry, you have been blocked"))
+
+    def _fetch(self, url, headers=None, tries=3):
+        last = ""
+        for _ in range(tries):
             try:
                 h = dict(self.headers)
                 if headers:
                     h.update(headers)
-                rsp = self.fetch(url, headers=h, timeout=timeout)
+                rsp = self.fetch(url, headers=h, timeout=(10, 30))
+                status = getattr(rsp, "status_code", 200)
                 if hasattr(rsp, "text"):
                     text = rsp.text or ""
                 elif hasattr(rsp, "content"):
                     text = rsp.content.decode("utf-8", "ignore")
                 else:
                     text = str(rsp)
-                # 边缘 520/挑战空壳：重试命中健康实例
-                if rsp is not None and getattr(rsp, "status_code", 200) == 200 \
-                        and len(text) > 800 and "error code" not in text:
+                if not self._is_upstream_error(text, status):
                     return text
-                last = Exception("http_%s len_%d" % (
-                    getattr(rsp, "status_code", "?"), len(text)))
+                last = text
             except Exception as e:
-                last = e
+                self.log("fetch FAIL", url, e)
+                last = ""
             time.sleep(1.2)
-        self.log("fetch FAIL", url, last)
-        return ""
+        return last
 
     def _fix_url(self, url):
         if not url:
@@ -648,25 +660,57 @@ class Spider(Spider):
         self._play_cache[play_page] = (now, res)
         return res
 
+    @staticmethod
+    def _player_json(html):
+        """括号深度配对精确截取 player_aaaa JSON（正确处理嵌套的 vod_data 对象）。"""
+        i = html.find("player_aaaa")
+        if i < 0:
+            return ""
+        j = html.find("{", i)
+        if j < 0:
+            return ""
+        depth, instr, esc = 0, False, False
+        for k in range(j, len(html)):
+            c = html[k]
+            if esc:
+                esc = False
+                continue
+            if c == "\\":
+                esc = True
+                continue
+            if c == '"':
+                instr = not instr
+                continue
+            if instr:
+                continue
+            if c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+                if depth == 0:
+                    return html[j:k + 1]
+        return ""
+
     def _extract_stream(self, html):
         if not html:
             return ""
-        m = _RE_PLAYER_AA.search(html)
-        if not m:
-            m2 = re.search(r'https?://[^"\\\s]*(?:m3u8|mp4)[^"\\\s]*', html, re.I)
-            return m2.group(0) if m2 else ""
-        raw = m.group(1)
-        raw = (raw.replace("\\/", "/").replace("\\u0026", "&")
-                  .replace("\\u0022", '"'))
-        try:
-            aa = json.loads(raw)
-            # encrypt 非 0 视为未直出，交兜底链路
-            if str(aa.get("encrypt", "0")) not in ("0", ""):
-                return ""
-            return aa.get("url", "") or ""
-        except Exception:
-            m2 = re.search(r'"url"\s*:\s*"([^"]+)"', raw)
-            return m2.group(1) if m2 else ""
+        # 1) MacCMS player_aaaa JSON（深度配对截取）
+        raw = self._player_json(html)
+        if raw:
+            try:
+                aa = json.loads(raw.replace("\\/", "/"))
+                # encrypt 非 0 视为未直出，交兜底链路
+                if str(aa.get("encrypt", "0")) not in ("0", ""):
+                    return ""
+                if aa.get("url"):
+                    return aa["url"].replace("\\/", "/")
+            except Exception:
+                m2 = re.search(r'"url"\s*:\s*"([^"]+)"', raw)
+                if m2:
+                    return m2.group(1).replace("\\/", "/")
+        # 2) 页面内裸 m3u8/mp4
+        m2 = re.search(r'https?://[^"\\\s]*(?:m3u8|mp4)[^"\\\s]*', html, re.I)
+        return m2.group(0) if m2 else ""
 
     def _resolve_sub_stream(self, url, header):
         """master 多码率：取首条子 m3u8 并 urljoin；已是含分片媒体列表/mp4 原样返回。"""
