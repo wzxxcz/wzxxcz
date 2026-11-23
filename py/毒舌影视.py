@@ -99,6 +99,10 @@ CLASSES = [
     {"type_id": "24", "type_name": "短剧"},
 ]
 
+# 电影 子类型（/list/id/<tid>.html）—— 筛选区“按类型”
+_MOVIE_SUBTYPE = [("6", "动作片"), ("7", "喜剧片"), ("8", "爱情片"), ("9", "科幻片"),
+                 ("10", "剧情片"), ("11", "战争片"), ("41", "动画片"), ("12", "记录片"),
+                 ("39", "恐怖片")]
 # 电影 按剧情（分类页 /list/class/<中文>/id/1.html）
 _MOVIE_CLASS = ["喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪",
                 "犯罪", "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚",
@@ -113,7 +117,7 @@ _MOVIE_YEAR = ["2010", "2012", "2013", "2014", "2015", "2016", "2017", "2018",
 
 # 电视剧 子类型（/list/id/<tid>.html）
 _TV_SUBTYPE = [("13", "国产剧"), ("14", "香港剧"), ("15", "韩国剧"), ("16", "欧美剧"),
-               ("22", "台湾剧"), ("21", "日本剧"), ("20", "泰国剧"), ("23", "海外剧")]
+               ("20", "泰国剧"), ("21", "日本剧"), ("22", "台湾剧"), ("23", "海外剧")]
 
 # 综艺 子类型（/list/id/<tid>.html）
 _ZY_SUBTYPE = [("25", "大陆综艺"), ("26", "日韩综艺"), ("27", "港台综艺"), ("28", "欧美综艺")]
@@ -122,14 +126,20 @@ _ZY_CLASS = ["选秀", "情感", "访谈", "播报", "旅游", "音乐", "美食
              "曲艺", "生活", "游戏互动", "财经", "求职"]
 # 综艺 按地区（/list/area/<中文>/id/3.html）
 _ZY_AREA = ["内地", "港台", "日韩", "欧美"]
-# 综艺 按年份
-_ZY_YEAR = [str(y) for y in range(2018, 2005, -1)]
+# 综艺 按年份（/list/id/3/year/<年>.html）
+_ZY_YEAR = [str(y) for y in range(2018, 2003, -1)]
 
 # 动漫 子类型（/list/id/<tid>.html）
 _DM_SUBTYPE = [("29", "国产动漫"), ("30", "日本动漫"), ("42", "港台动漫"),
                ("31", "欧美动漫"), ("43", "海外动漫")]
+# 动漫 按剧情（/list/class/<中文>/id/4.html）
+_DM_CLASS = ["情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园",
+             "动作", "机战", "运动", "战争", "少年", "少女", "社会", "原创",
+             "亲子", "益智", "励志", "其他"]
 # 动漫 按地区（/list/area/<中文>/id/4.html）
 _DM_AREA = ["国产", "日本", "欧美", "其他"]
+# 动漫 按年份（/list/id/4/year/<年>.html）
+_DM_YEAR = [str(y) for y in range(2018, 2003, -1)]
 
 # 短剧 子类型（/list/id/<tid>.html）
 _DJ_SUBTYPE = [("40", "短剧大全"), ("44", "AI漫剧")]
@@ -145,7 +155,8 @@ def _subtype_opts(pairs):
 
 FILTERS = {
     "1": [
-        {"key": "class", "name": "分类", "value": _class_opts(_MOVIE_CLASS)},
+        {"key": "subtype", "name": "类型", "value": _subtype_opts(_MOVIE_SUBTYPE)},
+        {"key": "class", "name": "剧情", "value": _class_opts(_MOVIE_CLASS)},
         {"key": "area",  "name": "地区", "value": _class_opts(_MOVIE_AREA)},
         {"key": "year",  "name": "年份", "value": _class_opts(_MOVIE_YEAR)},
     ],
@@ -160,7 +171,9 @@ FILTERS = {
     ],
     "4": [
         {"key": "subtype", "name": "类型", "value": _subtype_opts(_DM_SUBTYPE)},
+        {"key": "class",   "name": "剧情", "value": _class_opts(_DM_CLASS)},
         {"key": "area",    "name": "地区", "value": _class_opts(_DM_AREA)},
+        {"key": "year",    "name": "年份", "value": _class_opts(_DM_YEAR)},
     ],
     "24": [
         {"key": "subtype", "name": "类型", "value": _subtype_opts(_DJ_SUBTYPE)},
@@ -230,7 +243,7 @@ class Spider(Spider):
         self._play_cache = {}
 
     # ---------------- 基础工具 ----------------
-    def _fetch(self, url, timeout=15, headers=None):
+    def _fetch(self, url, timeout=(10, 60), headers=None):
         last = None
         for attempt in range(10):
             try:
@@ -282,6 +295,12 @@ class Spider(Spider):
         return s.strip()
 
     # ---------------- 列表解析 ----------------
+    def _is_placeholder_pic(self, pic):
+        if not pic:
+            return True
+        return any(k in pic.lower() for k in ("load.png", "load.gif",
+                                              "placeholder", "blank", "default"))
+
     def _parse_cards(self, html):
         videos = []
         seen = set()
@@ -303,6 +322,8 @@ class Spider(Spider):
             name = self._clean(mt.group(1)) if mt else ""
             mo = _RE_ORIG.search(block)
             pic = mo.group(1) if mo else ""
+            if self._is_placeholder_pic(pic):
+                pic = ""
 
             mp = _RE_PIC_TEXT.search(block)
             remarks = self._clean(mp.group(1)) if mp else ""
