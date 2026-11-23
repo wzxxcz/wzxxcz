@@ -14,9 +14,10 @@ m.xnhrsb.com | TVBox Python 爬虫
   - 搜索:     /dsshiyisc/<kw>-------------.html；分页 /dsshiyisc/<kw>----------<page>---.html
   - 注: /index.php/vod/search.html?wd= 在本站回退首页，非搜索结果；关键词搜索走伪静态 /dsshiyisc/
 
-分类导航（站点顶部导航 navlist，线上实证）:
-  1 电影 2 电视剧 3 综艺 4 动漫 5 短剧 豆瓣Top250(/label/duoban.html)
-  注: 首页第二行标签 submenu_mi(动作片…犯罪片) 不进一级分类栏
+分类导航（线上实证首页菜单，两组）:
+  主菜单 navlist: 1 电影 2 电视剧 3 综艺 4 动漫 5 短剧 豆瓣Top250(/label/duoban.html)
+  子分类 submenu_mi: 6 动作片 7 喜剧片 8 爱情片 9 科幻片 10 恐怖片 11 剧情片
+                     12 战争片 13 纪录片 14 悬疑片 15 犯罪片
   豆瓣Top250 分页: /label/movie/page/<N>.html（第1页 /label/duoban.html）
 
 列表卡片（首页/分类/搜索同构，实证）:
@@ -40,59 +41,60 @@ import re
 import sys
 import json
 import time
+import socket
 import urllib.parse
 
 sys.path.append('..')
 
-import requests as _rq
+# 云端出口 IPv6 不通/国内 IPv6 不稳：强制 IPv4 解析（壳子本地网络正常时不影响）
 try:
-    import urllib3
-    urllib3.disable_warnings()
+    _orig_getaddrinfo = socket.getaddrinfo
+    def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        res = _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+        v4 = [x for x in res if x[0] == socket.AF_INET]
+        return v4 or res
+    socket.getaddrinfo = _ipv4_getaddrinfo
 except Exception:
     pass
 
-
-class _LocalFetch:
-    """自建 Session：连接池复用、verify=False、cookie 在同一实例内复用；壳子/云端行为一致。"""
-
-    def __init__(self):
-        self._session = None
-
-    @property
-    def _sess(self):
-        if self._session is None:
-            self._session = _rq.Session()
-            self._session.verify = False
-            adapter = _rq.adapters.HTTPAdapter(
-                pool_connections=10, pool_maxsize=10, max_retries=0)
-            self._session.mount('https://', adapter)
-            self._session.mount('http://', adapter)
-        return self._session
-
-    def fetch(self, url, headers=None, **kw):
-        timeout = kw.pop('timeout', 15)
-        r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
-        r.encoding = 'utf-8'
-        return r
-
-    def log(self, *a, **kw):
-        try:
-            print("[xnhrsb]", *a)
-        except Exception:
-            pass
-
-
 try:
-    from base.spider import Spider as _BaseSpider
-
-    class Spider(_LocalFetch, _BaseSpider):
-        def __init__(self):
-            _LocalFetch.__init__(self)
-            _BaseSpider.__init__(self)
+    from base.spider import Spider
 except ImportError:
-    class Spider(_LocalFetch):
+    import requests as _rq
+    try:
+        import urllib3
+        urllib3.disable_warnings()
+    except Exception:
+        pass
+
+    class _BaseSpider:
         def __init__(self):
-            _LocalFetch.__init__(self)
+            self._session = None
+
+        @property
+        def _sess(self):
+            if self._session is None:
+                self._session = _rq.Session()
+                self._session.verify = False
+                adapter = _rq.adapters.HTTPAdapter(
+                    pool_connections=10, pool_maxsize=10, max_retries=0)
+                self._session.mount('https://', adapter)
+                self._session.mount('http://', adapter)
+            return self._session
+
+        def fetch(self, url, headers=None, **kw):
+            timeout = kw.pop('timeout', 15)
+            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
+            r.encoding = 'utf-8'
+            return r
+
+        def log(self, *a, **kw):
+            try:
+                print("[xnhrsb]", *a)
+            except Exception:
+                pass
+
+    Spider = _BaseSpider
 
 
 HOST = "https://m.xnhrsb.com"
@@ -103,7 +105,7 @@ DEFAULT_PIC = ""
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
 # ===================== 分类（对齐站点顶部导航 navlist，线上实证）=====================
-# 站点顶部导航仅: 电影/电视剧/综艺/动漫/短剧/豆瓣Top250；首页第二行标签(动作片…犯罪片)不进一级分类栏
+# 站点顶部导航仅: 电影/电视剧/综艺/动漫/短剧/豆瓣Top250；第二行标签(动作片…犯罪片)不进一级分类栏
 # 豆瓣Top250 为自定义标签页 /label/duoban.html，分页 /label/movie/page/<N>.html
 CLASSES = [
     {"type_id": "1",      "type_name": "电影"},
@@ -263,7 +265,6 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
-        self._warmed = False
 
     # ---------------- 基础工具 ----------------
     @staticmethod
@@ -291,14 +292,14 @@ class Spider(Spider):
             "error code", "ray id", "web server is down",
             "sorry, you have been blocked"))
 
-    def _fetch(self, url, headers=None, tries=5):
+    def _fetch(self, url, headers=None, tries=3):
         last = ""
-        for i in range(tries):
+        for _ in range(tries):
             try:
                 h = dict(self.headers)
                 if headers:
                     h.update(headers)
-                rsp = self.fetch(url, headers=h, timeout=(8, 20))
+                rsp = self.fetch(url, headers=h, timeout=(10, 30))
                 status = getattr(rsp, "status_code", 200)
                 if hasattr(rsp, "text"):
                     text = rsp.text or ""
@@ -308,25 +309,12 @@ class Spider(Spider):
                     text = str(rsp)
                 if not self._is_upstream_error(text, status):
                     return text
-                self.log("upstream 异常: status=%s len=%d" % (status, len(text)))
                 last = text
             except Exception as e:
-                self.log("fetch FAIL[%s]: %s | %s" % (
-                    type(e).__name__, str(e)[:120], url))
+                self.log("fetch FAIL", url, e)
                 last = ""
-            if i < tries - 1:
-                time.sleep(1.2)
+            time.sleep(1.2)
         return last
-
-    def _warm_up(self):
-        """冷启动先访问首页下发会话 Cookie、命中健康实例，后续请求复用同一会话。"""
-        if self._warmed:
-            return
-        try:
-            self._fetch(self.site_url + "/", tries=6)
-        except Exception as e:
-            self.log("warm_up FAIL", e)
-        self._warmed = True
 
     def _fix_url(self, url):
         if not url:
@@ -494,57 +482,46 @@ class Spider(Spider):
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        try:
-            self._warm_up()
-            html = self._fetch(self.site_url + "/")
-            self.log("home HTML 长度: %d" % len(html))
-            return {"list": self._parse_cards(html)}
-        except Exception as e:
-            self.log("homeVideoContent FAIL", e)
-            return {"list": []}
+        html = self._fetch(self.site_url + "/")
+        self.log("home HTML 长度: %d" % len(html))
+        return {"list": self._parse_cards(html)}
 
     def categoryContent(self, tid, pg, filter, extend):
-        try:
-            self._warm_up()
-            page = int(pg) if pg else 1
-            if isinstance(extend, str):
-                try:
-                    extend = json.loads(extend)
-                except Exception:
-                    extend = {}
-            extend = extend or {}
-            self.log("category 入参: tid=%s pg=%s extend=%s" % (tid, pg, extend))
+        page = int(pg) if pg else 1
+        if isinstance(extend, str):
+            try:
+                extend = json.loads(extend)
+            except Exception:
+                extend = {}
+        extend = extend or {}
 
-            # 豆瓣Top250：自定义标签页，独立路由，无筛选组
-            if tid == "duoban":
-                url = self._duoban_url(page)
-                self.log("category(豆瓣): %s" % url)
-                html = self._fetch(url)
-                self.log("  HTML 长度: %d" % len(html))
-                videos = self._parse_cards(html)
-                pagecount = self._page_count(html, page)
-                self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
-                return {
-                    "list": videos, "page": page, "pagecount": pagecount,
-                    "limit": 48, "total": pagecount * 48,
-                }
-
-            url = self._list_url(tid, extend, page)
-            self.log("category: %s" % url)
+        # 豆瓣Top250：自定义标签页，独立路由，无筛选组
+        if tid == "duoban":
+            url = self._duoban_url(page)
+            self.log("category(豆瓣): %s" % url)
             html = self._fetch(url)
             self.log("  HTML 长度: %d" % len(html))
-
             videos = self._parse_cards(html)
             pagecount = self._page_count(html, page)
             self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
-
             return {
                 "list": videos, "page": page, "pagecount": pagecount,
-                "limit": 45, "total": pagecount * 45,
+                "limit": 48, "total": pagecount * 48,
             }
-        except Exception as e:
-            self.log("categoryContent FAIL", e)
-            return {"list": [], "page": int(pg) if pg else 1, "pagecount": 1}
+
+        url = self._list_url(tid, extend, page)
+        self.log("category: %s" % url)
+        html = self._fetch(url)
+        self.log("  HTML 长度: %d" % len(html))
+
+        videos = self._parse_cards(html)
+        pagecount = self._page_count(html, page)
+        self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
+
+        return {
+            "list": videos, "page": page, "pagecount": pagecount,
+            "limit": 45, "total": pagecount * 45,
+        }
 
     def _duoban_url(self, page=1):
         page = int(page) if page else 1
@@ -569,26 +546,21 @@ class Spider(Spider):
         return max(pages) if pages else max(1, page)
 
     def searchContent(self, key, quick, pg="1"):
-        try:
-            self._warm_up()
-            page = int(pg) if pg else 1
-            kw = urllib.parse.quote(key)
-            if page <= 1:
-                url = "%s/dsshiyisc/%s-------------.html" % (self.site_url, kw)
-            else:
-                url = "%s/dsshiyisc/%s----------%d---.html" % (self.site_url, kw, page)
-            self.log("search: %s" % url)
-            html = self._fetch(url)
-            videos = self._parse_cards(html)
-            pagecount = self._page_count(html, page)
-            self.log("  搜索: %d 条, 总页数: %d" % (len(videos), pagecount))
-            return {
-                "list": videos, "page": page, "pagecount": pagecount,
-                "limit": 45, "total": pagecount * 45,
-            }
-        except Exception as e:
-            self.log("searchContent FAIL", e)
-            return {"list": [], "page": int(pg) if pg else 1, "pagecount": 1}
+        page = int(pg) if pg else 1
+        kw = urllib.parse.quote(key)
+        if page <= 1:
+            url = "%s/dsshiyisc/%s-------------.html" % (self.site_url, kw)
+        else:
+            url = "%s/dsshiyisc/%s----------%d---.html" % (self.site_url, kw, page)
+        self.log("search: %s" % url)
+        html = self._fetch(url)
+        videos = self._parse_cards(html)
+        pagecount = self._page_count(html, page)
+        self.log("  搜索: %d 条, 总页数: %d" % (len(videos), pagecount))
+        return {
+            "list": videos, "page": page, "pagecount": pagecount,
+            "limit": 45, "total": pagecount * 45,
+        }
 
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
