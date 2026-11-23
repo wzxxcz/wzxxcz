@@ -36,12 +36,21 @@ m.xnhrsb.com | TVBox Python 爬虫
 
 播放直链: 播放页内联 player_aaaa JSON，括号深度配对截取；encrypt:0 时取 url 直出 m3u8；
           master m3u8 取首条子流拆分兜底，失败回退 parse:1 嗅探。
+
+反爬校验（XCDN Bot detection，实证 2026-11-23）:
+  - 边缘节点对可疑请求回 408，body 为 PoW 挑战页（title "Bot detection"，含 /__xcdn/captcha/api/init）。
+  - 闭环: GET /__xcdn/captcha/api/init → {challenge, difficulty}；
+    枚举 nonce 使 sha256(challenge + nonce) 十六进制前 difficulty 位为 '0'；
+    GET /__xcdn/captcha/api/verify，头 X-CDN-VERIFY-NONCE / X-CDN-VERIFY-RESULT；
+    verify 200 后服务端 Set-Cookie __xcdn_captcha_verified=<JWT>（次日过期），携带该 Cookie 访问内容页即 200 出片。
+  - 同一 session 内 Cookie 跨页复用；失效后再次遇挑战自动重解。
 """
 import re
 import sys
 import json
 import time
 import socket
+import hashlib
 import urllib.parse
 
 sys.path.append('..')
@@ -265,6 +274,9 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        # XCDN PoW 校验会话：自建 session 保留挑战 Cookie，JWT 字符串双保险写入请求头
+        self._cd_session = None
+        self._cd_cookie = ""
 
     # ---------------- 基础工具 ----------------
     @staticmethod
@@ -292,6 +304,108 @@ class Spider(Spider):
             "error code", "ray id", "web server is down",
             "sorry, you have been blocked"))
 
+    # ---------------- XCDN PoW 校验 ----------------
+    def _cd_session_get(self):
+        if self._cd_session is None:
+            try:
+                import requests as rq
+                sess = rq.Session()
+                sess.verify = False
+                adapter = rq.adapters.HTTPAdapter(
+                    pool_connections=10, pool_maxsize=10, max_retries=0)
+                sess.mount('https://', adapter)
+                sess.mount('http://', adapter)
+            except Exception:
+                sess = None
+            self._cd_session = sess
+        return self._cd_session
+
+    @staticmethod
+    def _is_challenge(text, status):
+        if text and ("Bot detection" in text or "/__xcdn/captcha/api/init" in text):
+            return True
+        try:
+            if status and int(status) in (403, 408, 429):
+                return True
+        except Exception:
+            pass
+        return False
+
+    def _solve_captcha(self):
+        """解 XCDN SHA-256 PoW；成功后把 verified JWT 存入 session 与请求头 Cookie。"""
+        try:
+            sess = self._cd_session_get()
+            h = dict(self.headers)
+            init_url = self.site_url + "/__xcdn/captcha/api/init"
+            if sess is not None:
+                ri = sess.get(init_url, headers=h, timeout=(10, 30))
+                settings = ri.json()
+            else:
+                ri = self.fetch(init_url, headers=h, timeout=(10, 30))
+                settings = ri.json()
+            challenge = str(settings.get("challenge", ""))
+            difficulty = int(settings.get("difficulty", 4))
+            if not challenge:
+                return False
+            target = "0" * difficulty
+            nonce = 0
+            result = ""
+            while nonce < 3_000_000:
+                nonce += 1
+                result = hashlib.sha256(
+                    (challenge + str(nonce)).encode("utf-8")).hexdigest()
+                if result[:difficulty] == target:
+                    break
+            else:
+                self.log("PoW 枚举未命中")
+                return False
+            vh = dict(h)
+            vh["X-CDN-VERIFY-NONCE"] = str(nonce)
+            vh["X-CDN-VERIFY-RESULT"] = result
+            verify_url = self.site_url + "/__xcdn/captcha/api/verify"
+            jwt = ""
+            if sess is not None:
+                rv = sess.get(verify_url, headers=vh, timeout=(10, 30))
+                if getattr(rv, "status_code", 200) != 200:
+                    self.log("verify 状态", getattr(rv, "status_code", "?"))
+                    return False
+                jwt = sess.cookies.get("__xcdn_captcha_verified", "")
+            else:
+                rv = self.fetch(verify_url, headers=vh, timeout=(10, 30))
+            if jwt:
+                self._cd_cookie = "__xcdn_captcha_verified=" + jwt
+                self.headers["Cookie"] = self._cd_cookie
+            self.log("PoW 校验通过 nonce=%s" % nonce)
+            return True
+        except Exception as e:
+            self.log("PoW 求解异常", e)
+            return False
+
+    def _http_get(self, url, headers=None, timeout=15):
+        """本站 GET：优先自建 session（保留校验 Cookie）；遇挑战自动解 PoW 后重放一次。"""
+        h = dict(self.headers)
+        if headers:
+            h.update(headers)
+        if self._cd_cookie:
+            h["Cookie"] = self._cd_cookie
+        sess = self._cd_session_get()
+        if sess is not None:
+            rsp = sess.get(url, headers=h, timeout=timeout)
+        else:
+            rsp = self.fetch(url, headers=h, timeout=timeout)
+        text = rsp.text if hasattr(rsp, "text") else ""
+        status = getattr(rsp, "status_code", 200)
+        if self._is_challenge(text, status):
+            self.log("遇 XCDN 挑战，解 PoW")
+            if self._solve_captcha():
+                if self._cd_cookie:
+                    h["Cookie"] = self._cd_cookie
+                if sess is not None:
+                    rsp = sess.get(url, headers=h, timeout=timeout)
+                else:
+                    rsp = self.fetch(url, headers=h, timeout=timeout)
+        return rsp
+
     def _fetch(self, url, headers=None, tries=3):
         last = ""
         for _ in range(tries):
@@ -299,7 +413,7 @@ class Spider(Spider):
                 h = dict(self.headers)
                 if headers:
                     h.update(headers)
-                rsp = self.fetch(url, headers=h, timeout=(10, 30))
+                rsp = self._http_get(url, headers=h, timeout=(10, 30))
                 status = getattr(rsp, "status_code", 200)
                 if hasattr(rsp, "text"):
                     text = rsp.text or ""
