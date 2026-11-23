@@ -44,44 +44,55 @@ import urllib.parse
 
 sys.path.append('..')
 
+import requests as _rq
 try:
-    from base.spider import Spider
-except ImportError:
-    import requests as _rq
-    try:
-        import urllib3
-        urllib3.disable_warnings()
-    except Exception:
-        pass
+    import urllib3
+    urllib3.disable_warnings()
+except Exception:
+    pass
 
-    class _BaseSpider:
+
+class _LocalFetch:
+    """自建 Session：连接池复用、verify=False、cookie 在同一实例内复用；壳子/云端行为一致。"""
+
+    def __init__(self):
+        self._session = None
+
+    @property
+    def _sess(self):
+        if self._session is None:
+            self._session = _rq.Session()
+            self._session.verify = False
+            adapter = _rq.adapters.HTTPAdapter(
+                pool_connections=10, pool_maxsize=10, max_retries=0)
+            self._session.mount('https://', adapter)
+            self._session.mount('http://', adapter)
+        return self._session
+
+    def fetch(self, url, headers=None, **kw):
+        timeout = kw.pop('timeout', 15)
+        r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
+        r.encoding = 'utf-8'
+        return r
+
+    def log(self, *a, **kw):
+        try:
+            print("[xnhrsb]", *a)
+        except Exception:
+            pass
+
+
+try:
+    from base.spider import Spider as _BaseSpider
+
+    class Spider(_LocalFetch, _BaseSpider):
         def __init__(self):
-            self._session = None
-
-        @property
-        def _sess(self):
-            if self._session is None:
-                self._session = _rq.Session()
-                self._session.verify = False
-                adapter = _rq.adapters.HTTPAdapter(
-                    pool_connections=10, pool_maxsize=10, max_retries=0)
-                self._session.mount('https://', adapter)
-                self._session.mount('http://', adapter)
-            return self._session
-
-        def fetch(self, url, headers=None, **kw):
-            timeout = kw.pop('timeout', 15)
-            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
-            r.encoding = 'utf-8'
-            return r
-
-        def log(self, *a, **kw):
-            try:
-                print("[xnhrsb]", *a)
-            except Exception:
-                pass
-
-    Spider = _BaseSpider
+            _LocalFetch.__init__(self)
+            _BaseSpider.__init__(self)
+except ImportError:
+    class Spider(_LocalFetch):
+        def __init__(self):
+            _LocalFetch.__init__(self)
 
 
 HOST = "https://m.xnhrsb.com"
@@ -287,7 +298,7 @@ class Spider(Spider):
                 h = dict(self.headers)
                 if headers:
                     h.update(headers)
-                rsp = self.fetch(url, headers=h, timeout=(10, 30))
+                rsp = self.fetch(url, headers=h, timeout=(8, 20))
                 status = getattr(rsp, "status_code", 200)
                 if hasattr(rsp, "text"):
                     text = rsp.text or ""
@@ -297,9 +308,11 @@ class Spider(Spider):
                     text = str(rsp)
                 if not self._is_upstream_error(text, status):
                     return text
+                self.log("upstream 异常: status=%s len=%d" % (status, len(text)))
                 last = text
             except Exception as e:
-                self.log("fetch FAIL", url, e)
+                self.log("fetch FAIL[%s]: %s | %s" % (
+                    type(e).__name__, str(e)[:120], url))
                 last = ""
             if i < tries - 1:
                 time.sleep(1.2)
