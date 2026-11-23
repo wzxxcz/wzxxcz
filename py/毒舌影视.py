@@ -513,6 +513,7 @@ class Spider(Spider):
                 except Exception:
                     extend = {}
             extend = extend or {}
+            self.log("category 入参: tid=%s pg=%s extend=%s" % (tid, pg, extend))
 
             # 豆瓣Top250：自定义标签页，独立路由，无筛选组
             if tid == "duoban":
