@@ -16,6 +16,12 @@
             "url": "http://tv.305362.xyz/tg/live/27f2.txt"
         },
         {
+            "name": "央卫港台2",
+            "type": 0,
+            "ua": "okhttp/5.3.2",
+            "url": "http://wangziduoqing.cn/yuan/zb.txt"
+        },
+        {
             "name": "酒店",
             "type": 0,
             "ua": "okhttp/5.3.2",
