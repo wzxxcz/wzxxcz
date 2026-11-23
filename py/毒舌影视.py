@@ -2,28 +2,38 @@
 """
 毒舌影视 www.cssgm.com.cn | TVBox Python 爬虫
 站点模板: MacCMS stui / hl048
+
+路由（实证自列表/搜索/详情/播放源码）:
   - 首页:   /
-  - 分类:   /cat/<tid>.html；分页 /cat/<tid>-<page>.html（第 1 页无 -1）
+  - 主分类: /cat/<tid>.html；分页 /cat/<tid>-<page>.html（第 1 页无 -1）
   - 子类型: /list/id/<subtype>.html
-  - 类型:   /list/class/<URL编码中文>/id/<tid>.html
-  - 地区:   /list/area/<URL编码中文>/id/<tid>.html
-  - 年份:   /list/id/<tid>/year/<year>.html
+  - 剧情:   /list/class/<URL编码中文>/id/<tid>.html
+  - 地区:   /list/area/<URL编码中文>/id/<tid>.html（地区+剧情: /list/area/<a>/class/<c>/id/<tid>.html）
+  - 年份:   /list/id/<tid>/year/<年>.html（叠加剧情: /list/class/<c>/id/<tid>/year/<年>.html）
+  - 语言:   /list/class/<c>/id/<tid>/lang/<URL编码中文>.html（裸分类: /list/id/<tid>/lang/<中文>.html）
+  - 字母:   /list/class/<c>/id/<tid>/letter/<A-Z 或 0-9>.html
+  - 排序:   /list/by/time|hits|score/class/<c>/id/<tid>.html
+  - 筛选分页: /list/class/<c>/id/<tid>/page/<page>.html
   - 详情:   /cinema/<id>.html
   - 播放:   /view/<vid>/<sid>/<nid>.html
   - 搜索:   /so.html?wd=<关键词>；分页 /so/page/<page>/wd/<编码关键词>.html
-  - 列表卡片: a.stui-vodlist__thumb(.lazyload)，href/title/data-original；
-              span.pic-text.text-right = 副标；h4/h3.title a = 片名兜底；
-              p.text.text-overflow.text-muted.hidden-xs = 主演
-  - 详情字段:
-      · 片名 h1.title；海报 img.lazyload[data-original]
-      · 简介 span.detail-content（完整版,display:none）优先，span.detail-sketch 兜底
-      · 主演/导演: p.data > span.text-muted 标签之后文本
-      · 类型/地区/年份: p.data 内 span.text-muted(.hidden-xs) 标签之后文本
-      · 线路: div.stui-pannel-box.b.playlist.mb；h3.title 线路名（DOM 顺序即站点顺序）；
-              ul.stui-content__playlist > li > a[href]，a 文本=集名
-  - 播放直链: 播放页内联 player_aaaa JSON，取 url（encrypt:0 未加密）；
-              直链为含分片媒体列表（非 master），无 Referer 防盗链；
-              保留 master 多码率首条子流拆分兜底。
+
+列表/搜索卡片:
+  - 主列表: ul.stui-vodlist > li > a.stui-vodlist__thumb.lazyload
+  - 搜索主结果: ul.stui-vodlist__media > li.active > a.v-thumb.stui-vodlist__thumb.lazyload
+  - 侧边热门(必须排除): a.m-thumb / .detail-side / ul.stui-vodlist__text，背景图 style 封面
+  - 锚点 href/title/data-original；span.pic-text.text-right = 副标；h4/h3.title a = 片名兜底
+
+详情字段:
+  - 片名 h1.title；海报 img.lazyload[data-original]（src 为 load.gif 占位）
+  - 简介 span.detail-content（完整版,display:none）优先，span.detail-sketch（截断版）兜底
+  - 主演/导演: p.data > span.text-muted 标签之后的一串 <a>，逗号拼接；无 <a> 取纯文本
+  - 类型/地区/年份: p.data 内 span.text-muted(.hidden-xs) 标签之后文本
+  - 线路: div.stui-pannel-box.b.playlist.mb；h3.title 线路名（DOM 顺序即站点顺序，编号与 URL 段不一致时以 DOM/URL 为准）；
+          ul.stui-content__playlist > li > a[href]，a 文本=集名
+
+播放直链: 播放页内联 player_aaaa JSON，encrypt:0 时取 url 直出 m3u8；
+          直链 CDN 域名各线路不同，不写死；保留 master 多码率首条子流拆分兜底，失败回退 parse:1 客户端嗅探。
 """
 import re
 import sys
@@ -99,50 +109,54 @@ CLASSES = [
     {"type_id": "24", "type_name": "短剧"},
 ]
 
-# 电影 子类型（/list/id/<tid>.html）—— 筛选区“按类型”
+# ---- 各频道子类型（/list/id/<subtype>.html）----
 _MOVIE_SUBTYPE = [("6", "动作片"), ("7", "喜剧片"), ("8", "爱情片"), ("9", "科幻片"),
-                 ("10", "剧情片"), ("11", "战争片"), ("41", "动画片"), ("12", "记录片"),
-                 ("39", "恐怖片")]
-# 电影 按剧情（分类页 /list/class/<中文>/id/1.html）
+                  ("10", "剧情片"), ("11", "战争片"), ("41", "动画片"), ("12", "记录片"),
+                  ("39", "恐怖片")]
+_TV_SUBTYPE = [("13", "国产剧"), ("14", "香港剧"), ("15", "韩国剧"), ("16", "欧美剧"),
+               ("22", "台湾剧"), ("21", "日本剧"), ("20", "泰国剧"), ("23", "海外剧")]
+_ZY_SUBTYPE = [("25", "大陆综艺"), ("26", "日韩综艺"), ("27", "港台综艺"), ("28", "欧美综艺")]
+_DM_SUBTYPE = [("29", "国产动漫"), ("30", "日本动漫"), ("42", "港台动漫"),
+               ("31", "欧美动漫"), ("43", "海外动漫")]
+_DJ_SUBTYPE = [("40", "短剧大全"), ("44", "AI漫剧")]
+
+# ---- 剧情 class ----
 _MOVIE_CLASS = ["喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪",
                 "犯罪", "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚",
                 "经典", "青春", "文艺", "微电影", "古装", "历史", "运动", "农村",
                 "儿童", "网络电影"]
-# 电影 按地区（/list/area/<中文>/id/1.html）
-_MOVIE_AREA = ["大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国",
-               "德国", "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"]
-# 电影 按年份（/list/id/1/year/<年>.html）
-_MOVIE_YEAR = ["2010", "2012", "2013", "2014", "2015", "2016", "2017", "2018",
-               "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"]
-
-# 电视剧 子类型（/list/id/<tid>.html）
-_TV_SUBTYPE = [("13", "国产剧"), ("14", "香港剧"), ("15", "韩国剧"), ("16", "欧美剧"),
-               ("20", "泰国剧"), ("21", "日本剧"), ("22", "台湾剧"), ("23", "海外剧")]
-
-# 综艺 子类型（/list/id/<tid>.html）
-_ZY_SUBTYPE = [("25", "大陆综艺"), ("26", "日韩综艺"), ("27", "港台综艺"), ("28", "欧美综艺")]
-# 综艺 按剧情（/list/class/<中文>/id/3.html）
+_TV_CLASS = ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻",
+             "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"]
 _ZY_CLASS = ["选秀", "情感", "访谈", "播报", "旅游", "音乐", "美食", "纪实",
              "曲艺", "生活", "游戏互动", "财经", "求职"]
-# 综艺 按地区（/list/area/<中文>/id/3.html）
-_ZY_AREA = ["内地", "港台", "日韩", "欧美"]
-# 综艺 按年份（/list/id/3/year/<年>.html）
-_ZY_YEAR = [str(y) for y in range(2018, 2003, -1)]
-
-# 动漫 子类型（/list/id/<tid>.html）
-_DM_SUBTYPE = [("29", "国产动漫"), ("30", "日本动漫"), ("42", "港台动漫"),
-               ("31", "欧美动漫"), ("43", "海外动漫")]
-# 动漫 按剧情（/list/class/<中文>/id/4.html）
 _DM_CLASS = ["情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园",
-             "动作", "机战", "运动", "战争", "少年", "少女", "社会", "原创",
-             "亲子", "益智", "励志", "其他"]
-# 动漫 按地区（/list/area/<中文>/id/4.html）
+            "动作", "机战", "运动", "战争", "少年", "少女", "社会", "原创",
+            "亲子", "益智", "励志", "其他"]
+
+# ---- 地区 area ----
+_MOVIE_AREA = ["大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国",
+               "德国", "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"]
+_TV_AREA = ["内地", "韩国", "香港", "台湾", "日本", "美国", "泰国", "英国",
+            "新加坡", "其他"]
+_ZY_AREA = ["内地", "港台", "日韩", "欧美"]
 _DM_AREA = ["国产", "日本", "欧美", "其他"]
-# 动漫 按年份（/list/id/4/year/<年>.html）
+
+# ---- 年份 year（站点实证，电影缺 2011）----
+_MOVIE_YEAR = ["2010", "2012", "2013", "2014", "2015", "2016", "2017", "2018",
+               "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"]
+_TV_YEAR = [str(y) for y in range(2026, 2009, -1)]
+_ZY_YEAR = [str(y) for y in range(2018, 2003, -1)]
 _DM_YEAR = [str(y) for y in range(2018, 2003, -1)]
 
-# 短剧 子类型（/list/id/<tid>.html）
-_DJ_SUBTYPE = [("40", "短剧大全"), ("44", "AI漫剧")]
+# ---- 语言 lang ----
+_LANG_MOVIE = ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它"]
+_LANG_7 = ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"]
+
+# ---- 字母 letter：A-Z + 0-9 ----
+_LETTERS = ["0-9"] + [chr(c) for c in range(65, 91)]
+
+# ---- 排序 sort（站点 by/time|hits|score）----
+_SORT = [("time", "最新"), ("hits", "最热"), ("score", "评分")]
 
 
 def _class_opts(items):
@@ -153,37 +167,66 @@ def _subtype_opts(pairs):
     return [{"n": "全部", "v": ""}] + [{"n": n, "v": v} for v, n in pairs]
 
 
+def _lang_opts(items):
+    return [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in items]
+
+
+def _letter_opts():
+    return [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in _LETTERS]
+
+
+def _sort_opts():
+    return [{"n": "默认", "v": ""}] + [{"n": n, "v": v} for v, n in _SORT]
+
+
 FILTERS = {
     "1": [
         {"key": "subtype", "name": "类型", "value": _subtype_opts(_MOVIE_SUBTYPE)},
-        {"key": "class", "name": "剧情", "value": _class_opts(_MOVIE_CLASS)},
-        {"key": "area",  "name": "地区", "value": _class_opts(_MOVIE_AREA)},
-        {"key": "year",  "name": "年份", "value": _class_opts(_MOVIE_YEAR)},
+        {"key": "class",   "name": "剧情", "value": _class_opts(_MOVIE_CLASS)},
+        {"key": "area",    "name": "地区", "value": _class_opts(_MOVIE_AREA)},
+        {"key": "year",    "name": "年份", "value": _class_opts(_MOVIE_YEAR)},
+        {"key": "lang",    "name": "语言", "value": _lang_opts(_LANG_MOVIE)},
+        {"key": "letter",  "name": "字母", "value": _letter_opts()},
+        {"key": "sort",    "name": "排序", "value": _sort_opts()},
     ],
     "2": [
         {"key": "subtype", "name": "类型", "value": _subtype_opts(_TV_SUBTYPE)},
+        {"key": "class",   "name": "剧情", "value": _class_opts(_TV_CLASS)},
+        {"key": "area",    "name": "地区", "value": _class_opts(_TV_AREA)},
+        {"key": "year",    "name": "年份", "value": _class_opts(_TV_YEAR)},
+        {"key": "lang",    "name": "语言", "value": _lang_opts(_LANG_7)},
+        {"key": "letter",  "name": "字母", "value": _letter_opts()},
+        {"key": "sort",    "name": "排序", "value": _sort_opts()},
     ],
     "3": [
         {"key": "subtype", "name": "类型", "value": _subtype_opts(_ZY_SUBTYPE)},
         {"key": "class",   "name": "剧情", "value": _class_opts(_ZY_CLASS)},
         {"key": "area",    "name": "地区", "value": _class_opts(_ZY_AREA)},
         {"key": "year",    "name": "年份", "value": _class_opts(_ZY_YEAR)},
+        {"key": "lang",    "name": "语言", "value": _lang_opts(_LANG_7)},
+        {"key": "letter",  "name": "字母", "value": _letter_opts()},
+        {"key": "sort",    "name": "排序", "value": _sort_opts()},
     ],
     "4": [
         {"key": "subtype", "name": "类型", "value": _subtype_opts(_DM_SUBTYPE)},
         {"key": "class",   "name": "剧情", "value": _class_opts(_DM_CLASS)},
         {"key": "area",    "name": "地区", "value": _class_opts(_DM_AREA)},
         {"key": "year",    "name": "年份", "value": _class_opts(_DM_YEAR)},
+        {"key": "lang",    "name": "语言", "value": _lang_opts(_LANG_7)},
+        {"key": "letter",  "name": "字母", "value": _letter_opts()},
+        {"key": "sort",    "name": "排序", "value": _sort_opts()},
     ],
+    # 短剧：站点仅有“类型”一组有效筛选；剧情/地区/年份为空壳，无语言/字母组
     "24": [
         {"key": "subtype", "name": "类型", "value": _subtype_opts(_DJ_SUBTYPE)},
     ],
 }
 
 # ===================== 正则 =====================
-# 列表卡片锚点（首页/分类/搜索同构；class 顺序可能为 v-thumb 在前）
+# 列表/搜索卡片锚点（class 顺序可能为 v-thumb / m-thumb 在前）；
+# 主列表/搜索主结果锚点均带 lazyload；侧边背景图热门锚点无 lazyload，据此排除
 _RE_CARD_A = re.compile(
-    r'<a[^>]*class="[^"]*stui-vodlist__thumb[^"]*"[^>]*>'
+    r'<a[^>]*class="[^"]*stui-vodlist__thumb[^"]*lazyload[^"]*"[^>]*>'
     r'([\s\S]*?)</a>', re.I)
 _RE_HREF = re.compile(r'href="([^"]+)"', re.I)
 _RE_TITLE = re.compile(r'title="([^"]*)"', re.I)
@@ -204,6 +247,7 @@ _RE_LABEL = re.compile(
     r'<span[^>]*class="text-muted[^"]*"[^>]*>({lab}：)</span>\s*'
     r'([\s\S]*?)(?=<span[^>]*class="(?:split-line|text-muted)|<p|</p|$)',
     re.I)
+_RE_LINK = re.compile(r'<a[^>]*>([\s\S]*?)</a>', re.I)
 
 # 线路分组（DOM 顺序即站点顺序）
 _RE_PLAY_BLOCK = re.compile(
@@ -217,7 +261,7 @@ _RE_EP = re.compile(
 # 播放页 player_aaaa
 _RE_PLAYER_AA = re.compile(r'player_aaaa\s*=\s*(\{[\s\S]*?\})\s*(?:</script>|;)', re.I)
 
-# 分页总页：<span class="num">1/23754</span>
+# 分页总页：<span class="num">当前/总页</span>
 _RE_PAGE_NUM = re.compile(r'<span[^>]*class="num"[^>]*>\s*(\d+)\s*/\s*(\d+)', re.I)
 
 
@@ -301,6 +345,11 @@ class Spider(Spider):
         return any(k in pic.lower() for k in ("load.png", "load.gif",
                                               "placeholder", "blank", "default"))
 
+    def _is_side_block(self, block):
+        # 侧边热播榜：m-thumb 缩略榜 / detail-side 容器 / 文字榜，必须排除
+        return ("m-thumb" in block or "detail-side" in block
+                or "stui-vodlist__text" in block)
+
     def _parse_cards(self, html):
         videos = []
         seen = set()
@@ -308,6 +357,8 @@ class Spider(Spider):
             return videos
         for m in _RE_CARD_A.finditer(html):
             block = m.group(0)
+            if self._is_side_block(block):
+                continue
             mh = _RE_HREF.search(block)
             if not mh:
                 continue
@@ -366,28 +417,40 @@ class Spider(Spider):
         return {"list": self._parse_cards(html)}
 
     def _category_path(self, tid, extend, page):
-        # 保守单维度：按优先级取首个有效筛选条件（站点组合筛选路由未实证）
         subtype = extend.get("subtype") or ""
         klass = extend.get("class") or ""
         area = extend.get("area") or ""
         year = extend.get("year") or ""
+        lang = extend.get("lang") or ""
+        letter = extend.get("letter") or ""
+        sort = extend.get("sort") or ""
 
-        if subtype:
-            base = "/list/id/%s.html" % subtype
-        elif klass:
-            base = "/list/class/%s/id/%s.html" % (
-                urllib.parse.quote(klass), tid)
-        elif area:
-            base = "/list/area/%s/id/%s.html" % (
-                urllib.parse.quote(area), tid)
-        elif year:
-            base = "/list/id/%s/year/%s.html" % (tid, year)
-        else:
-            base = "/cat/%s.html" % tid
+        # 无任何筛选：主分类导航路由；分页 /cat/<tid>-<page>.html
+        if not any([subtype, klass, area, year, lang, letter, sort]):
+            if page and page > 1:
+                base = "/cat/%s-%d.html" % (tid, page)
+            else:
+                base = "/cat/%s.html" % tid
+            return self.site_url + base
 
+        idval = subtype or tid
+        segs = []
+        if sort:
+            segs.append("by/%s" % sort)
+        if area:
+            segs.append("area/%s" % urllib.parse.quote(area))
+        if klass:
+            segs.append("class/%s" % urllib.parse.quote(klass))
+        segs.append("id/%s" % idval)
+        if year:
+            segs.append("year/%s" % year)
+        if lang:
+            segs.append("lang/%s" % urllib.parse.quote(lang))
+        if letter:
+            segs.append("letter/%s" % letter)
         if page and page > 1:
-            base = base[:-5] + "-%d.html" % page
-        return self.site_url + base
+            segs.append("page/%d" % page)
+        return self.site_url + "/list/" + "/".join(segs) + ".html"
 
     def categoryContent(self, tid, pg, filter, extend):
         page = int(pg) if pg else 1
@@ -437,12 +500,26 @@ class Spider(Spider):
         return self.searchContent(key, quick, pg)
 
     # ---------------- 详情字段 ----------------
-    def _label_field(self, html, label):
+    def _label_seg(self, html, label):
         pat = _RE_LABEL.pattern.replace("{lab}", re.escape(label))
         m = re.search(pat, html.replace("\n", " "), re.I)
-        if not m:
+        return m.group(2) if m else ""
+
+    def _label_field(self, html, label):
+        """纯文本标签字段（类型/地区/年份）。"""
+        seg = self._label_seg(html, label)
+        return self._clean(seg)
+
+    def _links_field(self, html, label):
+        """主演/导演：标签后一串 <a> 逗号拼接；无 <a> 取纯文本。"""
+        seg = self._label_seg(html, label)
+        if not seg:
             return ""
-        return self._clean(m.group(2))
+        links = [self._clean(a) for a in _RE_LINK.findall(seg)]
+        links = [x for x in links if x]
+        if links:
+            return ",".join(links)
+        return self._clean(seg)
 
     def detailContent(self, ids):
         if not ids:
@@ -486,8 +563,8 @@ class Spider(Spider):
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
         # 元信息
-        actor = self._label_field(html, "主演")
-        director = self._label_field(html, "导演")
+        actor = self._links_field(html, "主演")
+        director = self._links_field(html, "导演")
         classify = self._label_field(html, "类型")
         area = self._label_field(html, "地区")
         year_raw = self._label_field(html, "年份")
@@ -583,6 +660,9 @@ class Spider(Spider):
                   .replace("\\u0022", '"'))
         try:
             aa = json.loads(raw)
+            # encrypt 非 0 视为未直出，交兜底链路
+            if str(aa.get("encrypt", "0")) not in ("0", ""):
+                return ""
             return aa.get("url", "") or ""
         except Exception:
             m2 = re.search(r'"url"\s*:\s*"([^"]+)"', raw)
