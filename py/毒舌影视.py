@@ -2,7 +2,7 @@
 """
 m.xnhrsb.com | TVBox Python 爬虫
 站点: 毒舌影视（MacCMS stui 模板 dsshiyi，移动端 m 站）
-线上实证 ：首页/电影/电视剧列表/详情(单集合集+多集连续剧)/播放页/搜索结果/筛选区落盘核对。
+线上实证：首页/电影/电视剧列表/详情(单集合集+多集连续剧)/播放页/搜索结果/筛选区落盘核对。
 
 已实证路由（audit/xnhrsb 样本）:
   - 首页:     /
@@ -14,9 +14,11 @@ m.xnhrsb.com | TVBox Python 爬虫
   - 搜索:     /dsshiyisc/<kw>-------------.html；分页 /dsshiyisc/<kw>----------<page>---.html
   - 注: /index.php/vod/search.html?wd= 在本站回退首页，非搜索结果；关键词搜索走伪静态 /dsshiyisc/
 
-分类导航（实证首页菜单）:
-  1 电影 2 电视剧 3 综艺 4 动漫 5 短剧
-  6 动作片 7 喜剧片 8 爱情片 9 科幻片 10 恐怖片 11 剧情片 12 战争片 13 纪录片 14 悬疑片 15 犯罪片
+分类导航（线上实证首页菜单，两组）:
+  主菜单 navlist: 1 电影 2 电视剧 3 综艺 4 动漫 5 短剧 豆瓣Top250(/label/duoban.html)
+  子分类 submenu_mi: 6 动作片 7 喜剧片 8 爱情片 9 科幻片 10 恐怖片 11 剧情片
+                     12 战争片 13 纪录片 14 悬疑片 15 犯罪片
+  豆瓣Top250 分页: /label/movie/page/<N>.html（第1页 /label/duoban.html）
 
 列表卡片（首页/分类/搜索同构，实证）:
   - li > a[href=/dsshiyidt/<id>.html] > img.thumb.lazy[alt=片名][data-original=封面]
@@ -102,23 +104,26 @@ DEFAULT_PIC = ""
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
-# ===================== 分类（对齐站点顶部导航，实证 tid）=====================
+# ===================== 分类（对齐站点导航，线上实证顺序）=====================
+# 主菜单 navlist: 电影/电视剧/综艺/动漫/短剧/豆瓣Top250；子分类 submenu_mi: 动作片…犯罪片
+# 豆瓣Top250 为自定义标签页 /label/duoban.html，分页 /label/movie/page/<N>.html
 CLASSES = [
-    {"type_id": "1", "type_name": "电影"},
-    {"type_id": "2", "type_name": "电视剧"},
-    {"type_id": "3", "type_name": "综艺"},
-    {"type_id": "4", "type_name": "动漫"},
-    {"type_id": "5", "type_name": "短剧"},
-    {"type_id": "6", "type_name": "动作片"},
-    {"type_id": "7", "type_name": "喜剧片"},
-    {"type_id": "8", "type_name": "爱情片"},
-    {"type_id": "9", "type_name": "科幻片"},
-    {"type_id": "10", "type_name": "恐怖片"},
-    {"type_id": "11", "type_name": "剧情片"},
-    {"type_id": "12", "type_name": "战争片"},
-    {"type_id": "13", "type_name": "纪录片"},
-    {"type_id": "14", "type_name": "悬疑片"},
-    {"type_id": "15", "type_name": "犯罪片"},
+    {"type_id": "1",      "type_name": "电影"},
+    {"type_id": "2",      "type_name": "电视剧"},
+    {"type_id": "3",      "type_name": "综艺"},
+    {"type_id": "4",      "type_name": "动漫"},
+    {"type_id": "5",      "type_name": "短剧"},
+    {"type_id": "duoban", "type_name": "豆瓣Top250"},
+    {"type_id": "6",      "type_name": "动作片"},
+    {"type_id": "7",      "type_name": "喜剧片"},
+    {"type_id": "8",      "type_name": "爱情片"},
+    {"type_id": "9",      "type_name": "科幻片"},
+    {"type_id": "10",     "type_name": "恐怖片"},
+    {"type_id": "11",     "type_name": "剧情片"},
+    {"type_id": "12",     "type_name": "战争片"},
+    {"type_id": "13",     "type_name": "纪录片"},
+    {"type_id": "14",     "type_name": "悬疑片"},
+    {"type_id": "15",     "type_name": "犯罪片"},
 ]
 
 # ===================== 正则 =====================
@@ -421,6 +426,20 @@ class Spider(Spider):
                 extend = {}
         extend = extend or {}
 
+        # 豆瓣Top250：自定义标签页，独立路由，无筛选组
+        if tid == "duoban":
+            url = self._duoban_url(page)
+            self.log("category(豆瓣): %s" % url)
+            html = self._fetch(url)
+            self.log("  HTML 长度: %d" % len(html))
+            videos = self._parse_cards(html)
+            pagecount = self._page_count(html, page)
+            self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
+            return {
+                "list": videos, "page": page, "pagecount": pagecount,
+                "limit": 48, "total": pagecount * 48,
+            }
+
         url = self._list_url(tid, extend, page)
         self.log("category: %s" % url)
         html = self._fetch(url)
@@ -441,6 +460,12 @@ class Spider(Spider):
             "limit": 45, "total": pagecount * 45,
         }
 
+    def _duoban_url(self, page=1):
+        page = int(page) if page else 1
+        if page <= 1:
+            return "%s/label/duoban.html" % self.site_url
+        return "%s/label/movie/page/%d.html" % (self.site_url, page)
+
     def _page_count(self, html, page):
         if not html:
             return 1
@@ -450,6 +475,10 @@ class Spider(Spider):
                 return max(1, int(m.group(2)))
             except Exception:
                 pass
+        # 豆瓣标签页末页 /label/movie/page/<N>.html
+        label_pages = [int(x) for x in re.findall(r'/label/movie/page/(\d+)\.html', html)]
+        if label_pages:
+            return max(label_pages)
         pages = [int(x) for x in re.findall(r'/dsshiyisw/\d+--------(\d+)---', html)]
         return max(pages) if pages else max(1, page)
 
