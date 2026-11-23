@@ -126,6 +126,87 @@ CLASSES = [
     {"type_id": "15",     "type_name": "犯罪片"},
 ]
 
+# ===================== 筛选（线上实证静态下发，各频道选项与站点一致）=====================
+_LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+            "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0~9"]
+_ORDER = [
+    {"n": "按时间", "v": "time"},
+    {"n": "按人气", "v": "hits"},
+    {"n": "按评分", "v": "score"},
+]
+
+
+def _opts(values):
+    return [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in values]
+
+
+def _build(types, areas, langs, years):
+    # 维度顺序对齐站点筛选栏：影片类型→年份→地区→语言→字母→排序
+    dims = []
+    if types:
+        dims.append({"key": "class", "name": "影片类型", "value": _opts(types)})
+    if years:
+        dims.append({"key": "year", "name": "年份", "value": _opts(years)})
+    if areas:
+        dims.append({"key": "area", "name": "地区", "value": _opts(areas)})
+    if langs:
+        dims.append({"key": "lang", "name": "语言", "value": _opts(langs)})
+    dims.append({"key": "letter", "name": "字母", "value": _opts(_LETTERS)})
+    dims.append({"key": "order", "name": "排序", "value": _ORDER})
+    return dims
+
+
+# —— 电影系（电影/动作/喜剧/爱情/科幻/恐怖/剧情/战争/纪录/悬疑/犯罪 共用一套）——
+_MOVIE_TYPES = ["喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪",
+    "犯罪", "动画", "奇幻", "武侠", "冒险", "枪战", "恐怖", "悬疑", "惊悚", "经典",
+    "青春", "文艺", "微电影", "古装", "历史", "运动", "农村", "儿童", "网络电影"]
+_MOVIE_AREA = ["大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国", "德国",
+    "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"]
+_MOVIE_LANG = ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它"]
+_MOVIE_YEAR = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019",
+    "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010"]
+
+# —— 电视剧 ——
+_TV_TYPES = ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻",
+    "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"]
+_TV_AREA = ["内地", "韩国", "香港", "台湾", "日本", "美国", "泰国", "英国", "新加坡", "其他"]
+_TV_YEAR = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018",
+    "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008",
+    "2006", "2005", "2004"]
+
+# —— 综艺 ——
+_VAR_TYPES = ["选秀", "情感", "访谈", "播报", "旅游", "音乐", "美食", "纪实", "曲艺",
+    "生活", "游戏互动", "财经", "求职"]
+_VAR_AREA = ["内地", "港台", "日韩", "欧美"]
+_VAR_YEAR = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018",
+    "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008",
+    "2007", "2006", "2005", "2004"]
+
+# —— 动漫 ——
+_ANI_TYPES = ["情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园", "动作",
+    "机战", "运动", "战争", "少年", "少女", "社会", "原创", "亲子", "益智", "励志", "其他"]
+_ANI_AREA = ["国产", "日本", "欧美", "其他"]
+_ANI_YEAR = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018",
+    "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008",
+    "2007", "2006", "2005", "2004"]
+
+# —— 短剧 ——
+_SH_TYPES = ["短剧"]
+_SH_AREA = ["大陆"]
+_SH_LANG = ["国语"]
+_SH_YEAR = ["2026", "2025", "2024", "2023", "2022"]
+
+_LANG_MAIN = ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"]
+
+FILTERS = {}
+for _t in ["1", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]:
+    FILTERS[_t] = _build(_MOVIE_TYPES, _MOVIE_AREA, _MOVIE_LANG, _MOVIE_YEAR)
+FILTERS["2"] = _build(_TV_TYPES, _TV_AREA, _LANG_MAIN, _TV_YEAR)
+FILTERS["3"] = _build(_VAR_TYPES, _VAR_AREA, _LANG_MAIN, _VAR_YEAR)
+FILTERS["4"] = _build(_ANI_TYPES, _ANI_AREA, _LANG_MAIN, _ANI_YEAR)
+FILTERS["5"] = _build(_SH_TYPES, _SH_AREA, _SH_LANG, _SH_YEAR)
+FILTERS["duoban"] = []
+
 # ===================== 正则 =====================
 # 列表卡片（普通 thumb lazy / 轮播 coveimg）
 _RE_LI = re.compile(r'<li[^>]*>([\s\S]*?)</li>', re.I)
@@ -195,7 +276,6 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
-        self._filter_cache = {}
 
     # ---------------- 基础工具 ----------------
     @staticmethod
@@ -410,7 +490,7 @@ class Spider(Spider):
 
     # ---------------- 首页 / 分类 / 搜索 ----------------
     def homeContent(self, filter=False):
-        return {"class": CLASSES, "filters": self._filter_cache}
+        return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
         html = self._fetch(self.site_url + "/")
@@ -444,12 +524,6 @@ class Spider(Spider):
         self.log("category: %s" % url)
         html = self._fetch(url)
         self.log("  HTML 长度: %d" % len(html))
-
-        # 动态解析筛选并缓存（仅首次）
-        if tid not in self._filter_cache:
-            fl = self._parse_filters(html)
-            if fl:
-                self._filter_cache[tid] = fl
 
         videos = self._parse_cards(html)
         pagecount = self._page_count(html, page)
@@ -798,7 +872,6 @@ class Spider(Spider):
 
     def destroy(self):
         self._play_cache = {}
-        self._filter_cache = {}
 
     def close(self):
         self.destroy()
