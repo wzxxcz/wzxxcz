@@ -4,7 +4,7 @@
 关键:
   - easy_slide 滑块守卫闭环：piece 原图块带掩码模板匹配定位缺口，RC4(key=guard[:8]) 加密 x"x"y 写 guardret
   - MacCMS style/26 移动模板，pej 前缀路由：详情 /pej/、分类 /pejtype/、筛选 /pejshow/、播放 /pejplay/、搜索 /search/
-  - 分类筛选对齐站点：类型 / 年份 / 字母，12 段槽位（段0 类型、段4 年份、段5 字母）
+  - 分类筛选对齐站点：类型 / 字母 / 年份（页面行序），12 段槽位（段0 类型、段4 年份、段5 字母）
   - 简介只留剧情正文：剥评论卡 / 配图 AI 综述 / SEO 堆砌；空走 meta 兜底；固定前缀
   - player_aaaa 括号配平取 JSON，master 首条子流 urljoin；直链 parse:0，不可还原回退 parse:1
   - 主备域名轮换，强制 IPv4
@@ -17,6 +17,7 @@ import base64
 import socket
 import struct
 import zlib
+import threading
 import urllib.parse
 
 sys.path.append('..')
@@ -130,8 +131,9 @@ def _build_filters(tid):
     types = _TYPE_MAP.get(tid, [])
     if types:
         dims.append({"key": "class", "name": "类型", "value": _opts(types)})
-    dims.append({"key": "year", "name": "年份", "value": _opts(_YEARS)})
+    # 展示顺序对齐站点页面行序：类型 → 字母 → 年份（URL 槽位仍为段4年份、段5字母）
     dims.append({"key": "letter", "name": "字母", "value": _opts(_LETTERS)})
+    dims.append({"key": "year", "name": "年份", "value": _opts(_YEARS)})
     return dims
 
 
@@ -352,6 +354,12 @@ class Spider(Spider):
         self._guard_session = None
         self._guard_cookie = ""
         self._guard_ok = False
+        self._guard_lock = threading.Lock()
+        # 串行加载期预热首页落会话/过盾，避免列表请求并发撞壳；失败不阻断，后续遇壳再解
+        try:
+            self._fetch(self.site_url + "/", tries=1)
+        except Exception as e:
+            self.log("init 预热异常", e)
 
     def _switch_host(self):
         """主备域名轮换：切到下一 host，清守卫会话与 Cookie，后续请求重解盾。"""
@@ -394,66 +402,75 @@ class Spider(Spider):
             pass
         return "_guard/html.js" in text
 
-    def _solve_guard(self):
-        """解滑块守卫：取拼图→识别缺口 x→RC4 种 guardret；成功返回 True。"""
+    def _solve_guard(self, retries=3):
+        """解滑块守卫：加锁串行，单轮失败换图重试；成功返回 True。"""
+        with self._guard_lock:
+            for attempt in range(retries):
+                try:
+                    if self._solve_once():
+                        return True
+                except Exception as e:
+                    self.log("守卫求解异常", e)
+                if attempt < retries - 1:
+                    time.sleep(0.8)
+        self._guard_ok = False
+        return False
+
+    def _solve_once(self):
+        """单轮：首访落会话→取拼图→识别缺口→RC4 种 guardret→验证放行。"""
         sess = self._guard_sess()
         h = dict(self.headers)
-        try:
-            # 1. 首访落会话 Cookie
-            if sess is not None:
-                sess.get(self.site_url + "/", headers=h, timeout=(10, 20))
-                rp = sess.get(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
-                              headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
-                body = rp.content
-                ck = sess.cookies.get_dict()
-            else:
-                r0 = self.fetch(self.site_url + "/", headers=h, timeout=(10, 20))
-                rp = self.fetch(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
-                                headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
-                body = rp.content
-                ck = {}
-                for c in getattr(rp, "cookies", []):
-                    ck[c.name] = c.value
-            guard = ck.get("guard", "")
-            guardword = ck.get("guardword", "")
-            if not guard or not guardword:
-                self.log("守卫缺 guard/guardword")
-                return False
-            gw = int(guardword)
-
-            gx = _gap_x_cv2(body, gw)
-            if gx is None:
-                gx = _gap_x_pure(body, gw)
-            gx = int(round(gx))
-            gy = gw
-
-            secret = guard[:8]
-            plain = ("%dx%d" % (gx, gy)).encode("utf-8")
-            guardret = base64.b64encode(_rc4(plain, secret)).decode("utf-8")
-            ck["guardret"] = guardret
-
-            if sess is not None:
-                sess.cookies.set("guardret", guardret, path="/")
-                sess.cookies.set("guard", guard, path="/")
-                sess.cookies.set("guardword", guardword, path="/")
-            self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in ck.items())
-
-            # 验证一次
-            if sess is not None:
-                rv = sess.get(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
-                              timeout=(10, 20))
-                ok = not self._is_shell(rv.text, getattr(rv, "status_code", 200))
-            else:
-                rv = self.fetch(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
-                                timeout=(10, 20))
-                ok = not self._is_shell(rv.text)
-            self._guard_ok = ok
-            self.log("守卫求解 gx=%d gw=%d 放行=%s" % (gx, gy, ok))
-            return ok
-        except Exception as e:
-            self.log("守卫求解异常", e)
-            self._guard_ok = False
+        # 1. 首访落会话 Cookie
+        if sess is not None:
+            sess.get(self.site_url + "/", headers=h, timeout=(10, 20))
+            rp = sess.get(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
+                          headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
+            body = rp.content
+            ck = sess.cookies.get_dict()
+        else:
+            self.fetch(self.site_url + "/", headers=h, timeout=(10, 20))
+            rp = self.fetch(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
+                            headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
+            body = rp.content
+            ck = {}
+            for c in getattr(rp, "cookies", []):
+                ck[c.name] = c.value
+        guard = ck.get("guard", "")
+        guardword = ck.get("guardword", "")
+        if not guard or not guardword:
+            self.log("守卫缺 guard/guardword")
             return False
+        gw = int(guardword)
+
+        gx = _gap_x_cv2(body, gw)
+        if gx is None:
+            gx = _gap_x_pure(body, gw)
+        gx = int(round(gx))
+        gy = gw
+
+        secret = guard[:8]
+        plain = ("%dx%d" % (gx, gy)).encode("utf-8")
+        guardret = base64.b64encode(_rc4(plain, secret)).decode("utf-8")
+        ck["guardret"] = guardret
+
+        if sess is not None:
+            sess.cookies.set("guardret", guardret, path="/")
+            sess.cookies.set("guard", guard, path="/")
+            sess.cookies.set("guardword", guardword, path="/")
+        self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in ck.items())
+
+        # 验证一次
+        if sess is not None:
+            rv = sess.get(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
+                          timeout=(10, 20))
+            ok = not self._is_shell(rv.text, getattr(rv, "status_code", 200))
+        else:
+            rv = self.fetch(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
+                            timeout=(10, 20))
+            ok = not self._is_shell(rv.text)
+        self._guard_ok = ok
+        self.log("守卫求解 gx=%d gw=%d 放行=%s" % (gx, gy, ok))
+        return ok
 
     def _http_get(self, url, headers=None, timeout=15):
         """本站 GET：优先守卫 session 复用 Cookie；遇壳重解后重放一次。"""
@@ -475,7 +492,9 @@ class Spider(Spider):
 
         if self._is_shell(text, status):
             self.log("遇守卫壳, 重新求解")
-            if self._solve_guard():
+            for _ in range(2):
+                if not self._solve_guard():
+                    break
                 try:
                     if sess is not None:
                         # 有守卫 session：Cookie 由 jar 自动携带，不再发手工头避免覆盖
@@ -488,6 +507,10 @@ class Spider(Spider):
                 except Exception as e:
                     self.log("重放异常", e)
                     text, status = "", 0
+                    break
+                if not self._is_shell(text, status):
+                    break
+                self.log("重放仍为壳, 再次求解")
         return rsp
 
     def _fetch(self, url, headers=None, tries=3):
@@ -674,6 +697,15 @@ class Spider(Spider):
         html = self._fetch(url)
         self.log("  HTML 长度: %d" % len(html))
         videos = self._parse_cards(html)
+        # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次
+        if not videos:
+            self.log("  列表为空, 清守卫态重拉一次")
+            self._guard_session = None
+            self._guard_cookie = ""
+            self._guard_ok = False
+            html = self._fetch(url)
+            self.log("  重拉 HTML 长度: %d" % len(html))
+            videos = self._parse_cards(html)
         pagecount = self._page_count(html, page)
         self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
         return {
