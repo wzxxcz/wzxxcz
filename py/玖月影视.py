@@ -679,56 +679,68 @@ class Spider(Spider):
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
-        html = self._fetch(self.site_url + "/")
-        self.log("home HTML 长度: %d" % len(html))
-        return {"list": self._parse_cards(html)}
+        try:
+            html = self._fetch(self.site_url + "/")
+            self.log("home HTML 长度: %d" % len(html))
+            return {"list": self._parse_cards(html)}
+        except Exception as e:
+            self.log("homeVideoContent 异常", e)
+            return {"list": []}
 
     def categoryContent(self, tid, pg, filter, extend):
-        page = int(pg) if pg else 1
-        if isinstance(extend, str):
-            try:
-                extend = json.loads(extend)
-            except Exception:
-                extend = {}
-        extend = extend or {}
+        try:
+            page = int(pg) if pg else 1
+            if isinstance(extend, str):
+                try:
+                    extend = json.loads(extend)
+                except Exception:
+                    extend = {}
+            extend = extend or {}
 
-        url = self._list_url(tid, extend, page)
-        self.log("category: %s" % url)
-        html = self._fetch(url)
-        self.log("  HTML 长度: %d" % len(html))
-        videos = self._parse_cards(html)
-        # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次
-        if not videos:
-            self.log("  列表为空, 清守卫态重拉一次")
-            self._guard_session = None
-            self._guard_cookie = ""
-            self._guard_ok = False
+            url = self._list_url(tid, extend, page)
+            self.log("category: %s" % url)
             html = self._fetch(url)
-            self.log("  重拉 HTML 长度: %d" % len(html))
+            self.log("  HTML 长度: %d" % len(html))
             videos = self._parse_cards(html)
-        pagecount = self._page_count(html, page)
-        self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
-        return {
-            "list": videos, "page": page, "pagecount": pagecount,
-            "limit": 36, "total": pagecount * 36,
-        }
+            # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次
+            if not videos:
+                self.log("  列表为空, 清守卫态重拉一次")
+                self._guard_session = None
+                self._guard_cookie = ""
+                self._guard_ok = False
+                html = self._fetch(url)
+                self.log("  重拉 HTML 长度: %d" % len(html))
+                videos = self._parse_cards(html)
+            pagecount = self._page_count(html, page)
+            self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
+            return {
+                "list": videos, "page": page, "pagecount": pagecount,
+                "limit": 36, "total": pagecount * 36,
+            }
+        except Exception as e:
+            self.log("categoryContent 异常", e)
+            return {"list": [], "page": 1, "pagecount": 1, "limit": 36, "total": 0}
 
     def searchContent(self, key, quick, pg="1"):
-        page = int(pg) if pg else 1
-        kw = urllib.parse.quote(str(key or "").strip())
-        if page <= 1:
-            url = "%s/search/%s-------------.html" % (self.site_url, kw)
-        else:
-            url = "%s/search/%s--%d-----------.html" % (self.site_url, kw, page)
-        self.log("search: %s" % url)
-        html = self._fetch(url)
-        videos = self._parse_cards(html)
-        pagecount = self._page_count(html, page)
-        self.log("  搜索: %d 条, 总页数: %d" % (len(videos), pagecount))
-        return {
-            "list": videos, "page": page, "pagecount": pagecount,
-            "limit": 30, "total": pagecount * 30,
-        }
+        try:
+            page = int(pg) if pg else 1
+            kw = urllib.parse.quote(str(key or "").strip())
+            if page <= 1:
+                url = "%s/search/%s-------------.html" % (self.site_url, kw)
+            else:
+                url = "%s/search/%s--%d-----------.html" % (self.site_url, kw, page)
+            self.log("search: %s" % url)
+            html = self._fetch(url)
+            videos = self._parse_cards(html)
+            pagecount = self._page_count(html, page)
+            self.log("  搜索: %d 条, 总页数: %d" % (len(videos), pagecount))
+            return {
+                "list": videos, "page": page, "pagecount": pagecount,
+                "limit": 30, "total": pagecount * 30,
+            }
+        except Exception as e:
+            self.log("searchContent 异常", e)
+            return {"list": [], "page": 1, "pagecount": 1, "limit": 30, "total": 0}
 
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
