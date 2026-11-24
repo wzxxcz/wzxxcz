@@ -756,7 +756,17 @@ class Spider(Spider):
         try:
             html = self._fetch(self.site_url + "/")
             self.log("home HTML 长度: %d" % len(html))
-            return {"list": self._parse_cards(html)}
+            videos = self._parse_cards(html)
+            # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次（与分类对齐）
+            if not videos:
+                self.log("  首页为空, 清守卫态重拉一次")
+                self._guard_session = None
+                self._guard_cookie = ""
+                self._guard_ok = False
+                html = self._fetch(self.site_url + "/")
+                self.log("  重拉 HTML 长度: %d" % len(html))
+                videos = self._parse_cards(html)
+            return {"list": videos}
         except Exception as e:
             self.log("homeVideoContent 异常", e)
             return {"list": []}
