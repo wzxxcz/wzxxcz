@@ -340,6 +340,11 @@ class Spider(Spider):
     def getName(self):
         return "rhwf.cn"
 
+    def getDependence(self):
+        # 框架 init 阶段反射调用（app.getDependence → ru.getDependence）；
+        # 本脚本无额外依赖模块，返回空列表，避免属性缺失在初始化窗口抛异常。
+        return []
+
     def log(self, *a, **kw):
         # 壳子基类 log 为单参签名，多参调用需在此拼接一行，避免 TypeError 吞掉成功路径
         try:
@@ -348,34 +353,36 @@ class Spider(Spider):
             pass
 
     def init(self, extend=""):
+        # 初始化只做本地字段装配，不在此发网络请求：
+        # init 在框架单例缓存(computeIfAbsent)窗口内同步执行，一旦在此抛异常，
+        # 实例会被永久缓存成空壳 SpiderNull，后续分类/首页请求不再重试 init；
+        # 会话与过盾推迟到首次列表请求惰性建立，遇壳由 _http_get 自愈重放。
         try:
-            self.extend = json.loads(extend) if extend else {}
-        except Exception:
-            self.extend = {}
-        self.hosts = list(self.extend.get("hosts") or HOSTS)
-        self.host_idx = 0
-        self.site_url = (self.extend.get("site") or self.hosts[0]).rstrip("/")
-        self.headers = {
-            "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Referer": self.site_url + "/",
-            "Upgrade-Insecure-Requests": "1",
-        }
-        self.default_pic = DEFAULT_PIC
-        self._play_cache = {}
-        # 守卫会话：自建 session 保留 guard/guardret Cookie；基类 fetch 不持 jar, 双保险写请求头
-        self._guard_session = None
-        self._guard_cookie = ""
-        self._guard_ok = False
-        self._guard_lock = threading.Lock()
-        # 热启动：先回填持久化的守卫令牌，失效/不可用则跳过，后续遇壳再解
-        self._cache_load()
-        # 串行加载期预热首页落会话/过盾，避免列表请求并发撞壳；失败不阻断，后续遇壳再解
-        try:
-            self._fetch(self.site_url + "/", tries=1)
+            try:
+                self.extend = json.loads(extend) if extend else {}
+            except Exception:
+                self.extend = {}
+            self.hosts = list(self.extend.get("hosts") or HOSTS)
+            self.host_idx = 0
+            self.site_url = (self.extend.get("site") or self.hosts[0]).rstrip("/")
+            self.headers = {
+                "User-Agent": UA,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Referer": self.site_url + "/",
+                "Upgrade-Insecure-Requests": "1",
+            }
+            self.default_pic = DEFAULT_PIC
+            self._play_cache = {}
+            # 守卫会话：自建 session 保留 guard/guardret Cookie；基类 fetch 不持 jar, 双保险写请求头
+            self._guard_session = None
+            self._guard_cookie = ""
+            self._guard_ok = False
+            self._guard_lock = threading.Lock()
+            # 热启动：先回填持久化的守卫令牌，失效/不可用则跳过，后续遇壳再解
+            self._cache_load()
         except Exception as e:
-            self.log("init 预热异常", e)
+            self.log("init 初始化异常(已兜底, 不阻断)", e)
 
     def _switch_host(self):
         """主备域名轮换：切到下一 host，清守卫会话与 Cookie，后续请求重解盾。"""
