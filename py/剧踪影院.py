@@ -16,7 +16,7 @@
           span.pic-text=备注；h4.title a 兜底片名；p.text=主演（副标题）
   - 详情: h1.title 片名；img.lazyload[data-original|src] 海报（排除 /statics/icon/ 占位）；
           p.data 内 类型：a / 地区：文本 / 年份：文本；主演/导演 a 列表；更新：时间；
-          简介 span.detail-sketch（正文）> span.detail-content > meta description 兜底
+          简介 span.detail-content（完整折叠全文）> span.detail-sketch（摘要兜底）> meta description 兜底
   - 线路: div.stui-pannel → h3.title 线路名（剥 img 标签）→ ul.stui-content__playlist
           li a[href=/vodplay/..][集名]；无 vodplay 选集的推荐/排行块跳过；顺序=站点 DOM 序，
           集名保留站点原文（第01集/第1集/数字 混用不统一）
@@ -619,15 +619,15 @@ class Spider(Spider):
         if mp and _PLACEHOLDER_PIC not in mp.group(1):
             pic = self._fix_url(mp.group(1))
 
-        # 简介：正文摘要优先 → 折叠全文兜底 → meta description 再兜底
+        # 简介：完整折叠全文 detail-content 优先 → detail-sketch 摘要兜底 → meta description 再兜底
         content = ""
-        ms = _RE_INTRO_SKETCH.search(html)
-        if ms:
-            content = self._clean(ms.group(1))
+        mc = _RE_INTRO_FULL.search(html)
+        if mc:
+            content = self._clean(mc.group(1))
         if not content:
-            mc = _RE_INTRO_FULL.search(html)
-            if mc:
-                content = self._clean(mc.group(1))
+            ms = _RE_INTRO_SKETCH.search(html)
+            if ms:
+                content = self._clean(ms.group(1))
         if not content:
             md = _RE_META_DESC.search(html)
             if md:
