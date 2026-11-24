@@ -75,6 +75,16 @@ except ImportError:
             except Exception:
                 pass
 
+        # 离线/老基类无持久化缓存时的空桩，脚本侧 try 兜底跳过
+        def getCache(self, key):
+            return None
+
+        def setCache(self, key, value):
+            return "failed"
+
+        def delCache(self, key):
+            return "failed"
+
     Spider = _BaseSpider
 
 
@@ -84,6 +94,10 @@ HOST = HOSTS[0]
 UA = ("Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) "
       "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1")
 DEFAULT_PIC = ""
+
+# 守卫令牌持久化缓存（热启动复用）：过盾成功后落盘，下次启动先读缓存试，失效自动回退重解
+_GUARD_CACHE_KEY = "rhwf_guard"
+_GUARD_TTL = 1800  # 秒，30 分钟内复用
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
@@ -355,6 +369,8 @@ class Spider(Spider):
         self._guard_cookie = ""
         self._guard_ok = False
         self._guard_lock = threading.Lock()
+        # 热启动：先回填持久化的守卫令牌，失效/不可用则跳过，后续遇壳再解
+        self._cache_load()
         # 串行加载期预热首页落会话/过盾，避免列表请求并发撞壳；失败不阻断，后续遇壳再解
         try:
             self._fetch(self.site_url + "/", tries=1)
@@ -371,6 +387,7 @@ class Spider(Spider):
         self._guard_session = None
         self._guard_cookie = ""
         self._guard_ok = False
+        self._cache_clear()
         self.headers.pop("Cookie", None)
         self.log("切换域名 →", self.site_url)
         return True
@@ -390,6 +407,54 @@ class Spider(Spider):
                 sess = None
             self._guard_session = sess
         return self._guard_session
+
+    def _cache_load(self):
+        """从持久化缓存回填守卫 Cookie；host 不符/过期/代理不可用则跳过，不阻断。"""
+        try:
+            data = self.getCache(_GUARD_CACHE_KEY)
+            if not isinstance(data, dict):
+                return False
+            if data.get("host") != self.site_url:
+                return False
+            ck = data.get("cookies") or {}
+            if not ck:
+                return False
+            sess = self._guard_sess()
+            if sess is not None:
+                for k, v in ck.items():
+                    sess.cookies.set(k, v, path="/")
+            self._guard_cookie = (data.get("cookie_header")
+                                  or "; ".join("%s=%s" % (k, v) for k, v in ck.items()))
+            self._guard_ok = True
+            self.log("守卫令牌缓存已复用")
+            return True
+        except Exception as e:
+            self.log("缓存读跳过", e)
+            return False
+
+    def _cache_save(self):
+        """过盾成功后持久化守卫令牌；代理不可用则跳过，不阻断。"""
+        try:
+            sess = self._guard_session
+            ck = sess.cookies.get_dict() if sess is not None else {}
+            if not ck:
+                return
+            data = {
+                "host": self.site_url,
+                "cookies": ck,
+                "cookie_header": self._guard_cookie,
+                "expiresAt": int(time.time()) + _GUARD_TTL,
+            }
+            self.setCache(_GUARD_CACHE_KEY, data)
+        except Exception as e:
+            self.log("缓存写跳过", e)
+
+    def _cache_clear(self):
+        """清除持久化守卫令牌（切域/令牌失效时调用）。"""
+        try:
+            self.delCache(_GUARD_CACHE_KEY)
+        except Exception:
+            pass
 
     @staticmethod
     def _is_shell(text, status=200):
@@ -469,6 +534,8 @@ class Spider(Spider):
                             timeout=(10, 20))
             ok = not self._is_shell(rv.text)
         self._guard_ok = ok
+        if ok:
+            self._cache_save()
         self.log("守卫求解 gx=%d gw=%d 放行=%s" % (gx, gy, ok))
         return ok
 
