@@ -611,7 +611,8 @@
             "changeable": 1,
             "ext": {
                 "site": [
-                    "http://shandian.blog"
+                    "http://oo.sduc.site",
+                    "http://sd.sduc.site"
                 ]
             },
             "timeout": 60
