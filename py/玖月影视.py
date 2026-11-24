@@ -1,65 +1,13 @@
 # coding=utf-8
 """
-www.rhwf.cn | TVBox Python 爬虫
-站点: 玖月影视（MacCMS 模板 style/26，移动端直出 HTML）
-线上实证：首页/六分类/筛选组合/详情(电影单集+连续剧多线路)/播放页/搜索结果落盘核对。
-
-已实证路由（audit/rhwf 样本）:
-  - 首页:     /
-  - 主分类:   /pgctype/<tid>.html
-  - 分类分页: /pgctype/<标识>-<page>.html（标识=主 tid 或类型 tid）
-  - 筛选:     /pgcshow/<12 槽>.html
-              槽0=主 tid/类型 tid；槽4=年份；槽5=字母；其余槽留空
-  - 详情:     /pgc/<id>.html
-  - 播放:     /pgcplay/<vid>-<sid>-<nid>.html
-  - 搜索第1页: /search/<wd>-------------.html
-  - 搜索分页:  /search/<wd>--<page>-----------.html
-
-分类导航（线上实证顶部导航，仅 6 项；专题/资讯/明星/话题/地图不进一级分类栏）:
-  1 电影 / 2 电视剧 / 3 综艺 / 4 动漫 / 9 短视频 / 51 即将上映
-
-筛选维度（本站实证仅三组，无地区/语言/排序）:
-  类型(槽0) / 年份(槽4, 2026~2016) / 字母(槽5, A~Z)
-  电影1: 35喜剧片 36动作片 37爱情片 38科幻片 39恐怖片 40剧情片 41战争片
-  电视剧2: 42国产剧 43港台剧 44日韩剧 45欧美剧
-  综艺3: 46国内综艺 47海外综艺
-  动漫4: 48国内动漫 49海外动漫
-  短视频9: 57动画短片 58短剧
-  即将上映51: 无类型选项
-
-列表卡片（首页/分类/搜索同构，实证）:
-  a[href=/pgc/<id>.html] > img[data-src=封面][alt=片名](src 空, onerror 占位 load1.png)
-  + div.ys-name6(片名, CSS/HTML 可能截断, 以 img alt 全名为兜底)
-  卡片无独立评分字段；副标(HD中字/集数)仅出现在详情线路选集。
-
-详情字段（实证详情页）:
-  - 片名 div.ys-name18；更新时间 div.year1(YYYY-MM-DD HH:MM:SS)
-  - 导演: div.main-actors2 "导演：" + a；主演: 同组另一 div "主演：" + 多个 a(逗号拼接, 剥 more-actor)
-  - 类型: div.ys-style8 "类型：" a；地区: 同组 "地区：" a
-  - 简介: div.Synopsis-word > p；兜底 meta[name=description](正文以"剧情介绍："开头, 剥前缀)
-  - 海报: a.poster5 > img[data-src]
-  - 线路分组: div.list-name23 > div.name-left2 > div.name17(线路名, 按 DOM 顺序保序, 不按 sid 排序)
-    紧跟 div.list-number1 > a[href=/pgcplay/<vid>-<sid>-<nid>.html] > div(集名)
-    演员表/相关资讯/相关推荐/热门推荐/友情链接等块虽复用 list-name23/name17, 但后跟
-    actors-list7 等其他容器, 无 list-number1, 须靠"标题后是否紧跟选集块"隔离, 避免误抓。
-
-播放直链: 播放页内联 player_aaaa JSON(括号深度配对截取)；encrypt:0 取 url 直出 m3u8；
-          master m3u8 取首条子流拆分兜底, 失败回退 parse:1 嗅探。
-
-反爬守卫（easy_slide 滑块, 实证 2026-11-23）:
-  - 未过守卫时所有文档/静态/接口一律回 59 字节壳: <script src="/_guard/html.js?js=easy_slide_html"></script>。
-  - 闭环: GET / 落会话 → GET /_guard/easy_slide.png 一次性 Set-Cookie:
-    guard(12 位密钥, key=guard[:8]) / guarddata(服务端持有, 前端不使用, 本地不可解) / guardword(缺口 Y)。
-  - 浏览器拖到缺口后本地算 RC4(key=guard[:8]) 加密明文 "<x>x<y>" → base64 → 种 cookie guardret, reload 放行。
-  - y=guardword 已知；缺口 x 须从拼图图片识别。服务端严格校验 x/y/RC4 明文, 容差约 ±8px。
-  - 已实证无旁路: 所有路径/UA/静态资源/接口均回壳; guarddata 为服务端不透明句柄(RC4/AES/XOR
-    多种密钥派生均无可读明文), 本地不可解; 响应头/PNG chunk 不下发坐标。
-  - 图像识别分级(均为尽力而为, 不保证通过): 环境有 cv2/numpy 走 piece 形状掩码 + 暗遮罩评分;
-    否则纯标准库(zlib 解码调色板 PNG + 形状掩码 + 暗/低饱和评分)兜底。壳子 chaquo 构建期
-    requirements 仅 lxml/ujson/pyquery/requests/cachetools/pycryptodome/beautifulsoup4,
-    无 PIL/numpy/cv2, 且 getDependence 只能拉 .py 模块、运行时无法补二进制图像库; 纯标准库在
-    自然风景拼图(低纹理天空/海面、乌云/山体暗区干扰)上达不到 ±8px 稳定精度。遇壳自动重新取图重试。
-  - 壳子端稳定过盾的必要条件: 构建期 requirements.txt 加入 Pillow 并重新打包 APK, 由脚本图像路径识别。
+玖月影视 rhwf.cn | TVBox Python 爬虫
+关键:
+  - easy_slide 滑块守卫闭环：piece 原图块带掩码模板匹配定位缺口，RC4(key=guard[:8]) 加密 x"x"y 写 guardret
+  - MacCMS style/26 移动模板，pej 前缀路由：详情 /pej/、分类 /pejtype/、筛选 /pejshow/、播放 /pejplay/、搜索 /search/
+  - 分类筛选对齐站点：类型 / 年份 / 字母，12 段槽位（段0 类型、段4 年份、段5 字母）
+  - 简介只留剧情正文：剥评论卡 / 配图 AI 综述 / SEO 堆砌；空走 meta 兜底；固定前缀
+  - player_aaaa 括号配平取 JSON，master 首条子流 urljoin；直链 parse:0，不可还原回退 parse:1
+  - 主备域名轮换，强制 IPv4
 """
 import re
 import sys
@@ -72,6 +20,11 @@ import zlib
 import urllib.parse
 
 sys.path.append('..')
+
+try:
+    from bs4 import BeautifulSoup
+except Exception:
+    BeautifulSoup = None
 
 # 云端出口 IPv6 不通/国内 IPv6 不稳：强制 IPv4 解析（壳子本地网络正常时不影响）
 try:
@@ -124,7 +77,9 @@ except ImportError:
     Spider = _BaseSpider
 
 
-HOST = "https://www.rhwf.cn"
+# 主备域名（HOSTS 顺序即轮换顺序；www 域偶发 503，根域优先）
+HOSTS = ["https://rhwf.cn", "https://www.rhwf.cn"]
+HOST = HOSTS[0]
 UA = ("Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) "
       "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1")
 DEFAULT_PIC = ""
@@ -141,12 +96,13 @@ CLASSES = [
     {"type_id": "51", "type_name": "即将上映"},
 ]
 
+# 筛选维度选项（年份 / 字母，线上实证全量）
 _YEARS = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019",
           "2018", "2017", "2016"]
 _LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
             "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
-# 各频道类型选项（槽0=类型 tid, 线上实证）
+# 各频道子类型选项（槽0=类型 tid，线上实证）
 _TYPE_MAP = {
     "1": [("35", "喜剧片"), ("36", "动作片"), ("37", "爱情片"), ("38", "科幻片"),
           ("39", "恐怖片"), ("40", "剧情片"), ("41", "战争片")],
@@ -182,13 +138,17 @@ def _build_filters(tid):
 FILTERS = {c["type_id"]: _build_filters(c["type_id"]) for c in CLASSES}
 
 # ===================== 正则 =====================
-_RE_HREF = re.compile(r'href="(/pgc/\d+\.html)"', re.I)
+# 卡片列表
+_RE_HREF = re.compile(r'href="(/pej/\d+\.html)"', re.I)
 _RE_IMG = re.compile(r'<img[^>]*>', re.I)
 _RE_ALT = re.compile(r'alt="([^"]*)"', re.I)
 _RE_DSRC = re.compile(r'data-src="([^"]*)"', re.I)
 _RE_SRC = re.compile(r'\bsrc="([^"]*)"', re.I)
 _RE_NAME6 = re.compile(r'<div[^>]*class="ys-name6"[^>]*>([\s\S]*?)</div>', re.I)
+_RE_FILMNAME = re.compile(r'<div[^>]*class="filmName"[^>]*>([\s\S]*?)</div>', re.I)
+_RE_CARD = re.compile(r'<a[^>]*href="/pej/\d+\.html"[\s\S]*?</a>', re.I)
 
+# 详情字段
 _RE_H1 = re.compile(r'<div[^>]*class="ys-name18"[^>]*>([\s\S]*?)</div>', re.I)
 _RE_YEAR1 = re.compile(r'<div[^>]*class="year1"[^>]*>([\s\S]*?)</div>', re.I)
 _RE_ACTOR = re.compile(r'<div[^>]*class="main-actors2"[^>]*>([\s\S]*?)</div>', re.I)
@@ -196,20 +156,25 @@ _RE_STYLE = re.compile(r'<div[^>]*class="ys-style8"[^>]*>([\s\S]*?)</div>', re.I
 _RE_A = re.compile(r'<a[^>]*>([\s\S]*?)</a>', re.I)
 _RE_SPAN = re.compile(r'<span[^>]*>([\s\S]*?)</span>', re.I)
 _RE_MORE = re.compile(r'<span[^>]*class="more-actor"[^>]*>[\s\S]*?</span>', re.I)
+_RE_POSTER = re.compile(r'<a[^>]*class="poster5"[^>]*>([\s\S]*?)</a>', re.I)
+
+# 简介（多层兜底）
 _RE_INTRO_P = re.compile(r'Synopsis-word[\s\S]*?<p[^>]*>([\s\S]*?)</p>', re.I)
 _RE_META_DESC = re.compile(
     r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']', re.I)
-_RE_POSTER = re.compile(r'<a[^>]*class="poster5"[^>]*>([\s\S]*?)</a>', re.I)
 
-# 线路分组（标题块 + 紧跟选集块）
+# 线路 / 选集（标题块 + 紧跟选集块）
 _RE_LINE_TITLE = re.compile(
     r'<div[^>]*class="list-name23"[^>]*>([\s\S]*?)</div>\s*</div>', re.I)
 _RE_LINE_NAME = re.compile(r'<div[^>]*class="name17"[^>]*>([\s\S]*?)</div>', re.I)
 _RE_EP_BLOCK = re.compile(r'<div[^>]*class="list-number1"[^>]*>([\s\S]*?)</div>', re.I)
-_RE_EP = re.compile(r'href="(/pgcplay/[^"]+)"[^>]*>\s*<div[^>]*>([\s\S]*?)</div>', re.I)
+_RE_EP = re.compile(r'href="(/pejplay/[^"]+)"[^>]*>\s*<div[^>]*>([\s\S]*?)</div>', re.I)
 
+# 分页 / 总页：pager2 块内 <span class="now">1</span>/<span class="total">133</span>
 _RE_SEARCH_PAGE = re.compile(r'/search/[^"]*?-(\d+)-+\.html', re.I)
-_RE_TYPE_PAGE = re.compile(r'/pgctype/[^"]*-(\d+)\.html', re.I)
+_RE_TYPE_PAGE = re.compile(r'/pejtype/[^"]*-(\d+)\.html', re.I)
+_RE_SHOW_PAGE = re.compile(r'/pejshow/[^"]*-(\d+)\.html', re.I)
+_RE_TOTAL = re.compile(r'<span class="now">\d+</span>/<span class="total">(\d+)</span>', re.I)
 
 
 # ===================== 守卫：RC4 / PNG 解码 / 缺口定位 =====================
@@ -321,9 +286,8 @@ def _gap_x_pure(data, gw, k_sat=0.6):
 
 
 def _gap_x_cv2(data, gw):
-    """运行环境有 cv2/numpy 时: 提取右侧 piece 形状掩码, 在左半背景滑窗找
-    遮罩压暗最明显的位置(内圈亮度 - 外圈环带亮度 最小)。不可用返回 None。
-    注意: 自然风景图上暗树林/草地会干扰, 识别为尽力而为, 不保证稳定通过。"""
+    """运行环境有 cv2/numpy 时: 右侧 piece 浮层即从背景原位抠出的原图块,
+    带掩码在左半背景做归一化相关匹配, 相关系数最高处即缺口原位。不可用返回 None。"""
     try:
         import cv2
         import numpy as np
@@ -340,33 +304,17 @@ def _gap_x_cv2(data, gw):
         else:
             bgra = img[:, :, :3]
             al = np.full(img.shape[:2], 255, np.uint8)
-        gray = cv2.cvtColor(bgra, cv2.COLOR_BGR2GRAY).astype(np.float32)
-        pm = al[:, 340:] > 20
+        pm = al[:, 345:] > 20
         ys, xs = np.where(pm)
         if len(xs) == 0:
             return None
         px0, px1, py0, py1 = xs.min(), xs.max(), ys.min(), ys.max()
-        mask = pm[py0:py1 + 1, px0:px1 + 1].astype(np.uint8)
-        h, w = mask.shape
-        left = gray[:, :340]
-        H, W = left.shape
-        best = (1e18, 0)
-        for y in range(0, H - h):
-            for x in range(0, W - w):
-                win = left[y:y + h, x:x + w]
-                inner = win[mask > 0]
-                if inner.size < 20:
-                    continue
-                ring = []
-                for yy in range(max(0, y - 2), min(H, y + h + 2)):
-                    for xx in range(max(0, x - 2), min(W, x + w + 2)):
-                        if not (y <= yy < y + h and x <= xx < x + w):
-                            ring.append(left[yy, xx])
-                ring = np.array(ring)
-                score = inner.mean() - ring.mean()
-                if score < best[0]:
-                    best = (score, x)
-        return best[1]
+        mask = (pm[py0:py1 + 1, px0:px1 + 1].astype(np.uint8)) * 255
+        tpl = bgra[py0:py1 + 1, 345 + px0:345 + px1 + 1]
+        bg = bgra[:, :340]
+        res = cv2.matchTemplate(bg, tpl, cv2.TM_CCOEFF_NORMED, mask=mask)
+        _, _, _, ml = cv2.minMaxLoc(res)
+        return ml[0]
     except Exception:
         return None
 
@@ -374,14 +322,23 @@ def _gap_x_cv2(data, gw):
 class Spider(Spider):
 
     def getName(self):
-        return "www.rhwf.cn"
+        return "rhwf.cn"
+
+    def log(self, *a, **kw):
+        # 壳子基类 log 为单参签名，多参调用需在此拼接一行，避免 TypeError 吞掉成功路径
+        try:
+            print("[rhwf]", " ".join(str(x) for x in a))
+        except Exception:
+            pass
 
     def init(self, extend=""):
         try:
             self.extend = json.loads(extend) if extend else {}
         except Exception:
             self.extend = {}
-        self.site_url = (self.extend.get("site") or HOST).rstrip("/")
+        self.hosts = list(self.extend.get("hosts") or HOSTS)
+        self.host_idx = 0
+        self.site_url = (self.extend.get("site") or self.hosts[0]).rstrip("/")
         self.headers = {
             "User-Agent": UA,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -395,6 +352,20 @@ class Spider(Spider):
         self._guard_session = None
         self._guard_cookie = ""
         self._guard_ok = False
+
+    def _switch_host(self):
+        """主备域名轮换：切到下一 host，清守卫会话与 Cookie，后续请求重解盾。"""
+        if len(self.hosts) <= 1:
+            return False
+        self.host_idx = (self.host_idx + 1) % len(self.hosts)
+        self.site_url = self.hosts[self.host_idx].rstrip("/")
+        self.headers["Referer"] = self.site_url + "/"
+        self._guard_session = None
+        self._guard_cookie = ""
+        self._guard_ok = False
+        self.headers.pop("Cookie", None)
+        self.log("切换域名 →", self.site_url)
+        return True
 
     # ---------------- 守卫会话 ----------------
     def _guard_sess(self):
@@ -462,11 +433,10 @@ class Spider(Spider):
             ck["guardret"] = guardret
 
             if sess is not None:
-                sess.cookies.set("guardret", guardret, domain="www.rhwf.cn", path="/")
-                sess.cookies.set("guard", guard, domain="www.rhwf.cn", path="/")
-                sess.cookies.set("guardword", guardword, domain="www.rhwf.cn", path="/")
+                sess.cookies.set("guardret", guardret, path="/")
+                sess.cookies.set("guard", guard, path="/")
+                sess.cookies.set("guardword", guardword, path="/")
             self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in ck.items())
-            self.headers["Cookie"] = self._guard_cookie
 
             # 验证一次
             if sess is not None:
@@ -506,11 +476,12 @@ class Spider(Spider):
         if self._is_shell(text, status):
             self.log("遇守卫壳, 重新求解")
             if self._solve_guard():
-                h["Cookie"] = self._guard_cookie
                 try:
                     if sess is not None:
+                        # 有守卫 session：Cookie 由 jar 自动携带，不再发手工头避免覆盖
                         rsp = sess.get(url, headers=h, timeout=timeout)
                     else:
+                        h["Cookie"] = self._guard_cookie
                         rsp = self.fetch(url, headers=h, timeout=timeout)
                     text = rsp.text if hasattr(rsp, "text") else ""
                     status = getattr(rsp, "status_code", 200)
@@ -521,7 +492,7 @@ class Spider(Spider):
 
     def _fetch(self, url, headers=None, tries=3):
         last = ""
-        for _ in range(tries):
+        for attempt in range(tries):
             try:
                 rsp = self._http_get(url, headers=headers, timeout=(10, 30))
                 status = getattr(rsp, "status_code", 200) if rsp is not None else 0
@@ -532,7 +503,10 @@ class Spider(Spider):
             except Exception as e:
                 self.log("fetch FAIL", url, e)
                 last = ""
-            time.sleep(1.2)
+            if attempt < tries - 1:
+                if self._switch_host():
+                    url = self._rebase_url(url)
+                time.sleep(1.2)
         return last
 
     @staticmethod
@@ -563,6 +537,18 @@ class Spider(Spider):
             return self.site_url + url
         return urllib.parse.urljoin(self.site_url + "/", url)
 
+    def _rebase_url(self, url):
+        """域名轮换后，把绝对 URL 的 scheme/netloc 替换为当前 site_url 域。"""
+        if not url or not url.startswith("http"):
+            return self._fix_url(url)
+        try:
+            parts = urllib.parse.urlsplit(url)
+            base = urllib.parse.urlsplit(self.site_url)
+            return urllib.parse.urlunsplit((
+                base.scheme, base.netloc, parts.path, parts.query, parts.fragment))
+        except Exception:
+            return url
+
     def _clean(self, s):
         if not s:
             return ""
@@ -590,7 +576,7 @@ class Spider(Spider):
         videos, seen = [], set()
         if not html:
             return videos
-        for block in re.findall(r'<a[^>]*href="/pgc/\d+\.html"[\s\S]*?</a>', html):
+        for block in _RE_CARD.findall(html):
             mh = _RE_HREF.search(block)
             if not mh:
                 continue
@@ -599,7 +585,7 @@ class Spider(Spider):
                 continue
             seen.add(href)
 
-            # 片名：img alt 优先（全名），div.ys-name6 文本兜底
+            # 片名：img alt 优先（全名），div.filmName / div.ys-name6 文本兜底
             name = ""
             mi = _RE_IMG.search(block)
             if mi:
@@ -607,7 +593,7 @@ class Spider(Spider):
                 if ma:
                     name = self._clean(ma.group(1))
             if not name:
-                mt = _RE_NAME6.search(block)
+                mt = _RE_FILMNAME.search(block) or _RE_NAME6.search(block)
                 if mt:
                     name = self._clean(mt.group(1))
             if not name:
@@ -646,17 +632,22 @@ class Spider(Spider):
         page = int(page) if page else 1
         slot0 = cls or tid
         if not any([cls, year, letter]) and page <= 1:
-            return "%s/pgctype/%s.html" % (self.site_url, tid)
+            return "%s/pejtype/%s.html" % (self.site_url, tid)
         if any([cls, year, letter]):
             seg = [slot0, "", "", "", year, letter, "", "", "", "", "", ""]
             seg = "-".join(urllib.parse.quote(x) if not x.isascii() else x for x in seg)
-            return "%s/pgcshow/%s.html" % (self.site_url, seg)
-        return "%s/pgctype/%s-%d.html" % (self.site_url, slot0, page)
+            return "%s/pejshow/%s.html" % (self.site_url, seg)
+        return "%s/pejtype/%s-%d.html" % (self.site_url, slot0, page)
 
     def _page_count(self, html, page):
         if not html:
             return 1
+        # 优先分页块内 span.total（当前页/总页）；无分页块再兜底页码链接
+        mt = _RE_TOTAL.search(html)
+        if mt:
+            return max(1, int(mt.group(1)))
         pages = [int(x) for x in _RE_TYPE_PAGE.findall(html)]
+        pages += [int(x) for x in _RE_SHOW_PAGE.findall(html)]
         pages += [int(x) for x in _RE_SEARCH_PAGE.findall(html)]
         return max(pages) if pages else max(1, page)
 
@@ -711,6 +702,62 @@ class Spider(Spider):
         return self.searchContent(key, quick, pg)
 
     # ---------------- 详情字段 ----------------
+    def _extract_intro(self, html):
+        """提取剧情正文：剥离网友评论卡、配图 AI 综述段、相关搜索 SEO 堆砌；
+        普通 <p> 正文保留，综述 p 之后吐出的裸摘要丢弃，前置占位文本保留。
+        bs4 不可用时回退首段正则。"""
+        if BeautifulSoup is not None:
+            try:
+                soup = BeautifulSoup(html, "html.parser")
+                box = soup.find(class_="Synopsis-word")
+                if box is None:
+                    return ""
+                # 1) 剥离网友评论卡（背景/渐变/圆角样式或含“网友评论”）
+                for tag in list(box.find_all(True)):
+                    style = ((tag.attrs or {}).get("style") or "").lower()
+                    txt = tag.get_text()
+                    if ("网友评论" in txt) or any(
+                            k in style for k in ("background", "linear-gradient", "border-radius")):
+                        tag.decompose()
+                # 2) 先扫描含配图的 AI 综述段（剥 img 前打标），再剥图片/SEO 链接
+                review_ps = set()
+                for p in box.find_all("p"):
+                    if p.find("img"):
+                        review_ps.add(id(p))
+                for img in box.find_all("img"):
+                    img.decompose()
+                for a in box.find_all("a"):
+                    a.decompose()
+                # 3) 按 DOM 顺序收集正文：综述 p 后裸摘要丢弃，普通正文/前置占位保留
+                parts = []
+                after_review = False
+                for ch in box.children:
+                    nm = getattr(ch, "name", None)
+                    if nm is None:
+                        t = self._clean(str(ch))
+                        if t and not after_review:
+                            parts.append(t)
+                        continue
+                    if nm not in ("p", "div"):
+                        continue
+                    if id(ch) in review_ps:
+                        after_review = True
+                        continue
+                    style = ((ch.attrs or {}).get("style") or "").lower()
+                    if any(k in style for k in ("background", "linear-gradient", "border-radius")):
+                        continue
+                    t = self._clean(ch.get_text())
+                    if t:
+                        after_review = False
+                        parts.append(t)
+                txt = "\n".join(parts)
+                txt = re.split(r"相关搜索[:：]", txt)[0]
+                return txt.strip()
+            except Exception as e:
+                self.log("简介解析异常", e)
+        mf = _RE_INTRO_P.search(html)
+        return self._clean(mf.group(1)) if mf else ""
+
     def _info_field(self, html, label):
         """在 main-actors2 / ys-style8 块中提取指定标签后的链接文本(逗号拼接)。"""
         for blk in list(_RE_ACTOR.finditer(html)) + list(_RE_STYLE.finditer(html)):
@@ -774,51 +821,77 @@ class Spider(Spider):
 
         # 片名
         name = ""
-        mh = _RE_H1.search(html)
-        if mh:
-            name = self._clean(mh.group(1))
-        if not name:
-            mt = re.search(r"<title>(.*?)</title>", html, re.S)
-            if mt:
-                name = self._clean(mt.group(1).split("_")[0].split("-")[0])
+        try:
+            m = _RE_H1.search(html)
+            if m:
+                name = self._clean(m.group(1))
+            if not name:
+                mt = re.search(r"<title>(.*?)</title>", html, re.S)
+                if mt:
+                    name = self._clean(mt.group(1).split("_")[0].split("-")[0])
+        except Exception:
+            pass
         name = name or vod_id
 
         # 海报
         pic = ""
-        mp = _RE_POSTER.search(html)
-        if mp:
-            mi = _RE_DSRC.search(mp.group(1)) or _RE_SRC.search(mp.group(1))
-            if mi:
-                pic = mi.group(1)
+        try:
+            mp = _RE_POSTER.search(html)
+            if mp:
+                mi = _RE_DSRC.search(mp.group(1)) or _RE_SRC.search(mp.group(1))
+                if mi:
+                    pic = mi.group(1)
+        except Exception:
+            pass
         if self._is_placeholder_pic(pic):
             pic = ""
         pic = self._fix_url(pic) or self.default_pic
 
-        # 简介：Synopsis-word>p 优先，meta description 兜底，剥“剧情介绍：”前缀
+        # 简介：Synopsis-word 正文（剥评论/综述/SEO）优先，meta description 兜底
         content = ""
-        mf = _RE_INTRO_P.search(html)
-        if mf:
-            content = self._clean(mf.group(1))
+        try:
+            content = self._extract_intro(html)
+        except Exception:
+            content = ""
         if not content:
-            mm = _RE_META_DESC.search(html)
-            if mm:
-                content = self._clean(mm.group(1))
+            try:
+                mm = _RE_META_DESC.search(html)
+                if mm:
+                    content = self._clean(mm.group(1))
+            except Exception:
+                pass
         content = re.sub(r"^(?:影片介绍|简介|剧情介绍)\s*[:：]?\s*", "", content)
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
         # 元信息
-        actor = self._info_field(html, "主演")
-        director = self._info_field(html, "导演")
-        classify = self._info_field(html, "类型")
-        area = self._info_field(html, "地区")
+        actor = director = classify = area = ""
+        try:
+            actor = self._info_field(html, "主演")
+        except Exception:
+            pass
+        try:
+            director = self._info_field(html, "导演")
+        except Exception:
+            pass
+        try:
+            classify = self._info_field(html, "类型")
+        except Exception:
+            pass
+        try:
+            area = self._info_field(html, "地区")
+        except Exception:
+            pass
 
         # 更新时间（副标兜底）
         remarks = ""
-        my = _RE_YEAR1.search(html)
-        if my:
-            upd = self._clean(my.group(1))
-            if upd:
-                remarks = "更新：" + upd
+        try:
+            my = _RE_YEAR1.search(html)
+            if my:
+                upd = self._clean(my.group(1))
+                if upd:
+                    remarks = "更新：" + upd
+        except Exception:
+            pass
 
         # 线路与选集（保 DOM 顺序）
         play_from, play_url = self._parse_lines(html)
@@ -994,4 +1067,3 @@ class Spider(Spider):
 
     def close(self):
         self.destroy()
-
