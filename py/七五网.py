@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-七五网 qwfun.com | TVBox Python 爬虫（豆花 dhvideo 契约）
+七五网 qwfun.com | TVBox Python 爬虫
 站点结构（线上快照实证，MacCMS piankuwap 移动模板）:
   - 首页:   /
   - 主分类: /vt/<tid>.html            （第 1 页）
@@ -98,7 +98,7 @@ except ImportError:
 
 
 # ===================== 站专属配置 =====================
-# 主备域名（顺序即轮换顺序，均为同站镜像；实测 2026-11-24）
+# 主备域名（顺序即轮换顺序，均为同站镜像）
 HOSTS = [
     "https://www.qwfun.com",
     "https://www.qwmkv.com",
@@ -147,15 +147,25 @@ _TYPES = {
            "逆袭", "重生", "萌宝"],
 }
 
-# 地区（URL 段1，站点原文，五分类一致）
-_AREAS = ["大陆", "香港", "台湾", "日本", "韩国", "泰国", "美国", "英国", "法国",
-          "德国", "印度", "丹麦", "瑞典", "荷兰", "加拿大", "俄罗斯", "意大利",
-          "比利时", "西班牙", "澳大利亚", "其他"]
+# 地区（URL 段1，站点原文；线上实证：动漫 tid4 站点单独排序，其余四分类同序）
+_AREAS_COMMON = ["大陆", "香港", "台湾", "日本", "韩国", "泰国", "美国", "英国", "法国",
+                 "德国", "印度", "丹麦", "瑞典", "荷兰", "加拿大", "俄罗斯", "意大利",
+                 "比利时", "西班牙", "澳大利亚", "其他"]
+_AREAS_ANIME = ["美国", "英国", "法国", "大陆", "日本", "香港", "台湾", "韩国", "泰国",
+                "德国", "印度", "丹麦", "瑞典", "荷兰", "加拿大", "俄罗斯", "意大利",
+                "比利时", "西班牙", "澳大利亚", "其他"]
+_AREAS = {"1": _AREAS_COMMON, "2": _AREAS_COMMON, "3": _AREAS_COMMON,
+          "4": _AREAS_ANIME, "30": _AREAS_COMMON}
 
-# 语言（URL 段4，站点原文，五分类一致）
-_LANGS = ["国语", "粤语", "英语", "法语", "日语", "韩语", "泰语", "德语", "俄语",
-          "闽南语", "丹麦语", "波兰语", "瑞典语", "印地语", "挪威语", "意大利语",
-          "西班牙语", "无对白", "其他"]
+# 语言（URL 段4，站点原文；线上实证：动漫 tid4 站点单独排序，其余四分类同序）
+_LANGS_COMMON = ["国语", "粤语", "英语", "法语", "日语", "韩语", "泰语", "德语", "俄语",
+                 "闽南语", "丹麦语", "波兰语", "瑞典语", "印地语", "挪威语", "意大利语",
+                 "西班牙语", "无对白", "其他"]
+_LANGS_ANIME = ["英语", "法语", "国语", "粤语", "日语", "韩语", "泰语", "德语", "俄语",
+                "闽南语", "丹麦语", "波兰语", "瑞典语", "印地语", "挪威语", "意大利语",
+                "西班牙语", "无对白", "其他"]
+_LANGS = {"1": _LANGS_COMMON, "2": _LANGS_COMMON, "3": _LANGS_COMMON,
+          "4": _LANGS_ANIME, "30": _LANGS_COMMON}
 
 # 年代（URL 段11，站点实证 2010~2027）
 _YEARS = [str(y) for y in range(2027, 2009, -1)]
@@ -171,12 +181,12 @@ def _opts(values):
 FILTERS = {}
 for c in CLASSES:
     tid = c["type_id"]
-    # 展示顺序对齐站点展开筛选：类型 → 地区 → 年代 → 语言；排序置顶在站点顶部
+    # 展示顺序对齐站点展开筛选（dl c1~c4）：类型 → 年代 → 地区 → 语言；排序在筛选区末行
     FILTERS[tid] = [
         {"key": "type", "name": "类型", "value": _opts(_TYPES.get(tid, []))},
-        {"key": "area", "name": "地区", "value": _opts(_AREAS)},
         {"key": "year", "name": "年代", "value": _opts(_YEARS)},
-        {"key": "lang", "name": "语言", "value": _opts(_LANGS)},
+        {"key": "area", "name": "地区", "value": _opts(_AREAS.get(tid, _AREAS_COMMON))},
+        {"key": "lang", "name": "语言", "value": _opts(_LANGS.get(tid, _LANGS_COMMON))},
         {"key": "sort", "name": "排序",
          "value": [{"n": n, "v": v} for n, v in _SORTS]},
     ]
@@ -544,19 +554,20 @@ class Spider(Spider):
             self.log("homeVideoContent 异常:", e)
             return {"list": []}
 
-    def _page_count(self, html):
-        """分页块 .pages 内尾页链接最大页码；兼容 /vt/<tid>-<pg> 与 /ms/ slug 段8 页码；
-        无分页块返回 1。"""
-        if not html:
+    def _pagecount(self, videos, page, limit=36):
+        """满页滑动判断（线上实证：站点分页为 5 页滑动窗口，HTML/JS 均不下发真实
+        总页数与影片总数，深页持续返满页）。
+        - 当前页 0 张：空页，仅 1 页；
+        - 0 < 张数 < limit：末页；
+        - 张数 >= limit：视为尚有下一页，可继续翻页。
+        不再取分页窗口内最大页码（首页窗口只列 1~5，会把翻页截断在第 5 页，
+        漏掉第 6 页起的真实新片）。"""
+        n = len(videos)
+        if n == 0:
             return 1
-        block = re.search(r'<div class="pages">([\s\S]*?)</div>', html)
-        scope = block.group(0) if block else html
-        pages = [int(x) for x in re.findall(r'/vt/\d+-(\d+)\.html', scope)]
-        for slug in re.findall(r'/ms/([^"\s]+)\.html', scope):
-            seg = slug.split("-")
-            if len(seg) > 8 and seg[8].isdigit():
-                pages.append(int(seg[8]))
-        return max(1, max(pages)) if pages else 1
+        if n >= limit:
+            return page + 1
+        return page
 
     def _filter_slug(self, tid, extend, page=1):
         """构造筛选 12 段空槽 URL。
@@ -603,12 +614,14 @@ class Spider(Spider):
             html = self._fetch(url)
             self.log("  HTML 长度: %d" % len(html))
             videos = self._parse_cards(html)
-            pagecount = self._page_count(html)
-            self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
+            limit = 36
+            pagecount = self._pagecount(videos, page, limit)
+            total = 0 if not videos else pagecount * limit
+            self.log("  最终: %d 条, 当前页 %d, 估总页 %d" % (len(videos), page, pagecount))
 
             return {
                 "list": videos, "page": page, "pagecount": pagecount,
-                "limit": 36, "total": pagecount * 36,
+                "limit": limit, "total": total,
             }
         except Exception as e:
             self.log("categoryContent 异常:", e)
