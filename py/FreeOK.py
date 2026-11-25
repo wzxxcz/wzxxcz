@@ -41,17 +41,25 @@ import urllib.parse
 
 sys.path.append('..')
 
-# ---- 强制 IPv4：禁用 IPv6（云端出口 IPv6 不稳）；过滤后为空回退原始解析 ----
+# ---- 强制 IPv4：禁用 IPv6（云端出口 IPv6 不稳）；过滤为空/异常回退原始解析 ----
 _orig_getaddrinfo = socket.getaddrinfo
 
 
 def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
-    v4 = [r for r in _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
-          if r[0] == socket.AF_INET]
-    return v4 or _orig_getaddrinfo(host, port, family, type, proto, flags)
+    try:
+        v4 = [r for r in _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+              if r[0] == socket.AF_INET]
+        if v4:
+            return v4
+    except Exception:
+        pass
+    return _orig_getaddrinfo(host, port, family, type, proto, flags)
 
 
-socket.getaddrinfo = _ipv4_getaddrinfo
+try:
+    socket.getaddrinfo = _ipv4_getaddrinfo
+except Exception:
+    pass
 
 try:
     from base.spider import Spider
