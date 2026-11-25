@@ -383,6 +383,27 @@ class Spider(Spider):
             self._cache_load()
         except Exception as e:
             self.log("init 初始化异常(已兜底, 不阻断)", e)
+        # 冷启动预热：后台线程提前过滑块守卫并落持久化缓存。
+        # 治"清空缓存后首页/列表空白、重启才正常"：清缓存后守卫令牌丢失，
+        # 首次 homeVideoContent 需串行 4 个请求(首访/取图/识别/验证)过盾，
+        # 壳子等待超时即渲染空白；后台预热在壳子真正发请求前完成解盾，
+        # 且令牌提前 setCache 落盘——即使首次仍超时, 重启后也必然命中缓存秒过。
+        try:
+            threading.Thread(target=self._warmup, daemon=True).start()
+        except Exception:
+            pass
+
+    def _warmup(self):
+        """后台预热守卫：缓存已命中/已放行则跳过；异常静默，不阻断主流程。"""
+        try:
+            time.sleep(0.2)  # 让 init 尽快返回
+            if not self._guard_ok:
+                self._solve_guard(retries=2)
+        except Exception as e:
+            try:
+                self.log("预热跳过", e)
+            except Exception:
+                pass
 
     def _switch_host(self):
         """主备域名轮换：切到下一 host，清守卫会话与 Cookie，后续请求重解盾。"""
@@ -757,15 +778,31 @@ class Spider(Spider):
             html = self._fetch(self.site_url + "/")
             self.log("home HTML 长度: %d" % len(html))
             videos = self._parse_cards(html)
-            # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次（与分类对齐）
+            # 空列表兜底1：直接重拉（_http_get 遇壳自会重解, 不盲目清守卫态）
             if not videos:
-                self.log("  首页为空, 清守卫态重拉一次")
+                self.log("  首页为空, 直接重拉一次")
+                html = self._fetch(self.site_url + "/")
+                self.log("  重拉 HTML 长度: %d" % len(html))
+                videos = self._parse_cards(html)
+            # 空列表兜底2：疑似令牌失效, 清守卫态重解重拉
+            if not videos:
+                self.log("  仍为空, 清守卫态重解重拉")
                 self._guard_session = None
                 self._guard_cookie = ""
                 self._guard_ok = False
                 html = self._fetch(self.site_url + "/")
-                self.log("  重拉 HTML 长度: %d" % len(html))
                 videos = self._parse_cards(html)
+            # 空列表兜底3：分类页卡片合并（保证"更新推荐"永不空白）
+            if not videos:
+                self.log("  仍为空, 分类页兜底")
+                seen, merged = set(), []
+                for tid in ("1", "2", "4"):
+                    th = self._fetch("%s/pejtype/%s.html" % (self.site_url, tid))
+                    for v in self._parse_cards(th):
+                        if v["vod_id"] not in seen:
+                            seen.add(v["vod_id"])
+                            merged.append(v)
+                videos = merged
             return {"list": videos}
         except Exception as e:
             self.log("homeVideoContent 异常", e)
@@ -786,14 +823,18 @@ class Spider(Spider):
             html = self._fetch(url)
             self.log("  HTML 长度: %d" % len(html))
             videos = self._parse_cards(html)
-            # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次
+            # 空列表兜底1：直接重拉（遇壳自愈, 不盲目清守卫态）
             if not videos:
-                self.log("  列表为空, 清守卫态重拉一次")
+                self.log("  列表为空, 直接重拉一次")
+                html = self._fetch(url)
+                videos = self._parse_cards(html)
+            # 空列表兜底2：清守卫态重解重拉
+            if not videos:
+                self.log("  仍为空, 清守卫态重解重拉")
                 self._guard_session = None
                 self._guard_cookie = ""
                 self._guard_ok = False
                 html = self._fetch(url)
-                self.log("  重拉 HTML 长度: %d" % len(html))
                 videos = self._parse_cards(html)
             pagecount = self._page_count(html, page)
             self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
@@ -840,7 +881,7 @@ class Spider(Spider):
                 box = soup.find(class_="Synopsis-word")
                 if box is None:
                     return ""
-                # 1) 剥离网友评论卡（背景/渐变/圆角样式或含“网友评论”）
+                # 1) 剥离网友评论卡（背景/渐变/圆角样式或含"网友评论"）
                 for tag in list(box.find_all(True)):
                     style = ((tag.attrs or {}).get("style") or "").lower()
                     txt = tag.get_text()
