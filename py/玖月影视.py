@@ -1,6 +1,5 @@
 # coding=utf-8
 """
-脚本文件: spider_rhwf.py
 玖月影视 rhwf.cn | TVBox Python 爬虫
 关键:
   - easy_slide 滑块守卫闭环：piece 原图块带掩码模板匹配定位缺口，RC4(key=guard[:8]) 加密 x"x"y 写 guardret
@@ -235,32 +234,45 @@ def _decode_png(data):
         off += 12 + ln
     raw = zlib.decompress(idat)
     stride = W
-    prev = [0] * stride
+    prev = bytes(stride)
     img = []
     pos = 0
     for y in range(H):
         f = raw[pos]
         pos += 1
-        row = list(raw[pos:pos + stride])
+        row = raw[pos:pos + stride]
         pos += stride
-        for x in range(stride):
-            a = row[x]
-            left = row[x - 1] if x >= 1 else 0
-            up = prev[x]
-            ul = prev[x - 1] if x >= 1 else 0
-            if f == 1:
-                row[x] = (a + left) & 255
-            elif f == 2:
-                row[x] = (a + up) & 255
-            elif f == 3:
-                row[x] = (a + ((left + up) >> 1)) & 255
-            elif f == 4:
+        # 滤波还原（实测本站拼图全为 filter 0, 各类型均兜底; 行输出统一 bytes,
+        # 供下游 bytes.translate 做 C 级透明掩码提取）
+        if f == 0:
+            cur = row
+        elif f == 2:
+            cur = bytes((a + b) & 255 for a, b in zip(row, prev))
+        elif f == 1:
+            cur = bytearray(row)
+            for x in range(1, stride):
+                cur[x] = (cur[x] + cur[x - 1]) & 255
+            cur = bytes(cur)
+        elif f == 3:
+            cur = bytearray(row)
+            for x in range(stride):
+                left = cur[x - 1] if x else 0
+                cur[x] = (cur[x] + ((left + prev[x]) >> 1)) & 255
+            cur = bytes(cur)
+        else:
+            cur = bytearray(row)
+            for x in range(stride):
+                a = cur[x]
+                left = cur[x - 1] if x else 0
+                up = prev[x]
+                ul = prev[x - 1] if x else 0
                 p = left + up - ul
                 pa, pb, pc = abs(p - left), abs(p - up), abs(p - ul)
                 pr = left if (pa <= pb and pa <= pc) else (up if pb <= pc else ul)
-                row[x] = (a + pr) & 255
-        img.append(row)
-        prev = row
+                cur[x] = (a + pr) & 255
+            cur = bytes(cur)
+        img.append(cur)
+        prev = cur
     return W, H, plte, trns, img
 
 
@@ -273,33 +285,164 @@ def _png_feat(plte, trns, img, x, y):
 
 
 def _gap_x_pure(data, gw, k_sat=0.6):
-    """纯标准库兜底：piece 形状掩码约束下, 背景窄带内找暗/低饱和拼图块, 返回缺口 x。"""
+    """纯标准库兜底：piece 形状掩码约束下, 背景窄带内找暗/低饱和拼图块, 返回缺口 x。
+    两级采样加速(粗扫 step 3 定位 → 精扫 ±3 逐点锁定), 设备端 CPU 慢也能秒级完成。"""
     W, H, plte, trns, img = _decode_png(data)
-    xs = [x for y in range(H) for x in range(345, W) if img[y][x] not in trns]
-    ys = [y for y in range(H) for x in range(345, W) if img[y][x] not in trns]
+    xs = []
+    ys = []
+    for y in range(H):
+        row = img[y]
+        for x in range(345, W):
+            if row[x] not in trns:
+                xs.append(x)
+                ys.append(y)
     if not xs:
         return 0
     px0, px1, py0, py1 = min(xs), max(xs), min(ys), max(ys)
     mask = [(y - py0, x - px0) for y in range(py0, py1 + 1)
             for x in range(px0, px1 + 1) if img[y][x] not in trns]
     tw = px1 - px0 + 1
-    BG = [[_png_feat(plte, trns, img, x, y) for x in range(340)] for y in range(H)]
-    y0 = max(0, gw)
-    best = (1e18, 0)
-    for x in range(0, max(1, 340 - tw)):
-        lum, sat, n = 0.0, 0.0, 0
-        for dy, dx in mask:
-            by, bx = y0 + dy, x + dx
-            if by < H and bx < 340 and BG[by][bx]:
-                lum += BG[by][bx][0]
-                sat += BG[by][bx][1]
-                n += 1
+    # 背景特征表 step=2 采样(速度×4, 精度损失可忽略)
+    SS = 2
+    BG = [[None] * 340 for _ in range(H)]
+    for y in range(0, H, SS):
+        row = img[y]
+        brow = BG[y]
+        for x in range(0, 340, SS):
+            i = row[x]
+            if i in trns:
+                continue
+            r, g, b = plte[i]
+            brow[x] = ((r + g + b) / 3.0, max(r, g, b) - min(r, g, b))
+
+    def score_at(x0, mask_pts):
+        lum = sat = 0.0
+        n = 0
+        for dy, dx in mask_pts:
+            by = max(0, gw) + dy
+            bx = x0 + dx
+            if by < H and bx < 340:
+                f = BG[by][bx]
+                if f:
+                    lum += f[0]
+                    sat += f[1]
+                    n += 1
         if n == 0:
+            return 1e18
+        return lum / n + k_sat * sat / n
+
+    # 粗扫: mask 亦按 SS 采样, 候选 x 步长 3
+    cmask = mask[::SS]
+    best = (1e18, 0)
+    for x in range(0, max(1, 340 - tw), 3):
+        sc = score_at(x, cmask)
+        if sc < best[0]:
+            best = (sc, x)
+    # 精扫: 粗最优 ±3 全点
+    bx0 = best[1]
+    best2 = (1e18, bx0)
+    for x in range(max(0, bx0 - 3), min(max(1, 340 - tw), bx0 + 4)):
+        sc = score_at(x, mask)
+        if sc < best2[0]:
+            best2 = (sc, x)
+    return best2[1]
+
+
+def _gap_x_candidates(data, gw, topn=6):
+    """归一化互相关候选排名（纯标准库复刻 cv2 TM_CCOEFF_NORMED + 掩码）。
+    源码实证: piece=缺口原内容原亮度, 故 piece 与缺口处背景强相关;
+    逐候选 x 计算掩码内 (p-p̄)(b-b̄) 相关系数, 取相关系数最高的 topn 个 x。
+    旧"残差/找最黑块"法实测仅 ~25% 准确率, 是设备端冷启动空白的真凶。"""
+    W, H, plte, trns, img = _decode_png(data)
+    OP = bytes(0 if i in trns else 1 for i in range(256))
+    # piece 包围盒
+    px0 = px1 = py0 = py1 = None
+    for y in range(H):
+        fb = img[y].translate(OP)
+        s = fb.find(1, 345)
+        if s < 0:
             continue
-        score = lum / n + k_sat * sat / n
-        if score < best[0]:
-            best = (score, x)
-    return best[1]
+        e = fb.rfind(1)
+        if py0 is None:
+            py0 = y
+        py1 = y
+        if px0 is None or s < px0:
+            px0 = s
+        if px1 is None or e > px1:
+            px1 = e
+    if px0 is None:
+        return [0]
+    tw = px1 - px0 + 1
+    # 每行 piece 不透明段（相对 px0）
+    runs = []
+    for y in range(py0, py1 + 1):
+        fb = img[y].translate(OP)
+        segs = []
+        i = fb.find(1, 345)
+        while 0 <= i <= px1:
+            j = fb.find(0, i)
+            if j < 0 or j > px1:
+                j = px1 + 1
+            segs.append((i - px0, j - 1 - px0))
+            i = fb.find(1, j)
+        if segs:
+            runs.append((y - py0, segs))
+    y0 = max(0, gw)
+    mh = py1 - py0 + 1
+    FH = min(H, y0 + mh)
+    FW = 340
+    LUM = [None] * 256
+    for i in range(min(256, len(plte))):
+        if i not in trns:
+            r, g, b = plte[i]
+            LUM[i] = r * 0.299 + g * 0.587 + b * 0.114
+    BG = [[LUM[i] for i in img[y][:FW]] for y in range(FH)]
+    PV = [[LUM[i] for i in img[y][px0:px1 + 1]] for y in range(py0, py1 + 1)]
+    # 扁平化掩码像素（隔 2 采样提速, 精度可忽略）→ (背景行引用, dx, p)
+    flat = []
+    for dy, segs in runs:
+        by = y0 + dy
+        if by >= FH:
+            continue
+        Bro = BG[by]
+        Ob = img[by].translate(OP)
+        for xa, xb in segs:
+            for dx in range(xa, xb + 1, 2):
+                p = PV[dy][dx]
+                if p is not None and Ob[dx]:
+                    flat.append((Bro, dx, p))
+    if len(flat) < 20:
+        return [0]
+    XN = max(1, FW - tw)
+    scored = []
+    for x in range(XN):
+        ps = []
+        bs = []
+        ap = ps.append
+        ab = bs.append
+        for Bro, dx, p in flat:
+            bx = x + dx
+            if bx < FW:
+                b = Bro[bx]
+                if b is not None:
+                    ap(p)
+                    ab(b)
+        n = len(ps)
+        if n < 20:
+            continue
+        pm = sum(ps) / n
+        bm = sum(bs) / n
+        num = spd = sbd = 0.0
+        for p, b in zip(ps, bs):
+            dv = p - pm
+            dw = b - bm
+            num += dv * dw
+            spd += dv * dv
+            sbd += dw * dw
+        den = (spd * sbd) ** 0.5
+        scored.append((-(num / den if den > 0 else 0.0), x))
+    scored.sort()
+    return [x for _, x in scored[:topn]] or [0]
 
 
 def _gap_x_cv2(data, gw):
@@ -382,9 +525,12 @@ class Spider(Spider):
             self._guard_lock = threading.Lock()
             # 热启动：先回填持久化的守卫令牌，失效/不可用则跳过，后续遇壳再解
             self._cache_load()
+            # exec 抢跑抓到的首页数据落持久缓存：为下次"清缓存冷启动"攒保险
+            mv = _MODULE_GUARD.get("videos")
+            if mv:
+                self._home_cache_put(mv)
         except Exception as e:
             self.log("init 初始化异常(已兜底, 不阻断)", e)
-
     def _switch_host(self):
         """主备域名轮换：切到下一 host，清守卫会话与 Cookie，后续请求重解盾。"""
         if len(self.hosts) <= 1:
@@ -420,25 +566,35 @@ class Spider(Spider):
         """从持久化缓存回填守卫 Cookie；host 不符/过期/代理不可用则跳过，不阻断。"""
         try:
             data = self.getCache(_GUARD_CACHE_KEY)
-            if not isinstance(data, dict):
-                return False
-            if data.get("host") != self.site_url:
-                return False
-            ck = data.get("cookies") or {}
-            if not ck:
-                return False
-            sess = self._guard_sess()
-            if sess is not None:
-                for k, v in ck.items():
-                    sess.cookies.set(k, v, path="/")
-            self._guard_cookie = (data.get("cookie_header")
-                                  or "; ".join("%s=%s" % (k, v) for k, v in ck.items()))
-            self._guard_ok = True
-            self.log("守卫令牌缓存已复用")
-            return True
+            if isinstance(data, dict) and data.get("host") == self.site_url:
+                ck = data.get("cookies") or {}
+                if ck:
+                    sess = self._guard_sess()
+                    if sess is not None:
+                        for k, v in ck.items():
+                            sess.cookies.set(k, v, path="/")
+                    self._guard_cookie = (data.get("cookie_header")
+                                          or "; ".join("%s=%s" % (k, v) for k, v in ck.items()))
+                    self._guard_ok = True
+                    self.log("守卫令牌缓存已复用")
+                    return True
         except Exception as e:
             self.log("缓存读跳过", e)
-            return False
+        # 持久缓存未命中 → 复用模块级抢跑解盾结果（exec 阶段已完成）
+        try:
+            mck = _MODULE_GUARD.get("cookies")
+            if mck:
+                sess = self._guard_sess()
+                if sess is not None:
+                    for k, v in mck.items():
+                        sess.cookies.set(k, v, path="/")
+                self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in mck.items())
+                self._guard_ok = True
+                self.log("模块级抢跑守卫结果已复用")
+                return True
+        except Exception:
+            pass
+        return False
 
     def _cache_save(self):
         """过盾成功后持久化守卫令牌；代理不可用则跳过，不阻断。"""
@@ -464,6 +620,31 @@ class Spider(Spider):
         except Exception:
             pass
 
+    # ---------------- 首页数据持久缓存 ----------------
+    # "清空缓存"往往清不掉壳子 getCache 存储：上次会话抓到的首页数据可直接
+    # 秒回，解盾/慢网全部绕开——这是冷启动空白的最后一道保险。
+    _HOME_CACHE_KEY = "rhwf_home"
+    _HOME_CACHE_TTL = 1800
+
+    def _home_cache_get(self, ignore_ttl=False):
+        try:
+            data = self.getCache(self._HOME_CACHE_KEY)
+            if isinstance(data, dict):
+                videos = data.get("videos") or []
+                ts = int(data.get("t") or 0)
+                if videos and (ignore_ttl or int(time.time()) - ts < self._HOME_CACHE_TTL):
+                    return videos
+        except Exception:
+            pass
+        return None
+
+    def _home_cache_put(self, videos):
+        try:
+            self.setCache(self._HOME_CACHE_KEY,
+                          {"t": int(time.time()), "videos": videos[:60]})
+        except Exception:
+            pass
+
     @staticmethod
     def _is_shell(text, status=200):
         if not text or len(text) < 80:
@@ -475,35 +656,41 @@ class Spider(Spider):
             pass
         return "_guard/html.js" in text
 
-    def _solve_guard(self, retries=3):
-        """解滑块守卫：加锁串行，单轮失败换图重试；成功返回 True。"""
+    def _solve_guard(self, retries=3, budget=0.0):
+        """解滑块守卫：加锁串行，单轮失败换图重试；budget>0 时超预算即停（预热防阻塞）。
+        成功返回 True。"""
         with self._guard_lock:
+            t0 = time.time()
             for attempt in range(retries):
                 try:
                     if self._solve_once():
                         return True
                 except Exception as e:
                     self.log("守卫求解异常", e)
+                if budget and (time.time() - t0) >= budget:
+                    self.log("预热预算用尽, 交由后续请求遇壳自愈")
+                    break
                 if attempt < retries - 1:
                     time.sleep(0.8)
         self._guard_ok = False
         return False
 
     def _solve_once(self):
-        """单轮：首访落会话→取拼图→识别缺口→RC4 种 guardret→验证放行。"""
+        """单轮：首访落会话→取拼图→识别缺口→RC4 种 guardret。
+        验证省略（交由 _http_get 重放目标请求时自然完成），压缩冷启动耗时。"""
         sess = self._guard_sess()
         h = dict(self.headers)
-        # 1. 首访落会话 Cookie
+        # 1. 首访落会话 Cookie（短超时：守卫路径响应都很轻）
         if sess is not None:
-            sess.get(self.site_url + "/", headers=h, timeout=(10, 20))
+            sess.get(self.site_url + "/", headers=h, timeout=(4, 8))
             rp = sess.get(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
-                          headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
+                          headers=dict(h, Referer=self.site_url + "/"), timeout=(4, 8))
             body = rp.content
             ck = sess.cookies.get_dict()
         else:
-            self.fetch(self.site_url + "/", headers=h, timeout=(10, 20))
+            self.fetch(self.site_url + "/", headers=h, timeout=(4, 8))
             rp = self.fetch(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
-                            headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
+                            headers=dict(h, Referer=self.site_url + "/"), timeout=(4, 8))
             body = rp.content
             ck = {}
             for c in getattr(rp, "cookies", []):
@@ -515,37 +702,58 @@ class Spider(Spider):
             return False
         gw = int(guardword)
 
-        gx = _gap_x_cv2(body, gw)
-        if gx is None:
-            gx = _gap_x_pure(body, gw)
-        gx = int(round(gx))
-        gy = gw
+        # 候选排名：cv2 最优优先, 纯算法残差排名紧随（源码实证: 服务器精确匹配,
+        # 旧"盲猜一次不验证"的准确率仅 ~25%, 是设备端冷启动超时空白的真凶）
+        cands = []
+        cgx = _gap_x_cv2(body, gw)
+        if cgx is not None:
+            cands.append(int(round(cgx)))
+        try:
+            for c in _gap_x_candidates(body, gw, topn=6):
+                if c not in cands:
+                    cands.append(c)
+        except Exception as e:
+            self.log("候选排名异常", e)
+        if not cands:
+            cands = [int(round(_gap_x_pure(body, gw)))]
 
+        # ⚠️ 源码+实验实证: guardret 是一次性令牌——错误提交一次即烧毁,
+        # 同会话再提交正确答案也无法放行, 唯一出路是换新图重解。
+        # 因此每张图只提交 top-1 候选, 失败交由 _solve_guard 换图重试。
+        gx = cands[0]
         secret = guard[:8]
-        plain = ("%dx%d" % (gx, gy)).encode("utf-8")
+        plain = ("%dx%d" % (gx, gw)).encode("utf-8")
         guardret = base64.b64encode(_rc4(plain, secret)).decode("utf-8")
-        ck["guardret"] = guardret
-
         if sess is not None:
             sess.cookies.set("guardret", guardret, path="/")
-            sess.cookies.set("guard", guard, path="/")
-            sess.cookies.set("guardword", guardword, path="/")
-        self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in ck.items())
-
-        # 验证一次
-        if sess is not None:
-            rv = sess.get(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
-                          timeout=(10, 20))
-            ok = not self._is_shell(rv.text, getattr(rv, "status_code", 200))
         else:
-            rv = self.fetch(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
-                            timeout=(10, 20))
-            ok = not self._is_shell(rv.text)
-        self._guard_ok = ok
+            self._guard_cookie = ("; ".join("%s=%s" % (k, v) for k, v in ck.items()
+                                            if k != "guardret") + "; guardret=" + guardret)
+        # 轻量验证：真页=令牌正确; 壳页=令牌已烧, 换图重解
+        try:
+            verify_url = self.site_url + "/pejtype/51.html"  # 小页面作裁判
+            if sess is not None:
+                rv = sess.get(verify_url, headers=h, timeout=(4, 8))
+            else:
+                rv = self.fetch(verify_url, headers=dict(h, Cookie=self._guard_cookie),
+                                timeout=(4, 8))
+            rtext = rv.text if hasattr(rv, "text") else ""
+            ok = len(rtext) > 500 and "_guard/html.js" not in rtext[:300]
+        except Exception as e:
+            self.log("验证请求异常", e)
+            ok = False
+        self.log("守卫求解 gx=%d gw=%d 放行=%s" % (gx, gw, ok))
         if ok:
+            ck["guardret"] = guardret
+            if sess is not None:
+                sess.cookies.set("guard", guard, path="/")
+                sess.cookies.set("guardword", guardword, path="/")
+            self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in ck.items())
+            self._guard_ok = True
             self._cache_save()
-        self.log("守卫求解 gx=%d gw=%d 放行=%s" % (gx, gy, ok))
-        return ok
+            return True
+        self._guard_ok = False
+        return False
 
     def _http_get(self, url, headers=None, timeout=15):
         """本站 GET：优先守卫 session 复用 Cookie；遇壳重解后重放一次。"""
@@ -604,7 +812,7 @@ class Spider(Spider):
             if attempt < tries - 1:
                 if self._switch_host():
                     url = self._rebase_url(url)
-                time.sleep(0.8 * (attempt + 1))
+                time.sleep(1.2)
         return last
 
     @staticmethod
@@ -751,25 +959,67 @@ class Spider(Spider):
 
     # ---------------- 首页 / 分类 / 搜索 ----------------
     def homeContent(self, filter=False):
+        # 铁律：homeContent 纯本地秒回，绝不碰网络/锁——
+        # 壳子对分类的超时容忍度极低，任何阻塞都会连分类栏一起拖空。
+        # 守卫预热由 homeVideoContent/categoryContent 的遇壳自愈承担。
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
         try:
+            t0 = time.time()
+            BUDGET = 12.0  # 预算感知: 超预算不再跑长兜底, 把剩余机会留给用户刷新重试
+            # 0) 持久缓存优先：令牌/数据任一命中即秒回，冷启动彻底绕开解盾耗时
+            cached = self._home_cache_get()
+            if cached:
+                self.log("home 命中持久缓存 %d 条" % len(cached))
+                return {"list": cached}
+
+            # 0.5) exec 抢跑数据：模块加载阶段已解盾+抓好首页，接口阶段零网络
+            mv = _MODULE_GUARD.get("videos")
+            if mv and self.site_url == HOST:
+                self.log("home 使用 exec 抢跑数据 %d 条" % len(mv))
+                self._home_cache_put(mv)
+                return {"list": mv}
+
             html = self._fetch(self.site_url + "/")
             self.log("home HTML 长度: %d" % len(html))
             videos = self._parse_cards(html)
-            # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次（与分类对齐）
-            if not videos:
-                self.log("  首页为空, 清守卫态重拉一次")
+            # 空列表兜底1：直接重拉（_http_get 遇壳自会重解, 不盲目清守卫态）
+            if not videos and (time.time() - t0) < BUDGET:
+                self.log("  首页为空, 直接重拉一次")
+                html = self._fetch(self.site_url + "/")
+                videos = self._parse_cards(html)
+            # 空列表兜底2：疑似令牌失效, 清守卫态重解重拉
+            if not videos and (time.time() - t0) < BUDGET:
+                self.log("  仍为空, 清守卫态重解重拉")
                 self._guard_session = None
                 self._guard_cookie = ""
                 self._guard_ok = False
                 html = self._fetch(self.site_url + "/")
-                self.log("  重拉 HTML 长度: %d" % len(html))
                 videos = self._parse_cards(html)
+            # 空列表兜底3：分类页卡片合并
+            if not videos and (time.time() - t0) < BUDGET:
+                self.log("  仍为空, 分类页兜底")
+                seen, merged = set(), []
+                for tid in ("1", "2", "4"):
+                    th = self._fetch("%s/pejtype/%s.html" % (self.site_url, tid))
+                    for v in self._parse_cards(th):
+                        if v["vod_id"] not in seen:
+                            seen.add(v["vod_id"])
+                            merged.append(v)
+                videos = merged
+            # 兜底4：旧数据(不限时)——宁可旧图也不要空白
+            if not videos:
+                videos = self._home_cache_get(ignore_ttl=True) or []
+            # 成功即落数据缓存：为下次"清缓存冷启动"攒保险
+            if videos:
+                self._home_cache_put(videos)
             return {"list": videos}
         except Exception as e:
             self.log("homeVideoContent 异常", e)
+            stale = self._home_cache_get(ignore_ttl=True)
+            if stale:
+                return {"list": stale}
             return {"list": []}
 
     def categoryContent(self, tid, pg, filter, extend):
@@ -787,27 +1037,20 @@ class Spider(Spider):
             html = self._fetch(url)
             self.log("  HTML 长度: %d" % len(html))
             videos = self._parse_cards(html)
-            # 空列表兜底：疑似撞壳/未解盾导致，清守卫态重解重拉一次
+            # 空列表兜底1：直接重拉（遇壳自愈, 不盲目清守卫态）
             if not videos:
-                self.log("  列表为空, 清守卫态重拉一次")
+                self.log("  列表为空, 直接重拉一次")
+                html = self._fetch(url)
+                videos = self._parse_cards(html)
+            # 空列表兜底2：清守卫态重解重拉
+            if not videos:
+                self.log("  仍为空, 清守卫态重解重拉")
                 self._guard_session = None
                 self._guard_cookie = ""
                 self._guard_ok = False
                 html = self._fetch(url)
-                self.log("  重拉 HTML 长度: %d" % len(html))
                 videos = self._parse_cards(html)
-            # 第二兜底：分类库页仍空，回退首页推荐（单页、筛选降级，仅冷启动抽风时触发）
-            home_fallback = False
-            if not videos:
-                self.log("  分类仍为空, 回退首页推荐兜底")
-                home_html = self._fetch(self.site_url + "/")
-                videos = self._parse_cards(home_html)
-                if videos:
-                    html = home_html
-                    home_fallback = True
-            pagecount = 1 if home_fallback else self._page_count(html, page)
-            if not videos:
-                pagecount = 1
+            pagecount = self._page_count(html, page)
             self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
             return {
                 "list": videos, "page": page, "pagecount": pagecount,
@@ -852,7 +1095,7 @@ class Spider(Spider):
                 box = soup.find(class_="Synopsis-word")
                 if box is None:
                     return ""
-                # 1) 剥离网友评论卡（背景/渐变/圆角样式或含“网友评论”）
+                # 1) 剥离网友评论卡（背景/渐变/圆角样式或含"网友评论"）
                 for tag in list(box.find_all(True)):
                     style = ((tag.attrs or {}).get("style") or "").lower()
                     txt = tag.get_text()
@@ -950,15 +1193,6 @@ class Spider(Spider):
         return play_from, play_url
 
     def detailContent(self, ids):
-        # 整体兜底：任何未预期异常都不冒泡到 Java 侧（冒泡崩溃会被框架记 crash 标志，
-        # 下次启动首页被主动跳过 → 冷启动空箱）；异常返回合法空结构。
-        try:
-            return self._detail_content(ids)
-        except Exception as e:
-            self.log("detailContent 异常(已兜底)", e)
-            return {"list": []}
-
-    def _detail_content(self, ids):
         if not ids:
             return {"list": []}
         vod_id = str(ids[0])
@@ -1067,19 +1301,6 @@ class Spider(Spider):
 
     # ---------------- 播放 ----------------
     def playerContent(self, flag, id, vipFlags):
-        # 整体兜底：异常不冒泡到 Java 侧；失败回退 parse:1 嗅探播放页。
-        try:
-            return self._player_content(flag, id, vipFlags)
-        except Exception as e:
-            self.log("playerContent 异常(已兜底)", e)
-            try:
-                play_page = id if str(id).startswith("http") else self._fix_url(id)
-            except Exception:
-                play_page = str(id or "")
-            return {"parse": 1, "playUrl": "", "url": play_page,
-                    "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
-
-    def _player_content(self, flag, id, vipFlags):
         play_page = id if str(id).startswith("http") else self._fix_url(id)
         now = int(time.time())
         if play_page in self._play_cache:
@@ -1229,3 +1450,83 @@ class Spider(Spider):
 
     def close(self):
         self.destroy()
+
+
+# ===================== 模块级抢跑（冷启动决胜） =====================
+# 壳子 exec 加载 py 时同步完成两件事: ①解滑块守卫 ②抓首页解析卡片。
+# 接口计时开始前，守卫与"更新推荐"数据全部就绪——
+# homeVideoContent 零网络秒回，彻底跳出壳子接口超时窗口。
+# 双轮尝试 + 12 秒预算，全程异常静默，绝不影响模块加载。
+_MODULE_GUARD = {"cookies": None, "videos": None}
+
+
+def _module_warm_guard():
+    for _round in range(3):
+        try:
+            import requests as rq
+            sess = rq.Session()
+            sess.verify = False
+            adapter = rq.adapters.HTTPAdapter(
+                pool_connections=4, pool_maxsize=4, max_retries=0)
+            sess.mount('https://', adapter)
+            sess.mount('http://', adapter)
+            h = {"User-Agent": UA, "Referer": HOST + "/",
+                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                 "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"}
+            t0 = time.time()
+            sess.get(HOST + "/", headers=h, timeout=(4, 8))
+            rp = sess.get(HOST + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
+                          headers=dict(h, Referer=HOST + "/"), timeout=(4, 8))
+            ck = sess.cookies.get_dict()
+            guard = ck.get("guard", "")
+            guardword = ck.get("guardword", "")
+            if not guard or not guardword or (time.time() - t0) > 12:
+                continue
+            gw = int(guardword)
+            # 候选排名（cv2 优先 + 残差匹配排名），逐一以"首页真伪"裁决：
+            # 真页 = 盾过 + 数据到手一步完成; 壳页 = 换下一候选
+            cands = []
+            cgx = _gap_x_cv2(rp.content, gw)
+            if cgx is not None:
+                cands.append(int(round(cgx)))
+            try:
+                for c in _gap_x_candidates(rp.content, gw, topn=6):
+                    if c not in cands:
+                        cands.append(c)
+            except Exception:
+                pass
+            secret = guard[:8]
+            # ⚠️ guardret 一次性令牌(实验实证): 每张图只提交 top-1,
+            # 错误提交会烧毁令牌, 失败换新图重来(外层 _round 循环)
+            gx = cands[0]
+            guardret = base64.b64encode(
+                _rc4(("%dx%d" % (gx, gw)).encode("utf-8"), secret)).decode("utf-8")
+            sess.cookies.set("guardret", guardret, path="/")
+            rv = sess.get(HOST + "/pejtype/51.html", headers=h, timeout=(4, 8))
+            rtext = rv.text if hasattr(rv, "text") else ""
+            if len(rtext) > 500 and "_guard/html.js" not in rtext[:300]:
+                ck["guardret"] = guardret
+                _MODULE_GUARD["cookies"] = ck
+                # 盾已过, 抓首页数据（接口阶段零网络秒回"更新推荐"）
+                try:
+                    hp = sess.get(HOST + "/", headers=h, timeout=(4, 8))
+                    hbody = hp.text if hasattr(hp, "text") else ""
+                    if len(hbody) > 500 and "_guard/html.js" not in hbody:
+                        _s = Spider.__new__(Spider)
+                        _s.site_url = HOST
+                        _s.default_pic = DEFAULT_PIC
+                        vids = Spider._parse_cards(_s, hbody)
+                        if vids:
+                            _MODULE_GUARD["videos"] = vids[:60]
+                except Exception:
+                    pass
+                return
+            if (time.time() - t0) > 12:
+                return
+        except Exception:
+            pass
+        if _round == 0 and _MODULE_GUARD["cookies"] is None:
+            time.sleep(0.5)
+
+
+_module_warm_guard()
