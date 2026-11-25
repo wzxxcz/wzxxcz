@@ -35,6 +35,7 @@ import re
 import sys
 import json
 import time
+import base64
 import socket
 import urllib.parse
 
@@ -241,6 +242,7 @@ _RE_A = re.compile(r'<a[^>]*>([\s\S]*?)</a>', re.I)
 _RE_TAB = re.compile(
     r'<(div|a)\b[^>]*class="[^"]*module-tab-item(?:\s|")[^"]*"[^>]*>([\s\S]*?)</\1>',
     re.S | re.I)
+_RE_TAB_VALUE = re.compile(r'data-dropdown-value="([^"]+)"', re.I)
 _RE_TAB_SPAN = re.compile(r'<span>([^<]+)</span>', re.I)
 _RE_TAB_SMALL = re.compile(r'<small[\s\S]*?</small>', re.I)
 _RE_PANEL = re.compile(
@@ -359,17 +361,22 @@ class Spider(Spider):
         except Exception as e:
             self.log("预热失败:", e)
 
-    def _http_get(self, url, headers=None, timeout=(6, 12)):
-        """自建 Session 优先；异常回退基类 fetch（显式 verify=False，对齐基类签名）。"""
+    def _http_get(self, url, headers=None, timeout=(8, 15)):
+        """基类 fetch 优先（走壳子封装网络栈/代理/DNS 适配）；异常回退自建 Session。"""
         h = dict(self.headers)
         if headers:
             h.update(headers)
+        to = timeout[1] if isinstance(timeout, tuple) else timeout
+        try:
+            return self.fetch(url, headers=h, timeout=to, verify=False)
+        except Exception as e:
+            self.log("基类 fetch 异常, 回退 Session:", url, repr(e)[:120])
         sess = self._session_get()
         try:
             if sess is not None:
                 return sess.get(url, headers=h, timeout=timeout, verify=False)
-            to = timeout[1] if isinstance(timeout, tuple) else timeout
-            return self.fetch(url, headers=h, timeout=to, verify=False)
+            self.log("Session 亦不可用:", url)
+            return None
         except Exception as e:
             self.log("GET 异常:", url, repr(e)[:120])
             return None
@@ -815,10 +822,17 @@ class Spider(Spider):
         """线路 tab（DOM 序）与 panel 选集块按顺序一一对应。
         返回 (play_from, play_url)；选集标识为 /play/<vid>-<sid>-<nid>.html。"""
         tabs = []
-        for _tag, inner in _RE_TAB.findall(html):
-            name = self._tab_name(inner)
+        # 优先取站点 data-dropdown-value 展示名（含自营后缀字母，属性直出、配对精确）
+        for mv in _RE_TAB_VALUE.findall(html):
+            name = self._clean(mv)
             if name and name not in tabs:
                 tabs.append(name)
+        # 兜底：tab 块内 span 文本
+        if not tabs:
+            for _tag, inner in _RE_TAB.findall(html):
+                name = self._tab_name(inner)
+                if name and name not in tabs:
+                    tabs.append(name)
         panels = _RE_PANEL.findall(html)
 
         play_from, play_url = [], []
@@ -1121,6 +1135,25 @@ class Spider(Spider):
                     return html[j:k + 1]
         return ""
 
+    def _decrypt_url(self, url, enc):
+        """按 encrypt 解密：0/空 明文；1 base64；2 urlencode 后 base64。失败回退明文。"""
+        if not url:
+            return ""
+        try:
+            enc = str(enc)
+            if enc in ("0", ""):
+                return url.replace("\\/", "/")
+            if enc == "1":
+                pad = "=" * (-len(url) % 4)
+                return base64.b64decode(url + pad).decode("utf-8", "ignore")
+            if enc == "2":
+                raw = urllib.parse.unquote(url)
+                pad = "=" * (-len(raw) % 4)
+                return base64.b64decode(raw + pad).decode("utf-8", "ignore")
+        except Exception as e:
+            self.log("  解密失败 enc=%s: %s" % (enc, repr(e)[:80]))
+        return url.replace("\\/", "/")
+
     def _extract_stream(self, html):
         if not html:
             return ""
@@ -1128,8 +1161,8 @@ class Spider(Spider):
         if raw:
             try:
                 aa = json.loads(raw.replace("\\/", "/"))
-                if str(aa.get("encrypt", "0")) in ("0", "") and aa.get("url"):
-                    return aa["url"].replace("\\/", "/")
+                if aa.get("url"):
+                    return self._decrypt_url(aa["url"], aa.get("encrypt", "0"))
             except Exception:
                 mu = re.search(r'"url"\s*:\s*"([^"]+)"', raw)
                 if mu:
