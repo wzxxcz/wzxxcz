@@ -61,7 +61,10 @@ except ImportError:
     Spider = _BaseSpider
 
 
-HOST = "https://www.freeokk.lol"
+HOST = "https://www.freeokk.pro"        # 主域(站点 maccms.url 指向)
+ALT_HOSTS = ["https://www.freeokk.lol",  # 备用域(wapurl)
+             "https://freeokk.pro",
+             "https://freeokk.lol"]
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
 DEFAULT_PIC = HOST + "/static/images/favicon.png"
@@ -202,6 +205,10 @@ class Spider(Spider):
             self.extend = {}
 
         self.site_url = (self.extend.get("site") or HOST).rstrip("/")
+        # 多域名兜底: 站点主域/备用域自动切换, 防止单域名 DNS 污染或被墙
+        self.hosts = [self.site_url] + [h for h in (ALT_HOSTS if not self.extend.get("site")
+                                                    else [HOST] + ALT_HOSTS)
+                                        if h.rstrip("/") != self.site_url]
         self.headers = {
             "User-Agent": UA,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -216,29 +223,42 @@ class Spider(Spider):
         self.log("init: site=%s" % self.site_url)
 
     # ---------- 基础 ----------
-    def _fetch(self, url, timeout=30, headers=None, retries=2):
-        """站点有轻量限流, 短响应自动重试"""
+    def _host_swap(self, url, host):
+        """把 URL 的域名部分替换为 host, 保留路径与参数"""
+        m = re.match(r"(https?://)[^/]+(/.*)?$", url, re.I)
+        if m:
+            return host + (m.group(2) or "")
+        return url
+
+    def _fetch(self, url, timeout=20, headers=None, retries=1):
+        """多域名自动切换 + 短响应重试; 某域名连续失败自动跳下一个"""
         h = dict(self.headers)
         if headers:
             h.update(headers)
         text = ""
-        for attempt in range(retries + 1):
-            try:
-                rsp = self.fetch(url, headers=h, timeout=timeout)
-                if hasattr(rsp, "text"):
-                    text = rsp.text or ""
-                elif hasattr(rsp, "content"):
-                    text = rsp.content.decode("utf-8", "ignore")
-                else:
-                    text = str(rsp)
-                if len(text) > 800:
-                    return text
-                self.log("fetch short(%d) %s retry %d" % (len(text), url, attempt + 1))
-            except Exception as e:
-                self.log("fetch FAIL %s -> %s (retry %d)" % (url, e, attempt + 1))
-                text = ""
-            if attempt < retries:
-                time.sleep(0.6)
+        for host in self.hosts:
+            cur = self._host_swap(url, host)
+            for attempt in range(retries + 1):
+                try:
+                    rsp = self.fetch(cur, headers=h, timeout=timeout)
+                    if hasattr(rsp, "text"):
+                        text = rsp.text or ""
+                    elif hasattr(rsp, "content"):
+                        text = rsp.content.decode("utf-8", "ignore")
+                    else:
+                        text = str(rsp)
+                    if len(text) > 800:
+                        return text
+                    self.log("fetch short(%d) %s retry %d"
+                             % (len(text), cur, attempt + 1))
+                except Exception as e:
+                    self.log("fetch FAIL %s -> %s (retry %d)"
+                             % (cur, e, attempt + 1))
+                    text = ""
+                if attempt < retries:
+                    time.sleep(0.5)
+            # 该域名整体失败, 换下一个域名
+            self.log("switch host: %s -> next" % host)
         return text
 
     def _fix_url(self, url):
@@ -450,6 +470,25 @@ class Spider(Spider):
 
         videos = self._extract_videos(html)
         pagecount = self._page_count(html)
+
+        # 兜底1: /show 列表页失败 -> /type/{tid}.html 推荐页(服务端同样渲染卡片)
+        if not videos:
+            alt = "%s/type/%s.html" % (self.site_url, str(tid).split("-")[0])
+            self.log("  /show 为空, 回退 %s" % alt)
+            html = self._fetch(alt)
+            videos = self._extract_videos(html)
+            if videos:
+                pagecount = 1  # 推荐页无分页, 只提示一页
+            else:
+                # 兜底2: 首页
+                html = self._fetch(self.site_url + "/")
+                videos = self._extract_videos(html)
+                if videos:
+                    pagecount = 1
+
+        # /show 页正常但末页解析失败时保守回退
+        if videos and pagecount <= 0:
+            pagecount = 1
         self.log("  最终: %d 条, 总页数: %d" % (len(videos), pagecount))
 
         return {
@@ -481,8 +520,10 @@ class Spider(Spider):
         try:
             api = ("%s/api.php/provide/vod/?ac=list&wd=%s&pg=%d"
                    % (self.site_url, urllib.parse.quote(key), page))
-            rsp = self.fetch(api, headers={"User-Agent": UA}, timeout=15)
-            data = json.loads(rsp.text)
+            text = self._api_get(api)
+            if not text:
+                raise RuntimeError("api 空响应")
+            data = json.loads(text)
             videos = [{
                 "vod_id": "/detail/%d.html" % it["vod_id"],
                 "vod_name": it.get("vod_name", ""),
@@ -498,6 +539,21 @@ class Spider(Spider):
                     "limit": SEARCH_PAGE_SIZE, "total": 0}
 
     # ---------- 详情 ----------
+    def _api_get(self, url):
+        """短 JSON 响应的多域名请求(不走 _fetch 的长度判断)"""
+        err = ""
+        for host in self.hosts:
+            cur = self._host_swap(url, host)
+            try:
+                rsp = self.fetch(cur, headers={"User-Agent": UA}, timeout=15)
+                text = rsp.text if hasattr(rsp, "text") else ""
+                if text and "{" in text:
+                    return text
+            except Exception as e:
+                err = str(e)
+            self.log("api switch host: %s -> next (%s)" % (cur, err))
+        return ""
+
     def _fetch_vod_sub(self, vod_id):
         """副标题(又名): 页面不展示, 从官方 API ac=detail 的 vod_sub 取"""
         m = re.search(r'/detail/(\d+)', vod_id)
@@ -509,8 +565,10 @@ class Spider(Spider):
         sub = ""
         try:
             api = "%s/api.php/provide/vod/?ac=detail&ids=%s" % (self.site_url, vid)
-            rsp = self.fetch(api, headers={"User-Agent": UA}, timeout=15)
-            data = json.loads(rsp.text)
+            text = self._api_get(api)
+            if not text:
+                raise RuntimeError("api 空响应")
+            data = json.loads(text)
             lst = data.get("list") or []
             if lst:
                 sub = (lst[0].get("vod_sub") or "").strip()
