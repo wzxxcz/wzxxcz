@@ -7618,4 +7618,3 @@ class Spider(_BaseSpider):
         except Exception as exc:
             msg = "hg localProxy failed: %s\n%s" % (exc, traceback.format_exc())
             return [500, "text/plain; charset=utf-8", msg.encode("utf-8")]
-
