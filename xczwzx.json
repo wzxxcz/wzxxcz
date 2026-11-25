@@ -1393,6 +1393,12 @@
             "api": "./py/七五网.py"
         },
         {
+            "key": "FreeOK",
+            "name": "🌱FreeOK",
+            "type": 3,
+            "api": "./py/FreeOK.py"
+        },
+        {
             "key": "爬虫影视",
             "name": "🐛爬虫影视",
             "type": 1,
