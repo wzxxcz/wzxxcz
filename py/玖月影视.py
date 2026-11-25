@@ -383,22 +383,16 @@ class Spider(Spider):
             self._cache_load()
         except Exception as e:
             self.log("init 初始化异常(已兜底, 不阻断)", e)
-        # 冷启动预热：后台线程提前过滑块守卫并落持久化缓存。
-        # 治"清空缓存后首页/列表空白、重启才正常"：清缓存后守卫令牌丢失，
-        # 首次 homeVideoContent 需串行 4 个请求(首访/取图/识别/验证)过盾，
-        # 壳子等待超时即渲染空白；后台预热在壳子真正发请求前完成解盾，
-        # 且令牌提前 setCache 落盘——即使首次仍超时, 重启后也必然命中缓存秒过。
-        try:
-            threading.Thread(target=self._warmup, daemon=True).start()
-        except Exception:
-            pass
+        # 注意：init 内不发网络请求、不起后台线程——设备端 py 引擎对 daemon
+        # 线程兼容性差，线程内异常会导致实例被壳子永久缓存成空壳(分类/首页全空)。
+        # 守卫预热改挂 homeContent（壳子进站第一个调用点）同步带预算执行。
 
-    def _warmup(self):
-        """后台预热守卫：缓存已命中/已放行则跳过；异常静默，不阻断主流程。"""
+    def _warmup(self, budget=8.0):
+        """同步预热守卫（带时间预算）：homeContent 首次调用时执行，
+        homeVideoContent 到来时守卫已就绪，首页数据秒回；异常静默不阻断。"""
         try:
-            time.sleep(0.2)  # 让 init 尽快返回
             if not self._guard_ok:
-                self._solve_guard(retries=2)
+                self._solve_guard(retries=2, budget=budget)
         except Exception as e:
             try:
                 self.log("预热跳过", e)
@@ -495,35 +489,41 @@ class Spider(Spider):
             pass
         return "_guard/html.js" in text
 
-    def _solve_guard(self, retries=3):
-        """解滑块守卫：加锁串行，单轮失败换图重试；成功返回 True。"""
+    def _solve_guard(self, retries=3, budget=0.0):
+        """解滑块守卫：加锁串行，单轮失败换图重试；budget>0 时超预算即停（预热防阻塞）。
+        成功返回 True。"""
         with self._guard_lock:
+            t0 = time.time()
             for attempt in range(retries):
                 try:
                     if self._solve_once():
                         return True
                 except Exception as e:
                     self.log("守卫求解异常", e)
+                if budget and (time.time() - t0) >= budget:
+                    self.log("预热预算用尽, 交由后续请求遇壳自愈")
+                    break
                 if attempt < retries - 1:
                     time.sleep(0.8)
         self._guard_ok = False
         return False
 
     def _solve_once(self):
-        """单轮：首访落会话→取拼图→识别缺口→RC4 种 guardret→验证放行。"""
+        """单轮：首访落会话→取拼图→识别缺口→RC4 种 guardret。
+        验证省略（交由 _http_get 重放目标请求时自然完成），压缩冷启动耗时。"""
         sess = self._guard_sess()
         h = dict(self.headers)
-        # 1. 首访落会话 Cookie
+        # 1. 首访落会话 Cookie（短超时：守卫路径响应都很轻）
         if sess is not None:
-            sess.get(self.site_url + "/", headers=h, timeout=(10, 20))
+            sess.get(self.site_url + "/", headers=h, timeout=(5, 10))
             rp = sess.get(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
-                          headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
+                          headers=dict(h, Referer=self.site_url + "/"), timeout=(5, 10))
             body = rp.content
             ck = sess.cookies.get_dict()
         else:
-            self.fetch(self.site_url + "/", headers=h, timeout=(10, 20))
+            self.fetch(self.site_url + "/", headers=h, timeout=(5, 10))
             rp = self.fetch(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
-                            headers=dict(h, Referer=self.site_url + "/"), timeout=(10, 20))
+                            headers=dict(h, Referer=self.site_url + "/"), timeout=(5, 10))
             body = rp.content
             ck = {}
             for c in getattr(rp, "cookies", []):
@@ -551,21 +551,11 @@ class Spider(Spider):
             sess.cookies.set("guard", guard, path="/")
             sess.cookies.set("guardword", guardword, path="/")
         self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in ck.items())
-
-        # 验证一次
-        if sess is not None:
-            rv = sess.get(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
-                          timeout=(10, 20))
-            ok = not self._is_shell(rv.text, getattr(rv, "status_code", 200))
-        else:
-            rv = self.fetch(self.site_url + "/", headers=dict(h, Referer=self.site_url + "/"),
-                            timeout=(10, 20))
-            ok = not self._is_shell(rv.text)
-        self._guard_ok = ok
-        if ok:
-            self._cache_save()
-        self.log("守卫求解 gx=%d gw=%d 放行=%s" % (gx, gy, ok))
-        return ok
+        # 乐观置位：令牌正确性由 _http_get 重放结果裁决，撞壳会自动重解覆盖缓存
+        self._guard_ok = True
+        self._cache_save()
+        self.log("守卫求解 gx=%d gw=%d" % (gx, gy))
+        return True
 
     def _http_get(self, url, headers=None, timeout=15):
         """本站 GET：优先守卫 session 复用 Cookie；遇壳重解后重放一次。"""
@@ -771,6 +761,10 @@ class Spider(Spider):
 
     # ---------------- 首页 / 分类 / 搜索 ----------------
     def homeContent(self, filter=False):
+        # 同步预热守卫（带 8s 预算）：homeContent 是壳子进站第一个调用点，
+        # 在此过盾后，紧随其后的 homeVideoContent 秒回数据，
+        # 治"清空缓存后首页更新推荐空白"。无线程，兼容所有设备端 py 引擎。
+        self._warmup(budget=8.0)
         return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
