@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-FreeOK freeokk.lol | TVBox Python 爬虫
+FreeOK freeokk.lol | TVBox Python 爬虫（豆花 dhvideo 契约）
 站点结构（线上快照实证，MacCMS 模板）:
   - 首页:   /
   - 分类入口: /type/<tid>.html            （首页模块，仅首屏 40 条）
@@ -34,7 +34,7 @@ FreeOK freeokk.lol | TVBox Python 爬虫
 
 站点防护（实证）:
   - 间歇 ReadTimeout/上游小页，重试即恢复；首页下发会话 Cookie，后续复用同一 Session。
-  - 主备域名（顺序即轮换顺序，均为同站镜像，2026-11-25 实测）:
+  - 主备域名（顺序即轮换顺序，均为同站镜像，实测）:
       freeokk.lol(主用最稳) → www.freeokk.pro → www.freeok.ink → freeokk.top(末位兜底,实测间歇 503)
   - 强制 IPv4；自建 Session 优先 + 基类 fetch 回退；遇障重放后轮换主备。
 """
@@ -260,32 +260,42 @@ class Spider(Spider):
 
     # ---------------- 基础 ----------------
     def init(self, extend=""):
+        # 整体 try 兜底：init 在框架 computeIfAbsent 窗口同步执行，任何装配异常外抛
+        # 都会被缓存成 SpiderNull 永久空箱；异常只记日志，字段给本地兜底值不外抛。
         try:
             self.extend = json.loads(extend) if extend else {}
-        except Exception:
-            self.extend = {}
+            self.hosts = list(HOSTS)
+            self.site_url = (self.extend.get("site") or HOST).rstrip("/")
+            self._host_idx = 0
+            for i, h in enumerate(self.hosts):
+                if h.rstrip("/") == self.site_url:
+                    self._host_idx = i
+                    break
 
-        self.hosts = list(HOSTS)
-        self.site_url = (self.extend.get("site") or HOST).rstrip("/")
-        self._host_idx = 0
-        for i, h in enumerate(self.hosts):
-            if h.rstrip("/") == self.site_url:
-                self._host_idx = i
-                break
-
-        self.headers = {
-            "User-Agent": UA,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
-            "Referer": self.site_url + "/",
-            "Upgrade-Insecure-Requests": "1",
-        }
-        self.default_pic = DEFAULT_PIC
-        self._session = None
-        self._warmed = False
-        self._play_cache = {}
+            self.headers = {
+                "User-Agent": UA,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache",
+                "Referer": self.site_url + "/",
+                "Upgrade-Insecure-Requests": "1",
+            }
+            self.default_pic = DEFAULT_PIC
+            self._session = None
+            self._warmed = False
+            self._play_cache = {}
+        except Exception as e:
+            self.log("init 初始化异常(已兜底, 不阻断)", e)
+            self.extend = getattr(self, "extend", {}) or {}
+            self.hosts = list(HOSTS)
+            self.site_url = HOST
+            self._host_idx = 0
+            self.headers = {"User-Agent": UA, "Referer": HOST + "/"}
+            self.default_pic = DEFAULT_PIC
+            self._session = None
+            self._warmed = False
+            self._play_cache = {}
 
     def getDependence(self):
         return []
@@ -312,7 +322,7 @@ class Spider(Spider):
                 self._session = None
         return self._session
 
-    def _is_bad(self, text, status=200):
+    def _is_bad(self, text, status=200, url=""):
         if not text:
             return True
         if status and int(status) in (403, 502, 503, 500, 404):
@@ -326,6 +336,10 @@ class Spider(Spider):
             return True
         # 列表/搜索异版缓存：短页且无任何详情链接、无播放变量，判坏跨域重试
         if len(text) < 4000 and "/detail/" not in text and "player_aaaa" not in text:
+            return True
+        # 播放页异版大壳：有选集/推荐 DOM 但缺播放器变量 player_aaaa（直链/外链正常页均带），
+        # 体积可能很大（~79KB），短页阈值拦不住，按播放页专项判坏触发重放/跨域轮换。
+        if "/play/" in url and "player_aaaa" not in text:
             return True
         return False
 
@@ -369,7 +383,7 @@ class Spider(Spider):
         text = rsp.text if rsp is not None and hasattr(rsp, "text") else ""
         status = getattr(rsp, "status_code", 200) if rsp is not None else 0
 
-        if self._is_bad(text, status):
+        if self._is_bad(text, status, url):
             # 重新落会话后直接重放目标一次（不再先打首页预热，减少抖动期开销）
             self._session = None
             sess2 = self._session_get()
@@ -401,7 +415,7 @@ class Spider(Spider):
                         rsp.content.decode("utf-8", "ignore")
                         if rsp is not None and hasattr(rsp, "content") else "")
                     status = getattr(rsp, "status_code", 200) if rsp is not None else 0
-                    if not self._is_bad(text, status):
+                    if not self._is_bad(text, status, target):
                         # 成功 host 记为当前主域，后续请求跟随最稳域名
                         if idx != self._host_idx:
                             self._host_idx = idx
@@ -584,7 +598,7 @@ class Spider(Spider):
     def homeVideoContent(self):
         try:
             self._warm_up()
-            html = self._fetch(self.site_url + "/")
+            html = self._fetch_list(self.site_url + "/")
             self.log("home HTML 长度: %d" % len(html))
             return {"list": self._parse_cards(html)}
         except Exception as e:
@@ -631,11 +645,12 @@ class Spider(Spider):
         return max(1, max(pages)) if pages else 1
 
     def _fetch_list(self, url):
-        """列表/搜索页：首次取空（变体缓存/空壳）时清会话重取一次。"""
+        """列表/搜索页：首次取空（变体缓存/空壳）时清会话、重新预热落 cookie 后重取一次。"""
         html = self._fetch(url)
         if not self._parse_cards(html):
             self._session = None
             self._warmed = False
+            self._warm_up()
             html = self._fetch(url)
         return html
 
@@ -910,10 +925,13 @@ class Spider(Spider):
                 self.log("  => 直链: %s" % stream[:160])
                 return res
 
-            # 提取不到直链（网页外链/无直链）：交客户端嗅探播放页
+            # 提取不到直链（网页外链/无直链）：交客户端嗅探播放页。
+            # 仅明确拿到 http 外链才缓存；空壳/坏页解析出的空 stream 兜底结果不缓存，
+            # 避免冷启动坏结果被锁 600 秒，下次播放重新抓取自愈。
             target = stream if stream.startswith("http") else play_page
             res = {"parse": 1, "playUrl": "", "url": target, "header": header}
-            self._play_cache[play_page] = (now, res)
+            if stream.startswith("http"):
+                self._play_cache[play_page] = (now, res)
             return res
         except Exception as e:
             self.log("playerContent 异常:", e)
@@ -1036,7 +1054,13 @@ class Spider(Spider):
         return False
 
     def destroy(self):
-        pass
+        # 退出源/重载时清内存会话与播放缓存，避免单例残留坏态；字段保留可下次重建
+        try:
+            self._session = None
+            self._play_cache = {}
+            self._warmed = False
+        except Exception:
+            pass
 
     def close(self):
         self.destroy()
