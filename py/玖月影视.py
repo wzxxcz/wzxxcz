@@ -468,25 +468,35 @@ class Spider(Spider):
         """从持久化缓存回填守卫 Cookie；host 不符/过期/代理不可用则跳过，不阻断。"""
         try:
             data = self.getCache(_GUARD_CACHE_KEY)
-            if not isinstance(data, dict):
-                return False
-            if data.get("host") != self.site_url:
-                return False
-            ck = data.get("cookies") or {}
-            if not ck:
-                return False
-            sess = self._guard_sess()
-            if sess is not None:
-                for k, v in ck.items():
-                    sess.cookies.set(k, v, path="/")
-            self._guard_cookie = (data.get("cookie_header")
-                                  or "; ".join("%s=%s" % (k, v) for k, v in ck.items()))
-            self._guard_ok = True
-            self.log("守卫令牌缓存已复用")
-            return True
+            if isinstance(data, dict) and data.get("host") == self.site_url:
+                ck = data.get("cookies") or {}
+                if ck:
+                    sess = self._guard_sess()
+                    if sess is not None:
+                        for k, v in ck.items():
+                            sess.cookies.set(k, v, path="/")
+                    self._guard_cookie = (data.get("cookie_header")
+                                          or "; ".join("%s=%s" % (k, v) for k, v in ck.items()))
+                    self._guard_ok = True
+                    self.log("守卫令牌缓存已复用")
+                    return True
         except Exception as e:
             self.log("缓存读跳过", e)
-            return False
+        # 持久缓存未命中 → 复用模块级抢跑解盾结果（exec 阶段已完成）
+        try:
+            mck = _MODULE_GUARD.get("cookies")
+            if mck:
+                sess = self._guard_sess()
+                if sess is not None:
+                    for k, v in mck.items():
+                        sess.cookies.set(k, v, path="/")
+                self._guard_cookie = "; ".join("%s=%s" % (k, v) for k, v in mck.items())
+                self._guard_ok = True
+                self.log("模块级抢跑守卫结果已复用")
+                return True
+        except Exception:
+            pass
+        return False
 
     def _cache_save(self):
         """过盾成功后持久化守卫令牌；代理不可用则跳过，不阻断。"""
@@ -827,6 +837,8 @@ class Spider(Spider):
 
     def homeVideoContent(self):
         try:
+            t0 = time.time()
+            BUDGET = 12.0  # 预算感知: 超预算不再跑长兜底, 把剩余机会留给用户刷新重试
             # 0) 持久缓存优先：令牌/数据任一命中即秒回，冷启动彻底绕开解盾耗时
             cached = self._home_cache_get()
             if cached:
@@ -837,12 +849,12 @@ class Spider(Spider):
             self.log("home HTML 长度: %d" % len(html))
             videos = self._parse_cards(html)
             # 空列表兜底1：直接重拉（_http_get 遇壳自会重解, 不盲目清守卫态）
-            if not videos:
+            if not videos and (time.time() - t0) < BUDGET:
                 self.log("  首页为空, 直接重拉一次")
                 html = self._fetch(self.site_url + "/")
                 videos = self._parse_cards(html)
             # 空列表兜底2：疑似令牌失效, 清守卫态重解重拉
-            if not videos:
+            if not videos and (time.time() - t0) < BUDGET:
                 self.log("  仍为空, 清守卫态重解重拉")
                 self._guard_session = None
                 self._guard_cookie = ""
@@ -850,7 +862,7 @@ class Spider(Spider):
                 html = self._fetch(self.site_url + "/")
                 videos = self._parse_cards(html)
             # 空列表兜底3：分类页卡片合并
-            if not videos:
+            if not videos and (time.time() - t0) < BUDGET:
                 self.log("  仍为空, 分类页兜底")
                 seen, merged = set(), []
                 for tid in ("1", "2", "4"):
@@ -860,6 +872,9 @@ class Spider(Spider):
                             seen.add(v["vod_id"])
                             merged.append(v)
                 videos = merged
+            # 兜底4：旧数据(不限时)——宁可旧图也不要空白
+            if not videos:
+                videos = self._home_cache_get(ignore_ttl=True) or []
             # 成功即落数据缓存：为下次"清缓存冷启动"攒保险
             if videos:
                 self._home_cache_put(videos)
@@ -1299,3 +1314,51 @@ class Spider(Spider):
 
     def close(self):
         self.destroy()
+
+
+# ===================== 模块级抢跑守卫（冷启动决胜） =====================
+# 壳子 exec 加载 py 时同步预解盾：守卫完成于接口计时开始之前，
+# 首个 homeContent/homeVideoContent 调用零守卫等待，全部落在壳子超时窗口内。
+# 单轮尝试 + 8 秒预算，任何异常静默吞掉，绝不影响模块加载。
+_MODULE_GUARD = {"cookies": None}
+
+
+def _module_warm_guard():
+    try:
+        import requests as rq
+        sess = rq.Session()
+        sess.verify = False
+        adapter = rq.adapters.HTTPAdapter(
+            pool_connections=4, pool_maxsize=4, max_retries=0)
+        sess.mount('https://', adapter)
+        sess.mount('http://', adapter)
+        h = {"User-Agent": UA, "Referer": HOST + "/",
+             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"}
+        t0 = time.time()
+        sess.get(HOST + "/", headers=h, timeout=(4, 8))
+        rp = sess.get(HOST + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
+                      headers=dict(h, Referer=HOST + "/"), timeout=(4, 8))
+        ck = sess.cookies.get_dict()
+        guard = ck.get("guard", "")
+        guardword = ck.get("guardword", "")
+        if not guard or not guardword or (time.time() - t0) > 8:
+            return
+        gw = int(guardword)
+        gx = _gap_x_cv2(rp.content, gw)
+        if gx is None:
+            gx = _gap_x_pure(rp.content, gw)
+        gx = int(round(gx))
+        guardret = base64.b64encode(
+            _rc4(("%dx%d" % (gx, gw)).encode("utf-8"), guard[:8])).decode("utf-8")
+        sess.cookies.set("guardret", guardret, path="/")
+        rv = sess.get(HOST + "/", headers=h, timeout=(4, 8))
+        body = rv.text if hasattr(rv, "text") else ""
+        if len(body) > 500 and "_guard/html.js" not in body:
+            ck["guardret"] = guardret
+            _MODULE_GUARD["cookies"] = ck
+    except Exception:
+        pass
+
+
+_module_warm_guard()
