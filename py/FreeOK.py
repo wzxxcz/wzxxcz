@@ -11,7 +11,7 @@ FreeOK freeokk.lol | TVBox Python 爬虫
 
   show slug 12 段槽位:
     段0=tid / 段1=地区 / 段2=排序 time·hits·score / 段3=类型 / 段4=语言 /
-    段5=首字母(脚本不暴露) / 段6~7 空 / 段8=页码 / 段9~10 空 / 段11=年代；中文 percent-encode
+    段5=字母(A~Z；0-9 落段5=0、段6=9) / 段7 空 / 段8=页码 / 段9~10 空 / 段11=年代；中文 percent-encode
 
   卡片(列表/首页): a.module-poster-item[href=/detail/<id>.html][title]
       .module-item-note=备注(HD国语/更新至xx集)；img.lazy data-original/alt 封面；
@@ -155,6 +155,9 @@ _LANGS = {
 # 年代（URL 段11，站点实证 2014~2026）
 _YEARS = [str(y) for y in range(2026, 2013, -1)]
 
+# 字母（URL 段5；0-9 选项本身含连字符，落段5=0、段6=9）
+_LETTERS = [chr(c) for c in range(ord("A"), ord("Z") + 1)] + ["0-9"]
+
 # 排序（URL 段2）
 _SORTS = [("最新更新", "time"), ("人气最高", "hits"), ("评分最高", "score")]
 
@@ -166,12 +169,13 @@ def _opts(values):
 FILTERS = {}
 for c in CLASSES:
     tid = c["type_id"]
-    # 展示顺序对齐站点展开筛选：类型 → 地区 → 语言 → 年代；排序在筛选区末行
+    # 展示顺序对齐站点 PC 库展开筛选：类型 → 地区 → 语言 → 年代 → 字母；排序在末行
     FILTERS[tid] = [
         {"key": "type", "name": "类型", "value": _opts(_TYPES.get(tid, []))},
         {"key": "area", "name": "地区", "value": _opts(_AREAS.get(tid, []))},
         {"key": "lang", "name": "语言", "value": _opts(_LANGS.get(tid, []))},
         {"key": "year", "name": "年代", "value": _opts(_YEARS)},
+        {"key": "letter", "name": "字母", "value": _opts(_LETTERS)},
         {"key": "sort", "name": "排序",
          "value": [{"n": n, "v": v} for n, v in _SORTS]},
     ]
@@ -225,9 +229,13 @@ _RE_FIELD = re.compile(
     re.S | re.I)
 _RE_A = re.compile(r'<a[^>]*>([\s\S]*?)</a>', re.I)
 
-# 线路 tab（DOM 序）与 panel 选集块；精确匹配 module-tab-item（排除 module-tab-items-box 容器）
-_RE_TAB = re.compile(r'<div class="module-tab-item(?:\s|")[^>]*>([\s\S]*?)</div>', re.S | re.I)
+# 线路 tab（DOM 序）与 panel 选集块；兼容 div/a 标签、class 前置属性；
+# 精确匹配 module-tab-item 边界，排除 module-tab-items-box / module-tab-title 容器
+_RE_TAB = re.compile(
+    r'<(div|a)\b[^>]*class="[^"]*module-tab-item(?:\s|")[^"]*"[^>]*>([\s\S]*?)</\1>',
+    re.S | re.I)
 _RE_TAB_SPAN = re.compile(r'<span>([^<]+)</span>', re.I)
+_RE_TAB_SMALL = re.compile(r'<small[\s\S]*?</small>', re.I)
 _RE_PANEL = re.compile(
     r'<div class="module-list[^"]*tab-list[^"]*"[^>]*>([\s\S]*?)(?=<div class="module-list|$)',
     re.S | re.I)
@@ -586,7 +594,7 @@ class Spider(Spider):
     def _filter_slug(self, tid, extend, page=1):
         """构造 /show/ 12 段空槽 URL。
         段0=tid / 段1=地区 / 段2=排序 / 段3=类型 / 段4=语言 /
-        段8=页码 / 段11=年代，段5~7、9~10 空段占位。"""
+        段5=字母(0-9 落段5=0、段6=9) / 段8=页码 / 段11=年代，段7、9~10 空段占位。"""
         seg = [""] * 12
         seg[0] = str(tid)
         if extend.get("area"):
@@ -597,7 +605,13 @@ class Spider(Spider):
             seg[3] = extend["type"]
         if extend.get("lang"):
             seg[4] = extend["lang"]
-        seg[8] = str(page) if page else ""
+        if extend.get("letter"):
+            lv = str(extend["letter"])
+            if lv == "0-9":
+                seg[5], seg[6] = "0", "9"
+            else:
+                seg[5] = lv
+        seg[8] = str(page) if page and page > 1 else ""
         if extend.get("year"):
             seg[11] = str(extend["year"])
         parts = [urllib.parse.quote(x, safe="") for x in seg]
@@ -642,7 +656,7 @@ class Spider(Spider):
             if extend or page > 1:
                 url = self.site_url + self._filter_slug(tid, extend, page)
             else:
-                url = self.site_url + "/show/%s-----------.html" % tid
+                url = self.site_url + "/show/" + str(tid) + "-----------.html"
 
             self.log("category: %s" % url)
             html = self._fetch_list(url)
@@ -801,13 +815,23 @@ class Spider(Spider):
             self.log("detailContent 异常:", e)
             return {"list": []}
 
+    def _tab_name(self, inner):
+        """线路名：span 优先；否则剥掉 <small> 计数后取纯文本。"""
+        ms = _RE_TAB_SPAN.search(inner)
+        if ms:
+            return self._clean(ms.group(1))
+        t = _RE_TAB_SMALL.sub("", inner)
+        return self._clean(re.sub(r"<[^>]+>", "", t))
+
     def _parse_lines(self, html):
         """线路 tab（DOM 序）与 panel 选集块按顺序一一对应。
-        返回 (play_from, play_url)，保序去重。"""
+        页面存在隐藏 mobile-tab-box 与可见 playSwiper 双份 tab，保序去重；
+        返回 (play_from, play_url)。"""
         tabs = []
-        for t in _RE_TAB.findall(html):
-            ms = _RE_TAB_SPAN.search(t)
-            tabs.append(self._clean(ms.group(1)) if ms else "")
+        for _tag, inner in _RE_TAB.findall(html):
+            name = self._tab_name(inner)
+            if name and name not in tabs:
+                tabs.append(name)
         panels = _RE_PANEL.findall(html)
 
         play_from, play_url = [], []
