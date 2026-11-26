@@ -202,6 +202,7 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
+        self._last_search = 0.0
         self.log("init: site=%s" % self.site_url)
 
     # ---------------- 基础工具 ----------------
@@ -250,6 +251,13 @@ class Spider(Spider):
         if not pic:
             return True
         return any(k in pic for k in _PLACEHOLDER_PICS)
+
+    def _is_rate_limited(self, html):
+        """站点搜索限流提示页: 标题「系统提示」/「请不要频繁操作」/「时间间隔」。"""
+        if not html:
+            return True
+        return ("频繁操作" in html or "时间间隔" in html or
+                "系统提示" in html or "msg_jump" in html)
 
     def _fix_pic(self, pic):
         pic = self._fix_url(pic)
@@ -416,8 +424,20 @@ class Spider(Spider):
             keyword = urllib.parse.quote(key)
             url = "%s/search/%s-------------.html?wd=%s" % (
                 self.site_url, keyword, keyword)
-            self.log("search: %s" % url)
-            html = self._fetch(url)
+            # 站点搜索限 3 秒/次: 先节流到 3.05s 间隔, 命中限流提示页则等待重试
+            html = ""
+            for attempt in range(3):
+                now = time.time()
+                wait = 3.05 - (now - self._last_search)
+                if wait > 0:
+                    time.sleep(wait)
+                self._last_search = time.time()
+                self.log("search: %s (第%d次)" % (url, attempt + 1))
+                html = self._fetch(url)
+                if not self._is_rate_limited(html):
+                    break
+                self.log("  搜索限流, 等待 3.2 秒后重试")
+                time.sleep(3.2)
             videos = self._extract_videos(html)
             return {
                 "list": videos,
