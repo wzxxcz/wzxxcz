@@ -5,7 +5,7 @@
 分类: 1 电影 / 2 电视剧 / 3 综艺 / 4 动漫 (四分类, 无短剧)。
 路由:
   - 分类       /type/<tid>.html        分页 /type/<tid>-<page>.html
-  - 筛选       /show/<12 槽>.html      seg0=tid seg1=地区 seg3=类型 seg8=页码 seg11=年份
+  - 筛选       /show/<12 槽>.html    seg0=tid seg1=地区 seg2=排序 seg3=类型 seg4=语言 seg8=页码 seg11=年份
   - 详情       /detail/<vid>.html
   - 搜索       /search/<词>-------------.html?wd=<词>
   - 播放       /play/<vid>-<sid>-<nid>.html
@@ -73,29 +73,58 @@ CLASSES = [
     {"type_id": "4", "type_name": "动漫"},
 ]
 
-# 站点分类页线上只暴露「类型」筛选标签 (无地区/年份/排序面板), 筛选组与网站保持一致。
-_TYPE_FALLBACK = {
-    "1": ["剧情", "喜剧", "动作", "爱情", "惊悚", "犯罪", "恐怖", "悬疑", "冒险",
-          "奇幻", "科幻", "家庭", "历史", "战争", "纪录片", "古装", "动画", "传记",
-          "武侠", "运动", "短片"],
-    "2": ["剧情", "喜剧", "爱情", "犯罪", "悬疑", "家庭", "古装", "惊悚", "动作",
-          "奇幻", "科幻", "都市", "历史", "战争", "冒险", "武侠", "恐怖", "青春",
-          "传记", "谍战", "情感", "军旅", "时装"],
-    "3": ["真人秀", "脱口秀", "国产综艺", "喜剧", "晚会", "综艺", "音乐", "纪录",
-          "游戏", "生活", "港台综艺", "日韩综艺", "文化", "相声", "情感", "欧美综艺",
-          "美食", "竞技"],
-    "4": ["动画", "冒险", "喜剧", "奇幻", "剧情", "科幻", "动作", "儿童", "悬疑",
-          "都市", "家庭", "国漫", "日常", "爱情", "玄幻", "日漫", "音乐", "治愈",
-          "短片", "古风", "犯罪", "武侠", "运动", "校园"],
+# 站点 show 库页线上渲染五组筛选: 地区 / 年份 / 剧情(类型) / 语言 / 排序。
+# 选项清单按四分类逐分类取自线上 show/<tid>-----------.html (地区/类型/语言各分类不同, 不共用)。
+# show 12 槽: seg0=tid seg1=地区 seg2=排序(time/hits/score) seg3=类型 seg4=语言 seg8=页码 seg11=年份。
+_YEARS = [str(y) for y in range(2027, 2009, -1)]
+_SORTS = [{"n": "全部", "v": ""}, {"n": "添加时间", "v": "time"},
+          {"n": "人气高低", "v": "hits"}, {"n": "评分高低", "v": "score"}]
+
+_FILTER_OPTIONS = {
+    "1": {
+        "area": ["大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国", "德国",
+                 "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"],
+        "type": ["喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪", "犯罪",
+                 "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚", "经典", "青春",
+                 "文艺", "微电影", "古装", "历史", "运动", "农村", "儿童", "网络电影"],
+        "lang": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它"],
+    },
+    "2": {
+        "area": ["内地", "韩国", "香港", "台湾", "日本", "美国", "泰国", "英国", "新加坡", "其他"],
+        "type": ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻", "剧情",
+                 "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"],
+        "lang": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"],
+    },
+    "3": {
+        "area": ["内地", "港台", "日韩", "欧美"],
+        "type": ["选秀", "情感", "访谈", "播报", "旅游", "音乐", "美食", "纪实", "曲艺",
+                 "生活", "游戏互动", "财经", "求职"],
+        "lang": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"],
+    },
+    "4": {
+        "area": ["国产", "日本", "欧美", "其他"],
+        "type": ["情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园", "动作",
+                 "机战", "运动", "战争", "少年", "少女", "社会", "原创", "亲子", "益智",
+                 "励志", "其他"],
+        "lang": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"],
+    },
 }
 
 FILTERS = {}
 for c in CLASSES:
-    _fallback = _TYPE_FALLBACK.get(c["type_id"], ["全部"])
-    FILTERS[c["type_id"]] = [
-        {"key": "class", "name": "类型",
-         "value": [{"n": "全部", "v": ""}] +
-                  [{"n": x, "v": x} for x in _fallback]},
+    tid = c["type_id"]
+    opt = _FILTER_OPTIONS.get(tid, {"area": [], "type": [], "lang": []})
+
+    def _vals(items):
+        return [{"n": "全部", "v": ""}] + [{"n": x, "v": x} for x in items]
+
+    FILTERS[tid] = [
+        {"key": "area", "name": "地区", "value": _vals(opt["area"])},
+        {"key": "year", "name": "年份",
+         "value": [{"n": "全部", "v": ""}] + [{"n": y, "v": y} for y in _YEARS]},
+        {"key": "class", "name": "剧情", "value": _vals(opt["type"])},
+        {"key": "lang", "name": "语言", "value": _vals(opt["lang"])},
+        {"key": "sort", "name": "排序", "value": _SORTS},
     ]
 
 # ===================== 正则 =====================
@@ -126,7 +155,13 @@ _RE_INTRO_DIV = re.compile(
 _RE_META_DESC = re.compile(
     r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']', re.I)
 _RE_SCORE = re.compile(r'<div class="score">([\d.]+)</div>', re.I)
+_RE_ROLES = re.compile(
+    r'<div class="roles">\s*<div class="name">别名:</div>([\s\S]*?)</div>', re.I)
+_RE_ITEM = re.compile(
+    r'<div class="item">([\s\S]*?)</div>\s*(?=<div class="line">|<div class="item">|</div>\s*</div>)',
+    re.S | re.I)
 _RE_ITEM_TOP = re.compile(r'<div class="item-top">([\s\S]*?)</div>', re.S | re.I)
+_RE_ITEM_BOT = re.compile(r'<div class="item-bottom">([\s\S]*?)</div>', re.S | re.I)
 _RE_YEAR = re.compile(r'(19|20)\d{2}')
 _RE_AREA_PAREN = re.compile(r'\(([^)]+)\)')
 
@@ -139,9 +174,6 @@ _RE_EP_BOX = re.compile(
     r'<div class="item">|$)', re.S | re.I)
 _RE_EP_A = re.compile(
     r'<a[^>]*href="(/play/[^"]+\.html)"[^>]*>([\s\S]*?)</a>', re.I)
-
-# 播放变量
-_RE_PLAYER_AAAA = re.compile(r'player_aaaa\s*=', re.I)
 
 _PLACEHOLDER_PICS = ("lazyload-poster", "error-poster", "default", "placeholder",
                       "loading", "blank")
@@ -170,7 +202,6 @@ class Spider(Spider):
         }
         self.default_pic = DEFAULT_PIC
         self._play_cache = {}
-        self._filter_cache = {}
         self.log("init: site=%s" % self.site_url)
 
     # ---------------- 基础工具 ----------------
@@ -283,13 +314,15 @@ class Spider(Spider):
         return videos
 
     # ---------------- 筛选 URL ----------------
-    def _build_show_url(self, tid, ctype="", page=1):
+    def _build_show_url(self, tid, ctype="", page=1, area="", sort="", lang="", year=""):
         seg = [""] * 12
         seg[0] = str(tid)
-        seg[1] = ""          # 地区 (站点线上未暴露)
-        seg[3] = ctype or ""  # 类型
+        seg[1] = area or ""    # 地区
+        seg[2] = sort or ""    # 排序 time/hits/score
+        seg[3] = ctype or ""   # 剧情/类型
+        seg[4] = lang or ""    # 语言
         seg[8] = str(page) if page and int(page) > 1 else ""  # 页码
-        seg[11] = ""         # 年份 (站点线上未暴露)
+        seg[11] = year or ""   # 年份
         slug = "-".join(urllib.parse.quote(x) for x in seg)
         return "/show/%s.html" % slug
 
@@ -345,9 +378,15 @@ class Spider(Spider):
                     del extend[k]
 
             ctype = extend.get("class") or ""
+            area = extend.get("area") or ""
+            lang = extend.get("lang") or ""
+            year = extend.get("year") or ""
+            sort = extend.get("sort") or ""
 
-            if ctype:
-                url = self.site_url + self._build_show_url(tid, ctype, page)
+            has_filter = any([ctype, area, lang, year, sort])
+            if has_filter:
+                url = self.site_url + self._build_show_url(
+                    tid, ctype, page, area=area, sort=sort, lang=lang, year=year)
             elif page > 1:
                 url = "%s/type/%s-%d.html" % (self.site_url, tid, page)
             else:
@@ -461,30 +500,40 @@ class Spider(Spider):
             else:
                 content = INTRO_PREFIX
 
-            # 评分 (占位 0 / 0.0 清空)
-            score = ""
-            sm = _RE_SCORE.search(html)
-            if sm:
-                score = sm.group(1)
+            # 年份 / 地区 / 语言 / 评分: 按 item-bottom 标签配对 item-top
+            year, area, lang, score = "", "", "", ""
+            for im in _RE_ITEM.finditer(html):
+                blk = im.group(1)
+                tm = _RE_ITEM_TOP.search(blk)
+                bm = _RE_ITEM_BOT.search(blk)
+                if not tm or not bm:
+                    continue
+                top = self._clean(tm.group(1))
+                bot = self._clean(bm.group(1))
+                if "评分" in bot:
+                    sm = _RE_SCORE.search(blk)
+                    if sm:
+                        score = sm.group(1)
+                elif bot == "语言":
+                    lang = top
+                elif bot == "上映时间":
+                    date_seg = top
+                    ym = _RE_YEAR.search(date_seg)
+                    if ym:
+                        year = ym.group(0)
+                    am = _RE_AREA_PAREN.search(date_seg)
+                    if am:
+                        area = self._clean(am.group(1))
             if score in ("0", "0.0", "0.00"):
                 score = ""
 
-            # 年份 / 地区 / 语言: item-top 顺序 [评分, 语言, 日期(含地区), 地区]
-            year, area, lang = "", "", ""
-            tops = [self._clean(x) for x in _RE_ITEM_TOP.findall(html)]
-            tops = [x for x in tops if x]
-            if len(tops) >= 2:
-                lang = tops[1]
-            if len(tops) >= 3:
-                date_seg = tops[2]
-                ym = _RE_YEAR.search(date_seg)
-                if ym:
-                    year = ym.group(0)
-                am = _RE_AREA_PAREN.search(date_seg)
-                if am:
-                    area = self._clean(am.group(1))
-            if len(tops) >= 4 and not area:
-                area = tops[3] if tops[3] != "未知" else ""
+            # 别名 (副标题); 站点占位 "未知" 视为空
+            subtitle = ""
+            rm = _RE_ROLES.search(html)
+            if rm:
+                subtitle = self._clean(rm.group(1))
+            if subtitle in ("未知", "暂无", "无", "未知 "):
+                subtitle = ""
 
             # ===== 线路 / 选集 =====
             groups = self._parse_line_groups(html)
@@ -527,6 +576,7 @@ class Spider(Spider):
                 "vod_year": year,
                 "vod_area": area,
                 "vod_lang": lang,
+                "vod_subtitle": subtitle,
                 "vod_play_from": "$$$".join(play_from),
                 "vod_play_url": "$$$".join(play_url),
             }]}
