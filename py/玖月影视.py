@@ -41,13 +41,7 @@ except Exception:
 try:
     from base.spider import Spider
 except ImportError:
-    import requests as _rq
-    try:
-        import urllib3
-        urllib3.disable_warnings()
-    except Exception:
-        pass
-
+    # 本机/无壳子环境兜底基类: 同样纯标准库(设备铁律, 不依赖 requests)
     class _BaseSpider:
         def __init__(self):
             self._session = None
@@ -55,19 +49,15 @@ except ImportError:
         @property
         def _sess(self):
             if self._session is None:
-                self._session = _rq.Session()
-                self._session.verify = False
-                adapter = _rq.adapters.HTTPAdapter(
-                    pool_connections=10, pool_maxsize=10, max_retries=0)
-                self._session.mount('https://', adapter)
-                self._session.mount('http://', adapter)
+                self._session = _StdSession()
             return self._session
 
         def fetch(self, url, headers=None, **kw):
-            timeout = kw.pop('timeout', 15)
-            r = self._sess.get(url, headers=headers, timeout=timeout, **kw)
-            r.encoding = 'utf-8'
-            return r
+            timeout = kw.get('timeout', 15)
+            try:
+                return self._sess.get(url, headers=headers, timeout=timeout)
+            except Exception:
+                return _StdResponse(b"", 0, {})
 
         def log(self, *a, **kw):
             try:
@@ -86,6 +76,118 @@ except ImportError:
             return "failed"
 
     Spider = _BaseSpider
+
+
+# ===================== 标准库 HTTP 会话（设备端零第三方依赖·决胜关键） =====================
+# 设备端 TVBox 内置 Python 只有标准库（无 requests/cv2）：
+# 旧版 exec 抢跑 "import requests" 在设备上必炸 → _MODULE_GUARD 永远为空;
+# 且壳子基类 fetch 返回的是 str, 旧代码 rp.content/.cookies 直接崩 → 解盾永不成功。
+# 这就是"清缓存后空白、重启(靠上次持久缓存)后正常"的完整真相。
+# 全链路改用 urllib 标准库会话, 桌面/设备同一套代码, 不再依赖任何第三方库。
+import gzip as _gzip
+import ssl as _ssl
+import urllib.request as _ureq
+
+_SSL_CTX = _ssl.create_default_context()
+_SSL_CTX.check_hostname = False
+_SSL_CTX.verify_mode = _ssl.CERT_NONE
+
+
+class _StdResponse(object):
+    """requests.Response 的标准库最小替身: text / content / status_code / cookies"""
+    def __init__(self, content, status, headers=None):
+        self.content = content if isinstance(content, bytes) else bytes(content or b"")
+        self.status_code = status
+        self.headers = headers or {}
+        try:
+            self.text = self.content.decode("utf-8", "ignore")
+        except Exception:
+            self.text = ""
+        self.cookies = []  # 兼容旧代码遍历占位
+
+    @property
+    def encoding(self):
+        return "utf-8"
+
+
+class _StdSession(object):
+    """requests.Session 的标准库最小实现: get + cookies.get_dict/set, 手工 Cookie 头。
+    守卫 Cookie 都是简单 kv, 手工管理比 CookieJar 更可控(逐条吸收 Set-Cookie)。"""
+    def __init__(self):
+        self._cookies = {}
+        self._opener = _ureq.build_opener(_ureq.HTTPSHandler(context=_SSL_CTX))
+
+    class _Cookies(object):
+        def __init__(self, store):
+            self._store = store
+
+        def get_dict(self, *a, **kw):
+            return dict(self._store)
+
+        def set(self, k, v, **kw):
+            self._store[str(k)] = str(v)
+
+    @property
+    def cookies(self):
+        return self._Cookies(self._cookies)
+
+    def _absorb(self, headers):
+        """吸收响应 Set-Cookie（守卫的 guard/guardword 即由此下发）"""
+        try:
+            lines = headers.get_all("Set-Cookie") if hasattr(headers, "get_all") else None
+        except Exception:
+            lines = None
+        if not lines and isinstance(headers, dict):
+            lines = [headers.get("Set-Cookie")] if headers.get("Set-Cookie") else None
+        for line in lines or []:
+            try:
+                kv = line.split(";", 1)[0]
+                k, _, v = kv.partition("=")
+                k = k.strip()
+                if k:
+                    self._cookies[k] = v.strip()
+            except Exception:
+                pass
+
+    def get(self, url, headers=None, timeout=15, **kw):
+        h = dict(headers or {})
+        h.setdefault("Accept-Encoding", "gzip")
+        if self._cookies:
+            h["Cookie"] = "; ".join("%s=%s" % (k, v) for k, v in self._cookies.items())
+        if isinstance(timeout, tuple):
+            timeout = float(timeout[0]) + float(timeout[1])
+        try:
+            rsp = self._opener.open(_ureq.Request(url, headers=h), timeout=timeout)
+            body = rsp.read()
+            hd = rsp.headers
+            try:
+                status = rsp.status
+            except Exception:
+                status = rsp.getcode()
+        except _ureq.HTTPError as e:
+            try:
+                body = e.read()
+                hd = e.headers
+            except Exception:
+                body, hd = b"", None
+            status = e.code
+        except Exception:
+            return _StdResponse(b"", 0, {})
+        self._absorb(hd)
+        try:
+            enc = (hd or {}).get("Content-Encoding") or ""
+            if "gzip" in enc.lower():
+                body = _gzip.decompress(body)
+        except Exception:
+            pass
+        return _StdResponse(body, status, dict(hd) if hd else {})
+
+
+def _wrap_rsp(rsp):
+    """壳子基类 fetch 可能返回 str——统一包装成带 text/content 的响应对象。"""
+    if isinstance(rsp, str):
+        return _StdResponse(rsp.encode("utf-8", "ignore"), 200, {})
+    return rsp
 
 
 # 主备域名（HOSTS 顺序即轮换顺序；www 域偶发 503，根域优先）
@@ -550,16 +652,10 @@ class Spider(Spider):
     def _guard_sess(self):
         if self._guard_session is None:
             try:
-                import requests as rq
-                sess = rq.Session()
-                sess.verify = False
-                adapter = rq.adapters.HTTPAdapter(
-                    pool_connections=10, pool_maxsize=10, max_retries=0)
-                sess.mount('https://', adapter)
-                sess.mount('http://', adapter)
+                # 纯标准库会话: 设备端(无 requests)与桌面同一套代码, 全平台可用
+                self._guard_session = _StdSession()
             except Exception:
-                sess = None
-            self._guard_session = sess
+                self._guard_session = None
         return self._guard_session
 
     def _cache_load(self):
@@ -688,9 +784,10 @@ class Spider(Spider):
             body = rp.content
             ck = sess.cookies.get_dict()
         else:
+            # 壳子 fetch 返回 str 且不持 Cookie, 统一包装; 解盾 Cookie 手工拼头
             self.fetch(self.site_url + "/", headers=h, timeout=(4, 8))
-            rp = self.fetch(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
-                            headers=dict(h, Referer=self.site_url + "/"), timeout=(4, 8))
+            rp = _wrap_rsp(self.fetch(self.site_url + "/_guard/easy_slide.png?t=%d" % int(time.time() * 1000),
+                                      headers=dict(h, Referer=self.site_url + "/"), timeout=(4, 8)))
             body = rp.content
             ck = {}
             for c in getattr(rp, "cookies", []):
@@ -766,7 +863,7 @@ class Spider(Spider):
             if sess is not None:
                 rsp = sess.get(url, headers=h, timeout=timeout)
             else:
-                rsp = self.fetch(url, headers=h, timeout=timeout)
+                rsp = _wrap_rsp(self.fetch(url, headers=h, timeout=timeout))
         except Exception as e:
             self.log("GET 异常", url, e)
             rsp = None
@@ -784,7 +881,7 @@ class Spider(Spider):
                         rsp = sess.get(url, headers=h, timeout=timeout)
                     else:
                         h["Cookie"] = self._guard_cookie
-                        rsp = self.fetch(url, headers=h, timeout=timeout)
+                        rsp = _wrap_rsp(self.fetch(url, headers=h, timeout=timeout))
                     text = rsp.text if hasattr(rsp, "text") else ""
                     status = getattr(rsp, "status_code", 200)
                 except Exception as e:
@@ -1461,15 +1558,12 @@ _MODULE_GUARD = {"cookies": None, "videos": None}
 
 
 def _module_warm_guard():
+    # ⚠️ 设备端铁律: 这里必须纯标准库。旧版 "import requests" 在设备内置
+    # Python 上必炸(无此库) → 抢跑整体静默报废 → 清缓存冷启动必空白。
+    # 现用 _StdSession(urllib), 与桌面同一套代码, 设备端同样能解盾+抓数据。
     for _round in range(3):
         try:
-            import requests as rq
-            sess = rq.Session()
-            sess.verify = False
-            adapter = rq.adapters.HTTPAdapter(
-                pool_connections=4, pool_maxsize=4, max_retries=0)
-            sess.mount('https://', adapter)
-            sess.mount('http://', adapter)
+            sess = _StdSession()
             h = {"User-Agent": UA, "Referer": HOST + "/",
                  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                  "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"}
@@ -1483,8 +1577,7 @@ def _module_warm_guard():
             if not guard or not guardword or (time.time() - t0) > 12:
                 continue
             gw = int(guardword)
-            # 候选排名（cv2 优先 + 残差匹配排名），逐一以"首页真伪"裁决：
-            # 真页 = 盾过 + 数据到手一步完成; 壳页 = 换下一候选
+            # 候选排名（cv2 可选加速 + 纯标准库 NCC 排名, 设备端无 cv2 也能算）
             cands = []
             cgx = _gap_x_cv2(rp.content, gw)
             if cgx is not None:
@@ -1495,6 +1588,8 @@ def _module_warm_guard():
                         cands.append(c)
             except Exception:
                 pass
+            if not cands:
+                continue
             secret = guard[:8]
             # ⚠️ guardret 一次性令牌(实验实证): 每张图只提交 top-1,
             # 错误提交会烧毁令牌, 失败换新图重来(外层 _round 循环)
@@ -1511,7 +1606,7 @@ def _module_warm_guard():
                 try:
                     hp = sess.get(HOST + "/", headers=h, timeout=(4, 8))
                     hbody = hp.text if hasattr(hp, "text") else ""
-                    if len(hbody) > 500 and "_guard/html.js" not in hbody:
+                    if len(hbody) > 500 and "_guard/html.js" not in hbody[:300]:
                         _s = Spider.__new__(Spider)
                         _s.site_url = HOST
                         _s.default_pic = DEFAULT_PIC
