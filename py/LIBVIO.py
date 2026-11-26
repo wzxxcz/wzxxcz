@@ -6,8 +6,8 @@ LIBVIO libvio.host | TVBox Python 爬虫
   - 主分类: /type/<tid>.html           （第 1 页）
             /type/<tid>-<page>.html    （分页）
   - 筛选:   /show/<tid>-<11 段空槽>.html
-            剥离 tid 后 11 段：seg1=地区 seg2=类型 seg3=语言
-            seg6=页码 seg10=年代年份，其余空段占位；中文段 percent-encode
+            12 段：seg0=tid seg1=地区 seg3=类型 seg6=页码 seg11=年份，
+            其余空段占位；中文段 percent-encode
   - 详情:   /detail/<vid>.html
   - 播放:   /w/<vid>-<sid>-<nid>.html
   - 搜索:   /search/-------------.html?wd=<关键词>（GET，单页返回，无分页）
@@ -51,9 +51,20 @@ import time
 import hashlib
 import socket
 import threading
+import ssl
 import urllib.parse
+import urllib.request
 
 sys.path.append('..')
+
+
+class _SimpleResp(object):
+    """urllib 兜底响应包装，兼容 _body/_status 取值约定。"""
+
+    def __init__(self, status, text):
+        self.status_code = status
+        self.text = text
+        self.content = text.encode("utf-8", "ignore")
 
 # ---- 强制 IPv4：禁用 IPv6（出口 IPv6 不稳）----
 _orig_getaddrinfo = socket.getaddrinfo
@@ -189,6 +200,7 @@ for c in CLASSES:
 
 
 # ===================== 正则 =====================
+_RE_COMMENT = re.compile(r"<!--[\s\S]*?-->", re.S)
 # 卡片封面 a（天然去重，避开 h4 标题重复链接）；整块含内部备注/评分 span
 _RE_CARD = re.compile(
     r'<a\s+class="stui-vodlist__thumb[^"]*"\s+'
@@ -296,7 +308,6 @@ class Spider(Spider):
         self._pow_cookie = ""
         self._pow_lock = threading.Lock()
         self._play_cache = {}
-        self._filter_cache = {}
 
     # ---------- 自建 Session（双轨：自建优先，异常回退壳子基类）----------
     def _build_http(self):
@@ -321,6 +332,13 @@ class Spider(Spider):
             h.update(headers)
         if self._pow_cookie:
             h["Cookie"] = self._pow_cookie
+        # 优先宿主基类通道（壳子 OkHttp 指纹更易过 envoy 粗筛），异常再回退自建 Session
+        try:
+            if method == "POST":
+                return self.post(url, headers=h, data=body, timeout=timeout)
+            return self.fetch(url, headers=h, timeout=timeout)
+        except Exception as e:
+            self.log("宿主通道失败,回退自建:", method, url[:60], repr(e)[:100])
         if self._http is not None:
             try:
                 if method == "POST":
@@ -328,11 +346,28 @@ class Spider(Spider):
                                            timeout=timeout, verify=False)
                 return self._http.get(url, headers=h, timeout=timeout, verify=False)
             except Exception as e:
-                self.log("自建请求失败,回退基类:", method, url[:60], repr(e)[:100])
-        # 回退壳子基类
-        if method == "POST":
-            return self.post(url, headers=h, data=body, timeout=timeout)
-        return self.fetch(url, headers=h, timeout=timeout)
+                self.log("自建请求失败:", method, url[:60], repr(e)[:100])
+        # 第三路标准库 urllib（Chaquopy 必有），兜底宿主/requests 同时异常
+        try:
+            data = None
+            if method == "POST" and body is not None:
+                if isinstance(body, dict):
+                    data = json.dumps(body, ensure_ascii=False).encode("utf-8")
+                    h.setdefault("Content-Type", "application/json")
+                elif isinstance(body, str):
+                    data = body.encode("utf-8")
+                else:
+                    data = body
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            req = urllib.request.Request(url, data=data, headers=h, method=method)
+            with urllib.request.urlopen(req, timeout=timeout, context=ctx) as r:
+                raw = r.read()
+                return _SimpleResp(r.status, raw.decode("utf-8", "ignore"))
+        except Exception as e:
+            self.log("urllib 兜底失败:", method, url[:60], repr(e)[:100])
+        raise
 
     @staticmethod
     def _body(rsp):
@@ -489,6 +524,7 @@ class Spider(Spider):
         seen = set()
         if not html:
             return videos
+        html = _RE_COMMENT.sub("", html)
         for m in _RE_CARD.finditer(html):
             href, name, pic = m.group(1), m.group(2), m.group(3)
             if href in seen:
@@ -548,69 +584,8 @@ class Spider(Spider):
         return "/show/%s.html" % "-".join(seg)
 
     # ---------- 首页 / 分类 / 搜索 ----------
-    # ---------- 筛选运行时解析（排除 class="hide" 折叠项；静态表兜底）----------
-    @staticmethod
-    def _parse_filters_html(html):
-        out = {"type": [], "area": [], "year": []}
-        if not html:
-            return out
-        key_map = {"按剧情": "type", "按地区": "area", "按年份": "year"}
-        for ul in re.findall(r'<ul class="clearfix">([\s\S]*?)</ul>', html):
-            head = re.search(r"<span>([^<]+)</span>", ul)
-            if not head:
-                continue
-            group = key_map.get(head.group(1).replace("：", "").strip())
-            if not group:
-                continue
-            for am in re.finditer(r'<a([^>]*)>([\s\S]*?)</a>', ul):
-                attr, txt = am.group(1), re.sub(r"<[^>]+>", "", am.group(2)).strip()
-                if "hide" in attr:
-                    continue
-                if txt and txt not in out[group]:
-                    out[group].append(txt)
-        return out
-
-    def _load_filters(self, tid):
-        if tid in self._filter_cache:
-            return self._filter_cache[tid]
-        # 静态兜底
-        fallback = {
-            "type": _TYPES.get(tid, []),
-            "area": _AREAS.get(tid, []),
-            "year": _YEARS,
-        }
-        try:
-            html = self._fetch("%s/type/%s.html" % (self.site_url, tid))
-            parsed = self._parse_filters_html(html)
-            if parsed["type"] or parsed["area"] or parsed["year"]:
-                # 任一维度为空时用静态项补齐，避免空组
-                for k in ("type", "area", "year"):
-                    if not parsed[k]:
-                        parsed[k] = fallback[k]
-                self._filter_cache[tid] = parsed
-                return parsed
-        except Exception as e:
-            self.log("筛选解析失败,回退静态:", repr(e)[:80])
-        self._filter_cache[tid] = fallback
-        return fallback
-
-    def _build_filters(self, tid):
-        data = self._load_filters(tid)
-        return [
-            {"key": "type", "name": "类型", "value": _opts(data["type"])},
-            {"key": "area", "name": "地区", "value": _opts(data["area"])},
-            {"key": "year", "name": "年份", "value": _opts(data["year"])},
-        ]
-
     def homeContent(self, filter=False):
-        try:
-            filters = {}
-            for c in CLASSES:
-                filters[c["type_id"]] = self._build_filters(c["type_id"])
-            return {"class": CLASSES, "filters": filters}
-        except Exception as e:
-            self.log("homeContent FAIL:", repr(e)[:120])
-            return {"class": CLASSES, "filters": FILTERS}
+        return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
         try:
@@ -719,6 +694,8 @@ class Spider(Spider):
             if not ids:
                 return {"list": []}
             vod_id = str(ids[0])
+            if re.fullmatch(r"\d+", vod_id):
+                vod_id = "/detail/%s.html" % vod_id
             url = vod_id if vod_id.startswith("http") else self._fix_url(vod_id)
             self.log("detail: %s" % url)
 
