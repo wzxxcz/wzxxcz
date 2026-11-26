@@ -3,21 +3,29 @@
 番茄酱影视 fanqe.cc | TVBox Python 爬虫 
 关键机关(全部死磕源码+实测破解):
   1. 苹果CMS V10(fq 模板), 无 PoW 无验证盾 — 明文请求直接通
-  2. 播放三线路(顺序与站点 tab 完全一致): 番茄 / 超清1 / 超清2
-     - 番茄(kkytest): player_aaaa.url 是票号 "svmhhk-1-1", 另带 kky 签名票
-       → /noad/kky_play.php?vid=票号 + X-Kky-Token: kky → 直链 MP4(byteimg 伪装域)
-       实测: 该接口校验"发票端指纹一致性"且后端多节点, 部分节点宽松 → 必须短重试,
-       平均约 1/3 命中; 全失败则用同页 lines 里其他线路的同集地址兜底
-     - 超清1(jsm3u8): player_aaaa.url 就是裸 m3u8 直链 → 直接 parse=0
+  2. 播放四线路(顺序与站点 tab 完全一致): 番茄 / 番茄二 / 超清1 / 超清2
+     ⚠️ V2 改版: 播放页 HTML 里 player_aaaa 的 url/from/kky 全被掏空,
+        权威播放数据在 meta 接口: GET 播放页URL + '?meta=1' →
+        {"url":票号,"url_next":...,"from":"kkytest","sid":3,"kky":"时间戳.签名"}
+     ⚠️ kky 票是一次性的(同票第二次必 403 token) → 必须"现取现用":
+        meta=1 取新票 → 立即换票; 失败则重新 meta=1 再取新票(循环 5~6 次)
+     - 番茄(kkytest)/番茄二(kky2): /noad/kky_play.php?vid=票 + X-Kky-Token:kky
+       → 直链 MP4(byteimg/wechat 伪装域)。两线路共用 kkytest.html 播放器,
+       站点前端逻辑就是"403 token → 重取 meta 新票 → 再换"(kkyFreshToken)
+     - 超清1(jsm3u8): url 就是裸 m3u8 直链 → 直接 parse=0
      - 超清2(xiguam3u8): url 是 "na:xiguam3u8:..." 票 → /noad/parse.php?t=票
-       同样多节点/签名校验 → 短重试; 命中后返回 svip.xgplay17.com 的 m3u8
+       后端多节点(部分校验) → 短重试; 命中返回 m3u8 直链
   3. 播放页内嵌 fqPreheat.lines 数组 = 该集"全部线路"地址(实测同集等效),
-     是番茄/故障线路的最佳兜底(优先 jsm3u8 http 直链, 否则拿 na: 票换票)
+     是番茄/故障线路的最佳兜底(优先 jsm3u8 http 直链, 否则 na: 票换票)
+     (fq_preheat.js 实锤: na:xiguam3u8|dyttm3u8 → parse.php; 番茄线路走 kky)
   4. m3u8 必须无 Referer 请求(站点前端 referrerPolicy:'no-referrer')
-  5. 分类筛选自由组合: /vod/show/by/{排序}/id/{tid}/page/{页}/year/{年}.html,
+  5. 分类: 常规五类走 /vod/show/..., 新增 Netflix 走独立 label 路由:
+     /index.php/label/netflix[/by/{排序}/order/desc][/area/{地区}][/class/{类型}]
+     [/page/{页}][/tid/{形态}][/year/{年}].html  (段序照站点分页链接实测)
+  6. 常规分类筛选自由组合: /vod/show/by/{排序}/id/{tid}/page/{页}/year/{年}.html,
      子分类直接换 id 段(如 /id/22.html = 日本剧); 页码取分页器最大 /page/N 链接
      (页面 "N页" 文本是虚标: 电视剧标 772 实为 695)
-  6. 副标题取详情页 "备注 :" 字段(与站点显示一致)
+  7. 副标题取详情页 "备注 :" 字段(与站点显示一致)
 """
 import re
 import sys
@@ -81,6 +89,7 @@ CLASSES = [
     {"type_id": "2",  "type_name": "电视剧"},
     {"type_id": "3",  "type_name": "综艺"},
     {"type_id": "4",  "type_name": "动漫"},
+    {"type_id": "netflix", "type_name": "Netflix"},
     {"type_id": "46", "type_name": "体育"},
 ]
 
@@ -103,9 +112,18 @@ _YEARS = [{"n": "全部", "v": ""}] + \
          [{"n": "2020年前", "v": "2020年前"}, {"n": "2010年前", "v": "2010年前"},
           {"n": "2000年前", "v": "2000年前"}]
 
+# Netflix 页年份面板(与常规分类不同): 2026~2021 + 2020年前
+_YEARS_NF = [{"n": "全部", "v": ""}] + \
+            [{"n": str(y), "v": str(y)} for y in range(2026, 2020, -1)] + \
+            [{"n": "2020年前", "v": "2020年前"}]
+
 _SORTS = [{"n": "按最新", "v": "time"},
           {"n": "按最热", "v": "hits"},
           {"n": "按评分", "v": "score"}]
+
+# Netflix 页排序: 最新(默认) / 热最(by/hits/order/desc)
+_SORTS_NF = [{"n": "最新", "v": ""},
+             {"n": "热最", "v": "hits"}]
 
 FILTERS = {}
 for _c in CLASSES:
@@ -117,6 +135,27 @@ for _c in CLASSES:
         {"key": "year", "name": "年份", "value": _YEARS},
         {"key": "by", "name": "排序", "value": _SORTS},
     ]
+
+# Netflix 独立 label 路由的五维筛选(与网页面板完全一致):
+# 形态(tid) / 地区(area) / 年份(year) / 类型(class) / 排序(by+order/desc)
+FILTERS["netflix"] = [
+    {"key": "tid", "name": "形态",
+     "value": [{"n": "全部", "v": ""}, {"n": "电影", "v": "1"},
+               {"n": "剧集", "v": "2"}, {"n": "综艺", "v": "3"},
+               {"n": "动漫", "v": "4"}]},
+    {"key": "area", "name": "地区",
+     "value": [{"n": "全部", "v": ""}, {"n": "美国", "v": "美国"},
+               {"n": "韩国", "v": "韩国"}, {"n": "日本", "v": "日本"},
+               {"n": "西班牙", "v": "西班牙"}, {"n": "英国", "v": "英国"},
+               {"n": "其它", "v": "其它"}]},
+    {"key": "year", "name": "年份", "value": _YEARS_NF},
+    {"key": "class", "name": "类型",
+     "value": [{"n": "全部", "v": ""}, {"n": "剧情", "v": "剧情"},
+               {"n": "喜剧", "v": "喜剧"}, {"n": "爱情", "v": "爱情"},
+               {"n": "科幻", "v": "科幻"}, {"n": "记录", "v": "记录"},
+               {"n": "纪录片", "v": "纪录片"}]},
+    {"key": "by", "name": "排序", "value": _SORTS_NF},
+]
 
 
 # ===================== 正则 =====================
@@ -172,14 +211,17 @@ _RE_LINES = re.compile(
 # 分页(取最大 /page/N 链接 — "N页"文本是虚标, 不可信)
 _RE_PAGE_LINK = re.compile(r'/page/(\d+)', re.I)
 
-# 线路别名(与站点 tab 文字一致, 站点本身即中文)
-# 线路别名(仅当详情页 tab 结构异常取不到名字时兜底)
+# 线路别名(与站点 tab 文字一致; kkytest/kky2/kky3 共用 kkytest.html 播放器)
 _LINE_ALIAS = {
-    "kkytest": "番茄", "jsm3u8": "超清1", "xiguam3u8": "超清2",
+    "kkytest": "番茄", "kky2": "番茄二", "kky3": "番茄三",
+    "jsm3u8": "超清1", "xiguam3u8": "超清2",
     "yzxm3u8": "超清HD", "dyttm3u8": "电影天堂",
 }
-# 站点 tab 顺序(实测): 番茄 → 超清1 → 超清2
-_LINE_ORDER = ["番茄", "超清1", "超清2", "超清HD", "电影天堂"]
+# 番茄家族(from 集合): 全部走 kky_play.php 换票
+_KKY_FROMS = ("kkytest", "kky2", "kky3")
+# 站点 tab 顺序(实测): 番茄 → 番茄二 → 超清1 → 超清2
+# (sid 编号: kkytest=3, kky2=4, jsm3u8=2, xiguam3u8=1 — 与 tab 顺序不同步!)
+_LINE_ORDER = ["番茄", "番茄二", "超清1", "超清2", "超清HD", "电影天堂"]
 
 
 # ===================== exec 抢跑（站点单页 8~12s, 壳子启动即预抓首页） =====================
@@ -355,6 +397,28 @@ class Spider(Spider):
             segs += ["year", q(str(year))]
         return "/index.php/vod/show/" + "/".join(segs) + ".html"
 
+    def _build_netflix_path(self, page, by="", year="", area="", vclass="", tid=""):
+        """Netflix 独立 label 路由(段序照站点分页链接实测):
+        /label/netflix[/by/{hits}/order/desc][/area/{地区}][/class/{类型}]
+        [/page/{页}][/tid/{形态}][/year/{年}].html"""
+        q = urllib.parse.quote
+        segs = []
+        if by:
+            segs += ["by", q(str(by)), "order", "desc"]
+        if area:
+            segs += ["area", q(str(area))]
+        if vclass:
+            segs += ["class", q(str(vclass))]
+        page = int(page) if page else 1
+        if page > 1:
+            segs += ["page", str(page)]
+        if tid:
+            segs += ["tid", str(tid)]
+        if year:
+            segs += ["year", q(str(year))]
+        return "/index.php/label/netflix" + \
+               (("/" + "/".join(segs)) if segs else "") + ".html"
+
     def homeContent(self, filter=False):
         return {"class": CLASSES, "filters": FILTERS}
 
@@ -411,11 +475,21 @@ class Spider(Spider):
             if extend[k] in ("", None, "全部"):
                 del extend[k]
 
-        url = self.site_url + self._build_show_path(
-            tid, page,
-            by=extend.get("by") or "",
-            year=extend.get("year") or "",
-            sub=extend.get("sub") or "")
+        if str(tid) == "netflix":
+            # Netflix 独立 label 路由(五维筛选)
+            url = self.site_url + self._build_netflix_path(
+                page,
+                by=extend.get("by") or "",
+                year=extend.get("year") or "",
+                area=extend.get("area") or "",
+                vclass=extend.get("class") or "",
+                tid=extend.get("tid") or "")
+        else:
+            url = self.site_url + self._build_show_path(
+                tid, page,
+                by=extend.get("by") or "",
+                year=extend.get("year") or "",
+                sub=extend.get("sub") or "")
         self.log("category: %s" % url)
         html = self._fetch(url)
         self.log("  HTML 长度: %d" % len(html))
@@ -610,6 +684,51 @@ class Spider(Spider):
             if now - ts < 600:
                 return res
 
+        # ⚠️ 站点前端明确 referrerPolicy:'no-referrer' 模拟播放器防盗链 — m3u8 严禁带 Referer
+        header = {"User-Agent": UA}
+        res = self._resolve_play(play_page, header)
+        self._play_cache[play_page] = (now, res)
+        return res
+
+    def _direct(self, url, header):
+        return {"parse": 0, "playUrl": "", "url": url, "header": header}
+
+    def _resolve_play(self, play_page, header):
+        """V2 播放决策链:
+        1) meta=1 接口(权威数据源; kky 票一次性 → 失败重取新票循环)
+        2) 播放页 HTML player_aaaa(兼容旧结构)
+        3) fqPreheat.lines 同集等效兜底
+        4) parse:1 交壳子嗅探"""
+        # ---- 1) meta=1 ----
+        meta_url = play_page + ("&" if "?" in play_page else "?") + "meta=1"
+        frm = ""
+        for _ in range(6):
+            meta = self._fetch_meta(meta_url)
+            if not meta:
+                break
+            url = str(meta.get("url") or "").replace("\\/", "/").replace("&amp;", "&")
+            frm = str(meta.get("from") or "")
+            kky = str(meta.get("kky") or "")
+            self.log("  meta: from=%s url=%s kky=%s" % (frm, url[:60], kky[:16]))
+            # a) 明文直链(jsm3u8 超清1 等)
+            if url.startswith("http"):
+                return self._direct(url, header)
+            # b) 番茄家族(kkytest/kky2/kky3): 票号+kky 签名 → kky_play.php 换票
+            #    票一次性: 403 token → 重新 meta=1 取新票再试(与站点前端逻辑一致)
+            if frm in _KKY_FROMS and url:
+                u = self._kky_exchange_once(url, kky)
+                if u:
+                    return self._direct(u, header)
+                continue
+            # c) na: 票(xiguam3u8 等) → parse.php 换票(多节点, 票可复用)
+            if url.startswith("na:"):
+                u = self._parse_na(url, play_page)
+                if u:
+                    return self._direct(u, header)
+                break
+            break
+
+        # ---- 2) HTML player_aaaa(兼容旧结构) ----
         html = self._fetch(play_page)
         aa = {}
         if html:
@@ -623,75 +742,78 @@ class Spider(Spider):
                 except Exception:
                     aa = {}
         real_url = (aa.get("url") or "").replace("\\/", "/").replace("&amp;", "&")
-        frm = aa.get("from") or ""
+        frm = aa.get("from") or frm
         kky = aa.get("kky") or ""
-        self.log("  from=%s url=%s" % (frm, real_url[:80]))
-
-        # ⚠️ 站点前端明确 referrerPolicy:'no-referrer' 模拟播放器防盗链 — m3u8 严禁带 Referer
-        header = {"User-Agent": UA}
-
-        # 情况 A: 明文直链 m3u8/mp4 (jsm3u8 超清1 等)
+        self.log("  html aa: from=%s url=%s" % (frm, real_url[:60]))
         if real_url.startswith("http"):
-            self.log("  => 直链: %s" % real_url[:120])
-            res = {"parse": 0, "playUrl": "", "url": real_url, "header": header}
-            self._play_cache[play_page] = (now, res)
-            return res
-
-        # 情况 B: 番茄线路 kkytest (url 为票号 "svmhhk-1-1", kky 为签名票)
-        # 实测: /noad/kky_play.php 后端是负载均衡, 仅约 1/6 节点校验签名放行
-        #       → 必须短重试(命中不校验的节点即可换出 byteimg 直链 MP4)
-        if frm == "kkytest" and kky and real_url:
-            u = self._kky_exchange(real_url, kky, play_page)
+            return self._direct(real_url, header)
+        if frm in _KKY_FROMS and real_url:
+            # 旧结构: kky 票在 player_aaaa 里, 403 时重取 meta 新票
+            u = self._kky_exchange_once(real_url, kky)
             if u:
-                res = {"parse": 0, "playUrl": "", "url": u, "header": header}
-                self._play_cache[play_page] = (now, res)
-                return res
-
-        # 情况 C: 超清2 xiguam3u8 na:票 → parse.php 换票(多数影片此路可通)
+                return self._direct(u, header)
+            for _ in range(4):
+                meta = self._fetch_meta(meta_url)
+                if not meta:
+                    break
+                u = self._kky_exchange_once(
+                    str(meta.get("url") or real_url), str(meta.get("kky") or ""))
+                if u:
+                    return self._direct(u, header)
         if real_url.startswith("na:"):
-            _u = self._parse_na(real_url, play_page)
-            if _u:
-                res = {"parse": 0, "playUrl": "", "url": _u, "header": header}
-                self._play_cache[play_page] = (now, res)
-                return res
+            u = self._parse_na(real_url, play_page)
+            if u:
+                return self._direct(u, header)
 
-        # 情况 D: 播放页 fqPreheat.lines 数组自带"全部线路本集地址" —
-        # 同集等效兜底: 先 http 直链(优先 jsm3u8), 再拿 na: 票换票
+        # ---- 3) fqPreheat.lines 同集等效兜底 ----
         m3u8_fb = self._extract_line_fallback(html, play_page, skip_from=frm)
         if m3u8_fb:
             self.log("  => lines 同集兜底: %s" % m3u8_fb[:120])
-            res = {"parse": 0, "playUrl": "", "url": m3u8_fb, "header": header}
-            self._play_cache[play_page] = (now, res)
-            return res
+            return self._direct(m3u8_fb, header)
 
-        # 兜底: 交 TVBox 嗅探
-        res = {"parse": 1, "playUrl": "", "url": play_page,
-               "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
-        self._play_cache[play_page] = (now, res)
-        return res
+        # ---- 4) 兜底: 交 TVBox 嗅探 ----
+        return {"parse": 1, "playUrl": "", "url": play_page,
+                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
-    def _kky_exchange(self, vid, token, referer="", tries=6):
-        """番茄 kkytest 换票: 票号+kky签名票 → 直链 MP4。
-        后端多节点, 部分节点校验签名(403 token) → 短重试换节点。"""
-        if not vid or not token:
+    def _fetch_meta(self, meta_url):
+        """播放数据权威接口: 播放页URL + '?meta=1' →
+        {"url":票,"from":"kkytest","sid":3,"kky":"时间戳.签名",...}"""
+        try:
+            rsp = self.fetch(meta_url, headers={
+                "User-Agent": UA,
+                "Referer": self.site_url + "/",
+                "Accept": "application/json, text/plain, */*",
+                "X-Requested-With": "XMLHttpRequest",
+            }, timeout=10)
+            text = rsp.text if hasattr(rsp, "text") else str(rsp)
+            j = json.loads(text)
+            if isinstance(j, dict) and j.get("url") is not None:
+                return j
+        except Exception as e:
+            self.log("  meta FAIL: %s" % e)
+        return {}
+
+    def _kky_exchange_once(self, vid, token):
+        """番茄家族单次换票: 票号+kky签名票 → 直链(多为 MP4)。
+        票是一次性的 — 同票重试必 403 token, 必须由上层重新 meta=1 取新票。"""
+        if not vid:
             return ""
         api = self.site_url + "/noad/kky_play.php?vid=" + urllib.parse.quote(vid)
-        for _ in range(tries):
-            try:
-                rsp = self.fetch(api, headers={
-                    "User-Agent": UA,
-                    "Referer": self.site_url + "/static/player/kkytest.html?v=8",
-                    "X-Kky-Token": token,
-                    "Accept": "*/*",
-                }, timeout=10)
-                j = json.loads(rsp.text if hasattr(rsp, "text") else str(rsp))
-                u = str(j.get("url") or "")
-                if j.get("code") == 200 and u.startswith("http"):
-                    self.log("  => kky 换票成功: %s" % u[:100])
-                    return u
-            except Exception:
-                pass
-        self.log("  kky 换票 %d 次均被节点拒" % tries)
+        try:
+            rsp = self.fetch(api, headers={
+                "User-Agent": UA,
+                "Referer": self.site_url + "/static/player/kkytest.html?v=8",
+                "X-Kky-Token": token or "",
+                "Accept": "*/*",
+            }, timeout=10)
+            j = json.loads(rsp.text if hasattr(rsp, "text") else str(rsp))
+            u = str(j.get("url") or "")
+            if j.get("code") == 200 and u.startswith("http"):
+                self.log("  => kky 换票成功: %s" % u[:100])
+                return u
+            self.log("  kky 换票拒绝: code=%s msg=%s" % (j.get("code"), j.get("msg")))
+        except Exception:
+            pass
         return ""
 
     def _parse_na(self, ticket, referer="", tries=6):
