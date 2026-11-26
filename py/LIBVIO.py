@@ -21,6 +21,7 @@ import gzip
 import ssl
 import base64
 import hashlib
+import threading
 import http.client
 import urllib.parse
 
@@ -188,7 +189,7 @@ class _Net(object):
         self.host = host
         self.conn = None
         self.cookies = {}     # 全部会话 cookie(全站同域, 统一携带)
-        self.lock = None
+        self.lock = threading.RLock()  # 壳子可能并发调用接口(清缓存重入), 防连接串线
 
     def _newconn(self):
         self.conn = http.client.HTTPSConnection(
@@ -271,7 +272,11 @@ class _Net(object):
         return ""
 
     def get(self, path, tries=3, referer=None):
-        """带自动过盾的 GET。成功返回 html; 失败返回 ''。"""
+        """带自动过盾的 GET(线程安全: 壳子清缓存可能并发重入)。成功返回 html; 失败返回 ''。"""
+        with self.lock:
+            return self._get_locked(path, tries, referer)
+
+    def _get_locked(self, path, tries=3, referer=None):
         for _ in range(tries):
             try:
                 if self.conn is None:
@@ -409,23 +414,52 @@ def _fix_url(url):
     return url
 
 
-def _module_warm():
-    """exec 阶段抢跑: 过盾 + 抓首页 + 解析卡片。全程异常静默, 绝不阻塞模块加载。"""
-    for _ in range(2):
-        try:
-            t0 = time.time()
-            html = _NET.get("/")
-            if not html or "stui-vodlist__thumb" not in html:
-                if _NET.conn is not None and (time.time() - t0) > 15:
-                    return
-                time.sleep(0.5)
-                continue
+_WARM_EVENT = threading.Event()
+
+
+def _warm_once():
+    """单次抓首页并填充 _MODULE_DATA。成功返回 True。"""
+    try:
+        html = _NET.get("/")
+        if html and "stui-vodlist__thumb" in html:
             vids = _parse_cards(html)
             if vids:
                 _MODULE_DATA["videos"] = vids[:60]
-            return
+                return True
+    except Exception:
+        pass
+    return False
+
+
+def _warm_thread():
+    """后台预热: 失败自动断线重连重过盾, 约 60s 窗口内不停重试 —
+    网络晚就绪(开机/切网)也能自愈, 保证清缓存后 exec 数据仍在场。
+    成功或窗口耗尽后放行全部等待者。"""
+    for _ in range(24):
+        if _warm_once():
+            break
+        try:
+            _NET.close()
         except Exception:
             pass
+        try:
+            time.sleep(2.5)
+        except Exception:
+            break
+    _WARM_EVENT.set()
+
+
+def _module_warm():
+    """exec 阶段: 启动后台预热线程, 主线程最多等 3 秒 —
+    exec 永不长阻塞(防壳子超时杀模块), 慢网由接口侧等待兜底。"""
+    try:
+        t = threading.Thread(target=_warm_thread)
+        t.daemon = True
+        t.start()
+    except Exception:
+        _WARM_EVENT.set()
+        return
+    _WARM_EVENT.wait(3.0)
 
 
 # ===================== Spider =====================
@@ -513,27 +547,57 @@ class Spider(Spider):
             if cached:
                 self.log("home 命中持久缓存 %d 条" % len(cached))
                 return {"list": cached}
-            # 0.5) exec 抢跑数据: 模块加载阶段已过盾抓好首页
+            # 0.5) exec 抢跑数据; 不在场则等预热线程(最多 5s, 数据一到立即放行)
             mv = _MODULE_DATA.get("videos")
+            if not mv:
+                self.log("home 预热未就绪, 等待最多 5s")
+                for _ in range(25):
+                    if _WARM_EVENT.wait(0.2):
+                        break
+                    mv = _MODULE_DATA.get("videos")
+                    if mv:
+                        break
+                mv = _MODULE_DATA.get("videos")
             if mv:
                 self.log("home 使用 exec 抢跑数据 %d 条" % len(mv))
                 self._home_cache_put(mv)
                 return {"list": mv}
-            # 1) 现场抓取(_NET 自动过盾)
-            html = self._fetch("/")
-            videos = _parse_cards(html)
-            self.log("home 现场抓取 %d 条" % len(videos))
-            # 2) 兜底: 各分类第一页合并
-            if not videos:
-                seen, merged = set(), []
-                for tid in ("1", "2", "4", "3"):
+            # 1) 现场抓取: 两轮, 第二轮强制断线重连重过盾(单轮异常不逃逸)
+            videos = []
+            for _round in range(2):
+                try:
+                    html = self._fetch("/")
+                    videos = _parse_cards(html)
+                except Exception:
+                    videos = []
+                if videos:
+                    self.log("home 现场抓取 %d 条(第%d轮)" % (len(videos), _round + 1))
+                    break
+                try:
+                    _NET.close()  # 断线重连(通行证绑连接, 重过盾)
+                except Exception:
+                    pass
+            if videos:
+                _MODULE_DATA["videos"] = videos[:60]  # 回写: 下次清缓存 exec 数据在场
+                self._home_cache_put(videos)
+                return {"list": videos}
+            # 2) 兜底: 各分类第一页合并(单类异常不逃逸)
+            seen, merged = set(), []
+            for tid in ("1", "2", "4", "3"):
+                try:
                     th = self._fetch("/type/%s.html" % tid)
                     for v in _parse_cards(th):
                         if v["vod_id"] not in seen:
                             seen.add(v["vod_id"])
                             merged.append(v)
-                videos = merged[:60]
+                except Exception:
+                    pass
+                if len(merged) >= 40:
+                    break
+            videos = merged[:60]
+            self.log("home 分类合并 %d 条" % len(videos))
             if videos:
+                _MODULE_DATA["videos"] = videos
                 self._home_cache_put(videos)
             return {"list": videos}
         except Exception as e:
