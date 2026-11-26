@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 LIBVIO libvio.host | TVBox Python 爬虫
-站点结构（线上快照实证 2026-11-26，MacCMS stui_default 模板，HTML 直出）:
+站点结构（线上快照实证，MacCMS stui_default 模板，HTML 直出）:
   - 首页:   /
   - 主分类: /type/<tid>.html           （第 1 页）
             /type/<tid>-<page>.html    （分页）
@@ -143,26 +143,24 @@ CLASSES = [
     {"type_id": "16", "type_name": "欧美"},
 ]
 
-# 类型（show 槽 seg2，各分类站点库内实际标签，页面实证，去重保序）
+# 类型（show 槽段3；仅站点默认可见项，class="hide" 折叠标签不纳入，页面实证去重保序）
 _TYPES = {
     "1": ["喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪", "犯罪",
-          "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚", "经典", "青春",
-          "文艺", "微电影", "古装", "历史", "运动", "农村", "儿童", "网络电影"],
+          "动画", "奇幻", "武侠", "冒险"],
     "2": ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻",
-          "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"],
+          "剧情", "历史", "经典", "乡村", "情景"],
     "4": ["情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园", "动作",
-          "机战", "运动", "战争", "少年", "少女", "社会", "原创", "亲子", "益智",
-          "励志", "其他"],
+          "机战", "运动", "战争", "少年"],
     "15": ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻",
-           "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "惊悚", "其他"],
+           "剧情", "历史", "经典", "乡村", "情景"],
     "16": ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻",
-           "剧情", "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"],
+           "剧情", "历史", "经典", "乡村", "情景"],
 }
 
-# 地区（show 槽 seg1，站点原文，逐分类实证）
+# 地区（show 槽段1，站点原文，逐分类实证）
 _AREAS = {
     "1": ["中国大陆", "中国香港", "中国台湾", "美国", "法国", "英国", "日本", "韩国",
-          "德国", "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"],
+          "德国", "泰国", "印度", "意大利", "西班牙"],
     "2": ["中国大陆", "中国台湾", "中国香港", "韩国", "日本", "美国", "泰国", "英国",
           "新加坡", "其他"],
     "4": ["中国", "日本", "欧美", "其他"],
@@ -170,8 +168,9 @@ _AREAS = {
     "16": ["美国", "英国", "德国", "加拿大", "其他"],
 }
 
-# 年代（show 槽 seg10，站点实证 1998~2026 倒序）
-_YEARS = [str(y) for y in range(2026, 1997, -1)]
+# 年代（show 槽段11；站点默认可见 2015~2026，更早年份为 hide 折叠项）
+_YEARS = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019",
+          "2018", "2017", "2016", "2015"]
 
 
 def _opts(values):
@@ -297,6 +296,7 @@ class Spider(Spider):
         self._pow_cookie = ""
         self._pow_lock = threading.Lock()
         self._play_cache = {}
+        self._filter_cache = {}
 
     # ---------- 自建 Session（双轨：自建优先，异常回退壳子基类）----------
     def _build_http(self):
@@ -548,8 +548,69 @@ class Spider(Spider):
         return "/show/%s.html" % "-".join(seg)
 
     # ---------- 首页 / 分类 / 搜索 ----------
+    # ---------- 筛选运行时解析（排除 class="hide" 折叠项；静态表兜底）----------
+    @staticmethod
+    def _parse_filters_html(html):
+        out = {"type": [], "area": [], "year": []}
+        if not html:
+            return out
+        key_map = {"按剧情": "type", "按地区": "area", "按年份": "year"}
+        for ul in re.findall(r'<ul class="clearfix">([\s\S]*?)</ul>', html):
+            head = re.search(r"<span>([^<]+)</span>", ul)
+            if not head:
+                continue
+            group = key_map.get(head.group(1).replace("：", "").strip())
+            if not group:
+                continue
+            for am in re.finditer(r'<a([^>]*)>([\s\S]*?)</a>', ul):
+                attr, txt = am.group(1), re.sub(r"<[^>]+>", "", am.group(2)).strip()
+                if "hide" in attr:
+                    continue
+                if txt and txt not in out[group]:
+                    out[group].append(txt)
+        return out
+
+    def _load_filters(self, tid):
+        if tid in self._filter_cache:
+            return self._filter_cache[tid]
+        # 静态兜底
+        fallback = {
+            "type": _TYPES.get(tid, []),
+            "area": _AREAS.get(tid, []),
+            "year": _YEARS,
+        }
+        try:
+            html = self._fetch("%s/type/%s.html" % (self.site_url, tid))
+            parsed = self._parse_filters_html(html)
+            if parsed["type"] or parsed["area"] or parsed["year"]:
+                # 任一维度为空时用静态项补齐，避免空组
+                for k in ("type", "area", "year"):
+                    if not parsed[k]:
+                        parsed[k] = fallback[k]
+                self._filter_cache[tid] = parsed
+                return parsed
+        except Exception as e:
+            self.log("筛选解析失败,回退静态:", repr(e)[:80])
+        self._filter_cache[tid] = fallback
+        return fallback
+
+    def _build_filters(self, tid):
+        data = self._load_filters(tid)
+        return [
+            {"key": "type", "name": "类型", "value": _opts(data["type"])},
+            {"key": "area", "name": "地区", "value": _opts(data["area"])},
+            {"key": "year", "name": "年份", "value": _opts(data["year"])},
+        ]
+
     def homeContent(self, filter=False):
-        return {"class": CLASSES, "filters": FILTERS}
+        try:
+            filters = {}
+            for c in CLASSES:
+                filters[c["type_id"]] = self._build_filters(c["type_id"])
+            return {"class": CLASSES, "filters": filters}
+        except Exception as e:
+            self.log("homeContent FAIL:", repr(e)[:120])
+            return {"class": CLASSES, "filters": FILTERS}
 
     def homeVideoContent(self):
         try:
