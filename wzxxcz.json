@@ -1887,14 +1887,10 @@
             "api": "./py/星空影视.py"
         },
         {
-            "key": "戒",
+            "key": "视界影视",
             "name": "💡视界影视",
             "type": 3,
-            "api": "./js/jys.js",
-            "searchable": 1,
-            "quickSearch": 0,
-            "filterable": 0,
-            "changeable": 0
+            "api": "./py/视界影视.py"
         },
         {
             "key": "师兄",
