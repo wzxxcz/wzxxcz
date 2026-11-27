@@ -230,6 +230,15 @@ _LINE_ORDER = ["番茄", "番茄二", "超清1", "超清2", "超清HD", "电影�
 _MODULE_DATA = {"home": None}
 _WARM_EVENT = threading.Event()
 
+# ===================== 播放接口全局节流（429 风控破解） =====================
+# ⚠️ 实测: meta/kky/parse 接口短时间连打约 8 次触发 HTTP 429
+#   {"code":0,"msg":"你操作太频繁","url":"","wait":3} — 冷却约 3s 恢复。
+# 429 响应里恰好有 "url":"" 字段, 会冒充"无票线路"骗上层疯狂切线路雪上加霜!
+# ⚠️ 惩罚会累计升级: 每次 429 都算新违规(固定等 3s 再打 = 持续违规, 窗口不断重置)
+#   → 必须指数退避(3→6→12→24→30s 封顶), 请求成功后复位。
+_G_RATE = {"ts": 0.0, "until": 0.0, "strike": 0, "lock": threading.Lock()}
+_API_GAP = 0.8
+
 
 def _module_warm():
     """后台线程预抓首页; 失败静默重试, 全程不阻塞 exec。"""
@@ -693,19 +702,69 @@ class Spider(Spider):
     def _direct(self, url, header):
         return {"parse": 0, "playUrl": "", "url": url, "header": header}
 
+    def _api_gap(self):
+        """播放接口全局节流: 相邻请求 ≥_API_GAP 秒; 限频冷却期间自动等待。"""
+        with _G_RATE["lock"]:
+            now = time.time()
+            wait = _G_RATE["until"] - now
+            if wait > 0:
+                time.sleep(wait)
+            gap = _API_GAP - (time.time() - _G_RATE["ts"])
+            if gap > 0:
+                time.sleep(gap)
+            _G_RATE["ts"] = time.time()
+
+    def _is_rate_limited(self, j):
+        """识别 429 限频响应 {"code":0,"msg":"你操作太频繁","url":"","wait":3};
+        命中则按指数退避设置全局冷却并返回 True(429 里恰好有 url:"" 字段,
+        必须先识别, 否则会冒充"无票线路"触发疯狂切线路雪上加霜)"""
+        try:
+            if isinstance(j, dict) and j.get("code") == 0 \
+                    and not j.get("url") and "频繁" in str(j.get("msg") or ""):
+                base = 3
+                try:
+                    base = max(1, int(j.get("wait") or 3))
+                except Exception:
+                    pass
+                with _G_RATE["lock"]:
+                    strike = _G_RATE["strike"] + 1
+                    _G_RATE["strike"] = strike
+                    w = min(30, base * (2 ** (strike - 1)))
+                    _G_RATE["until"] = time.time() + w
+                self.log("  ⚠️ 接口限频(429) 第%d次, 指数冷却 %ss" % (strike, w))
+                return True
+        except Exception:
+            pass
+        return False
+
+    def _rate_ok(self):
+        """一次成功请求后复位违规计数。"""
+        with _G_RATE["lock"]:
+            _G_RATE["strike"] = 0
+
     def _resolve_play(self, play_page, header):
         """V2 播放决策链:
-        1) meta=1 接口(权威数据源; kky 票一次性 → 失败重取新票循环)
-        2) 播放页 HTML player_aaaa(兼容旧结构)
-        3) fqPreheat.lines 同集等效兜底
-        4) parse:1 交壳子嗅探"""
-        # ---- 1) meta=1 ----
+        1) meta=1 接口(权威数据源; kky 票一次性 → 失败重取新票循环, 带退避防风控)
+        2) 当前线路无票(url 为空, 站点该线路本就播不了) → 自动切换其他线路同集
+           (优先 meta.link 站点推荐默认线路, 等效站点前端 fq_preheat 自动切线路)
+        3) 播放页 HTML player_aaaa(兼容旧结构)
+        4) fqPreheat.lines 同集等效兜底
+        5) parse:1 交壳子嗅探"""
+        # ---- 1) meta=1 (当前线路) ----
         meta_url = play_page + ("&" if "?" in play_page else "?") + "meta=1"
-        frm = ""
-        for _ in range(6):
+        no_ticket = False
+        meta_first = {}
+        for attempt in range(6):
             meta = self._fetch_meta(meta_url)
+            if attempt == 0:
+                meta_first = meta if isinstance(meta, dict) else {}
+            if meta is None:
+                # 限频(429): _api_gap 已自动全局冷却 → 直接重取
+                continue
             if not meta:
-                break
+                # 网络抖动 → 退避后再取(防连打加重风控)
+                time.sleep(0.8)
+                continue
             url = str(meta.get("url") or "").replace("\\/", "/").replace("&amp;", "&")
             frm = str(meta.get("from") or "")
             kky = str(meta.get("kky") or "")
@@ -719,6 +778,7 @@ class Spider(Spider):
                 u = self._kky_exchange_once(url, kky)
                 if u:
                     return self._direct(u, header)
+                time.sleep(0.5)
                 continue
             # c) na: 票(xiguam3u8 等) → parse.php 换票(多节点, 票可复用)
             if url.startswith("na:"):
@@ -726,9 +786,19 @@ class Spider(Spider):
                 if u:
                     return self._direct(u, header)
                 break
+            # d) url 为空 = 当前线路无票(站点网页上该线路也是"换票失败") → 转线路切换
+            if not url:
+                no_ticket = True
+                break
             break
 
-        # ---- 2) HTML player_aaaa(兼容旧结构) ----
+        # ---- 2) 无票线路 → 自动切换其他线路同集 ----
+        if no_ticket:
+            res = self._switch_line(play_page, meta_first, header)
+            if res:
+                return res
+
+        # ---- 3) HTML player_aaaa(兼容旧结构) ----
         html = self._fetch(play_page)
         aa = {}
         if html:
@@ -742,7 +812,7 @@ class Spider(Spider):
                 except Exception:
                     aa = {}
         real_url = (aa.get("url") or "").replace("\\/", "/").replace("&amp;", "&")
-        frm = aa.get("from") or frm
+        frm = aa.get("from") or ""
         kky = aa.get("kky") or ""
         self.log("  html aa: from=%s url=%s" % (frm, real_url[:60]))
         if real_url.startswith("http"):
@@ -755,29 +825,72 @@ class Spider(Spider):
             for _ in range(4):
                 meta = self._fetch_meta(meta_url)
                 if not meta:
+                    time.sleep(0.6)
                     break
                 u = self._kky_exchange_once(
                     str(meta.get("url") or real_url), str(meta.get("kky") or ""))
                 if u:
                     return self._direct(u, header)
+                time.sleep(0.5)
         if real_url.startswith("na:"):
             u = self._parse_na(real_url, play_page)
             if u:
                 return self._direct(u, header)
 
-        # ---- 3) fqPreheat.lines 同集等效兜底 ----
+        # ---- 4) fqPreheat.lines 同集等效兜底 ----
         m3u8_fb = self._extract_line_fallback(html, play_page, skip_from=frm)
         if m3u8_fb:
             self.log("  => lines 同集兜底: %s" % m3u8_fb[:120])
             return self._direct(m3u8_fb, header)
 
-        # ---- 4) 兜底: 交 TVBox 嗅探 ----
+        # ---- 5) 兜底: 交 TVBox 嗅探 ----
         return {"parse": 1, "playUrl": "", "url": play_page,
                 "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
 
+    def _switch_line(self, play_page, meta_first, header):
+        """当前线路无票(站点该线路网页上也播不了) → 换同影片其他线路的同集。
+        顺序: meta.link(站点推荐的默认可播线路) → 常见 sid 逐个试。
+        等效站点前端 fq_preheat.js 的 switchTo 自动切换。"""
+        m = re.search(r'/vod/play/id/(\d+)/sid/(\d+)/nid/(\d+)\.html', play_page)
+        if not m:
+            return None
+        vid, cur_sid, nid = m.group(1), m.group(2), m.group(3)
+        candidates = []
+        # 优先站点 meta.link 指向的默认线路
+        link = str((meta_first or {}).get("link") or "")
+        lm = re.search(r'/sid/(\d+)/', link)
+        if lm and lm.group(1) != cur_sid:
+            candidates.append(lm.group(1))
+        for s in ("3", "4", "2", "1", "5", "6"):
+            if s != cur_sid and s not in candidates:
+                candidates.append(s)
+        for s in candidates:
+            url = "%s/index.php/vod/play/id/%s/sid/%s/nid/%s.html" % (
+                self.site_url, vid, s, nid)
+            meta = self._fetch_meta(url + "?meta=1")
+            if meta is None or not meta:
+                continue
+            u = str(meta.get("url") or "").replace("\\/", "/")
+            frm = str(meta.get("from") or "")
+            self.log("  切线路 sid=%s: from=%s url=%s" % (s, frm, u[:60]))
+            if u.startswith("http"):
+                self.log("  => 切到线路 sid=%s 直链" % s)
+                return self._direct(u, header)
+            if frm in _KKY_FROMS and u:
+                got = self._kky_exchange_once(u, str(meta.get("kky") or ""))
+                if got:
+                    return self._direct(got, header)
+            elif u.startswith("na:"):
+                got = self._parse_na(u, url)
+                if got:
+                    return self._direct(got, header)
+        return None
+
     def _fetch_meta(self, meta_url):
         """播放数据权威接口: 播放页URL + '?meta=1' →
-        {"url":票,"from":"kkytest","sid":3,"kky":"时间戳.签名",...}"""
+        {"url":票,"from":"kkytest","sid":3,"kky":"时间戳.签名",...}
+        返回 {} = 网络失败; None = 被限频(上层应冷却重试)"""
+        self._api_gap()
         try:
             rsp = self.fetch(meta_url, headers={
                 "User-Agent": UA,
@@ -787,7 +900,10 @@ class Spider(Spider):
             }, timeout=10)
             text = rsp.text if hasattr(rsp, "text") else str(rsp)
             j = json.loads(text)
+            if self._is_rate_limited(j):
+                return None
             if isinstance(j, dict) and j.get("url") is not None:
+                self._rate_ok()
                 return j
         except Exception as e:
             self.log("  meta FAIL: %s" % e)
@@ -799,6 +915,7 @@ class Spider(Spider):
         if not vid:
             return ""
         api = self.site_url + "/noad/kky_play.php?vid=" + urllib.parse.quote(vid)
+        self._api_gap()
         try:
             rsp = self.fetch(api, headers={
                 "User-Agent": UA,
@@ -810,6 +927,7 @@ class Spider(Spider):
             u = str(j.get("url") or "")
             if j.get("code") == 200 and u.startswith("http"):
                 self.log("  => kky 换票成功: %s" % u[:100])
+                self._rate_ok()
                 return u
             self.log("  kky 换票拒绝: code=%s msg=%s" % (j.get("code"), j.get("msg")))
         except Exception:
@@ -817,11 +935,13 @@ class Spider(Spider):
         return ""
 
     def _parse_na(self, ticket, referer="", tries=6):
-        """na: 票 → /noad/parse.php 换票(同样多节点, 约 1/6 节点放行)。"""
+        """na: 票 → /noad/parse.php 换票(多节点抖动, 同票可重试, 全局节流防风控)。"""
         if not ticket:
             return ""
         api = self.site_url + "/noad/parse.php?t=" + urllib.parse.quote(ticket)
-        for _ in range(tries):
+        for i in range(tries):
+            if i:
+                self._api_gap()
             try:
                 rsp = self.fetch(api, headers={
                     "User-Agent": UA,
@@ -832,6 +952,7 @@ class Spider(Spider):
                 u = str(j.get("url") or "")
                 if j.get("code") == 200 and u.startswith("http"):
                     self.log("  => parse 换票成功: %s" % u[:100])
+                    self._rate_ok()
                     return u
             except Exception:
                 pass
