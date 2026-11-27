@@ -189,6 +189,8 @@ for c in CLASSES:
     FILTERS[tid] = groups
 
 _PAGE_LIMIT = 60
+_PAGE_SIZE = 36   # 站点筛选库页每页卡片数
+_MAX_PAGE = 50   # 翻页安全阀
 
 # ===================== 正则 =====================
 # 库页/首页卡片: <a ...class="video-pic[ loading]"...> 锚点(属性顺序两种, 分项 search)
@@ -411,7 +413,7 @@ class Spider(Spider):
         return videos
 
     # ---------------- 路由构造 ----------------
-    def _build_ku(self, tid, extend):
+    def _build_ku(self, tid, extend, page=1):
         cls = (extend.get("class") or "").strip()
         area = urllib.parse.quote(extend.get("area") or "", safe="")
         year = extend.get("year") or ""
@@ -421,9 +423,11 @@ class Spider(Spider):
         # 无任何筛选条件: 主类全量库页 vodtype/<tid>.html (单页全量)
         if not area and not year:
             return self.site_url + "/vodtype/" + tid + ".html"
-        # 带地区/年份筛选: 12 段 vodshow/<tid>-<area>----------<year>.html
-        segs = [tid, area, "", "", "", "", "", "", "", "", "", year]
-        return self.site_url + "/vodshow/" + "-".join(segs) + ".html"
+        # 带地区/年份筛选: 12 段 vodshow/<tid>-<area>-------<page>---<year>/sid/1.html
+        # seg0 tid / seg1 地区别名 / seg8 页码 / seg11 年份, 其余空段占位
+        segs = [tid, area, "", "", "", "", "", "",
+                str(page), "", "", year]
+        return self.site_url + "/vodshow/" + "-".join(segs) + "/sid/1.html"
 
     def _build_search(self, keyword, page):
         kw = urllib.parse.quote(str(keyword or "").strip(), safe="")
@@ -451,14 +455,42 @@ class Spider(Spider):
             extend = {}
         extend = {k: v for k, v in extend.items() if v not in ("", None, "全部")}
 
-        url = self._build_ku(tid, extend)
-        self.log("category: %s" % url)
-        html = self._fetch(url)
-        videos = self._extract_videos(html)
-        self.log("  HTML 长度: %d, 卡片: %d" % (len(html), len(videos)))
+        cls = (extend.get("class") or "").strip()
+        area = extend.get("area") or ""
+        year = extend.get("year") or ""
+        # 筛选页(地区/年份, 无子类)走 vodshow 分页; 主类/子类 vodtype 单页全量
+        is_filter = (not cls) and bool(area or year)
 
-        # 单页全量: 有片即 1 页, 空即 1 页
+        videos, seen = [], set()
         pagecount = 1
+
+        if not is_filter:
+            url = self._build_ku(tid, extend)
+            self.log("category: %s" % url)
+            html = self._fetch(url)
+            videos = self._extract_videos(html)
+            self.log("  HTML 长度: %d, 卡片: %d" % (len(html), len(videos)))
+        else:
+            # 逐页聚合: 每页 36, 翻到空页/不足一页即末页; 按 vod_id 去重
+            page = 1
+            while page <= _MAX_PAGE:
+                url = self._build_ku(tid, extend, page)
+                self.log("category p%d: %s" % (page, url))
+                html = self._fetch(url)
+                v = self._extract_videos(html)
+                if not v:
+                    break
+                for x in v:
+                    if x["vod_id"] in seen:
+                        continue
+                    seen.add(x["vod_id"])
+                    videos.append(x)
+                pagecount = page
+                if len(v) < _PAGE_SIZE:
+                    break
+                page += 1
+            self.log("  筛选聚合卡片: %d, 页数: %d" % (len(videos), pagecount))
+
         return {
             "list": videos, "page": 1, "pagecount": pagecount,
             "limit": _PAGE_LIMIT, "total": len(videos),
