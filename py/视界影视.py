@@ -30,7 +30,9 @@
 详情: h1 片名(兜底 title); 封面 data-original 兜底 og:image;
   tag 链: 第1个分类名(忽略) / 第2个年份 / 第3个地区 a / 第4个类型 a 链;
   info-item: span.module-info-item-title 标签 ↔ div.module-info-item-content 值
-    (导演/主演/上映/片长/更新/备注), a 文本逗号 join;
+    (导演/主演/编剧/上映/片长/更新/备注), a 文本逗号 join;
+    备注(HD/正片/第N集完结)优先入 vod_remarks, 缺省兜底片长(集数状态/时长);
+    编剧/更新时间 TVBox 无独立键, 并入 vod_subtitle; 上映日期不重复入字段;
   简介 .module-info-introduction-content p 全文 → meta description 两层兜底;
   前缀固定注入, 空简介只回前缀; 本站无评分 / 无语言 / 无又名副标题。
 
@@ -501,7 +503,21 @@ class Spider(Spider):
             meta[lab] = ", ".join(v for v in vals if v)
         director = meta.get("导演", "")
         actor = meta.get("主演", "")
+        writer = meta.get("编剧", "")
+        update_at = meta.get("更新", "")
+        duration = meta.get("片长", "")
         remarks_note = meta.get("备注", "")
+
+        # 备注角标: 站点「备注」(HD/正片/第N集完结) 优先, 缺省兜底「片长」(集数状态/时长)
+        remarks = remarks_note or duration
+
+        # 副标题: TVBox 无独立编剧/更新时间键, 挂 vod_subtitle 保留, 不污染导演/主演
+        sub_parts = []
+        if writer:
+            sub_parts.append("编剧：" + writer[:200])
+        if update_at:
+            sub_parts.append("更新：" + update_at)
+        subtitle = " · ".join(sub_parts)
 
         # 简介: intro 全文 → meta description; 前缀强制注入
         content = ""
@@ -551,7 +567,7 @@ class Spider(Spider):
         if not play_from:
             return {"list": []}
 
-        remarks = remarks_note or ("%d条线路" % len(play_from))
+        remarks = remarks or ("%d条线路" % len(play_from))
 
         return {"list": [{
             "vod_id": vod_id,
@@ -565,7 +581,7 @@ class Spider(Spider):
             "vod_class": vclass,
             "vod_lang": "",
             "vod_score": "",
-            "vod_subtitle": "",
+            "vod_subtitle": subtitle,
             "vod_remarks": remarks,
             "vod_play_from": "$$$".join(play_from),
             "vod_play_url": "$$$".join(play_url),
