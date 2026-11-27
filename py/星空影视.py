@@ -117,11 +117,12 @@ _SUBCAT = {
            ("41", "现代都市"), ("42", "古装仙侠"), ("43", "热血剧情")],
 }
 
-# 排序（seg2; 站点面板: 按时间/按人气/按评分）
-_SORTS = [("", "全部"), ("time", "最新"), ("hits", "人气"), ("score", "评分")]
+# 排序（seg2; 站点面板: 按时间/按人气/按评分）; 选项统一为 {"n": 面板名, "v": 路由值} 对象
+_SORTS = [{"n": "全部", "v": ""}, {"n": "最新", "v": "time"},
+          {"n": "人气", "v": "hits"}, {"n": "评分", "v": "score"}]
 
-_YEARS = [("", "全部")] + [(str(y), str(y)) for y in range(2026, 1999, -1)]
-_LETTERS = [("", "全部")] + [(c, c) for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"] + [("0-9", "0-9")]
+_YEARS = [{"n": "全部", "v": ""}] + [{"n": str(y), "v": str(y)} for y in range(2026, 1999, -1)]
+_LETTERS = [{"n": "全部", "v": ""}] + [{"n": c, "v": c} for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"] + [{"n": "0-9", "v": "0-9"}]
 
 # 逐分类筛选面板（站点 show 页实证; v=路由值, n=面板名）
 _FILTER_TABLE = {
@@ -180,7 +181,7 @@ for c in CLASSES:
         {"key": "area",  "name": "地区", "value": _opts(tab.get("area", []))},
         {"key": "lang",  "name": "语言", "value": _opts(tab.get("lang", []))},
         {"key": "year",  "name": "年份", "value": _YEARS},
-        {"key": "by",    "name": "排序", "value": [{"n": n, "v": v} for v, n in _SORTS]},
+        {"key": "by",    "name": "排序", "value": _SORTS},
         {"key": "letter", "name": "字母", "value": _LETTERS},
     ]
 
@@ -378,7 +379,7 @@ class Spider(Spider):
         return self.site_url + "/%s/%s.html" % (kind, "-".join(segs))
 
     def homeContent(self, filter=False):
-        return {"class": CLASSES, "filters": FILTERS}
+        return {"class": list(CLASSES), "filters": dict(FILTERS)}
 
     def homeVideoContent(self):
         self._warm_up()
