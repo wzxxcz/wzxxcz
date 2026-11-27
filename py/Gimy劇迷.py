@@ -12,13 +12,13 @@ Gimy 劇迷 gimytv.biz | TVBox Python 爬虫
 
 路由:
   首页       /
-  主类库页   /vodtype/<tid>.html            (单页全量, 无分页)
-  筛选库页   /vodshow/<tid>-<area>----------<year>.html
-             12 段: seg0 tid / seg1 地区(别名逗号串) / seg11 年份; 无排序/类型/页码段
-  子类       /vodtype/<子tid>.html
+  主类库页   /vodtype/<tid>-<page>.html       (電影/劇集单页全量; 綜藝/動漫分页)
+  子类库页   /vodtype/<子tid>-<page>.html     (全部子类分页)
+  筛选库页   /vodshow/<12 槽>/sid/1.html
+             12 段: seg0 tid / seg1 地区(别名逗号串) / seg8 页码 / seg11 年份; 无排序/类型段
   详情       /voddetail/<vid>.html
   播放       /video/<vid>-<nid>.html#sid=<sid>
-  搜索       /vodsearch/-----<kw>--------.html
+  搜索       /vodsearch/<13 槽>.html
              13 段: seg5 关键词; ?wd= query 兜底
 
 筛选 extend key: class(子类 tid) / area(地区别名串) / year(年份)。
@@ -47,7 +47,8 @@ Gimy 劇迷 gimytv.biz | TVBox Python 爬虫
   3) 提取不到 / 加密 → parse:1 交壳子嗅探
   直链 header 只带 UA(实测 CDN v.fengbao14.com 无需 Referer)。
 
-分页: 主分类单页全量(站点不下发分页链接, 翻页参数被忽略返同页), pagecount=1, 不做滑动翻页。
+分页: vodtype(主类/子类) 与 vodshow(筛选) 统一按页头总页号 N/M 逐页聚合, 按 vid 去重;
+      電影/劇集无分页锚点视为 1 页; 每页大小浮动, 不靠"不足一页"判末页。
 
 脚本文件名: spider_gimytv.py (交付 api 链接须含 .py 后缀, 满足壳子 isPy 判定)。
 """
@@ -189,8 +190,8 @@ for c in CLASSES:
     FILTERS[tid] = groups
 
 _PAGE_LIMIT = 60
-_PAGE_SIZE = 36   # 站点筛选库页每页卡片数
-_MAX_PAGE = 50   # 翻页安全阀
+_PAGE_SIZE = 36   # 站点单页参考卡片数(实际每页大小浮动, 末页判定以页头总页号为准)
+_MAX_PAGE = 300  # 翻页安全阀(仅防 num 缺失死循环; 正常按页头总页号抓满)
 
 # ===================== 正则 =====================
 # 库页/首页卡片: <a ...class="video-pic[ loading]"...> 锚点(属性顺序两种, 分项 search)
@@ -417,17 +418,31 @@ class Spider(Spider):
         cls = (extend.get("class") or "").strip()
         area = urllib.parse.quote(extend.get("area") or "", safe="")
         year = extend.get("year") or ""
-        # 子类: 独立 vodtype/<子tid>.html
+        # 子类: 独立 vodtype/<子tid>-<page>.html
         if cls:
-            return self.site_url + "/vodtype/" + cls + ".html"
-        # 无任何筛选条件: 主类全量库页 vodtype/<tid>.html (单页全量)
+            return self.site_url + "/vodtype/" + cls + "-" + str(page) + ".html"
+        # 无任何筛选条件: 主类库页 vodtype/<tid>-<page>.html
+        # (電影/劇集站点忽略页码返同页; 綜藝/動漫/子类按页头总页号翻页)
         if not area and not year:
-            return self.site_url + "/vodtype/" + tid + ".html"
+            return self.site_url + "/vodtype/" + tid + "-" + str(page) + ".html"
         # 带地区/年份筛选: 12 段 vodshow/<tid>-<area>-------<page>---<year>/sid/1.html
         # seg0 tid / seg1 地区别名 / seg8 页码 / seg11 年份, 其余空段占位
         segs = [tid, area, "", "", "", "", "", "",
                 str(page), "", "", year]
         return self.site_url + "/vodshow/" + "-".join(segs) + "/sid/1.html"
+
+    def _read_page_count(self, html, route, idv):
+        """读页头总页号 M: 优先 class=num 的 N/M, 兜底分页锚最大页号; 取不到返 1。"""
+        if not html:
+            return 1
+        m = re.search(r'class="num">\s*\d+\s*/\s*(\d+)', html)
+        if m and int(m.group(1)) >= 1:
+            return int(m.group(1))
+        if route == "vodtype":
+            pg = [int(n) for n in re.findall(r'/vodtype/%s-(\d+)\.html' % idv, html)]
+        else:
+            pg = [int(n) for n in re.findall(r'/vodshow/[^"\']*?-(\d+)-[^"\']*?/sid/1\.html', html)]
+        return max(pg) if pg else 1
 
     def _build_search(self, keyword, page):
         kw = urllib.parse.quote(str(keyword or "").strip(), safe="")
@@ -458,38 +473,35 @@ class Spider(Spider):
         cls = (extend.get("class") or "").strip()
         area = extend.get("area") or ""
         year = extend.get("year") or ""
-        # 筛选页(地区/年份, 无子类)走 vodshow 分页; 主类/子类 vodtype 单页全量
-        is_filter = (not cls) and bool(area or year)
+        # 通道: 子类/主类 → vodtype; 带地区/年份筛选 → vodshow
+        route = "vodshow" if (not cls and (area or year)) else "vodtype"
+        idv = cls or tid
 
         videos, seen = [], set()
+        page = 1
         pagecount = 1
+        total_pages = None
 
-        if not is_filter:
-            url = self._build_ku(tid, extend)
-            self.log("category: %s" % url)
+        while page <= _MAX_PAGE:
+            url = self._build_ku(tid, extend, page)
+            self.log("category p%d: %s" % (page, url))
             html = self._fetch(url)
-            videos = self._extract_videos(html)
-            self.log("  HTML 长度: %d, 卡片: %d" % (len(html), len(videos)))
-        else:
-            # 逐页聚合: 每页 36, 翻到空页/不足一页即末页; 按 vod_id 去重
-            page = 1
-            while page <= _MAX_PAGE:
-                url = self._build_ku(tid, extend, page)
-                self.log("category p%d: %s" % (page, url))
-                html = self._fetch(url)
-                v = self._extract_videos(html)
-                if not v:
-                    break
-                for x in v:
-                    if x["vod_id"] in seen:
-                        continue
-                    seen.add(x["vod_id"])
-                    videos.append(x)
-                pagecount = page
-                if len(v) < _PAGE_SIZE:
-                    break
-                page += 1
-            self.log("  筛选聚合卡片: %d, 页数: %d" % (len(videos), pagecount))
+            v = self._extract_videos(html)
+            if not v:
+                break
+            for x in v:
+                if x["vod_id"] in seen:
+                    continue
+                seen.add(x["vod_id"])
+                videos.append(x)
+            # 第 1 页读页头总页号 M, 之后按 M 抓满(站点每页大小浮动, 不靠不足一页判末页)
+            if total_pages is None:
+                total_pages = self._read_page_count(html, route, idv)
+                pagecount = total_pages
+            if page >= total_pages:
+                break
+            page += 1
+        self.log("  聚合卡片: %d, 页数: %d" % (len(videos), pagecount))
 
         return {
             "list": videos, "page": 1, "pagecount": pagecount,
