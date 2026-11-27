@@ -124,47 +124,39 @@ _SORTS = [{"n": "全部", "v": ""}, {"n": "最新", "v": "time"},
 _YEARS = [{"n": "全部", "v": ""}] + [{"n": str(y), "v": str(y)} for y in range(2026, 1999, -1)]
 _LETTERS = [{"n": "全部", "v": ""}] + [{"n": c, "v": c} for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"] + [{"n": "0-9", "v": "0-9"}]
 
-# 逐分类筛选面板（站点 show 页实证; v=路由值, n=面板名）
+# 通用地区/语言（电视剧/综艺/动漫/动画片/短剧站点实测一致）
+_AREA_COMMON = ["内地", "韩国", "香港", "台湾", "日本", "美国", "泰国", "英国", "新加坡", "其他"]
+_LANG_COMMON = ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "其它"]
+# 电视剧/动画片/短剧 共用剧情清单
+_CLASS_TV = ["古装", "战争", "青春偶像", "喜剧", "家庭", "犯罪", "动作", "奇幻", "剧情",
+             "历史", "经典", "乡村", "情景", "商战", "网剧", "其他"]
+
+# 逐分类筛选面板（站点 show 页实测; 列表项为 v=n=面板名, 顺序与站点一致; "全部"由 _opts 自动补）
 _FILTER_TABLE = {
     "1": {
-        "area": ["其他", "加拿大", "印度", "台湾", "大陆", "德国", "意大利", "日本",
-                 "法国", "泰国", "美国", "英国", "西班牙", "韩国", "香港"],
-        "class": ["儿童", "冒险", "农村", "剧情", "动作", "动画", "历史", "古装", "喜剧",
-                  "奇幻", "微电影", "恐怖", "悬疑", "惊悚", "战争", "文艺", "枪战", "武侠",
-                  "爱情", "犯罪", "科幻", "经典", "网络电影", "警匪", "运动", "青春"],
-        "lang": ["其它", "国语", "德语", "日语", "法语", "粤语", "英语", "闽南语", "韩语"],
+        "area": ["大陆", "香港", "台湾", "美国", "法国", "英国", "日本", "韩国", "德国",
+                 "泰国", "印度", "意大利", "西班牙", "加拿大", "其他"],
+        "class": ["喜剧", "爱情", "恐怖", "动作", "科幻", "剧情", "战争", "警匪", "犯罪",
+                  "动画", "奇幻", "武侠", "冒险", "枪战", "悬疑", "惊悚", "经典", "青春",
+                  "文艺", "微电影", "古装", "历史", "运动", "农村", "儿童", "网络电影"],
+        "lang": ["国语", "英语", "粤语", "闽南语", "韩语", "日语", "法语", "德语", "其它"],
     },
-    "2": {
-        "area": ["其他", "内地", "台湾", "新加坡", "日本", "泰国", "美国", "英国", "韩国", "香港"],
-        "class": ["乡村", "其他", "剧情", "动作", "历史", "古装", "商战", "喜剧", "奇幻",
-                  "家庭", "情景", "战争", "犯罪", "经典", "网剧", "青春偶像"],
-        "lang": ["其它", "国语", "日语", "粤语", "英语", "闽南语", "韩语"],
-    },
+    "2": {"area": _AREA_COMMON, "class": _CLASS_TV, "lang": _LANG_COMMON},
     "3": {
-        "area": ["其他", "内地", "台湾", "新加坡", "日本", "泰国", "美国", "英国", "韩国", "香港"],
-        "class": ["情感", "播报", "旅游", "曲艺", "求职", "游戏互动", "生活", "纪实",
-                  "美食", "访谈", "财经", "选秀", "音乐"],
-        "lang": ["其它", "国语", "日语", "粤语", "英语", "闽南语", "韩语"],
+        "area": _AREA_COMMON,
+        "class": ["选秀", "情感", "访谈", "播报", "旅游", "音乐", "美食", "纪实", "曲艺",
+                  "生活", "游戏互动", "财经", "求职"],
+        "lang": _LANG_COMMON,
     },
     "4": {
-        "area": ["其他", "内地", "台湾", "新加坡", "日本", "泰国", "美国", "英国", "韩国", "香港"],
-        "class": ["亲子", "其他", "冒险", "动作", "励志", "原创", "少女", "少年", "情感",
-                  "战争", "推理", "搞笑", "机战", "校园", "热血", "益智", "社会", "科幻",
-                  "萝莉", "运动"],
-        "lang": ["其它", "国语", "日语", "粤语", "英语", "闽南语", "韩语"],
+        "area": _AREA_COMMON,
+        "class": ["情感", "科幻", "热血", "推理", "搞笑", "冒险", "萝莉", "校园", "动作",
+                  "机战", "运动", "战争", "少年", "少女", "社会", "原创", "亲子", "益智",
+                  "励志", "其他"],
+        "lang": _LANG_COMMON,
     },
-    "35": {
-        "area": ["其他", "内地", "台湾", "新加坡", "日本", "泰国", "美国", "英国", "韩国", "香港"],
-        "class": ["乡村", "其他", "剧情", "动作", "历史", "古装", "商战", "喜剧", "奇幻",
-                  "家庭", "情景", "战争", "犯罪", "经典", "网剧", "青春偶像"],
-        "lang": ["其它", "国语", "日语", "粤语", "英语", "闽南语", "韩语"],
-    },
-    "36": {
-        "area": ["其他", "内地", "台湾", "新加坡", "日本", "泰国", "美国", "英国", "韩国", "香港"],
-        "class": ["乡村", "其他", "剧情", "动作", "历史", "古装", "商战", "喜剧", "奇幻",
-                  "家庭", "情景", "战争", "犯罪", "经典", "网剧", "青春偶像"],
-        "lang": ["其它", "国语", "日语", "粤语", "英语", "闽南语", "韩语"],
-    },
+    "35": {"area": _AREA_COMMON, "class": _CLASS_TV, "lang": _LANG_COMMON},
+    "36": {"area": _AREA_COMMON, "class": _CLASS_TV, "lang": _LANG_COMMON},
 }
 
 
@@ -172,28 +164,42 @@ def _opts(values):
     return [{"n": "全部", "v": ""}] + [{"n": v, "v": v} for v in values]
 
 
+def _sub_opts(tid):
+    subs = _SUBCAT.get(tid)
+    if not subs:
+        return None
+    return [{"n": "全部", "v": ""}] + [{"n": name, "v": sid} for sid, name in subs]
+
+
 FILTERS = {}
 for c in CLASSES:
     tid = c["type_id"]
     tab = _FILTER_TABLE.get(tid, {})
-    FILTERS[tid] = [
-        {"key": "class", "name": "类型", "value": _opts(tab.get("class", []))},
+    groups = []
+    sub_opts = _sub_opts(tid)
+    # 站点面板行序: 类型(子类) → 剧情 → 地区 → 年份 → 语言 → 字母 → 排序
+    if sub_opts:
+        groups.append({"key": "sub", "name": "类型", "value": sub_opts})
+    groups += [
+        {"key": "class", "name": "剧情", "value": _opts(tab.get("class", []))},
         {"key": "area",  "name": "地区", "value": _opts(tab.get("area", []))},
-        {"key": "lang",  "name": "语言", "value": _opts(tab.get("lang", []))},
         {"key": "year",  "name": "年份", "value": _YEARS},
-        {"key": "by",    "name": "排序", "value": _SORTS},
+        {"key": "lang",  "name": "语言", "value": _opts(tab.get("lang", []))},
         {"key": "letter", "name": "字母", "value": _LETTERS},
+        {"key": "by",    "name": "排序", "value": _SORTS},
     ]
+    FILTERS[tid] = groups
 
 # ===================== 正则 =====================
 # 卡片: <a class="stui-vodlist__thumb lazyload" href="/voddetail/xx.html" title="片名" data-original="封面">
-_RE_CARD = re.compile(
-    r'<a[^>]*class="stui-vodlist__thumb[^"]*lazyload"[^>]*href="(/voddetail/\d+\.html)"[^>]*'
-    r'(?:title="([^"]*)")?[^>]*?(?:data-original|data-src)="([^"]*)"', re.I)
-# 兜底: 先取详情链接, 再在其块内找封面/标题
+# 卡片: 先按 <li> 块切分, 块内分项取 href / title / 封面 / 备注 / 主演(副标题), 不依赖属性顺序
+_RE_LI_BLOCK = re.compile(r'<li class="col-[^"]*">([\s\S]*?)</li>', re.I)
 _RE_DETAIL_HREF = re.compile(r'href="(/voddetail/\d+\.html)"', re.I)
+_RE_THUMB = re.compile(r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*>', re.I)
+_RE_ATTR_TITLE = re.compile(r'title="([^"]*)"', re.I)
+_RE_ATTR_PIC = re.compile(r'(?:data-original|data-src)="([^"]*)"', re.I)
 _RE_CARD_IMG = re.compile(r'<img[^>]*?(?:data-original|data-src)="([^"]*)"', re.I)
-_RE_CARD_TITLE = re.compile(r'<h4[^>]*class="title[^"]*"[^>]*>\s*<a[^>]*title="([^"]*)"', re.I)
+_RE_H4_TEXT = re.compile(r'<h4[^>]*class="title[^"]*"[^>]*>\s*<a[^>]*>([^<]*)</a>', re.I)
 _RE_CARD_NOTE = re.compile(r'<span class="pic-text[^"]*"[^>]*>([^<]*)</span>', re.I)
 _RE_CARD_ACTOR = re.compile(r'<p class="text[^"]*"[^>]*>([\s\S]*?)</p>', re.I)
 
@@ -307,23 +313,49 @@ class Spider(Spider):
         if not html:
             return videos
 
-        # 优先完整卡片匹配
-        for href, title, pic in _RE_CARD.findall(html):
-            href = href.replace("&amp;", "&")
+        # 按 <li> 卡片块切分, 块内分项取 href/标题/封面/备注/主演, 不依赖锚点属性顺序
+        for blk in _RE_LI_BLOCK.findall(html):
+            mh = _RE_DETAIL_HREF.search(blk)
+            if not mh:
+                continue
+            href = mh.group(1).replace("&amp;", "&")
             if href in seen:
                 continue
             seen.add(href)
+
+            # 标题: 优先 thumb 锚点 title 属性, 兜底 h4 链接文本
+            mt = _RE_THUMB.search(blk)
+            if not mt:
+                continue  # 非海报墙卡片(排行/推荐链接), 跳过
+            title = ""
+            ma = _RE_ATTR_TITLE.search(mt.group(0))
+            if ma:
+                title = self._clean(ma.group(1))
+            if not title:
+                mh4 = _RE_H4_TEXT.search(blk)
+                if mh4:
+                    title = self._clean(mh4.group(1))
+
+            # 封面: thumb 锚点 data-original/data-src, 兜底块内 img
+            pic = ""
+            mp = _RE_ATTR_PIC.search(mt.group(0))
+            if mp:
+                pic = mp.group(1)
+
+            mn = _RE_CARD_NOTE.search(blk)
+            note = self._clean(mn.group(1)) if mn else ""
+            ma = _RE_CARD_ACTOR.search(blk)
+            actor = self._clean(ma.group(1)) if ma else ""
+
             videos.append({
                 "vod_id": href,
-                "vod_name": self._clean(title)[:100] or href,
+                "vod_name": title[:100] or href,
                 "vod_pic": self._fix_url(pic) or self.default_pic,
-                "vod_remarks": "",
-                "vod_subtitle": "",
+                "vod_remarks": note,
+                "vod_subtitle": actor[:100],
             })
 
         if videos:
-            # 备注 / 副标题按详情链接块回填
-            self._fill_notes(html, videos, seen)
             return videos
 
         # 兜底: 详情链接 + 块内封面/标题分离匹配
@@ -343,20 +375,6 @@ class Spider(Spider):
                 "vod_subtitle": "",
             })
         return videos
-
-    def _fill_notes(self, html, videos, seen):
-        # 按 li 卡片块回填备注(pic-text)
-        blocks = re.findall(r'<li class="col-[^"]*">([\s\S]*?)</li>', html, re.I)
-        for blk in blocks:
-            mh = _RE_DETAIL_HREF.search(blk)
-            if not mh:
-                continue
-            href = mh.group(1).replace("&amp;", "&")
-            mn = _RE_CARD_NOTE.search(blk)
-            note = self._clean(mn.group(1)) if mn else ""
-            for v in videos:
-                if v["vod_id"] == href:
-                    v["vod_remarks"] = note
 
     # ---------------- 路由构造 ----------------
     def _build_url(self, kind, tid, extend, page, tail=""):
