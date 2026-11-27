@@ -94,11 +94,13 @@ CLASSES = [
 ]
 
 # 站点筛选面板: 类型(子分类, 换 type_id) / 年份 / 排序(by 段) — 与网页完全一致
+# ⚠️ 电影分类特殊: "悬疑"不是子类 id 而是 class 段(v="class:悬疑"), 站点 URL
+#    /vod/show/class/悬疑/id/1.html; 顺序与站点面板逐项一致
 _SUB_MAP = {
-    "1": [("6", "动作片"), ("7", "喜剧片"), ("8", "爱情片"), ("9", "科幻片"),
-          ("10", "恐怖片"), ("11", "剧情片"), ("12", "战争片"), ("20", "记录片"),
-          ("37", "动画片"), ("49", "悬疑片"), ("50", "犯罪片"), ("51", "灾难片"),
-          ("52", "奇幻片")],
+    "1": [("6", "动作片"), ("7", "喜剧片"), ("8", "爱情片"), ("class:悬疑", "悬疑"),
+          ("9", "科幻片"), ("10", "恐怖片"), ("11", "剧情片"), ("12", "战争片"),
+          ("20", "记录片"), ("37", "动画片"), ("49", "悬疑片"), ("50", "犯罪片"),
+          ("51", "灾难片"), ("52", "奇幻片")],
     "2": [("13", "国产剧"), ("14", "香港剧"), ("15", "韩国剧"), ("16", "欧美剧"),
           ("21", "台湾剧"), ("22", "日本剧"), ("23", "海外剧"), ("24", "泰国剧")],
     "3": [("25", "大陆综艺"), ("26", "港台综艺"), ("27", "日韩综艺"), ("28", "欧美综艺")],
@@ -106,6 +108,10 @@ _SUB_MAP = {
           ("32", "港台动漫"), ("33", "海外动漫")],
     "46": [("47", "足球"), ("48", "篮球")],
 }
+
+# 电影分类独有: 地区筛选行(16 项, 与站点面板逐项一致, URL /vod/show/area/{地区}/id/1)
+_AREAS_MOVIE = ["大陆", "香港", "台湾", "美国", "韩国", "日本", "英国", "法国",
+                "泰国", "印度", "加拿大", "西班牙", "俄罗斯", "德国", "意大利", "其它"]
 
 _YEARS = [{"n": "全部", "v": ""}] + \
          [{"n": str(y), "v": str(y)} for y in range(2026, 2020, -1)] + \
@@ -128,13 +134,21 @@ _SORTS_NF = [{"n": "最新", "v": ""},
 FILTERS = {}
 for _c in CLASSES:
     _tid = _c["type_id"]
-    FILTERS[_tid] = [
+    _fl = [
         {"key": "sub", "name": "类型",
          "value": [{"n": "全部", "v": ""}] +
                   [{"n": n, "v": i} for i, n in _SUB_MAP.get(_tid, [])]},
+    ]
+    if _tid == "1":
+        # 电影独有: 地区行(站点面板第二行, 16 项)
+        _fl.append({"key": "area", "name": "地区",
+                    "value": [{"n": "全部", "v": ""}] +
+                             [{"n": a, "v": a} for a in _AREAS_MOVIE]})
+    _fl += [
         {"key": "year", "name": "年份", "value": _YEARS},
         {"key": "by", "name": "排序", "value": _SORTS},
     ]
+    FILTERS[_tid] = _fl
 
 # Netflix 独立 label 路由的五维筛选(与网页面板完全一致):
 # 形态(tid) / 地区(area) / 年份(year) / 类型(class) / 排序(by+order/desc)
@@ -390,14 +404,24 @@ class Spider(Spider):
             pass
         return 1
 
-    def _build_show_path(self, tid, page, by="", year="", sub=""):
+    def _build_show_path(self, tid, page, by="", year="", sub="", area=""):
         """与站点完全同构的组合筛选路由(段序与站点分页链接一致):
-        /vod/show/by/{排序}/id/{tid}/page/{页}/year/{年}.html"""
+        /vod/show[/by/{排序}][/class/{类型}][/area/{地区}]/id/{tid}/page/{页}/year/{年}.html
+        - sub 为 "class:悬疑" 形式时走 class 段(id 保持父类) — 电影"悬疑"特殊项
+        - area 为电影独有地区筛选(大陆/香港/美国/...16 项)"""
         t = str(sub) if sub else str(tid)
+        vclass = ""
+        if t.startswith("class:"):
+            vclass = t.split("class:", 1)[1]
+            t = str(tid)
         q = urllib.parse.quote
         segs = []
         if by:
             segs += ["by", q(str(by))]
+        if vclass:
+            segs += ["class", q(vclass)]
+        if area:
+            segs += ["area", q(str(area))]
         segs += ["id", t]
         page = int(page) if page else 1
         if page > 1:
@@ -498,7 +522,8 @@ class Spider(Spider):
                 tid, page,
                 by=extend.get("by") or "",
                 year=extend.get("year") or "",
-                sub=extend.get("sub") or "")
+                sub=extend.get("sub") or "",
+                area=extend.get("area") or "")
         self.log("category: %s" % url)
         html = self._fetch(url)
         self.log("  HTML 长度: %d" % len(html))
