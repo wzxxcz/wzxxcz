@@ -190,8 +190,8 @@ for c in CLASSES:
     FILTERS[tid] = groups
 
 _PAGE_LIMIT = 60
-_PAGE_SIZE = 36   # 站点单页参考卡片数(实际每页大小浮动, 末页判定以页头总页号为准)
-_MAX_PAGE = 300  # 翻页安全阀(仅防 num 缺失死循环; 正常按页头总页号抓满)
+_PAGE_SIZE = 36   # 站点单页参考卡片数(实际每页大小浮动, 末页/总页号以页头 N/M 为准)
+_MAX_PAGE = 300  # 预留安全阀(当前 categoryContent 按 pg 单页返回, 不做站内聚合)
 
 # ===================== 正则 =====================
 # 库页/首页卡片: <a ...class="video-pic[ loading]"...> 锚点(属性顺序两种, 分项 search)
@@ -454,84 +454,91 @@ class Spider(Spider):
         return {"class": list(CLASSES), "filters": dict(FILTERS)}
 
     def homeVideoContent(self):
-        self._warm_up()
-        html = self._fetch(self.site_url + "/")
-        self.log("home HTML 长度: %d" % len(html))
-        return {"list": self._extract_videos(html)}
+        try:
+            self._warm_up()
+            html = self._fetch(self.site_url + "/")
+            self.log("home HTML 长度: %d" % len(html))
+            return {"list": self._extract_videos(html)}
+        except Exception as e:
+            self.log("homeVideoContent FAIL: %s" % e)
+            return {"list": []}
 
     def categoryContent(self, tid, pg, filter, extend):
-        self._warm_up()
-        if isinstance(extend, str):
-            try:
-                extend = json.loads(extend)
-            except Exception:
+        try:
+            self._warm_up()
+            if isinstance(extend, str):
+                try:
+                    extend = json.loads(extend)
+                except Exception:
+                    extend = {}
+            if not isinstance(extend, dict):
                 extend = {}
-        if not isinstance(extend, dict):
-            extend = {}
-        extend = {k: v for k, v in extend.items() if v not in ("", None, "全部")}
+            extend = {k: v for k, v in extend.items() if v not in ("", None, "全部")}
 
-        cls = (extend.get("class") or "").strip()
-        area = extend.get("area") or ""
-        year = extend.get("year") or ""
-        # 通道: 子类/主类 → vodtype; 带地区/年份筛选 → vodshow
-        route = "vodshow" if (not cls and (area or year)) else "vodtype"
-        idv = cls or tid
+            cls = (extend.get("class") or "").strip()
+            area = extend.get("area") or ""
+            year = extend.get("year") or ""
+            # 通道: 子类/主类 → vodtype; 带地区/年份筛选 → vodshow
+            route = "vodshow" if (not cls and (area or year)) else "vodtype"
+            idv = cls or tid
+            page = int(pg) if str(pg or "1").isdigit() else 1
+            page = page if page >= 1 else 1
 
-        videos, seen = [], set()
-        page = 1
-        pagecount = 1
-        total_pages = None
-
-        while page <= _MAX_PAGE:
             url = self._build_ku(tid, extend, page)
             self.log("category p%d: %s" % (page, url))
             html = self._fetch(url)
-            v = self._extract_videos(html)
-            if not v:
-                break
-            for x in v:
-                if x["vod_id"] in seen:
-                    continue
-                seen.add(x["vod_id"])
-                videos.append(x)
-            # 第 1 页读页头总页号 M, 之后按 M 抓满(站点每页大小浮动, 不靠不足一页判末页)
-            if total_pages is None:
-                total_pages = self._read_page_count(html, route, idv)
-                pagecount = total_pages
-            if page >= total_pages:
-                break
-            page += 1
-        self.log("  聚合卡片: %d, 页数: %d" % (len(videos), pagecount))
+            videos = self._extract_videos(html)
+            pagecount = self._read_page_count(html, route, idv)
+            total = len(videos) if videos else pagecount * _PAGE_SIZE
+            self.log("  卡片: %d, 页数: %d" % (len(videos), pagecount))
 
-        return {
-            "list": videos, "page": 1, "pagecount": pagecount,
-            "limit": _PAGE_LIMIT, "total": len(videos),
-        }
+            return {
+                "list": videos, "page": page, "pagecount": pagecount,
+                "limit": _PAGE_LIMIT, "total": total,
+            }
+        except Exception as e:
+            self.log("categoryContent FAIL: %s" % e)
+            return {"list": [], "page": 1, "pagecount": 1,
+                    "limit": _PAGE_LIMIT, "total": 0}
 
     def searchContent(self, key, quick, pg="1"):
-        self._warm_up()
-        url = self._build_search(key, pg)
-        self.log("search: %s" % url)
-        html = self._fetch(url)
-        videos = self._extract_videos(html, search=True)
-        # path 段返空(未命中渲染排行榜)时, 兜底 query 参数通道
-        if not videos:
-            q = urllib.parse.quote(str(key or "").strip(), safe="")
-            alt = self.site_url + "/vodsearch/-------------.html?wd=" + q
-            self.log("search 兜底 query: %s" % alt)
-            html = self._fetch(alt)
+        try:
+            if not str(key or "").strip():
+                return {"list": [], "page": 1, "pagecount": 1,
+                        "limit": _PAGE_LIMIT, "total": 0}
+            self._warm_up()
+            url = self._build_search(key, pg)
+            self.log("search: %s" % url)
+            html = self._fetch(url)
             videos = self._extract_videos(html, search=True)
-        return {
-            "list": videos, "page": int(pg) if pg else 1,
-            "pagecount": 1 if not videos else 1,
-            "limit": _PAGE_LIMIT, "total": len(videos),
-        }
+            # path 段返空(未命中渲染排行榜)时, 兜底 query 参数通道
+            if not videos:
+                q = urllib.parse.quote(str(key or "").strip(), safe="")
+                alt = self.site_url + "/vodsearch/-------------.html?wd=" + q
+                self.log("search 兜底 query: %s" % alt)
+                html = self._fetch(alt)
+                videos = self._extract_videos(html, search=True)
+            return {
+                "list": videos, "page": int(pg) if pg else 1,
+                "pagecount": 1, "limit": _PAGE_LIMIT, "total": len(videos),
+            }
+        except Exception as e:
+            self.log("searchContent FAIL: %s" % e)
+            return {"list": [], "page": 1, "pagecount": 1,
+                    "limit": _PAGE_LIMIT, "total": 0}
 
     def searchContentPage(self, key, quick, pg="1"):
         return self.searchContent(key, quick, pg)
 
     # ---------------- 详情 ----------------
     def detailContent(self, ids):
+        try:
+            return self._detail(ids)
+        except Exception as e:
+            self.log("detailContent FAIL: %s" % e)
+            return {"list": []}
+
+    def _detail(self, ids):
         if not ids:
             return {"list": []}
         vod_id = str(ids[0])
@@ -706,6 +713,14 @@ class Spider(Spider):
 
     # ---------------- 播放 ----------------
     def playerContent(self, flag, id, vipFlags):
+        try:
+            return self._play(flag, id, vipFlags)
+        except Exception as e:
+            self.log("playerContent FAIL: %s" % e)
+            return {"parse": 1, "playUrl": "", "url": id,
+                    "header": {"User-Agent": UA}}
+
+    def _play(self, flag, id, vipFlags):
         play_page = id if id.startswith("http") else self._fix_url(id)
         self.log("player: %s" % play_page)
 
