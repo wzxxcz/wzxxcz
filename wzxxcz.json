@@ -2350,15 +2350,10 @@
             }
         },
         {
-            "key": "cat_剧迷网",
-            "name": "🥇剧迷影视",
+            "key": "Gimy劇迷",
+            "name": "🍊Gimy劇迷",
             "type": 3,
-            "api": "./js/高清剧迷.js",
-            "style": {
-                "type": "rect",
-                "ratio": 1
-            },
-            "changeable": 1
+            "api": "./py/Gimy劇迷.py"
         },
         {
             "key": "饭团影视1",
