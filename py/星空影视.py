@@ -26,7 +26,7 @@
 
 详情: h1 片名; 封面 img.lazyload[data-original] 兜底 og:image; 评分 div.score span.branch;
   元信息 p.data 内 span.text-muted 标签 ↔ a 值配对(类型/地区/年份/语言/主演/导演/标签);
-  简介 .detail-sketch → .detail-content → meta description 三层兜底; 前缀固定注入, 空简介只回前缀。
+  简介 .detail-content 全文 → .detail-sketch 摘要 → meta description 三层兜底; 前缀固定注入, 空简介只回前缀。
 线路: div.stui-pannel-box.b.playlist.mb 盒, h3.title 线路名, 盒内 ul.stui-content__playlist li>a 选集;
   选集按末段 /<vid>-<sid>-<nid>.html 第二组 nid 数值正序(站点 DOM 已正序, 脚本仍重排保险)。
 
@@ -118,8 +118,8 @@ _SUBCAT = {
 }
 
 # 排序（seg2; 站点面板: 按时间/按人气/按评分）; 选项统一为 {"n": 面板名, "v": 路由值} 对象
-_SORTS = [{"n": "全部", "v": ""}, {"n": "最新", "v": "time"},
-          {"n": "人气", "v": "hits"}, {"n": "评分", "v": "score"}]
+_SORTS = [{"n": "全部", "v": ""}, {"n": "按时间", "v": "time"},
+          {"n": "按人气", "v": "hits"}, {"n": "按评分", "v": "score"}]
 
 _YEARS = [{"n": "全部", "v": ""}] + [{"n": str(y), "v": str(y)} for y in range(2026, 1999, -1)]
 _LETTERS = [{"n": "全部", "v": ""}] + [{"n": c, "v": c} for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"] + [{"n": "0-9", "v": "0-9"}]
@@ -193,15 +193,16 @@ for c in CLASSES:
 # ===================== 正则 =====================
 # 卡片: <a class="stui-vodlist__thumb lazyload" href="/voddetail/xx.html" title="片名" data-original="封面">
 # 卡片: 先按 <li> 块切分, 块内分项取 href / title / 封面 / 备注 / 主演(副标题), 不依赖属性顺序
-_RE_LI_BLOCK = re.compile(r'<li class="col-[^"]*">([\s\S]*?)</li>', re.I)
+# 库页 li.class=col-md-6.., 搜索页 li.class=active clearfix, 故切块不限定 class
+_RE_LI_BLOCK = re.compile(r'<li[^>]*>([\s\S]*?)</li>', re.I)
 _RE_DETAIL_HREF = re.compile(r'href="(/voddetail/\d+\.html)"', re.I)
-_RE_THUMB = re.compile(r'<a[^>]*class="stui-vodlist__thumb[^"]*"[^>]*>', re.I)
+_RE_THUMB = re.compile(r'<a[^>]*class="[^"]*stui-vodlist__thumb[^"]*"[^>]*>', re.I)
 _RE_ATTR_TITLE = re.compile(r'title="([^"]*)"', re.I)
 _RE_ATTR_PIC = re.compile(r'(?:data-original|data-src)="([^"]*)"', re.I)
 _RE_CARD_IMG = re.compile(r'<img[^>]*?(?:data-original|data-src)="([^"]*)"', re.I)
-_RE_H4_TEXT = re.compile(r'<h4[^>]*class="title[^"]*"[^>]*>\s*<a[^>]*>([^<]*)</a>', re.I)
+_RE_H4_TEXT = re.compile(r'<h[34][^>]*class="title[^"]*"[^>]*>\s*<a[^>]*>([^<]*)</a>', re.I)
 _RE_CARD_NOTE = re.compile(r'<span class="pic-text[^"]*"[^>]*>([^<]*)</span>', re.I)
-_RE_CARD_ACTOR = re.compile(r'<p class="text[^"]*"[^>]*>([\s\S]*?)</p>', re.I)
+_RE_CARD_ACTOR = re.compile(r'<p[^>]*>([\s\S]*?)</p>', re.I)
 
 _RE_H1 = re.compile(r'<h1[^>]*>([\s\S]*?)</h1>', re.I)
 _RE_TITLE = re.compile(r"<title>(.*?)</title>", re.S)
@@ -216,7 +217,7 @@ _RE_DATA_LABEL = re.compile(r'<span class="text-muted">([^<]*)</span>', re.I)
 _RE_DATA_VAL = re.compile(r'<a[^>]*>([^<]*)</a>', re.I)
 _RE_SCORE = re.compile(r'<div class="score"[\s\S]*?<span class="branch">([\d.]+)</span>', re.I)
 
-# 简介: .detail-sketch → .detail-content
+# 简介: detail-content 全文优先, detail-sketch 摘要兜底(sketch 常为 100 字截断)
 _RE_INTRO_SKETCH = re.compile(r'<span class="detail-sketch">([\s\S]*?)</span>', re.I)
 _RE_INTRO_FULL = re.compile(r'<span class="detail-content"[^>]*>([\s\S]*?)</span>', re.I)
 
@@ -482,13 +483,14 @@ class Spider(Spider):
             if mi:
                 pic = self._fix_url(mi.group(1))
 
-        # 简介: .detail-sketch → .detail-content → meta description
+        # 简介: detail-content 全文 → detail-sketch 摘要 → meta description
+        # 注意 sketch 常为 100 字截断摘要, 须让位于 detail-content 全文, 否则简介被截短
         content = ""
-        m = _RE_INTRO_SKETCH.search(html)
+        m = _RE_INTRO_FULL.search(html)
         if m:
             content = self._clean(m.group(1))
         if (not content or "暂无简介" in content):
-            m = _RE_INTRO_FULL.search(html)
+            m = _RE_INTRO_SKETCH.search(html)
             if m:
                 content = self._clean(m.group(1))
         if (not content or "暂无简介" in content):
@@ -499,6 +501,7 @@ class Spider(Spider):
             content = ""
         if content:
             content = re.sub(r"^\s*" + re.escape(name) + r"\s*", "", content).strip()
+            content = re.sub(r"^剧情\s*[:：]\s*", "", content).strip()
         content = INTRO_PREFIX + ("\n" + content if content else "")
 
         # 元信息配对: 块内 span.text-muted 标签 ↔ 紧随 a 值交替扫描
