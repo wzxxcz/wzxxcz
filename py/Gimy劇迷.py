@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-Gimy 劇迷 gimytv.biz | TVBox Python 爬虫 
+Gimy 劇迷 gimytv.biz | TVBox Python 爬虫
 关键机关(全部死磕源码+实测破解):
   1. 苹果CMS V10(gimy 自研模板, 繁体站), 无 PoW 无验证盾 — 明文请求直接通
   2. 筛选路由 12 段连字符拼接: /vodshow/{id}-{地區}-{?}x6-{頁碼}-{?}x2-{年份}.html
