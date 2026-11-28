@@ -445,10 +445,10 @@ class Spider(Spider):
         return max(pg) if pg else 1
 
     def _build_search(self, keyword, page):
+        # 站点顶部表单 action=/vodsearch/-------------.html method=get, 关键词走 wd query;
+        # 伪静态 path 槽段无命中时会回退渲染排行榜假卡, 故搜索统一走 ?wd= query 通道。
         kw = urllib.parse.quote(str(keyword or "").strip(), safe="")
-        # 13 段: seg5 关键词
-        segs = ["", "", "", "", "", kw, "", "", "", "", "", "", ""]
-        return self.site_url + "/vodsearch/" + "-".join(segs) + ".html"
+        return self.site_url + "/vodsearch/-------------.html?wd=" + kw
 
     def homeContent(self, filter=False):
         return {"class": list(CLASSES), "filters": dict(FILTERS)}
@@ -507,17 +507,12 @@ class Spider(Spider):
                 return {"list": [], "page": 1, "pagecount": 1,
                         "limit": _PAGE_LIMIT, "total": 0}
             self._warm_up()
+            # 站点表单真实通道: /vodsearch/-------------.html?wd=<关键词>
+            # path 伪静态槽未命中会渲染排行榜假卡, 不作为结果来源。
             url = self._build_search(key, pg)
             self.log("search: %s" % url)
             html = self._fetch(url)
             videos = self._extract_videos(html, search=True)
-            # path 段返空(未命中渲染排行榜)时, 兜底 query 参数通道
-            if not videos:
-                q = urllib.parse.quote(str(key or "").strip(), safe="")
-                alt = self.site_url + "/vodsearch/-------------.html?wd=" + q
-                self.log("search 兜底 query: %s" % alt)
-                html = self._fetch(alt)
-                videos = self._extract_videos(html, search=True)
             return {
                 "list": videos, "page": int(pg) if pg else 1,
                 "pagecount": 1, "limit": _PAGE_LIMIT, "total": len(videos),
