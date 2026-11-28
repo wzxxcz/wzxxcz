@@ -6,15 +6,27 @@ Gimy 劇迷 gimytv.biz | TVBox Python 爬虫
   2. 筛选路由 12 段连字符拼接: /vodshow/{id}-{地區}-{?}x6-{頁碼}-{?}x2-{年份}.html
      段1=id 段2=地區(多值逗号拼接,如"中國大陸,大陸") 段9=页码 段12=年份
      第一页页码段留空; 面板三行: 類型(子类走同构 vodshow 路由)/地區/年份
-  3. 列表每页 36 部(父类页纯列表); 子类页额外有"今日熱播"24 部侧栏(需剥除)
+  3. 短劇(type 54)为独立一级分类(用户指定): 筛选面板仅年份行 2026/2025/2024,
+     89 页(末页 12 部)= 88×36+12 = 3180 部; 短剧页同样有"今日熱播"侧栏需剥除
   4. 详情页剧集列表站点自带 data-gimy-episode-order="reverse"(倒序展示)!
      → 必须按 nid 数字升序重排输出(用户硬性要求: 集数正序)
-  5. 播放页 player_aaaa 明文 m3u8 直链(play.modujx17.com), 无需换票 → parse=0
-     m3u8 无 Referer 即 200(实测)
-  6. 全站单线路聚合源: DYun(modum3u8), 线路名取自 source-pill
-  7. 搜索两格式: 第1页 /vodsearch/{词}-------------.html(13连字符),
+  5. 多线路机关(V2.0 重构核心):
+     - 剧集块 <ul id="con_playlist_{源ID}">, 每集链接带 #sid={源ID};
+       同源另有 conmobi_playlist_{N} 移动端块 — 只取 con_playlist 首个非空块
+     - 线路定义藏三处: 桌面 li[data-source-id]>a.gico{frm} 名 / 注释掉的
+       playTab(<a class="gico {frm}" href="#con_playlist_{N}">名</a>) /
+       playlist-mobile 块(gico+span 名) — 短剧模板 pill 在 HTML 注释里!
+     - 单集名: 取"第N集/全集"等集次词(episode-card-link 卡片内含冗长标题, 弃)
+     - frm→线路名对照表兜底(modum3u8=DYun 等 16 组, 站点实测)
+     - 陆剧页 16 线路(DYun/GYun/NYun/BYun/XLYun/WYun/SYun/Uyun/JYun/BYun/
+       SZyun/ZYun/FYun/HYun/IKYun/JSyun), 与站点"播放來源"顺序一致
+  6. 播放页换线路靠 Cookie: changeSid() 设 document.cookie="sid={源ID}" 后刷新,
+     服务端按 sid cookie 渲染对应线路的 player_aaaa → 请求播放页必须带
+     Cookie: sid={源ID}(实测: sid=13→gsm3u8, sid=1→bfzym3u8, sid=8→ukm3u8)
+  7. player_aaaa 明文 m3u8 直链, 无 Referer 即 200(实测) → parse=0
+  8. 搜索两格式: 第1页 /vodsearch/{词}-------------.html(13连字符),
      第N页 /vodsearch/{词}----------{N}---.html(10连字符+页+3连字符)
-  8. 简介添加指定前缀; 副标题取详情页"狀態"字段(与站点显示一致)
+  9. 简介添加指定前缀; 副标题取详情页"狀態"字段(与站点显示一致)
 """
 import re
 import sys
@@ -70,19 +82,20 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 
 INTRO_PREFIX = "🍊小橙子为您介绍剧情👉请不要相信视频中的广告，以免上当受骗！"
 
-# ===================== 分类(与站点导航完全一致) =====================
+# ===================== 分类(与站点导航一致 + 短剧独立一级分类) =====================
 CLASSES = [
     {"type_id": "2", "type_name": "電視劇"},
     {"type_id": "4", "type_name": "動漫"},
     {"type_id": "3", "type_name": "綜藝"},
     {"type_id": "1", "type_name": "電影"},
+    {"type_id": "54", "type_name": "短劇"},
 ]
 
 # 類型行(子分类) — 与站点筛选面板逐项一致(繁体名)
+# 短劇(54)按用户要求提升为一级分类, 不再挂在電視劇子类型下
 _SUBS = {
     "2": [("13", "陸劇"), ("15", "韓劇"), ("16", "美劇"), ("20", "日劇"),
-          ("14", "台劇"), ("21", "海外劇"), ("22", "港劇"), ("23", "紀錄片"),
-          ("54", "短劇")],
+          ("14", "台劇"), ("21", "海外劇"), ("22", "港劇"), ("23", "紀錄片")],
     "1": [("6", "動作片"), ("7", "喜劇片"), ("8", "愛情片"), ("9", "科幻片"),
           ("10", "恐怖片"), ("11", "劇情片"), ("12", "戰爭片"), ("24", "動畫電影")],
 }
@@ -109,6 +122,10 @@ _AREAS_MAP = {
 _YEARS = [{"n": "全部", "v": ""}] + \
          [{"n": str(y), "v": str(y)} for y in range(2026, 2015, -1)]
 
+# 短劇分类页筛选面板站点原样: 仅年份行 2026/2025/2024(无類型/地區行)
+_YEARS_54 = [{"n": "全部", "v": ""}] + \
+            [{"n": str(y), "v": str(y)} for y in (2026, 2025, 2024)]
+
 FILTERS = {}
 for _c in CLASSES:
     _tid = _c["type_id"]
@@ -117,10 +134,12 @@ for _c in CLASSES:
         _rows.append({"key": "cat", "name": "類型",
                       "value": [{"n": "全部", "v": ""}] +
                                [{"n": n, "v": i} for i, n in _SUBS[_tid]]})
-    _rows.append({"key": "area", "name": "地區",
-                  "value": [{"n": "全部", "v": ""}] +
-                           [{"n": n, "v": v} for n, v in _AREAS_MAP.get(_tid, [])]})
-    _rows.append({"key": "year", "name": "年份", "value": _YEARS})
+    if _tid in _AREAS_MAP:
+        _rows.append({"key": "area", "name": "地區",
+                      "value": [{"n": "全部", "v": ""}] +
+                               [{"n": n, "v": v} for n, v in _AREAS_MAP[_tid]]})
+    _rows.append({"key": "year", "name": "年份",
+                  "value": _YEARS_54 if _tid == "54" else _YEARS})
     FILTERS[_tid] = _rows
 
 
@@ -146,20 +165,37 @@ _RE_META_LABEL = re.compile(
     r'([\s\S]*?)</(?:strong|span|a)>', re.S | re.I)
 _RE_DESC = re.compile(r'name="description" content="([^"]+)"', re.I)
 
-# 播放来源 pill: gico {from} gimy-detail-source-pill {active} > 名
-_RE_SOURCE = re.compile(
-    r'gico\s+([\w]+)\s+gimy-detail-source-pill[^>]*>\s*([^<]+?)\s*<', re.I)
+# 播放来源定义(三种藏法, 按优先级):
+#   ① 桌面源选择器: <li data-source-id="7"><a class="gico modum3u8" ...>DYun</a>
+#   ② 注释掉的 playTab(短剧模板): <a class="gico modum3u8" href="#con_playlist_1">DYun
+#   ③ 移动端块: <div class="playlist-mobile..."><i class="gico modum3u8"...><span>DYun</span>...con_playlist_1
+_RE_SRC_TAB = re.compile(
+    r'data-source-id="(\d+)"[^>]*>\s*<a class="gico ([\w]+)"[^>]*>\s*([^<]+?)\s*</a>', re.I)
+_RE_SRC_COMMENT = re.compile(
+    r'<a class="gico ([\w]+)"\s+href="#con_playlist_(\d+)"[^>]*>\s*([^<]+?)\s*</a>', re.I)
+_RE_SRC_MOBILE = re.compile(
+    r'playlist-mobile[^>]*>\s*<i class="gico ([\w]+)"[\s\S]{0,300}?'
+    r'<span[^>]*>([^<]+)</span>[\s\S]{0,300}?id="con_playlist_(\d+)"', re.I)
 
-# 剧集块: id="con_playlist_N" ... data-gimy-episode-order="reverse"
-_RE_PLAYLIST = re.compile(
-    r'id="con_playlist_(\d+)"[^>]*data-gimy-episode-order="(\w+)"', re.I)
+# 剧集块(桌面): <ul id="con_playlist_{源ID}"> ... </ul>
+# 移动端块 id 为 conmobi_playlist_N, 不匹配 — 只取每源首个块
+_RE_PLAYLIST_UL = re.compile(
+    r'<ul[^>]*id="con_playlist_(\d+)"[^>]*>([\s\S]*?)</ul>', re.I)
 
-# 剧集卡: <a class="episode-card-link" title=".. 第N集" ... href="/video/{id}-{nid}.html">
-# (title/href 属性顺序不固定, 整块匹配后块内提取)
-_RE_EPISODE_BLOCK = re.compile(
-    r'<a[^>]*episode-card-link[^>]*>[\s\S]{0,400}?</a>', re.S | re.I)
-_RE_EP_HREF = re.compile(r'href="(/video/\d+-(\d+)\.html)"', re.I)
-_RE_EP_TITLE = re.compile(r'title="([^"]+)"')
+# 块内剧集(通用, 不挑 class): href 含 #sid 或裸链接, 标题取"第N集/全集"集次词
+_RE_EP_ANY = re.compile(
+    r'<a[^>]*href="(/video/\d+-(\d+)\.html[^"]*)"[^>]*>([\s\S]*?)</a>', re.I)
+_RE_EP_WORD = re.compile(r'(第\s*\d+\s*集|全集|第\s*\d+\s*話|第\s*\d+\s*期|預告|花絮)')
+
+# frm → 线路名对照表(站点 16 源实测; ③无标签时兜底)
+_FRM_ALIAS = {
+    "modum3u8": "DYun", "gsm3u8": "GYun", "lzm3u8": "NYun",
+    "bfzym3u8": "BYun", "xlm3u8": "XLYun", "wjm3u8": "WYun",
+    "sdm3u8": "SYun", "ukm3u8": "Uyun", "jinyingm3u8": "JYun",
+    "subm3u8": "BYun", "snm3u8": "SZyun", "zuidam3u8": "ZYun",
+    "ffm3u8": "FYun", "hnm3u8": "HYun", "ikm3u8": "IKYun",
+    "jsm3u8": "JSyun",
+}
 
 # 播放页 player_aaaa
 _RE_PLAYER_AA = re.compile(r'var\s+player_aaaa\s*=\s*(\{[\s\S]*?\})\s*</', re.I)
@@ -289,23 +325,24 @@ class Spider(Spider):
         return videos
 
     def _last_page(self, html):
-        """从分页组件"尾頁"链接解析总页数; 链接形如 /vodshow/2--------128---/sid/1.html"""
+        """从分页组件解析总页数。
+        中间页: 尾頁是链接 <a ...>尾頁</a>, 链接 /vodshow/...---N---/sid/1.html
+        末页:   尾頁变 disabled <span>尾頁</span>, 总页数在 "89/89" 徽标里"""
         m = _RE_LAST_PAGE.search(html)
-        if not m:
-            return 1
-        seg = html[max(0, m.start() - 500):m.start()]
-        last = 1
-        for u in re.findall(r'/vod(?:show|search)/([^"]+)/sid/\d+\.html', seg):
-            p = u.split("-")
-            # vodshow 页码段9(index 8); vodsearch 页码段11(index 10)
-            if len(p) >= 12:
-                if "vodsearch" in seg[max(0, m.start() - 500):m.start()][:40] or \
-                        u.startswith("%") or "----" in u and p[8] == "":
-                    pass
+        if m:
+            seg = html[max(0, m.start() - 500):m.start()]
+            last = 1
+            for u in re.findall(r'/vod(?:show|search)/([^"]+)/sid/\d+\.html', seg):
+                p = u.split("-")
+                # vodshow 页码段9(index 8); vodsearch 页码段11(index 10)
                 for idx in (8, 10):
                     if idx < len(p) and p[idx].isdigit():
                         last = max(last, int(p[idx]))
-        return last
+            return last
+        m2 = re.search(r'class="num"\s*>\s*\d+/(\d+)\s*<', html)
+        if m2:
+            return int(m2.group(1))
+        return 1
 
     # ================= TVBox 接口 =================
     def homeContent(self, filter=False):
@@ -414,59 +451,70 @@ class Spider(Spider):
                 content = desc
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
-        # ===== 剧集(多线路: source pill × con_playlist_N) =====
-        sources = _RE_SOURCE.findall(html)
-        # 块切分: 每个 con_playlist_N 区域单独提取
-        playlists = list(_RE_PLAYLIST.finditer(html))
-        play_from, play_url = [], []
+        # ===== 剧集(多线路: con_playlist_{源ID} × 三种线路定义来源) =====
+        # 1) 线路定义: 源ID -> (frm, 线路名), 按站点展示顺序
+        src_defs = {}   # pid -> (frm, alias)
+        src_order = []
+        for pid, frm, alias in _RE_SRC_TAB.findall(html):
+            pid = str(pid)
+            if pid not in src_defs:
+                src_defs[pid] = (frm, self._clean(alias))
+                src_order.append(pid)
+        if not src_order:
+            for frm, pid, alias in _RE_SRC_COMMENT.findall(html):
+                pid = str(pid)
+                if pid not in src_defs:
+                    src_defs[pid] = (frm, self._clean(alias))
+                    src_order.append(pid)
+        if not src_order:
+            for frm, alias, pid in _RE_SRC_MOBILE.findall(html):
+                pid = str(pid)
+                if pid not in src_defs:
+                    src_defs[pid] = (frm, self._clean(alias))
+                    src_order.append(pid)
 
-        if playlists:
-            for idx, pm in enumerate(playlists):
-                n = pm.group(1)
-                blk_start = pm.end()
-                blk_end = playlists[idx + 1].start() if idx + 1 < len(playlists) \
-                    else len(html)
-                blk = html[blk_start:blk_end]
-                eps = []
-                for eb in _RE_EPISODE_BLOCK.findall(blk):
-                    me = _RE_EP_HREF.search(eb)
-                    if not me:
-                        continue
-                    nid = int(me.group(2))
-                    mt = _RE_EP_TITLE.search(eb)
-                    eps.append((nid,
-                                self._clean(mt.group(1)) if mt else "",
-                                me.group(1)))
-                if not eps:
-                    continue
-                # ⚠️ 站点剧集 DOM 倒序(reverse) — 强制按 nid 升序(用户硬性要求)
-                eps.sort(key=lambda x: x[0])
-                # 线路名: 与 pill 顺序对应
-                alias = "DYun"
-                frm = "modum3u8"
-                if idx < len(sources):
-                    frm = sources[idx][0]
-                    alias = self._clean(sources[idx][1]) or frm
-                play_from.append(alias)
-                play_url.append("#".join(
-                    "%s$%s" % (title or ("第%02d集" % nid), self._fix_url(href))
-                    for nid, title, href in eps))
-        else:
-            # 兜底: 全页剧集链接(升序)
+        # 2) 剧集块: 每源取首个 <ul id="con_playlist_{pid}">(含桌面卡片/普通列
+        #    表/移动端复用块三种形态; 移动端独立块 id 是 conmobi_*, 天然排除)
+        blocks = {}
+        for m in _RE_PLAYLIST_UL.finditer(html):
+            pid = m.group(1)
+            if pid not in blocks:
+                blocks[pid] = m.group(2)
+
+        play_from, play_url = [], []
+        # 顺序: 有线路定义的按定义顺序; 无定义的块按 pid 升序兜底
+        ordered_pids = [p for p in src_order if p in blocks]
+        for pid in sorted(k for k in blocks if k not in src_order):
+            ordered_pids.append(pid)
+
+        for pid in ordered_pids:
             eps = []
-            for eb in _RE_EPISODE_BLOCK.findall(html):
-                me = _RE_EP_HREF.search(eb)
-                if not me:
+            seen_nid = set()
+            for href, nid, inner in _RE_EP_ANY.findall(blocks[pid]):
+                nid = int(nid)
+                if nid in seen_nid:
                     continue
-                nid = int(me.group(2))
-                mt = _RE_EP_TITLE.search(eb)
-                eps.append((nid, self._clean(mt.group(1)) if mt else "", me.group(1)))
+                seen_nid.add(nid)
+                # 集名: 块内文本中取"第N集/全集"等集次词(卡片长标题只留集次)
+                mw = _RE_EP_WORD.search(inner)
+                label = re.sub(r"\s+", "", mw.group(1)) if mw else "第%02d集" % nid
+                # ⚠️ TVBox 以 "#" 作为集分隔符 — 剧集 URL 里绝不能带 #sid 片段!
+                #    改用 ?sid={源ID} 查询参数编码(playerContent 解析后还原 cookie)
+                href = re.sub(r"#sid=\d+", "", href)
+                if "sid=" not in href:
+                    href = href + "?sid=" + pid
+                eps.append((nid, label, href))
+            if not eps:
+                continue
+            # ⚠️ 站点剧集 DOM 倒序(reverse) — 强制按 nid 升序(用户硬性要求)
             eps.sort(key=lambda x: x[0])
-            if eps:
-                play_from.append("DYun")
-                play_url.append("#".join(
-                    "%s$%s" % (title or ("第%02d集" % nid), self._fix_url(href))
-                    for nid, title, href in eps))
+            frm, alias = src_defs.get(pid, ("", ""))
+            if not alias:
+                alias = _FRM_ALIAS.get(frm) or ("源%s" % pid)
+            play_from.append(alias)
+            play_url.append("#".join(
+                "%s$%s" % (label, self._fix_url(href))
+                for nid, label, href in eps))
 
         if not play_from:
             return {"list": []}
@@ -489,16 +537,27 @@ class Spider(Spider):
 
     # -------- 播放 --------
     def playerContent(self, flag, id, vipFlags):
-        play_page = id if id.startswith("http") else self._fix_url(id)
-        self.log("player: %s" % play_page)
+        raw = str(id)
+        # id 形如 /video/{vid}-{nid}.html?sid={源ID} — 换线路靠 cookie(sid)
+        # (?sid 是我们自编码的, 请求时剥离; 站点真实机制见下)
+        path = re.sub(r"[?&]sid=\d+", "", raw)
+        msid = re.search(r"sid=(\d+)", raw)
+        sid = msid.group(1) if msid else ""
+        play_page = path if path.startswith("http") else self._fix_url(path)
+        self.log("player: %s (sid=%s)" % (play_page, sid or "default"))
 
         now = int(time.time())
-        if play_page in self._play_cache:
-            ts, res = self._play_cache[play_page]
+        if raw in self._play_cache:
+            ts, res = self._play_cache[raw]
             if now - ts < 600:
                 return res
 
-        html = self._fetch(play_page)
+        headers = {"User-Agent": UA}
+        if sid:
+            # ⚠️ 站点 changeSid 机制: 服务端按 cookie sid 渲染对应线路的
+            #    player_aaaa(实测 sid=13→gsm3u8, sid=1→bfzym3u8, sid=8→ukm3u8)
+            headers["Cookie"] = "sid=" + sid
+        html = self._fetch(play_page, headers=headers)
         real_url = ""
         if html:
             m = _RE_PLAYER_AA.search(html)
@@ -517,13 +576,13 @@ class Spider(Spider):
             # 站点前端 referrerPolicy 无 Referer 即 200 — 不带 Referer
             res = {"parse": 0, "playUrl": "", "url": real_url,
                    "header": {"User-Agent": UA}}
-            self._play_cache[play_page] = (now, res)
+            self._play_cache[raw] = (now, res)
             return res
 
         # 兜底: 交 TVBox 嗅探
         res = {"parse": 1, "playUrl": "", "url": play_page,
                "header": {"User-Agent": UA, "Referer": self.site_url + "/"}}
-        self._play_cache[play_page] = (now, res)
+        self._play_cache[raw] = (now, res)
         return res
 
     def localProxy(self, param):
