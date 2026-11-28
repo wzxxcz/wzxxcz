@@ -452,7 +452,10 @@ class Spider(Spider):
         content = (INTRO_PREFIX + "\n" + content) if content else INTRO_PREFIX
 
         # ===== 剧集(多线路: con_playlist_{源ID} × 三种线路定义来源) =====
-        # 1) 线路定义: 源ID -> (frm, 线路名), 按站点展示顺序
+        # 1) 线路定义: 源ID -> (frm, 线路名), 按站点显示顺序
+        #    ⚠️ 源ID 是每片独立的(同 pid 在不同片对应不同线路), 别建全局 pid 表!
+        #    ⚠️ 顺序优先级: 桌面 DSI = 移动端 MOBI(显示序) > 注释 playTab(旧序,
+        #       playTab 是按源ID升序的遗留顺序, 与站点 pill 显示序不一致!)
         src_defs = {}   # pid -> (frm, alias)
         src_order = []
         for pid, frm, alias in _RE_SRC_TAB.findall(html):
@@ -461,13 +464,13 @@ class Spider(Spider):
                 src_defs[pid] = (frm, self._clean(alias))
                 src_order.append(pid)
         if not src_order:
-            for frm, pid, alias in _RE_SRC_COMMENT.findall(html):
+            for frm, alias, pid in _RE_SRC_MOBILE.findall(html):
                 pid = str(pid)
                 if pid not in src_defs:
                     src_defs[pid] = (frm, self._clean(alias))
                     src_order.append(pid)
         if not src_order:
-            for frm, alias, pid in _RE_SRC_MOBILE.findall(html):
+            for frm, pid, alias in _RE_SRC_COMMENT.findall(html):
                 pid = str(pid)
                 if pid not in src_defs:
                     src_defs[pid] = (frm, self._clean(alias))
@@ -495,9 +498,16 @@ class Spider(Spider):
                 if nid in seen_nid:
                     continue
                 seen_nid.add(nid)
-                # 集名: 块内文本中取"第N集/全集"等集次词(卡片长标题只留集次)
-                mw = _RE_EP_WORD.search(inner)
-                label = re.sub(r"\s+", "", mw.group(1)) if mw else "第%02d集" % nid
+                # 集名 = 站点原样文本(卡片型取"·"前段, 剥 ▶ 图标符)
+                # 综艺形如 "20261128第8期上"(日期期数保留), 卡片形如
+                # "第10集 · 片名" 只取前段; 无文本时兜底"第N集"
+                txt = self._clean(inner).replace("▶", "").strip()
+                if "·" in txt:
+                    txt = txt.split("·", 1)[0].strip()
+                if not txt:
+                    mw = _RE_EP_WORD.search(inner)
+                    txt = re.sub(r"\s+", "", mw.group(1)) if mw else ""
+                label = txt or ("第%02d集" % nid)
                 # ⚠️ TVBox 以 "#" 作为集分隔符 — 剧集 URL 里绝不能带 #sid 片段!
                 #    改用 ?sid={源ID} 查询参数编码(playerContent 解析后还原 cookie)
                 href = re.sub(r"#sid=\d+", "", href)
